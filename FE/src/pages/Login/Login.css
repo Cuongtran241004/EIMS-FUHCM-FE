@@ -1,0 +1,31 @@
+
+.login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-image: url("/assets/FPTU.png");
+  background-size: cover; 
+  background-position: center;
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+.login-form {
+  background-color: rgba(255, 255, 255, 0.522);
+  padding: 20px 40px 60px 40px;
+  border-radius: 10px;
+  box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.1);
+  height: 50%;
+}
+.login-form:hover {
+  background-color: rgba(255, 255, 255, 0.708);
+
+}
+
+.login-h1 {
+  text-align: center;
+  padding-top: 20%;
+}
+
