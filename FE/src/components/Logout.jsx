@@ -1,22 +1,20 @@
-import React from 'react';
-
-
+import React from "react";
+import { Button } from "antd";
 
 function Logout() {
+  const handleLogout = () => {
+    sessionStorage.removeItem("isLoggedIn");
+    sessionStorage.removeItem("expirationTime");
+    sessionStorage.clear();
 
-    const handleLogout = () => {
-        sessionStorage.removeItem('isLoggedIn');
-        sessionStorage.removeItem('expirationTime');
-        sessionStorage.clear();
-        
-        window.location.reload();
-    }
+    window.location.reload();
+  };
 
-    return (
-        <button onClick={handleLogout}>
-            Logout
-        </button>
-    );
+  return (
+    <Button danger onClick={handleLogout}>
+      Logout
+    </Button>
+  );
 }
 
 export default Logout;
