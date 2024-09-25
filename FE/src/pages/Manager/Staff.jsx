@@ -13,8 +13,13 @@ import {
   message,
   Space,
   Popconfirm,
+  Upload,
 } from "antd";
-import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
+import {
+  EditOutlined,
+  DeleteOutlined,
+  UploadOutlined,
+} from "@ant-design/icons";
 import {
   ADD_STAFF_FAILED,
   ADD_STAFF_FAILED_SERVER,
@@ -26,29 +31,34 @@ import {
   EDIT_STAFF_FAILED_SERVER,
   EDIT_STAFF_SUCCESS,
 } from "../../configs/messages";
+import { processExcelFile } from "../../utils/ImportExcel.js";
+import { ExcelTemplate } from "../../utils/ExcelTemplate.js";
 // Ant Design Layout Components
 const { Content, Sider } = Layout;
 
 const Staff = () => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [fileLoading, setFileLoading] = useState(false); // For file upload loading state
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
-  const [editingStaff, setEditingStaff] = useState(null); // Hold the staff data to be edited
+  const [editingStaff, setEditingStaff] = useState(null);
   const [form] = Form.useForm();
 
   const fetchData = async () => {
     setLoading(true);
     try {
       const response = await fetch(API_BASE_URL + "/staffs");
-      const data = await response.json();
-      setData(data);
+      const result = await response.json();
+      setData(result);
     } catch (error) {
-      console.log("error", error);
+      console.error("Error fetching data:", error);
+      message.error("Failed to fetch staff data.");
     } finally {
       setLoading(false);
     }
   };
+
   useEffect(() => {
     fetchData();
   }, []);
@@ -60,12 +70,12 @@ const Staff = () => {
   const handleCancel = () => {
     setIsModalVisible(false);
     setIsEditing(false);
-    form.resetFields(); // Reset the form fields when the modal is closed
+    form.resetFields();
   };
 
   const handleOk = async () => {
     try {
-      const values = await form.validateFields(); // Validate form input
+      const values = await form.validateFields();
       if (isEditing) {
         // Update existing staff
         const response = await fetch(
@@ -82,9 +92,7 @@ const Staff = () => {
         if (response.ok) {
           message.success(EDIT_STAFF_SUCCESS);
           fetchData();
-          setIsModalVisible(false);
-          setIsEditing(false);
-          form.resetFields();
+          handleCancel();
         } else {
           throw new Error(EDIT_STAFF_FAILED);
         }
@@ -101,8 +109,7 @@ const Staff = () => {
         if (response.ok) {
           message.success(ADD_STAFF_SUCCESS);
           fetchData();
-          form.resetFields();
-          setIsModalVisible(false);
+          handleCancel();
         } else {
           throw new Error(ADD_STAFF_FAILED);
         }
@@ -121,7 +128,7 @@ const Staff = () => {
       name: staff.name,
       email: staff.email,
     });
-    setIsModalVisible(true); // Show modal with pre-filled data
+    setIsModalVisible(true);
   };
 
   const handleDelete = async (id) => {
@@ -131,7 +138,7 @@ const Staff = () => {
       });
       if (response.ok) {
         message.success(DELETE_STAFF_SUCCESS);
-        fetchData(); // Fetch updated data after deletion
+        fetchData();
       } else {
         throw new Error(DELETE_STAFF_FAILED);
       }
@@ -139,6 +146,40 @@ const Staff = () => {
       message.error(DELETE_STAFF_FAILED_SERVER);
     }
   };
+
+  const handleFileUpload = async ({ file }) => {
+    setFileLoading(true); // Set loading for file upload
+    try {
+      const staffData = await processExcelFile(file);
+      console.log("Staff data:", staffData);
+      const responses = await Promise.all(
+        staffData.map(async (staff) => {
+          const response = await fetch(API_BASE_URL + "/staffs", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(staff),
+          });
+          return response.ok;
+        })
+      );
+
+      if (responses.every((response) => response)) {
+        message.success("All staffs imported successfully!");
+      } else {
+        message.error("Some staffs could not be imported.");
+      }
+
+      fetchData();
+    } catch (error) {
+      console.error("Error importing staffs:", error);
+      message.error("Failed to import staffs.");
+    } finally {
+      setFileLoading(false); // Reset loading state after process
+    }
+  };
+
   const columns = [
     {
       title: "ID",
@@ -176,6 +217,7 @@ const Staff = () => {
       ),
     },
   ];
+
   return (
     <Layout style={{ height: "100vh" }}>
       <Header />
@@ -192,24 +234,43 @@ const Staff = () => {
               minHeight: 280,
             }}
           >
-            <Button
-              type="primary"
-              onClick={showModal}
-              style={{ marginBottom: "16px" }}
-            >
-              Add New Staff
-            </Button>
+            <Space>
+              <Button type="primary" onClick={showModal}>
+                Add New Staff
+              </Button>
+
+              <Upload
+                beforeUpload={() => false}
+                showUploadList={false}
+                onChange={handleFileUpload}
+                maxCount={1}
+                method="POST"
+              >
+                <Button icon={<UploadOutlined />} loading={fileLoading}>
+                  Import Staffs
+                </Button>
+              </Upload>
+
+              <Button onClick={ExcelTemplate} type="default">
+                Download Import Template
+              </Button>
+            </Space>
 
             <Spin spinning={loading}>
-              <Table dataSource={data} columns={columns} rowKey="id" />
+              <Table
+                dataSource={data}
+                columns={columns}
+                rowKey="id"
+                pagination={{ pageSize: 9 }}
+              />
             </Spin>
           </Content>
         </Layout>
       </Layout>
 
-      {/* Add New Staff Modal */}
+      {/* Add/Edit Staff Modal */}
       <Modal
-        title="Add New Staff"
+        title={isEditing ? "Edit Staff" : "Add New Staff"}
         open={isModalVisible}
         onOk={handleOk}
         onCancel={handleCancel}
@@ -241,4 +302,5 @@ const Staff = () => {
     </Layout>
   );
 };
+
 export default Staff;
