@@ -31,13 +31,6 @@ const items = [
     icon: <UserOutlined />,
     danger: true,
   },
-  {
-    label: "4rd menu item",
-    key: "4",
-    icon: <UserOutlined />,
-    danger: true,
-    disabled: true,
-  },
 ];
 const menuProps = {
   items,

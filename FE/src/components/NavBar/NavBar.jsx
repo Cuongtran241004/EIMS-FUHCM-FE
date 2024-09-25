@@ -13,67 +13,32 @@ import { useState } from "react";
 const items = [
   {
     key: "sub1",
-    label: "Navigation One",
+    label: "Exam Management",
     icon: <MailOutlined />,
+
     children: [
       {
-        key: "g1",
-        label: "Item 1",
-        type: "group",
-        children: [
-          {
-            key: "1",
-            label: "Option 1",
-          },
-          {
-            key: "2",
-            label: "Option 2",
-          },
-        ],
+        key: "1",
+        label: "Exam slots",
       },
       {
-        key: "g2",
-        label: "Item 2",
-        type: "group",
-        children: [
-          {
-            key: "3",
-            label: "Option 3",
-          },
-          {
-            key: "4",
-            label: "Option 4",
-          },
-        ],
+        key: "2",
+        label: "Attendance check",
       },
     ],
   },
   {
     key: "sub2",
-    label: "Navigation Two",
+    label: "Invigilation Manangement",
     icon: <AppstoreOutlined />,
     children: [
       {
         key: "5",
-        label: "Option 5",
+        label: "Invigilator Attendance",
       },
       {
         key: "6",
-        label: "Option 6",
-      },
-      {
-        key: "sub3",
-        label: "Submenu",
-        children: [
-          {
-            key: "7",
-            label: "Option 7",
-          },
-          {
-            key: "8",
-            label: "Option 8",
-          },
-        ],
+        label: "Invigilation fees",
       },
     ],
   },
@@ -82,39 +47,53 @@ const items = [
   },
   {
     key: "sub4",
-    label: "Navigation Three",
+    label: "Settings",
     icon: <SettingOutlined />,
     children: [
       {
-        key: "9",
-        label: "Option 9",
+        key: "g1",
+        label: "Configs",
+        type: "group",
+        children: [
+          {
+            key: "9",
+            label: "Semester",
+          },
+          {
+            key: "10",
+            label: "Subjects",
+          },
+        ],
       },
       {
-        key: "10",
-        label: "Option 10",
-      },
-      {
-        key: "11",
-        label: "Option 11",
-      },
-      {
-        key: "12",
-        label: "Option 12",
+        key: "g2",
+        label: "Users",
+        type: "group",
+        children: [
+          {
+            key: "11",
+            label: "Staffs",
+          },
+          {
+            key: "12",
+            label: "Invigilators",
+          },
+        ],
       },
     ],
   },
   {
     key: "grp",
-    label: "Group",
+    label: "",
     type: "group",
     children: [
       {
         key: "13",
-        label: "Option 13",
+        label: "Requests",
       },
       {
         key: "14",
-        label: "Option 14",
+        label: "Dashboard",
       },
     ],
   },
