@@ -12,6 +12,7 @@ import {
   Input,
   message,
   Space,
+  Popconfirm,
 } from "antd";
 import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
 import {
@@ -163,10 +164,14 @@ const Staff = () => {
             onClick={() => handleEdit(record)}
             style={{ color: "blue", cursor: "pointer" }}
           />
-          <DeleteOutlined
-            onClick={() => handleDelete(record.id)}
-            style={{ color: "red", cursor: "pointer" }}
-          />
+          <Popconfirm
+            title="Are you sure to delete this staff?"
+            onConfirm={() => handleDelete(record.id)}
+            okText="Yes"
+            cancelText="No"
+          >
+            <DeleteOutlined style={{ color: "red", cursor: "pointer" }} />
+          </Popconfirm>
         </Space>
       ),
     },
