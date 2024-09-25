@@ -29,7 +29,7 @@ function App() {
             <Routes>
               <Route path="/" element={<Home />} />
             </Routes>
-            <Logout setLoggedIn={setLoggedIn} />
+            <Logout />
           </div>
         )}
       </div>
