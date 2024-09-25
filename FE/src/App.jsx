@@ -4,6 +4,8 @@ import { Route, Routes } from "react-router-dom";
 import Home from "./pages/Home/Home";
 import "./App.css";
 import Staff from "./pages/Manager/Staff";
+import Dashboard from "./pages/Dashboard/Dashboard";
+import Request from "./pages/Request/Request";
 
 function App() {
   const [loggedIn, setLoggedIn] = useState(false);
@@ -29,6 +31,8 @@ function App() {
             <Routes>
               <Route path="/" element={<Home />} />
               <Route path="/staffs" element={<Staff />} />
+              <Route path="/requests" element={<Request />} />
+              <Route path="/dashboard" element={<Dashboard />} />
             </Routes>
           </div>
         )}

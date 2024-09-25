@@ -197,7 +197,7 @@ const Staff = () => {
               onClick={showModal}
               style={{ marginBottom: "16px" }}
             >
-              Add New Satff
+              Add New Staff
             </Button>
 
             <Spin spinning={loading}>
