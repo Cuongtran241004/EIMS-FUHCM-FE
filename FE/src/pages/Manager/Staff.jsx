@@ -3,6 +3,11 @@ import Header from "../../components/Header/Header";
 import NavBar from "../../components/NavBar/NavBar";
 import { API_BASE_URL } from "../../configs/urlApi";
 import { Spin, Table, Layout, Button, Form, Modal, Input, message } from "antd";
+import {
+  ADD_STAFF_FAILED,
+  ADD_STAFF_FAILED_SERVER,
+  ADD_STAFF_SUCCESS,
+} from "../../configs/messages";
 // Ant Design Layout Components
 const { Content, Sider } = Layout;
 const columns = [
@@ -51,12 +56,15 @@ const Staff = () => {
 
   const handleCancel = () => {
     setIsModalVisible(false);
-    form.resetFields(); // Reset the form fields when the modal is closed
+    // Reset the form fields when the modal is closed
+    form.resetFields();
   };
 
   const handleOk = async () => {
     try {
-      const values = await form.validateFields(); // Validate form input
+      // Validate form input
+      const values = await form.validateFields();
+
       // Send POST request to add new staff
       const response = await fetch(API_BASE_URL + "/staffs", {
         method: "POST",
@@ -67,16 +75,15 @@ const Staff = () => {
       });
 
       if (response.ok) {
-        message.success("Staff added successfully!");
+        message.success(ADD_STAFF_SUCCESS);
         fetchData(); // Fetch updated data
         form.resetFields(); // Reset form after success
         setIsModalVisible(false); // Close modal after success
       } else {
-        throw new Error("Failed to add staff");
+        throw new Error(ADD_STAFF_FAILED);
       }
     } catch (error) {
-      console.error("Error adding staff:", error);
-      message.error("Failed to add staff. Please try again.");
+      message.error(ADD_STAFF_FAILED_SERVER);
     }
   };
 
