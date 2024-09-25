@@ -4,41 +4,37 @@ import {
   MailOutlined,
   AppstoreOutlined,
   SettingOutlined,
-  MenuUnfoldOutlined,
-  MenuFoldOutlined,
 } from "@ant-design/icons";
-import { Button } from "antd";
-import { useState } from "react";
+import { Link } from "react-router-dom";
 
 const items = [
   {
     key: "sub1",
     label: "Exam Management",
     icon: <MailOutlined />,
-
     children: [
       {
         key: "1",
-        label: "Exam slots",
+        label: <Link to="/exam-slots">Exam slots</Link>, // Wrapped with Link
       },
       {
         key: "2",
-        label: "Attendance check",
+        label: <Link to="/attendance-check">Attendance check</Link>, // Wrapped with Link
       },
     ],
   },
   {
     key: "sub2",
-    label: "Invigilation Manangement",
+    label: "Invigilation Management",
     icon: <AppstoreOutlined />,
     children: [
       {
         key: "5",
-        label: "Invigilator Attendance",
+        label: <Link to="/invigilator-attendance">Invigilator Attendance</Link>, // Wrapped with Link
       },
       {
         key: "6",
-        label: "Invigilation fees",
+        label: <Link to="/invigilation-fees">Invigilation fees</Link>, // Wrapped with Link
       },
     ],
   },
@@ -57,11 +53,11 @@ const items = [
         children: [
           {
             key: "9",
-            label: "Semester",
+            label: <Link to="/semester">Semester</Link>, // Wrapped with Link
           },
           {
             key: "10",
-            label: "Subjects",
+            label: <Link to="/subjects">Subjects</Link>, // Wrapped with Link
           },
         ],
       },
@@ -72,11 +68,11 @@ const items = [
         children: [
           {
             key: "11",
-            label: "Staffs",
+            label: <Link to="/staffs">Staffs</Link>, // Wrapped with Link
           },
           {
             key: "12",
-            label: "Invigilators",
+            label: <Link to="/invigilators">Invigilators</Link>, // Wrapped with Link
           },
         ],
       },
@@ -89,60 +85,27 @@ const items = [
     children: [
       {
         key: "13",
-        label: "Requests",
+        label: <Link to="/requests">Requests</Link>, // Wrapped with Link
       },
       {
         key: "14",
-        label: "Dashboard",
+        label: <Link to="/dashboard">Dashboard</Link>, // Wrapped with Link
       },
     ],
   },
 ];
-const NavBar = () => {
-  //   const onClick = (e) => {
-  //     console.log("click ", e);
-  //   };
-  //   return (
-  //     <Menu
-  //       onClick={onClick}
-  //       style={{
-  //         width: 256,
-  //       }}
-  //       defaultSelectedKeys={["1"]}
-  //       defaultOpenKeys={["sub1"]}
-  //       mode="inline"
-  //       items={items}
-  //     />
-  //   );
 
-  const [collapsed, setCollapsed] = useState(false);
-  const toggleCollapsed = () => {
-    setCollapsed(!collapsed);
-  };
+const NavBar = () => {
   return (
-    <div
+    <Menu
       style={{
         width: 256,
       }}
-    >
-      <Button
-        type="primary"
-        onClick={toggleCollapsed}
-        style={{
-          marginBottom: 16,
-        }}
-      >
-        {collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
-      </Button>
-      <Menu
-        defaultSelectedKeys={["1"]}
-        defaultOpenKeys={["sub1"]}
-        mode="inline"
-        theme="dark"
-        inlineCollapsed={collapsed}
-        items={items}
-      />
-    </div>
+      defaultSelectedKeys={["1"]}
+      defaultOpenKeys={["sub1"]}
+      mode="inline"
+      items={items}
+    />
   );
 };
 

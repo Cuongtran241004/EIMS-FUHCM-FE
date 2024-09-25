@@ -24,8 +24,8 @@
 }
 
 .header a img {
-  height: 50px;
-  aspect-ratio: 3.3 /1;
+  height: 55px;
+  aspect-ratio: 3.5 /1;
 }
 /* Style the active/current link*/
 .header a.active {

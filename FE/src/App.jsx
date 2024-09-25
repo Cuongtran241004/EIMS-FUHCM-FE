@@ -3,6 +3,7 @@ import Login from "./pages/Login/Login";
 import { Route, Routes } from "react-router-dom";
 import Home from "./pages/Home/Home";
 import "./App.css";
+import Staff from "./pages/Manager/Staff";
 
 function App() {
   const [loggedIn, setLoggedIn] = useState(false);
@@ -27,6 +28,7 @@ function App() {
           <div>
             <Routes>
               <Route path="/" element={<Home />} />
+              <Route path="/staffs" element={<Staff />} />
             </Routes>
           </div>
         )}
