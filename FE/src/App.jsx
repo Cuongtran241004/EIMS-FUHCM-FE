@@ -3,7 +3,6 @@ import Login from "./pages/Login/Login";
 import { Route, Routes } from "react-router-dom";
 import Home from "./pages/Home/Home";
 import "./App.css";
-import Logout from "./components/Logout";
 
 function App() {
   const [loggedIn, setLoggedIn] = useState(false);
@@ -29,7 +28,6 @@ function App() {
             <Routes>
               <Route path="/" element={<Home />} />
             </Routes>
-            <Logout />
           </div>
         )}
       </div>
