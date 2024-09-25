@@ -2,36 +2,38 @@ import React, { useState, useEffect } from "react";
 import Header from "../../components/Header/Header";
 import NavBar from "../../components/NavBar/NavBar";
 import { API_BASE_URL } from "../../configs/urlApi";
-import { Spin, Table, Layout, Button, Form, Modal, Input, message } from "antd";
+import {
+  Spin,
+  Table,
+  Layout,
+  Button,
+  Form,
+  Modal,
+  Input,
+  message,
+  Space,
+} from "antd";
+import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
 import {
   ADD_STAFF_FAILED,
   ADD_STAFF_FAILED_SERVER,
   ADD_STAFF_SUCCESS,
+  DELETE_STAFF_FAILED,
+  DELETE_STAFF_FAILED_SERVER,
+  DELETE_STAFF_SUCCESS,
+  EDIT_STAFF_FAILED,
+  EDIT_STAFF_FAILED_SERVER,
+  EDIT_STAFF_SUCCESS,
 } from "../../configs/messages";
 // Ant Design Layout Components
 const { Content, Sider } = Layout;
-const columns = [
-  {
-    title: "ID",
-    dataIndex: "id",
-    key: "id",
-  },
-  {
-    title: "Name",
-    dataIndex: "name",
-    key: "name",
-  },
-  {
-    title: "Email",
-    dataIndex: "email",
-    key: "email",
-  },
-];
 
 const Staff = () => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editingStaff, setEditingStaff] = useState(null); // Hold the staff data to be edited
   const [form] = Form.useForm();
 
   const fetchData = async () => {
@@ -56,37 +58,119 @@ const Staff = () => {
 
   const handleCancel = () => {
     setIsModalVisible(false);
-    // Reset the form fields when the modal is closed
-    form.resetFields();
+    setIsEditing(false);
+    form.resetFields(); // Reset the form fields when the modal is closed
   };
 
   const handleOk = async () => {
     try {
-      // Validate form input
-      const values = await form.validateFields();
+      const values = await form.validateFields(); // Validate form input
+      if (isEditing) {
+        // Update existing staff
+        const response = await fetch(
+          `${API_BASE_URL}/staffs/${editingStaff.id}`,
+          {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(values),
+          }
+        );
 
-      // Send POST request to add new staff
-      const response = await fetch(API_BASE_URL + "/staffs", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(values),
-      });
-
-      if (response.ok) {
-        message.success(ADD_STAFF_SUCCESS);
-        fetchData(); // Fetch updated data
-        form.resetFields(); // Reset form after success
-        setIsModalVisible(false); // Close modal after success
+        if (response.ok) {
+          message.success(EDIT_STAFF_SUCCESS);
+          fetchData();
+          setIsModalVisible(false);
+          setIsEditing(false);
+          form.resetFields();
+        } else {
+          throw new Error(EDIT_STAFF_FAILED);
+        }
       } else {
-        throw new Error(ADD_STAFF_FAILED);
+        // Add new staff
+        const response = await fetch(API_BASE_URL + "/staffs", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(values),
+        });
+
+        if (response.ok) {
+          message.success(ADD_STAFF_SUCCESS);
+          fetchData();
+          form.resetFields();
+          setIsModalVisible(false);
+        } else {
+          throw new Error(ADD_STAFF_FAILED);
+        }
       }
     } catch (error) {
-      message.error(ADD_STAFF_FAILED_SERVER);
+      message.error(
+        isEditing ? EDIT_STAFF_FAILED_SERVER : ADD_STAFF_FAILED_SERVER
+      );
     }
   };
 
+  const handleEdit = (staff) => {
+    setIsEditing(true);
+    setEditingStaff(staff);
+    form.setFieldsValue({
+      name: staff.name,
+      email: staff.email,
+    });
+    setIsModalVisible(true); // Show modal with pre-filled data
+  };
+
+  const handleDelete = async (id) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/staffs/${id}`, {
+        method: "DELETE",
+      });
+      if (response.ok) {
+        message.success(DELETE_STAFF_SUCCESS);
+        fetchData(); // Fetch updated data after deletion
+      } else {
+        throw new Error(DELETE_STAFF_FAILED);
+      }
+    } catch (error) {
+      message.error(DELETE_STAFF_FAILED_SERVER);
+    }
+  };
+  const columns = [
+    {
+      title: "ID",
+      dataIndex: "id",
+      key: "id",
+    },
+    {
+      title: "Name",
+      dataIndex: "name",
+      key: "name",
+    },
+    {
+      title: "Email",
+      dataIndex: "email",
+      key: "email",
+    },
+    {
+      title: "Action",
+      key: "action",
+      render: (text, record) => (
+        <Space size="middle">
+          <EditOutlined
+            onClick={() => handleEdit(record)}
+            style={{ color: "blue", cursor: "pointer" }}
+          />
+          <DeleteOutlined
+            onClick={() => handleDelete(record.id)}
+            style={{ color: "red", cursor: "pointer" }}
+          />
+        </Space>
+      ),
+    },
+  ];
   return (
     <Layout style={{ height: "100vh" }}>
       <Header />
@@ -124,7 +208,7 @@ const Staff = () => {
         open={isModalVisible}
         onOk={handleOk}
         onCancel={handleCancel}
-        okText="Add Staff"
+        okText="Submit"
         cancelText="Cancel"
       >
         <Form form={form} layout="vertical" name="add_staff_form">
