@@ -3,13 +3,9 @@ import { Dropdown } from "antd";
 import { Button, Space, Tooltip, message } from "antd";
 import { DownOutlined, UserOutlined } from "@ant-design/icons";
 import logo from "../../assets/fpt-university-logo.png";
-import "./Header.css";
+import "./Header_Manager.css";
 import Logout from "../Logout";
 
-const handleButtonClick = (e) => {
-  message.info("Click on left button.");
-  console.log("click left button", e);
-};
 const handleMenuClick = (e) => {
   message.info("Click on menu item.");
   console.log("click", e);
@@ -37,7 +33,7 @@ const menuProps = {
   onClick: handleMenuClick,
 };
 
-const Header = () => {
+const Header_Manager = () => {
   return (
     <div className="header">
       <a className="logo">
@@ -68,4 +64,4 @@ const Header = () => {
     </div>
   );
 };
-export default Header;
+export default Header_Manager;

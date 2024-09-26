@@ -1,12 +1,13 @@
-import Header from "../../components/Header/Header";
-import NavBar from "../../components/NavBar/NavBar";
+import Header_Manager from "../../components/Header/Header_Manager";
+import NavBar_Manager from "../../components/NavBar/NavBar_Manager";
+
 import "./Home.css";
 
 function Home() {
   return (
     <div>
-      <Header />
-      <NavBar />
+      <Header_Manager />
+      <NavBar_Manager />
     </div>
   );
 }

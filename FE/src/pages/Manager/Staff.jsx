@@ -1,6 +1,4 @@
 import React, { useState, useEffect } from "react";
-import Header from "../../components/Header/Header";
-import NavBar from "../../components/NavBar/NavBar";
 import { API_BASE_URL } from "../../configs/urlApi";
 import {
   Spin,
@@ -37,6 +35,9 @@ import {
 } from "../../configs/messages";
 import { Staff_Import_Excel } from "../../utils/Staff_Import_Excel.js";
 import { Staff_Excel_Template } from "../../utils/Staff_Excel_Template.js";
+import Header_Manager from "../../components/Header/Header_Manager.jsx";
+import NavBar_Manager from "../../components/NavBar/NavBar_Manager.jsx";
+
 // Ant Design Layout Components
 const { Content, Sider } = Layout;
 
@@ -55,6 +56,7 @@ const Staff = () => {
       const response = await fetch(API_BASE_URL + "/staffs");
       const result = await response.json();
       setData(result);
+      console.log(result);
     } catch (error) {
       message.error(FETCH_STAFFS_FAILED);
     } finally {
@@ -221,10 +223,10 @@ const Staff = () => {
 
   return (
     <Layout style={{ height: "100vh" }}>
-      <Header />
+      <Header_Manager />
       <Layout>
         <Sider width={256} style={{ backgroundColor: "#fff" }}>
-          <NavBar />
+          <NavBar_Manager />
         </Sider>
         <Layout style={{ padding: "16px" }}>
           <Content
@@ -261,7 +263,7 @@ const Staff = () => {
               <Table
                 dataSource={data}
                 columns={columns}
-                rowKey="id"
+                rowKey={(record) => `${record.id}-${record.email}`}
                 pagination={{ pageSize: 8 }}
               />
             </Spin>

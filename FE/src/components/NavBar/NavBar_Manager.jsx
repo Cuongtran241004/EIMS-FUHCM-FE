@@ -95,7 +95,7 @@ const items = [
   },
 ];
 
-const NavBar = () => {
+const NavBar_Manager = () => {
   return (
     <Menu
       style={{
@@ -109,4 +109,4 @@ const NavBar = () => {
   );
 };
 
-export default NavBar;
+export default NavBar_Manager;
