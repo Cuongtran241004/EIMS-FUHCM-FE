@@ -6,6 +6,9 @@ import "./App.css";
 import Staff from "./pages/Manager/Staff";
 import Dashboard from "./pages/Dashboard/Dashboard";
 import Request from "./pages/Request/Request";
+import Invigilator from "./pages/Manager/Invigilator";
+import Semester from "./pages/Manager/Semester";
+import Subject from "./pages/Manager/Subject";
 
 function App() {
   const [loggedIn, setLoggedIn] = useState(false);
@@ -30,7 +33,10 @@ function App() {
           <div>
             <Routes>
               <Route path="/" element={<Home />} />
+              <Route path="/semesters" element={<Semester />} />
+              <Route path="/subjects" element={<Subject />} />
               <Route path="/staffs" element={<Staff />} />
+              <Route path="/invigilators" element={<Invigilator />} />
               <Route path="/requests" element={<Request />} />
               <Route path="/dashboard" element={<Dashboard />} />
             </Routes>

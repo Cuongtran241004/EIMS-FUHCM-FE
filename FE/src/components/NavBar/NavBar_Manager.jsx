@@ -15,11 +15,11 @@ const items = [
     children: [
       {
         key: "1",
-        label: <Link to="/exam-slots">Exam slots</Link>, // Wrapped with Link
+        label: <Link to="/exam-slots">Exam slots</Link>,
       },
       {
         key: "2",
-        label: <Link to="/attendance-check">Attendance check</Link>, // Wrapped with Link
+        label: <Link to="/attendance-check">Attendance check</Link>,
       },
     ],
   },
@@ -30,11 +30,11 @@ const items = [
     children: [
       {
         key: "5",
-        label: <Link to="/invigilator-attendance">Invigilator Attendance</Link>, // Wrapped with Link
+        label: <Link to="/invigilator-attendance">Invigilator Attendance</Link>,
       },
       {
         key: "6",
-        label: <Link to="/invigilation-fees">Invigilation fees</Link>, // Wrapped with Link
+        label: <Link to="/invigilation-fees">Invigilation fees</Link>,
       },
     ],
   },
@@ -53,11 +53,11 @@ const items = [
         children: [
           {
             key: "9",
-            label: <Link to="/semester">Semester</Link>, // Wrapped with Link
+            label: <Link to="/semester">Semester</Link>,
           },
           {
             key: "10",
-            label: <Link to="/subjects">Subjects</Link>, // Wrapped with Link
+            label: <Link to="/subjects">Subjects</Link>,
           },
         ],
       },
@@ -68,11 +68,11 @@ const items = [
         children: [
           {
             key: "11",
-            label: <Link to="/staffs">Staffs</Link>, // Wrapped with Link
+            label: <Link to="/staffs">Staffs</Link>,
           },
           {
             key: "12",
-            label: <Link to="/invigilators">Invigilators</Link>, // Wrapped with Link
+            label: <Link to="/invigilators">Invigilators</Link>,
           },
         ],
       },
@@ -85,30 +85,22 @@ const items = [
     children: [
       {
         key: "13",
-        label: <Link to="/requests">Requests</Link>, // Wrapped with Link
+        label: <Link to="/requests">Requests</Link>,
       },
       {
         key: "14",
-        label: <Link to="/dashboard">Dashboard</Link>, // Wrapped with Link
+        label: <Link to="/dashboard">Dashboard</Link>,
       },
     ],
   },
 ];
 
 const NavBar_Manager = () => {
-  const location = useLocation(); // To get current path
-  const [selectedKeys, setSelectedKeys] = useState(["1"]); // Initially selected item
-  const [openKeys, setOpenKeys] = useState(["sub1"]); // Initially opened submenu
+  const location = useLocation();
+  const [selectedKeys, setSelectedKeys] = useState(["1"]);
+  const [openKeys, setOpenKeys] = useState(["sub1"]);
 
-  // update selectedKeys when path changes
-  const handleClick = (e) => {
-    setSelectedKeys([e.key]);
-  };
-
-  // Update open keys when a submenu is expanded/collapsed
-  const handleOpenChange = (keys) => {
-    setOpenKeys(keys);
-  };
+  // Update selected keys based on path
   useEffect(() => {
     const pathKeyMap = {
       "/exam-slots": "1",
@@ -123,13 +115,25 @@ const NavBar_Manager = () => {
       "/dashboard": "14",
     };
 
-    setSelectedKeys([pathKeyMap[location.pathname] || "1"]);
-  }, [openKeys]);
+    const newSelectedKey = pathKeyMap[location.pathname];
+
+    // Only update state if the key changes
+    if (newSelectedKey && newSelectedKey !== selectedKeys[0]) {
+      setSelectedKeys([newSelectedKey]);
+    }
+  }, [location.pathname, selectedKeys]);
+
+  const handleClick = (e) => {
+    setSelectedKeys([e.key]);
+  };
+
+  const handleOpenChange = (keys) => {
+    setOpenKeys(keys);
+  };
+
   return (
     <Menu
-      style={{
-        width: 256,
-      }}
+      style={{ width: 256 }}
       mode="inline"
       selectedKeys={selectedKeys}
       openKeys={openKeys}

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { API_BASE_URL } from "../../configs/urlApi";
+import Header_Manager from "../../components/Header/Header_Manager";
+import NavBar_Manager from "../../components/NavBar/NavBar_Manager";
 import {
   Spin,
   Table,
@@ -18,30 +19,27 @@ import {
   DeleteOutlined,
   UploadOutlined,
 } from "@ant-design/icons";
+import { Invigilator_Excel_Template } from "../../utils/Invigilator_Excel_Template";
+import { Invigilator_Import_Excel } from "../../utils/Invigilator_Import_Excel";
 import {
-  ADD_STAFF_FAILED,
-  ADD_STAFF_FAILED_SERVER,
-  ADD_STAFF_SUCCESS,
-  DELETE_STAFF_FAILED,
-  DELETE_STAFF_FAILED_SERVER,
-  DELETE_STAFF_SUCCESS,
-  EDIT_STAFF_FAILED,
-  EDIT_STAFF_FAILED_SERVER,
-  EDIT_STAFF_SUCCESS,
-  IMPORT_STAFFS_SUCCESS,
-  IMPORT_STAFFS_FAILED,
-  IMPORT_STAFFS_FAILED_SERVER,
-  FETCH_STAFFS_FAILED,
+  ADD_INVIGILATOR_FAILED,
+  ADD_INVIGILATOR_FAILED_SERVER,
+  ADD_INVIGILATOR_SUCCESS,
+  DELETE_INVIGILATOR_FAILED,
+  DELETE_INVIGILATOR_FAILED_SERVER,
+  DELETE_INVIGILATOR_SUCCESS,
+  EDIT_INVIGILATOR_FAILED,
+  EDIT_INVIGILATOR_FAILED_SERVER,
+  EDIT_INVIGILATOR_SUCCESS,
+  FETCH_INVIGILATORS_FAILED,
+  IMPORT_INVIGILATOR_FAILED,
+  IMPORT_INVIGILATOR_FAILED_SERVER,
+  IMPORT_INVIGILATOR_SUCCESS,
 } from "../../configs/messages";
-import { Staff_Import_Excel } from "../../utils/Staff_Import_Excel.js";
-import { Staff_Excel_Template } from "../../utils/Staff_Excel_Template.js";
-import Header_Manager from "../../components/Header/Header_Manager.jsx";
-import NavBar_Manager from "../../components/NavBar/NavBar_Manager.jsx";
-
+import { API_BASE_URL } from "../../configs/urlApi";
 // Ant Design Layout Components
 const { Content, Sider } = Layout;
-
-const Staff = () => {
+const Invigilator = () => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [fileLoading, setFileLoading] = useState(false); // For file upload loading state
@@ -50,25 +48,18 @@ const Staff = () => {
   const [editingStaff, setEditingStaff] = useState(null);
   const [form] = Form.useForm();
 
-  const getIndex = (data) => {
-    data = data.map((item, index) => ({ index: index + 1 }));
-    console.log(data);
-  }
-    
   const fetchData = async () => {
     setLoading(true);
     try {
-      const response = await fetch(API_BASE_URL + "/staffs");
+      const response = await fetch(API_BASE_URL + "/invigilators");
       const result = await response.json();
       setData(result);
     } catch (error) {
-      message.error(FETCH_STAFFS_FAILED);
+      message.error(FETCH_INVIGILATORS_FAILED);
     } finally {
       setLoading(false);
     }
   };
-
- 
 
   useEffect(() => {
     fetchData();
@@ -90,7 +81,7 @@ const Staff = () => {
       if (isEditing) {
         // Update existing staff
         const response = await fetch(
-          `${API_BASE_URL}/staffs/${editingStaff.id}`,
+          `${API_BASE_URL}/invigilators/${editingStaff.id}`,
           {
             method: "PUT",
             headers: {
@@ -101,15 +92,15 @@ const Staff = () => {
         );
 
         if (response.ok) {
-          message.success(EDIT_STAFF_SUCCESS);
+          message.success(EDIT_INVIGILATOR_SUCCESS);
           fetchData();
           handleCancel();
         } else {
-          throw new Error(EDIT_STAFF_FAILED);
+          throw new Error(EDIT_INVIGILATOR_FAILED);
         }
       } else {
         // Add new staff
-        const response = await fetch(API_BASE_URL + "/staffs", {
+        const response = await fetch(API_BASE_URL + "/invigilators", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -118,16 +109,18 @@ const Staff = () => {
         });
 
         if (response.ok) {
-          message.success(ADD_STAFF_SUCCESS);
+          message.success(ADD_INVIGILATOR_SUCCESS);
           fetchData();
           handleCancel();
         } else {
-          throw new Error(ADD_STAFF_FAILED);
+          throw new Error(ADD_INVIGILATOR_FAILED);
         }
       }
     } catch (error) {
       message.error(
-        isEditing ? EDIT_STAFF_FAILED_SERVER : ADD_STAFF_FAILED_SERVER
+        isEditing
+          ? EDIT_INVIGILATOR_FAILED_SERVER
+          : ADD_INVIGILATOR_FAILED_SERVER
       );
     }
   };
@@ -144,27 +137,27 @@ const Staff = () => {
 
   const handleDelete = async (id) => {
     try {
-      const response = await fetch(`${API_BASE_URL}/staffs/${id}`, {
+      const response = await fetch(`${API_BASE_URL}/invigilators/${id}`, {
         method: "DELETE",
       });
       if (response.ok) {
-        message.success(DELETE_STAFF_SUCCESS);
+        message.success(DELETE_INVIGILATOR_SUCCESS);
         fetchData();
       } else {
-        throw new Error(DELETE_STAFF_FAILED);
+        throw new Error(DELETE_INVIGILATOR_FAILED);
       }
     } catch (error) {
-      message.error(DELETE_STAFF_FAILED_SERVER);
+      message.error(DELETE_INVIGILATOR_FAILED_SERVER);
     }
   };
 
   const handleFileUpload = async ({ file }) => {
     setFileLoading(true); // Set loading for file upload
     try {
-      const staffData = await Staff_Import_Excel(file);
+      const staffData = await Invigilator_Import_Excel(file);
       const responses = await Promise.all(
         staffData.map(async (staff) => {
-          const response = await fetch(API_BASE_URL + "/staffs", {
+          const response = await fetch(API_BASE_URL + "/invigilators", {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
@@ -176,14 +169,14 @@ const Staff = () => {
       );
 
       if (responses.every((response) => response)) {
-        message.success(IMPORT_STAFFS_SUCCESS);
+        message.success(IMPORT_INVIGILATOR_SUCCESS);
       } else {
-        message.error(IMPORT_STAFFS_FAILED);
+        message.error(IMPORT_INVIGILATOR_FAILED);
       }
 
       fetchData();
     } catch (error) {
-      message.error(IMPORT_STAFFS_FAILED_SERVER);
+      message.error(IMPORT_INVIGILATOR_FAILED_SERVER);
     } finally {
       setFileLoading(false); // Reset loading state after process
     }
@@ -206,6 +199,11 @@ const Staff = () => {
       key: "email",
     },
     {
+      title: "Phone",
+      dataIndex: "phone",
+      key: "phone",
+    },
+    {
       title: "Action",
       key: "action",
       render: (text, record) => (
@@ -215,7 +213,7 @@ const Staff = () => {
             style={{ color: "blue", cursor: "pointer" }}
           />
           <Popconfirm
-            title="Are you sure to delete this staff?"
+            title="Are you sure to delete this invigilator?"
             onConfirm={() => handleDelete(record.id)}
             okText="Yes"
             cancelText="No"
@@ -245,7 +243,7 @@ const Staff = () => {
           >
             <Space>
               <Button type="primary" onClick={showModal}>
-                Add New Staff
+                Add New Invigilator
               </Button>
 
               <Upload
@@ -256,11 +254,11 @@ const Staff = () => {
                 method="POST"
               >
                 <Button icon={<UploadOutlined />} loading={fileLoading}>
-                  Import Staffs
+                  Import Invigilators
                 </Button>
               </Upload>
 
-              <Button onClick={Staff_Excel_Template} type="default">
+              <Button onClick={Invigilator_Excel_Template} type="default">
                 Download Import Template
               </Button>
             </Space>
@@ -269,7 +267,7 @@ const Staff = () => {
               <Table
                 dataSource={data}
                 columns={columns}
-                rowKey= {getIndex(data)}
+                rowKey={Math.random}
                 pagination={{ pageSize: 8 }}
               />
             </Spin>
@@ -279,32 +277,48 @@ const Staff = () => {
 
       {/* Add/Edit Staff Modal */}
       <Modal
-        title={isEditing ? "Edit Staff" : "Add New Staff"}
+        title={isEditing ? "Edit Invigilator" : "Add New Invigilator"}
         open={isModalVisible}
         onOk={handleOk}
         onCancel={handleCancel}
         okText="Submit"
         cancelText="Cancel"
       >
-        <Form form={form} layout="vertical" name="add_staff_form">
+        <Form form={form} layout="vertical" name="add_invigilator_form">
           <Form.Item
             name="name"
             label="Name"
             rules={[
-              { required: true, message: "Please input the staff name!" },
+              { required: true, message: "Please input the invigilator name!" },
             ]}
           >
-            <Input placeholder="Enter staff name" />
+            <Input placeholder="Enter invigilator name" />
           </Form.Item>
           <Form.Item
             name="email"
             label="Email"
             rules={[
-              { required: true, message: "Please input the staff email!" },
+              {
+                required: true,
+                message: "Please input the invigilator email!",
+              },
               { type: "email", message: "Please enter a valid email!" },
             ]}
           >
-            <Input placeholder="Enter staff email" />
+            <Input placeholder="Enter invigilator email" />
+          </Form.Item>
+          <Form.Item
+            name="phone"
+            label="Phone"
+            rules={[
+              {
+                required: true,
+                message: "Please input the invigilator phone!",
+              },
+              { type: "text", message: "Please enter a valid phone!" },
+            ]}
+          >
+            <Input placeholder="Enter invigilator phone" />
           </Form.Item>
         </Form>
       </Modal>
@@ -312,4 +326,4 @@ const Staff = () => {
   );
 };
 
-export default Staff;
+export default Invigilator;

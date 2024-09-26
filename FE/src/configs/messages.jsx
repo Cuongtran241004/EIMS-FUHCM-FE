@@ -2,7 +2,8 @@
 const LOGIN_NOT_ALLOW = "You do not have permission to login!";
 const LOGIN_FAILED = "Login failed!";
 
-// Manager
+/*************************** MANAGER **************************/
+// Staff
 const ADD_STAFF_SUCCESS = "Add staff successfully!";
 const ADD_STAFF_FAILED = "Failed to add staff!";
 const ADD_STAFF_FAILED_SERVER = "Failed to add staff! Please try again.";
@@ -20,6 +21,26 @@ const IMPORT_STAFFS_FAILED = "Some staffs could not be imported.";
 const IMPORT_STAFFS_FAILED_SERVER =
   "Failed to import staffs! Please try again.";
 const FETCH_STAFFS_FAILED = "Failed to fetch staffs data!";
+
+// Invigilator
+const ADD_INVIGILATOR_SUCCESS = "Add invigilator successfully!";
+const ADD_INVIGILATOR_FAILED = "Add invigilator failed!";
+const ADD_INVIGILATOR_FAILED_SERVER = "Failed to add invigilator!";
+
+const EDIT_INVIGILATOR_SUCCESS = "Edit invigilator successfully!";
+const EDIT_INVIGILATOR_FAILED = "Edit invigilator failed!";
+const EDIT_INVIGILATOR_FAILED_SERVER = "Failed to edit invigilator!";
+
+const DELETE_INVIGILATOR_SUCCESS = "Delete invigilator successfully!";
+const DELETE_INVIGILATOR_FAILED = "Delete invigilator failed!";
+const DELETE_INVIGILATOR_FAILED_SERVER = "Failed to delete invigilator!";
+
+const IMPORT_INVIGILATOR_SUCCESS = "Import invigilators successfully!";
+const IMPORT_INVIGILATOR_FAILED = "Some invigilators could not be imported.";
+const IMPORT_INVIGILATOR_FAILED_SERVER =
+  "Failed to import invigilators! Please try again.";
+
+const FETCH_INVIGILATORS_FAILED = "Failed to fetch invigilators data!";
 export {
   LOGIN_NOT_ALLOW,
   LOGIN_FAILED,
@@ -36,4 +57,17 @@ export {
   IMPORT_STAFFS_SUCCESS,
   IMPORT_STAFFS_FAILED,
   IMPORT_STAFFS_FAILED_SERVER,
+  ADD_INVIGILATOR_SUCCESS,
+  ADD_INVIGILATOR_FAILED,
+  ADD_INVIGILATOR_FAILED_SERVER,
+  EDIT_INVIGILATOR_SUCCESS,
+  EDIT_INVIGILATOR_FAILED,
+  EDIT_INVIGILATOR_FAILED_SERVER,
+  DELETE_INVIGILATOR_SUCCESS,
+  DELETE_INVIGILATOR_FAILED,
+  DELETE_INVIGILATOR_FAILED_SERVER,
+  IMPORT_INVIGILATOR_SUCCESS,
+  IMPORT_INVIGILATOR_FAILED,
+  IMPORT_INVIGILATOR_FAILED_SERVER,
+  FETCH_INVIGILATORS_FAILED,
 };
