@@ -1,5 +1,6 @@
 import React from 'react';
 import { Button, Checkbox, Form as form, Input } from 'antd';
+import './Form.css'
 const onFinish = (values) => {
   console.log('Success:', values);
 };
@@ -19,7 +20,7 @@ function Form() {
     }}
     style={{
       maxWidth: 600,
-      fontWeight: 600,
+      fontWeight: 600
     }}
     initialValues={{
       remember: true,
