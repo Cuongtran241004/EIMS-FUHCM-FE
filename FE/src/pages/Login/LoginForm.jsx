@@ -1,15 +1,18 @@
 import React from 'react';
-import { Button, Checkbox, Form as form, Input } from 'antd';
-import './Form.css'
+import { Button, Checkbox, Form, Input } from 'antd';
+import './Form.css';
+
 const onFinish = (values) => {
   console.log('Success:', values);
 };
+
 const onFinishFailed = (errorInfo) => {
   console.log('Failed:', errorInfo);
 };
-function Form() {
-    return (
-        <form
+
+function LoginForm()  {
+  return (
+  <Form
     name="basic"
     labelCol={{
       span: 8,
@@ -28,20 +31,20 @@ function Form() {
     onFinishFailed={onFinishFailed}
     autoComplete="off"
   >
-    <form.Item
+    <Form.Item
       label="Email"
       name="Email"
       rules={[
         {
           required: true,
-          message: 'Please input your username!',
+          message: 'Please input your email!',
         },
       ]}
     >
       <Input />
-    </form.Item>
+    </Form.Item>
 
-    <form.Item
+    <Form.Item
       label="Password"
       name="password"
       rules={[
@@ -52,11 +55,9 @@ function Form() {
       ]}
     >
       <Input.Password />
-    </form.Item>
+    </Form.Item>
 
-   
-
-    <form.Item
+    <Form.Item
       wrapperCol={{
         offset: 8,
         span: 16,
@@ -65,10 +66,9 @@ function Form() {
       <Button type="primary" htmlType="submit">
         Login
       </Button>
-    </form.Item>
-  </form>
-    );
-  
+    </Form.Item>
+  </Form>
+  );
 };
 
-export default Form;
+export default LoginForm;

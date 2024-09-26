@@ -1,15 +1,15 @@
 import HandleLogin from "./HandleLogin";
 import "./Login.css";
-import Form from "./Form";
+import LoginForm from "./LoginForm";
 
 function Login({ setLoggedIn }) {
   return (
     <div className="login-container">
-      <form className="login-form">
+      <div className="login-form">
         <h1 className="login-h1">Login</h1>
         <div className="login-form-section">
           <div className="form-section">
-            <Form />
+            <LoginForm />
           </div>
           <div className="divider"></div>
 
@@ -18,7 +18,7 @@ function Login({ setLoggedIn }) {
             <HandleLogin setLoggedIn={setLoggedIn} />
           </div>
         </div>
-      </form>
+      </div>
     </div>
   );
 }
