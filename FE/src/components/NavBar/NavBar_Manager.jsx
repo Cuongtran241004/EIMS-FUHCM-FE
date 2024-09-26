@@ -1,11 +1,11 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Menu } from "antd";
 import {
   MailOutlined,
   AppstoreOutlined,
   SettingOutlined,
 } from "@ant-design/icons";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 
 const items = [
   {
@@ -96,14 +96,45 @@ const items = [
 ];
 
 const NavBar_Manager = () => {
+  const location = useLocation(); // To get current path
+  const [selectedKeys, setSelectedKeys] = useState(["1"]); // Initially selected item
+  const [openKeys, setOpenKeys] = useState(["sub1"]); // Initially opened submenu
+
+  // update selectedKeys when path changes
+  const handleClick = (e) => {
+    setSelectedKeys([e.key]);
+  };
+
+  // Update open keys when a submenu is expanded/collapsed
+  const handleOpenChange = (keys) => {
+    setOpenKeys(keys);
+  };
+  useEffect(() => {
+    const pathKeyMap = {
+      "/exam-slots": "1",
+      "/attendance-check": "2",
+      "/invigilator-attendance": "5",
+      "/invigilation-fees": "6",
+      "/semester": "9",
+      "/subjects": "10",
+      "/staffs": "11",
+      "/invigilators": "12",
+      "/requests": "13",
+      "/dashboard": "14",
+    };
+
+    setSelectedKeys([pathKeyMap[location.pathname] || "1"]);
+  }, [openKeys]);
   return (
     <Menu
       style={{
         width: 256,
       }}
-      defaultSelectedKeys={["1"]}
-      defaultOpenKeys={["sub1"]}
       mode="inline"
+      selectedKeys={selectedKeys}
+      openKeys={openKeys}
+      onClick={handleClick}
+      onOpenChange={handleOpenChange}
       items={items}
     />
   );

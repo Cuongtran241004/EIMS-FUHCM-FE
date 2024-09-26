@@ -190,6 +190,11 @@ const Staff = () => {
       key: "id",
     },
     {
+      title: "MSNV",
+      dataIndex: "fuId",
+      key: "fuId",
+    },
+    {
       title: "Name",
       dataIndex: "name",
       key: "name",
@@ -263,7 +268,7 @@ const Staff = () => {
               <Table
                 dataSource={data}
                 columns={columns}
-                rowKey={(record) => `${record.id}-${record.email}`}
+                rowKey={Math.random}
                 pagination={{ pageSize: 8 }}
               />
             </Spin>
