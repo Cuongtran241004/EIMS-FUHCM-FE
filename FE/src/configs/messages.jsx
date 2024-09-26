@@ -15,6 +15,11 @@ const DELETE_STAFF_SUCCESS = "Delete staff successfully!";
 const DELETE_STAFF_FAILED = "Failed to delete staff!";
 const DELETE_STAFF_FAILED_SERVER = "Failed to delete staff! Please try again.";
 
+const IMPORT_STAFFS_SUCCESS = "Import staffs successfully!";
+const IMPORT_STAFFS_FAILED = "Some staffs could not be imported.";
+const IMPORT_STAFFS_FAILED_SERVER =
+  "Failed to import staffs! Please try again.";
+const FETCH_STAFFS_FAILED = "Failed to fetch staffs data!";
 export {
   LOGIN_NOT_ALLOW,
   LOGIN_FAILED,
@@ -27,4 +32,8 @@ export {
   DELETE_STAFF_SUCCESS,
   DELETE_STAFF_FAILED,
   DELETE_STAFF_FAILED_SERVER,
+  FETCH_STAFFS_FAILED,
+  IMPORT_STAFFS_SUCCESS,
+  IMPORT_STAFFS_FAILED,
+  IMPORT_STAFFS_FAILED_SERVER,
 };

@@ -2,7 +2,7 @@
 import * as XLSX from "xlsx";
 
 // Function to create and download the Excel template
-export const ExcelTemplate = () => {
+export const Staff_Excel_Template = () => {
   // Define the columns for the Excel template
   const worksheetData = [
     // Example row to guide users on what to enter

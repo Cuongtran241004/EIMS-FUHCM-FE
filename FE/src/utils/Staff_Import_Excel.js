@@ -5,7 +5,7 @@ import * as XLSX from "xlsx";
  * @param {File} file - The uploaded Excel file
  * @returns {Promise<Array>} - Promise resolving to an array of staff objects
  */
-export const processExcelFile = (file) => {
+export const Staff_Import_Excel = (file) => {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
 

@@ -30,9 +30,13 @@ import {
   EDIT_STAFF_FAILED,
   EDIT_STAFF_FAILED_SERVER,
   EDIT_STAFF_SUCCESS,
+  IMPORT_STAFFS_SUCCESS,
+  IMPORT_STAFFS_FAILED,
+  IMPORT_STAFFS_FAILED_SERVER,
+  FETCH_STAFFS_FAILED,
 } from "../../configs/messages";
-import { processExcelFile } from "../../utils/ImportExcel.js";
-import { ExcelTemplate } from "../../utils/ExcelTemplate.js";
+import { Staff_Import_Excel } from "../../utils/Staff_Import_Excel.js";
+import { Staff_Excel_Template } from "../../utils/Staff_Excel_Template.js";
 // Ant Design Layout Components
 const { Content, Sider } = Layout;
 
@@ -52,8 +56,7 @@ const Staff = () => {
       const result = await response.json();
       setData(result);
     } catch (error) {
-      console.error("Error fetching data:", error);
-      message.error("Failed to fetch staff data.");
+      message.error(FETCH_STAFFS_FAILED);
     } finally {
       setLoading(false);
     }
@@ -150,8 +153,7 @@ const Staff = () => {
   const handleFileUpload = async ({ file }) => {
     setFileLoading(true); // Set loading for file upload
     try {
-      const staffData = await processExcelFile(file);
-      console.log("Staff data:", staffData);
+      const staffData = await Staff_Import_Excel(file);
       const responses = await Promise.all(
         staffData.map(async (staff) => {
           const response = await fetch(API_BASE_URL + "/staffs", {
@@ -166,15 +168,14 @@ const Staff = () => {
       );
 
       if (responses.every((response) => response)) {
-        message.success("All staffs imported successfully!");
+        message.success(IMPORT_STAFFS_SUCCESS);
       } else {
-        message.error("Some staffs could not be imported.");
+        message.error(IMPORT_STAFFS_FAILED);
       }
 
       fetchData();
     } catch (error) {
-      console.error("Error importing staffs:", error);
-      message.error("Failed to import staffs.");
+      message.error(IMPORT_STAFFS_FAILED_SERVER);
     } finally {
       setFileLoading(false); // Reset loading state after process
     }
@@ -251,7 +252,7 @@ const Staff = () => {
                 </Button>
               </Upload>
 
-              <Button onClick={ExcelTemplate} type="default">
+              <Button onClick={Staff_Excel_Template} type="default">
                 Download Import Template
               </Button>
             </Space>
@@ -261,7 +262,7 @@ const Staff = () => {
                 dataSource={data}
                 columns={columns}
                 rowKey="id"
-                pagination={{ pageSize: 9 }}
+                pagination={{ pageSize: 8 }}
               />
             </Spin>
           </Content>
