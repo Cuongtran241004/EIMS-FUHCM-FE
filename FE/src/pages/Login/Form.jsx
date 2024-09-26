@@ -1,5 +1,6 @@
 import React from 'react';
 import { Button, Checkbox, Form as form, Input } from 'antd';
+import './Form.css'
 const onFinish = (values) => {
   console.log('Success:', values);
 };
@@ -8,7 +9,6 @@ const onFinishFailed = (errorInfo) => {
 };
 function Form() {
     return (
-
         <form
     name="basic"
     labelCol={{
