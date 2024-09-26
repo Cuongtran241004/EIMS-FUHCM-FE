@@ -50,19 +50,25 @@ const Staff = () => {
   const [editingStaff, setEditingStaff] = useState(null);
   const [form] = Form.useForm();
 
+  const getIndex = (data) => {
+    data = data.map((item, index) => ({ index: index + 1 }));
+    console.log(data);
+  }
+    
   const fetchData = async () => {
     setLoading(true);
     try {
       const response = await fetch(API_BASE_URL + "/staffs");
       const result = await response.json();
       setData(result);
-      console.log(result);
     } catch (error) {
       message.error(FETCH_STAFFS_FAILED);
     } finally {
       setLoading(false);
     }
   };
+
+ 
 
   useEffect(() => {
     fetchData();
@@ -268,7 +274,7 @@ const Staff = () => {
               <Table
                 dataSource={data}
                 columns={columns}
-                rowKey={Math.random}
+                rowKey= {getIndex(data)}
                 pagination={{ pageSize: 8 }}
               />
             </Spin>
