@@ -15,11 +15,11 @@ const items = [
     children: [
       {
         key: "1",
-        label: <Link to="/exam-slots">Exam slots</Link>,
+        label: <Link to="/exam-schedule">Exam Schedule</Link>,
       },
       {
         key: "2",
-        label: <Link to="/attendance-check">Attendance check</Link>,
+        label: <Link to="/attendance-check">Attendance Check</Link>,
       },
     ],
   },
@@ -29,20 +29,17 @@ const items = [
     icon: <AppstoreOutlined />,
     children: [
       {
-        key: "5",
+        key: "3",
         label: <Link to="/invigilator-attendance">Invigilator Attendance</Link>,
       },
       {
-        key: "6",
-        label: <Link to="/invigilation-fees">Invigilation fees</Link>,
+        key: "4",
+        label: <Link to="/invigilation-fees">Invigilation Fees</Link>,
       },
     ],
   },
   {
-    type: "divider",
-  },
-  {
-    key: "sub4",
+    key: "sub3",
     label: "Settings",
     icon: <SettingOutlined />,
     children: [
@@ -52,12 +49,16 @@ const items = [
         type: "group",
         children: [
           {
-            key: "9",
+            key: "5",
             label: <Link to="/semester">Semester</Link>,
           },
           {
-            key: "10",
+            key: "6",
             label: <Link to="/subjects">Subjects</Link>,
+          },
+          {
+            key: "7",
+            label: <Link to="/exam-slot">Exam Slot</Link>,
           },
         ],
       },
@@ -67,11 +68,11 @@ const items = [
         type: "group",
         children: [
           {
-            key: "11",
+            key: "8",
             label: <Link to="/staffs">Staffs</Link>,
           },
           {
-            key: "12",
+            key: "9",
             label: <Link to="/invigilators">Invigilators</Link>,
           },
         ],
@@ -79,16 +80,20 @@ const items = [
     ],
   },
   {
+    type: "divider",
+  },
+
+  {
     key: "grp",
     label: "",
     type: "group",
     children: [
       {
-        key: "13",
+        key: "10",
         label: <Link to="/requests">Requests</Link>,
       },
       {
-        key: "14",
+        key: "11",
         label: <Link to="/dashboard">Dashboard</Link>,
       },
     ],
@@ -97,31 +102,34 @@ const items = [
 
 const NavBar_Manager = () => {
   const location = useLocation();
-  const [selectedKeys, setSelectedKeys] = useState(["1"]);
-  const [openKeys, setOpenKeys] = useState(["sub1"]);
+  const [selectedKeys, setSelectedKeys] = useState([]);
+  const [openKeys, setOpenKeys] = useState(["sub1", "sub2", "sub3"]); // Initially open one submenu
 
-  // Update selected keys based on path
+  // Mapping of routes to submenu keys
+  const pathToKeyMap = {
+    "/exam-schedule": { key: "1", openKey: "sub1" },
+    "/attendance-check": { key: "2", openKey: "sub1" },
+    "/invigilator-attendance": { key: "3", openKey: "sub2" },
+    "/invigilation-fees": { key: "4", openKey: "sub2" },
+    "/semester": { key: "5", openKey: "sub3" },
+    "/subjects": { key: "6", openKey: "sub3" },
+    "/exam-slot": { key: "7", openKey: "sub3" },
+    "/staffs": { key: "8", openKey: "sub3" },
+    "/invigilators": { key: "9", openKey: "sub3" },
+    "/requests": { key: "10", openKey: "grp" },
+    "/dashboard": { key: "11", openKey: "grp" },
+  };
+
+  // Set selected key and open key when location changes
   useEffect(() => {
-    const pathKeyMap = {
-      "/exam-slots": "1",
-      "/attendance-check": "2",
-      "/invigilator-attendance": "5",
-      "/invigilation-fees": "6",
-      "/semester": "9",
-      "/subjects": "10",
-      "/staffs": "11",
-      "/invigilators": "12",
-      "/requests": "13",
-      "/dashboard": "14",
-    };
+    const currentPath = location.pathname;
+    const pathInfo = pathToKeyMap[currentPath];
 
-    const newSelectedKey = pathKeyMap[location.pathname];
-
-    // Only update state if the key changes
-    if (newSelectedKey && newSelectedKey !== selectedKeys[0]) {
-      setSelectedKeys([newSelectedKey]);
+    if (pathInfo) {
+      setSelectedKeys([pathInfo.key]);
+      setOpenKeys([...openKeys, pathInfo.openKey]);
     }
-  }, [location.pathname, selectedKeys]);
+  }, [location.pathname]);
 
   const handleClick = (e) => {
     setSelectedKeys([e.key]);
@@ -131,14 +139,18 @@ const NavBar_Manager = () => {
     setOpenKeys(keys);
   };
 
+  const handleOnSelect = ({ key }) => {
+    setSelectedKeys([key]);
+  };
   return (
     <Menu
       style={{ width: 256 }}
       mode="inline"
       selectedKeys={selectedKeys}
-      openKeys={openKeys}
+      openKeys={openKeys} // Control open keys
       onClick={handleClick}
-      onOpenChange={handleOpenChange}
+      onOpenChange={handleOpenChange} // Manually handle open/close
+      onSelect={handleOnSelect}
       items={items}
     />
   );

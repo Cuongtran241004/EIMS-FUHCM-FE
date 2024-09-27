@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import Login from "./pages/Login/Login";
-import { Route, Routes } from "react-router-dom";
+import { Route, Routes, Navigate } from "react-router-dom";
 import Home from "./pages/Home/Home";
 import "./App.css";
 import Staff from "./pages/Manager/Staff";
@@ -40,7 +40,9 @@ function App() {
               <Route path="/invigilators" element={<Invigilator />} />
               <Route path="/requests" element={<Request />} />
               <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/exam-slots" element={<ExamSlots />} />
+              <Route path="/exam-schedule" element={<ExamSlots />} />
+              {/* Redirect any unknown routes to the dashboard */}
+              <Route path="*" element={<Navigate to="/dashboard" replace />} />
             </Routes>
           </div>
         )}
