@@ -82,22 +82,6 @@ const items = [
   {
     type: "divider",
   },
-
-  {
-    key: "grp",
-    label: "",
-    type: "group",
-    children: [
-      {
-        key: "10",
-        label: <Link to="/requests">Requests</Link>,
-      },
-      {
-        key: "11",
-        label: <Link to="/dashboard">Dashboard</Link>,
-      },
-    ],
-  },
 ];
 
 const NavBar_Manager = () => {

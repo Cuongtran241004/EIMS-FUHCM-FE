@@ -1,9 +1,12 @@
 import React from "react";
+import Header_Manager from "../../components/Header/Header_Manager";
+import NavBar_Manager from "../../components/NavBar/NavBar_Manager";
 
 const Request = () => {
   return (
     <div>
-      <h1>Request</h1>
+      <Header_Manager />
+      <NavBar_Manager />
     </div>
   );
 };

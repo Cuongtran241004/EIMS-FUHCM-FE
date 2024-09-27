@@ -1,10 +1,11 @@
 import React from "react";
 import { Dropdown } from "antd";
-import { Button, Space, Tooltip, message } from "antd";
+import { Button, Space, message } from "antd";
 import { DownOutlined, UserOutlined } from "@ant-design/icons";
 import logo from "../../assets/fpt-university-logo.png";
 import "./Header_Manager.css";
 import Logout from "../Logout";
+import { Link } from "react-router-dom";
 
 const handleMenuClick = (e) => {
   message.info("Click on menu item.");
@@ -12,20 +13,14 @@ const handleMenuClick = (e) => {
 };
 const items = [
   {
-    label: "1st menu item",
+    label: "Profile",
     key: "1",
     icon: <UserOutlined />,
   },
   {
-    label: "2nd menu item",
+    label: "",
     key: "2",
-    icon: <UserOutlined />,
-  },
-  {
-    label: "3rd menu item",
-    key: "3",
-    icon: <UserOutlined />,
-    danger: true,
+    icon: <Logout />,
   },
 ];
 const menuProps = {
@@ -36,29 +31,29 @@ const menuProps = {
 const Header_Manager = () => {
   return (
     <div className="header">
-      <a className="logo">
-        <img src={logo} alt="logo" />
-      </a>
+      <div className="header-left">
+        <a className="logo">
+          <img src={logo} alt="logo" />
+        </a>
+      </div>
       <div className="header-right">
-        <Space wrap>
-          <Dropdown.Button
-            menu={menuProps}
-            placement="bottom"
-            icon={<UserOutlined />}
-          >
-            Dropdown
-          </Dropdown.Button>
+        <Space wrap className="header-right-space">
+          <Button>
+            <Link to="/dashboard">Dashboard</Link>
+          </Button>
+
+          <Button variant="dashed">
+            <Link to="/requests">Request</Link>
+          </Button>
 
           <Dropdown menu={menuProps}>
             <Button>
               <Space>
-                Button
+                Quốc Cường
                 <DownOutlined />
               </Space>
             </Button>
           </Dropdown>
-
-          <Logout />
         </Space>
       </div>
     </div>

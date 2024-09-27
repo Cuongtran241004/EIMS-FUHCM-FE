@@ -53,12 +53,12 @@ const Staff = () => {
   const getIndex = (data) => {
     data = data.map((item, index) => ({ index: index + 1 }));
     console.log(data);
-  }
-    
+  };
+
   const fetchData = async () => {
     setLoading(true);
     try {
-      const response = await fetch(API_BASE_URL + "users");
+      const response = await fetch(API_BASE_URL + "staffs");
       const result = await response.json();
       setData(result);
     } catch (error) {
@@ -67,8 +67,6 @@ const Staff = () => {
       setLoading(false);
     }
   };
-
- 
 
   useEffect(() => {
     fetchData();
@@ -269,7 +267,7 @@ const Staff = () => {
               <Table
                 dataSource={data}
                 columns={columns}
-                rowKey= {getIndex(data)}
+                rowKey={getIndex(data)}
                 pagination={{ pageSize: 8 }}
               />
             </Spin>
