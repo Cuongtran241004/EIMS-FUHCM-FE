@@ -1,4 +1,4 @@
-import HandleLogin from "./HandleLogin";
+import HandleLogin from "../../components/Handle/HandleLogin";
 import "./Login.css";
 import LoginForm from "./LoginForm";
 

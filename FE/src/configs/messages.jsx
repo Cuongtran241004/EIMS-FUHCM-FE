@@ -1,6 +1,9 @@
 // Login function
 const LOGIN_NOT_ALLOW = "You do not have permission to login!";
 const LOGIN_FAILED = "Login failed!";
+const ENTER_EMAIL = "Please enter your email!";
+const VALID_EMAIL = "Please enter a valid format!";
+const ENTER_PASSWORD = "Please enter your password!";
 
 /*************************** MANAGER **************************/
 // Staff
@@ -44,6 +47,9 @@ const FETCH_INVIGILATORS_FAILED = "Failed to fetch invigilators data!";
 export {
   LOGIN_NOT_ALLOW,
   LOGIN_FAILED,
+  ENTER_EMAIL,
+  ENTER_PASSWORD,
+  VALID_EMAIL,
   ADD_STAFF_SUCCESS,
   ADD_STAFF_FAILED,
   ADD_STAFF_FAILED_SERVER,
