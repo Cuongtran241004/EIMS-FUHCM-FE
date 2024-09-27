@@ -58,7 +58,7 @@ const Staff = () => {
   const fetchData = async () => {
     setLoading(true);
     try {
-      const response = await fetch(API_BASE_URL + "/staffs");
+      const response = await fetch(API_BASE_URL + "users");
       const result = await response.json();
       setData(result);
     } catch (error) {
