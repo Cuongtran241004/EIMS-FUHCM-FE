@@ -5,7 +5,7 @@ function Logout() {
   const handleLogout = () => {
     localStorage.removeItem("isLoggedIn");
     localStorage.removeItem("expirationTime");
-    localStorage.clear();
+    sessionStorage.removeItem("authToken");
 
     window.location.reload();
   };
