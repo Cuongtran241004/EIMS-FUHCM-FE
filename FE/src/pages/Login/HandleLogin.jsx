@@ -27,6 +27,8 @@ function HandleLogin({ setLoggedIn }) {
             "Authorization": `Bearer ${token}`, 
           },
       });
+      console.log("Response from Backend:", response);
+console.log("Response status:", response.status);
 
       if (response.status === 200) {
         sessionStorage.setItem("isLoggedIn", "true");
