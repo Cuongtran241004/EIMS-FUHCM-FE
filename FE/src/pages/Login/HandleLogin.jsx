@@ -1,56 +1,56 @@
 import { GoogleLogin } from "@react-oauth/google";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import axios from "axios";
 import { Tag } from "antd";
-import { CLIENT_ID } from "../../configs/keys";
-import { LOGIN_FAILED, LOGIN_NOT_ALLOW } from "../../configs/messages";
+import { BACKEND_API_URL } from "../../configs/keys"; 
+import { LOGIN_FAILED } from "../../configs/messages";
 
 function HandleLogin({ setLoggedIn }) {
   const [errorMessage, setErrorMessage] = useState("");
-  const [allowedEmails, setAllowedEmails] = useState([]);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await axios.get(CLIENT_ID);
-        setAllowedEmails(response.data.map((login) => login.email));
-      } catch (error) {
-        console.error("Error fetching data:", error);
+  // Handle successful login from Google
+  const handleLoginSuccess = async (credentialResponse) => {
+    try {
+      const token = credentialResponse.credential;
+      const payload = JSON.parse(atob(token.split(".")[1])); // Decode JWT
+      const userEmail = payload.email;
+      const expirationTime = new Date().getTime() + 60 * 60 * 1000; // 1-hour expiration
+
+      console.log("Token:", token);
+      console.log("Payload:", payload);
+
+      // Post the token to the backend for validation
+      const response = await axios.post(`${BACKEND_API_URL}/oauth2/code/google`, {
+        token,
+      });
+
+      // Handle response after posting the token
+      if (response.status === 200) {
+        // Save login session data
+        sessionStorage.setItem("isLoggedIn", "true");
+        sessionStorage.setItem("userEmail", userEmail);
+        sessionStorage.setItem("expirationTime", expirationTime.toString());
+        setLoggedIn(true);
+        setErrorMessage("");
+      } else {
+        setErrorMessage(LOGIN_FAILED);
       }
-    };
+    } catch (error) {
+      console.error("Error during login process:", error);
+      setErrorMessage(LOGIN_FAILED);
+    }
+  };
 
-    fetchData();
-  }, []);
+  // Handle login error
+  const handleLoginError = () => {
+    setErrorMessage(LOGIN_FAILED);
+  };
 
   return (
     <div>
       <GoogleLogin
-        onSuccess={(credentialResponse) => {
-          // Lấy token từ phản hồi
-          const token = credentialResponse.credential;
-          // Giải mã JWT để lấy thông tin người dùng
-          const payload = JSON.parse(atob(token.split(".")[1]));
-
-          // Lấy email của người dùng từ token
-          const userEmail = payload.email;
-          // Duy trì đăng nhập trong 1 tiếng
-          const expirationTime = new Date().getTime() + 60 * 60 * 1000;
-          // Kiểm tra email có trong danh sách allowedEmails không
-          if (allowedEmails.includes(userEmail)) {
-            sessionStorage.setItem("isLoggedIn", "true");
-            sessionStorage.setItem("userEmail", userEmail);
-            sessionStorage.setItem("expirationTime", expirationTime);
-            setLoggedIn(true);
-            setErrorMessage("");
-            console.log(token);
-            console.log(payload);
-          } else {
-            setErrorMessage(LOGIN_NOT_ALLOW);
-          }
-        }}
-        onError={() => {
-          errorMessage(LOGIN_FAILED);
-        }}
+        onSuccess={handleLoginSuccess}
+        onError={handleLoginError}
       />
       {errorMessage && (
         <Tag color="red" style={{ fontSize: "15px", margin: "20px auto" }}>
@@ -60,4 +60,5 @@ function HandleLogin({ setLoggedIn }) {
     </div>
   );
 }
+
 export default HandleLogin;
