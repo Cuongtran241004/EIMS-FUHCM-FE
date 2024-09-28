@@ -19,14 +19,16 @@ function HandleLogin({ setLoggedIn }) {
       console.log("Token:", token);
       console.log("Payload:", payload);
 
-      // Post the token to the backend for validation
       const response = await axios.post(`${BACKEND_API_URL}/oauth2/code/google`, {
-        token,
+        token},
+        {
+          headers: {
+            "Content-Type": "application/json", 
+            "Authorization": `Bearer ${token}`, 
+          },
       });
 
-      // Handle response after posting the token
       if (response.status === 200) {
-        // Save login session data
         sessionStorage.setItem("isLoggedIn", "true");
         sessionStorage.setItem("userEmail", userEmail);
         sessionStorage.setItem("expirationTime", expirationTime.toString());
