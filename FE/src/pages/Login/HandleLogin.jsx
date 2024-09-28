@@ -14,10 +14,8 @@ function HandleLogin({ setLoggedIn }) {
       const token = credentialResponse.credential;
       const payload = JSON.parse(atob(token.split(".")[1])); // Decode JWT
       const userEmail = payload.email;
-      const expirationTime = new Date().getTime() + 60 * 60 * 1000; // 1-hour expiration
+      const expirationTime = new Date().getTime() + 60 * 30 * 1000; 
 
-      console.log("Token:", token);
-      console.log("Payload:", payload);
 
       const response = await axios.post(`${BACKEND_API_URL}/oauth2/code/google`, {
         token},
@@ -31,9 +29,9 @@ function HandleLogin({ setLoggedIn }) {
 console.log("Response status:", response.status);
 
       if (response.status === 200) {
-        sessionStorage.setItem("isLoggedIn", "true");
-        sessionStorage.setItem("userEmail", userEmail);
-        sessionStorage.setItem("expirationTime", expirationTime.toString());
+        localStorage.setItem("isLoggedIn", "true");
+        localStorage.setItem("userEmail", userEmail);
+        localStorage.setItem("expirationTime", expirationTime.toString());
         setLoggedIn(true);
         setErrorMessage("");
       } else {
@@ -45,7 +43,6 @@ console.log("Response status:", response.status);
     }
   };
 
-  // Handle login error
   const handleLoginError = () => {
     setErrorMessage(LOGIN_FAILED);
   };

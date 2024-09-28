@@ -3,9 +3,9 @@ import { Button } from "antd";
 
 function Logout() {
   const handleLogout = () => {
-    sessionStorage.removeItem("isLoggedIn");
-    sessionStorage.removeItem("expirationTime");
-    sessionStorage.clear();
+    localStorage.removeItem("isLoggedIn");
+    localStorage.removeItem("expirationTime");
+    localStorage.clear();
 
     window.location.reload();
   };
