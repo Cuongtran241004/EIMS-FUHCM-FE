@@ -2,7 +2,7 @@ import { GoogleLogin } from "@react-oauth/google";
 import { useState } from "react";
 import axios from "axios";
 import { Tag } from "antd";
-import { BACKEND_API_URL } from "../../configs/keys"; 
+import { BACKEND_API_URL } from "../../configs/keys";
 import { LOGIN_FAILED } from "../../configs/messages";
 
 function HandleLogin({ setLoggedIn }) {
@@ -14,24 +14,28 @@ function HandleLogin({ setLoggedIn }) {
       const token = credentialResponse.credential;
       const payload = JSON.parse(atob(token.split(".")[1])); // Decode JWT
       const userEmail = payload.email;
-      const expirationTime = new Date().getTime() + 60 * 30 * 1000; 
+      const expirationTime = new Date().getTime() + 60 * 30 * 1000;
 
 
       const response = await axios.post(`${BACKEND_API_URL}/oauth2/code/google`, {
-        token},
+        token
+      },
         {
           headers: {
-            "Content-Type": "application/json", 
-            "Authorization": `Bearer ${token}`, 
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`,
           },
-      });
+        });
       console.log("Response from Backend:", response);
-console.log("Response status:", response.status);
+      console.log("Response status:", response.status);
 
       if (response.status === 200) {
-        localStorage.setItem("isLoggedIn", "true");
-        localStorage.setItem("userEmail", userEmail);
-        localStorage.setItem("expirationTime", expirationTime.toString());
+        const data = await response.json();
+        const token = data.token;
+        sessionStorage.setItem("isLoggedIn", "true");
+        sessionStorage.setItem("userEmail", userEmail);
+        sessionStorage.setItem("expirationTime", expirationTime.toString());
+        sessionStorage.setItem("authToken", token);
         setLoggedIn(true);
         setErrorMessage("");
       } else {
