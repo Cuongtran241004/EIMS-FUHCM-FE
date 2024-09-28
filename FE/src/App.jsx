@@ -4,6 +4,7 @@ import { Route, Routes } from "react-router-dom";
 import Home from "./pages/Home/Home";
 import "./App.css";
 import Logout from "./components/Logout";
+import HandleLogin from "./pages/Login/HandleLogin";
 
 function App() {
   const [loggedIn, setLoggedIn] = useState(false);
@@ -27,6 +28,7 @@ function App() {
         ) : (
           <div>
             <Routes>
+              <Route path="/login" element={<HandleLogin />} />
               <Route path="/" element={<Home />} />
             </Routes>
             <Logout setLoggedIn={setLoggedIn} />

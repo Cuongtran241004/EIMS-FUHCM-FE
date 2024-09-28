@@ -32,10 +32,10 @@ function HandleLogin({ setLoggedIn }) {
       if (response.status === 200) {
         const data = response.data;
         const backendToken = data.token;
-        sessionStorage.setItem("isLoggedIn", "true");
-        sessionStorage.setItem("userEmail", userEmail);
-        sessionStorage.setItem("expirationTime", expirationTime.toString());
-        sessionStorage.setItem("authToken", backendToken);
+        localStorage.setItem("isLoggedIn", "true");
+        localStorage.setItem("userEmail", userEmail);
+        localStorage.setItem("expirationTime", expirationTime.toString());
+        localStorage.setItem("authToken", backendToken);
         setLoggedIn(true);
         setErrorMessage("");
       } else {
