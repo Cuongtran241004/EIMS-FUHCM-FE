@@ -7,7 +7,7 @@ function Logout() {
     localStorage.removeItem("expirationTime");
     localStorage.removeItem("authToken");
 
-    window.location.href = "/login";
+    window.location.reload();
   };
 
   return (
