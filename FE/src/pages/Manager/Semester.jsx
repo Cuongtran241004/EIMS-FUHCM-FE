@@ -27,8 +27,6 @@ import {
 // Ant Design Layout Components
 const { Content, Sider } = Layout;
 
-// Use RangePicker for selecting date ranges
-const { RangePicker } = DatePicker;
 const Semester = () => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);

@@ -24,17 +24,13 @@ import { User_Excel_Template } from "../../utils/User_Excel_Template";
 import { User_Import_Excel } from "../../utils/User_Import_Excel";
 import {
   ADD_INVIGILATOR_FAILED,
-  ADD_INVIGILATOR_FAILED_SERVER,
   ADD_INVIGILATOR_SUCCESS,
   DELETE_INVIGILATOR_FAILED,
-  DELETE_INVIGILATOR_FAILED_SERVER,
   DELETE_INVIGILATOR_SUCCESS,
   EDIT_INVIGILATOR_FAILED,
-  EDIT_INVIGILATOR_FAILED_SERVER,
   EDIT_INVIGILATOR_SUCCESS,
   FETCH_INVIGILATORS_FAILED,
   IMPORT_INVIGILATOR_FAILED,
-  IMPORT_INVIGILATOR_FAILED_SERVER,
   IMPORT_INVIGILATOR_SUCCESS,
 } from "../../configs/messages";
 import userApi from "../../services/User";
@@ -92,9 +88,7 @@ const Invigilator = () => {
       handleCancel();
     } catch (error) {
       message.error(
-        isEditing
-          ? EDIT_INVIGILATOR_FAILED_SERVER
-          : ADD_INVIGILATOR_FAILED_SERVER
+        isEditing ? EDIT_INVIGILATOR_FAILED : ADD_INVIGILATOR_FAILED
       );
     }
   };
@@ -119,7 +113,7 @@ const Invigilator = () => {
       await userApi.deleteUser(fuId);
       message.success(DELETE_INVIGILATOR_SUCCESS);
     } catch (error) {
-      message.error(DELETE_INVIGILATOR_FAILED_SERVER);
+      message.error(DELETE_INVIGILATOR_FAILED);
     }
   };
 
@@ -133,13 +127,13 @@ const Invigilator = () => {
         role: 4,
       }));
       await Promise.all(
-        invigilatorWithRole.map(userApi.addUser) // Add each invigilator to the database
+        invigilatorWithRole.map((invigilator) => userApi.addUser(invigilator)) // Add each invigilator to the database
       );
 
       message.success(IMPORT_INVIGILATOR_SUCCESS);
       fetchData();
     } catch (error) {
-      message.error(IMPORT_INVIGILATOR_FAILED_SERVER);
+      message.error(IMPORT_INVIGILATOR_FAILED);
     } finally {
       setFileLoading(false); // Reset loading state after process
     }

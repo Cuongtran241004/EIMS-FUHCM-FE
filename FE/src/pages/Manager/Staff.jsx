@@ -127,7 +127,7 @@ const Staff = () => {
       const staffWithrole = staffData.map((staff) => ({ ...staff, role: 3 }));
       await Promise.all(
         // Add each staff to the database
-        staffWithrole.map(userApi.addUser)
+        staffWithrole.map((staff) => userApi.addUser(staff))
       );
 
       message.success(IMPORT_STAFFS_SUCCESS);
