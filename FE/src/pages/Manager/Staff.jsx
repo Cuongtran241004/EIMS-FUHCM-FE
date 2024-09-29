@@ -21,17 +21,13 @@ import {
 } from "@ant-design/icons";
 import {
   ADD_STAFF_FAILED,
-  ADD_STAFF_FAILED_SERVER,
   ADD_STAFF_SUCCESS,
   DELETE_STAFF_FAILED,
-  DELETE_STAFF_FAILED_SERVER,
   DELETE_STAFF_SUCCESS,
   EDIT_STAFF_FAILED,
-  EDIT_STAFF_FAILED_SERVER,
   EDIT_STAFF_SUCCESS,
   IMPORT_STAFFS_SUCCESS,
   IMPORT_STAFFS_FAILED,
-  IMPORT_STAFFS_FAILED_SERVER,
   FETCH_STAFFS_FAILED,
 } from "../../configs/messages";
 import { User_Import_Excel } from "../../utils/User_Import_Excel.js";
@@ -94,9 +90,7 @@ const Staff = () => {
       fetchData();
       handleCancel();
     } catch (error) {
-      message.error(
-        isEditing ? EDIT_STAFF_FAILED_SERVER : ADD_STAFF_FAILED_SERVER
-      );
+      message.error(isEditing ? EDIT_STAFF_FAILED : ADD_STAFF_FAILED);
     }
   };
 
@@ -121,7 +115,7 @@ const Staff = () => {
       message.success(DELETE_STAFF_SUCCESS);
       fetchData();
     } catch (error) {
-      message.error(DELETE_STAFF_FAILED_SERVER);
+      message.error(DELETE_STAFF_FAILED);
     }
   };
 
@@ -139,7 +133,7 @@ const Staff = () => {
       message.success(IMPORT_STAFFS_SUCCESS);
       fetchData();
     } catch (error) {
-      message.error(IMPORT_STAFFS_FAILED_SERVER);
+      message.error(IMPORT_STAFFS_FAILED);
     } finally {
       setFileLoading(false); // Reset loading state after process
     }

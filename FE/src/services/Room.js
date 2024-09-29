@@ -2,6 +2,10 @@ import axios from "axios";
 import { API_BASE_URL } from "../configs/urlApi.jsx";
 const ROOM_API_BASE_URL = `${API_BASE_URL}/rooms`;
 
+const handleError = (error) => {
+  console.error("Error fetching data:", error);
+  throw error;
+};
 const roomApi = {
   getAllRooms: async ({ filters = {} }) => {
     try {
@@ -10,8 +14,7 @@ const roomApi = {
       });
       return response.data;
     } catch (error) {
-      console.error("Error fetching data:", error);
-      throw error;
+      handleError(error);
     }
   },
   getRoomByName: async (name) => {
@@ -19,8 +22,7 @@ const roomApi = {
       const response = await axios.get(`${ROOM_API_BASE_URL}/${name}`);
       return response.data;
     } catch (error) {
-      console.error("Error fetching data:", error);
-      throw error;
+      handleError(error);
     }
   },
   addRoom: async (room) => {
@@ -28,8 +30,7 @@ const roomApi = {
       const response = await axios.post(`${ROOM_API_BASE_URL}`, room);
       return response.data;
     } catch (error) {
-      console.error("Error fetching data:", error);
-      throw error;
+      handleError(error);
     }
   },
   updateRoom: async (room) => {
@@ -37,8 +38,7 @@ const roomApi = {
       const response = await axios.put(`${ROOM_API_BASE_URL}/${room.id}`, room);
       return response.data;
     } catch (error) {
-      console.error("Error fetching data:", error);
-      throw error;
+      handleError(error);
     }
   },
   //   deleteRoom: async (code) => {

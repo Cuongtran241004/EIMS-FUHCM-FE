@@ -1,16 +1,134 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Header_Manager from "../../components/Header/Header_Manager";
 import NavBar_Manager from "../../components/NavBar/NavBar_Manager";
-import { Layout, Button, Space } from "antd";
+import {
+  Layout,
+  Button,
+  Space,
+  Modal,
+  Form,
+  Spin,
+  Table,
+  Input,
+  message,
+  DatePicker,
+} from "antd";
+
+import semesterApi from "../../services/Semester.js";
+import {
+  ADD_SEMESTER_FAILED,
+  ADD_SEMESTER_SUCCESS,
+  EDIT_SEMESTER_FAILED,
+  EDIT_SEMESTER_SUCCESS,
+  FETCH_SEMESTERS_FAILED,
+} from "../../configs/messages.jsx";
 
 // Ant Design Layout Components
 const { Content, Sider } = Layout;
+
+// Use RangePicker for selecting date ranges
+const { RangePicker } = DatePicker;
 const Semester = () => {
+  const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(false);
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editingSemester, setEditingSemester] = useState(null);
+  const [form] = Form.useForm();
+
+  const fetchData = async () => {
+    setLoading(true);
+    try {
+      const result = await semesterApi.getAllSemesters();
+      setData(result);
+    } catch (error) {
+      message.error(FETCH_SEMESTERS_FAILED);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
   const showModal = () => {
     setIsModalVisible(true);
   };
 
+  const handleCancel = () => {
+    setIsModalVisible(false);
+    setIsEditing(false);
+    form.resetFields();
+  };
+  const handleOk = async () => {
+    try {
+      const values = await form.validateFields();
+      console.log(values);
+      if (isEditing) {
+        // Update existing semester
+        await semesterApi.updateSemester({ ...editingSemester, ...values });
+        message.success(EDIT_SEMESTER_SUCCESS);
+      } else {
+        // Add new semester
+        await semesterApi.addSemester(values);
+        message.success(ADD_SEMESTER_SUCCESS);
+      }
+      fetchData();
+      handleCancel();
+    } catch (error) {
+      message.error(isEditing ? EDIT_SEMESTER_FAILED : ADD_SEMESTER_FAILED);
+    }
+  };
+
+  const handleEdit = (semester) => {
+    setIsEditing(true);
+    setEditingSemester(semester);
+    form.setFieldsValue({
+      name: semester.name,
+      startAt: semester.startAt,
+      endAt: semester.endAt,
+    });
+    setIsModalVisible(true);
+  };
+  const columns = [
+    {
+      title: "Name",
+      dataIndex: "name",
+      key: "name",
+    },
+
+    {
+      title: "Start Date",
+      dataIndex: "startAt",
+      key: "startAt",
+    },
+    {
+      title: "End Date",
+      dataIndex: "endAt",
+      key: "  endAt",
+    },
+    {
+      title: "Action",
+      key: "action",
+      render: (text, record) => (
+        <Space size="middle">
+          <EditOutlined
+            onClick={() => handleEdit(record)}
+            style={{ color: "blue", cursor: "pointer" }}
+          />
+          <Popconfirm
+            title="Are you sure to delete this staff?"
+            onConfirm={() => handleDelete(record.fuId)}
+            okText="Yes"
+            cancelText="No"
+          >
+            <DeleteOutlined style={{ color: "red", cursor: "pointer" }} />
+          </Popconfirm>
+        </Space>
+      ),
+    },
+  ];
   return (
     <Layout style={{ height: "100vh" }}>
       <Header_Manager />
@@ -33,49 +151,59 @@ const Semester = () => {
               </Button>
             </Space>
 
-            {/* <Spin spinning={loading}>
-                  <Table
-                    dataSource={data}
-                    columns={columns}
-                    rowKey={Math.random}
-                    pagination={{ pageSize: 8 }}
-                  />
-                </Spin> */}
+            <Spin spinning={loading}>
+              <Table
+                dataSource={data}
+                columns={columns}
+                rowKey={Math.random}
+                pagination={{ pageSize: 8 }}
+              />
+            </Spin>
           </Content>
         </Layout>
       </Layout>
 
       {/* Add/Edit Staff Modal */}
-      {/* <Modal
-            title={isEditing ? "Edit Staff" : "Add New Staff"}
-            open={isModalVisible}
-            onOk={handleOk}
-            onCancel={handleCancel}
-            okText="Submit"
-            cancelText="Cancel"
+      <Modal
+        title={isEditing ? "Edit Semester" : "Add New Semester"}
+        open={isModalVisible}
+        onOk={handleOk}
+        onCancel={handleCancel}
+        okText="Submit"
+        cancelText="Cancel"
+      >
+        <Form form={form} layout="vertical" name="add_semester_form">
+          <Form.Item
+            name="name"
+            label="Name"
+            rules={[{ required: true, message: "Please input semester name!" }]}
           >
-            <Form form={form} layout="vertical" name="add_staff_form">
-              <Form.Item
-                name="name"
-                label="Name"
-                rules={[
-                  { required: true, message: "Please input the staff name!" },
-                ]}
-              >
-                <Input placeholder="Enter staff name" />
-              </Form.Item>
-              <Form.Item
-                name="email"
-                label="Email"
-                rules={[
-                  { required: true, message: "Please input the staff email!" },
-                  { type: "email", message: "Please enter a valid email!" },
-                ]}
-              >
-                <Input placeholder="Enter staff email" />
-              </Form.Item>
-            </Form>
-          </Modal> */}
+            <Input placeholder="Enter semester name" />
+          </Form.Item>
+          <Form.Item
+            name="startAt"
+            label="Start Date"
+            rules={[
+              { required: true, message: "Please select the start date!" },
+            ]}
+          >
+            <DatePicker
+              placeholder="Select start date"
+              style={{ width: "100%" }}
+            />
+          </Form.Item>
+          <Form.Item
+            name="endAt"
+            label="End Date"
+            rules={[{ required: true, message: "Please select the end date!" }]}
+          >
+            <DatePicker
+              placeholder="Select end date"
+              style={{ width: "100%" }}
+            />
+          </Form.Item>
+        </Form>
+      </Modal>
     </Layout>
   );
 };

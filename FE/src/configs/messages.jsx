@@ -25,6 +25,16 @@ const IMPORT_STAFFS_FAILED_SERVER =
   "Failed to import staffs! Please try again.";
 const FETCH_STAFFS_FAILED = "Failed to fetch staffs data!";
 
+// Semester
+const FETCH_SEMESTERS_FAILED = "Failed to fetch semesters data!";
+const ADD_SEMESTER_SUCCESS = "Add semester successfully!";
+const ADD_SEMESTER_FAILED = "Failed to add semester!";
+const ADD_SEMESTER_FAILED_SERVER = "Failed to add semester! Please try again.";
+const EDIT_SEMESTER_SUCCESS = "Edit semester successfully!";
+const EDIT_SEMESTER_FAILED = "Failed to edit semester!";
+const EDIT_SEMESTER_FAILED_SERVER =
+  "Failed to edit semester! Please try again.";
+
 // Invigilator
 const ADD_INVIGILATOR_SUCCESS = "Add invigilator successfully!";
 const ADD_INVIGILATOR_FAILED = "Add invigilator failed!";
@@ -76,4 +86,11 @@ export {
   IMPORT_INVIGILATOR_FAILED,
   IMPORT_INVIGILATOR_FAILED_SERVER,
   FETCH_INVIGILATORS_FAILED,
+  FETCH_SEMESTERS_FAILED,
+  ADD_SEMESTER_SUCCESS,
+  ADD_SEMESTER_FAILED,
+  ADD_SEMESTER_FAILED_SERVER,
+  EDIT_SEMESTER_SUCCESS,
+  EDIT_SEMESTER_FAILED,
+  EDIT_SEMESTER_FAILED_SERVER,
 };
