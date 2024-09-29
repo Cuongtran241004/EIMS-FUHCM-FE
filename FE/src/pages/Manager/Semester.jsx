@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import Header_Manager from "../../components/Header/Header_Manager";
 import NavBar_Manager from "../../components/NavBar/NavBar_Manager";
 import { Layout, Button, Space } from "antd";
@@ -6,6 +6,11 @@ import { Layout, Button, Space } from "antd";
 // Ant Design Layout Components
 const { Content, Sider } = Layout;
 const Semester = () => {
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const showModal = () => {
+    setIsModalVisible(true);
+  };
+
   return (
     <Layout style={{ height: "100vh" }}>
       <Header_Manager />

@@ -129,9 +129,11 @@ const Staff = () => {
     setFileLoading(true); // Set loading for file upload
     try {
       const staffData = await User_Import_Excel(file);
+      // Add role to each staff object
+      const staffWithrole = staffData.map((staff) => ({ ...staff, role: 3 }));
       await Promise.all(
         // Add each staff to the database
-        staffData.map(userApi.addUser)
+        staffWithrole.map(userApi.addUser)
       );
 
       message.success(IMPORT_STAFFS_SUCCESS);

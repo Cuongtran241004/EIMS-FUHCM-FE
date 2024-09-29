@@ -126,9 +126,14 @@ const Invigilator = () => {
   const handleFileUpload = async ({ file }) => {
     setFileLoading(true); // Set loading for file upload
     try {
-      const staffData = await User_Import_Excel(file);
+      const InvigilatorData = await User_Import_Excel(file);
+      // Add role to each invigilator
+      const invigilatorWithRole = InvigilatorData.map((invigilator) => ({
+        ...invigilator,
+        role: 4,
+      }));
       await Promise.all(
-        staffData.map(userApi.addUser) // Add each invigilator to the database
+        invigilatorWithRole.map(userApi.addUser) // Add each invigilator to the database
       );
 
       message.success(IMPORT_INVIGILATOR_SUCCESS);
