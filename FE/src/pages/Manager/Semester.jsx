@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import Header_Manager from "../../components/Header/Header_Manager";
 import NavBar_Manager from "../../components/NavBar/NavBar_Manager";
+import moment from "moment";
 import {
   Layout,
   Button,
@@ -52,6 +53,14 @@ const Semester = () => {
     fetchData();
   }, []);
 
+  const validateEndDate = (_, value) => {
+    const { startAt } = form.getFieldsValue();
+    if (value && startAt && value.isBefore(startAt)) {
+      return Promise.reject(new Error("End date cannot be before start date!"));
+    }
+    return Promise.resolve();
+  };
+
   const showModal = () => {
     setIsModalVisible(true);
   };
@@ -64,14 +73,27 @@ const Semester = () => {
   const handleOk = async () => {
     try {
       const values = await form.validateFields();
-      console.log(values);
+      const { startAt, endAt } = values;
+
+      // Convert moment objects to date strings if necessary
+      const formattedStartAt = startAt.format("YYYY-MM-DD");
+      const formattedEndAt = endAt.format("YYYY-MM-DD");
+
       if (isEditing) {
         // Update existing semester
-        await semesterApi.updateSemester({ ...editingSemester, ...values });
+        await semesterApi.updateSemester({
+          ...editingSemester,
+          startAt: formattedStartAt,
+          endAt: formattedEndAt,
+        });
         message.success(EDIT_SEMESTER_SUCCESS);
       } else {
         // Add new semester
-        await semesterApi.addSemester(values);
+        await semesterApi.addSemester({
+          ...values,
+          startAt: formattedStartAt,
+          endAt: formattedEndAt,
+        });
         message.success(ADD_SEMESTER_SUCCESS);
       }
       fetchData();
@@ -86,8 +108,9 @@ const Semester = () => {
     setEditingSemester(semester);
     form.setFieldsValue({
       name: semester.name,
-      startAt: semester.startAt,
-      endAt: semester.endAt,
+      // Use moment for date formatting
+      startAt: moment(semester.startAt),
+      endAt: moment(semester.endAt),
     });
     setIsModalVisible(true);
   };
@@ -195,7 +218,10 @@ const Semester = () => {
           <Form.Item
             name="endAt"
             label="End Date"
-            rules={[{ required: true, message: "Please select the end date!" }]}
+            rules={[
+              { required: true, message: "Please select the end date!" },
+              { validator: validateEndDate }, // Custom validator for end date
+            ]}
           >
             <DatePicker
               placeholder="Select end date"
