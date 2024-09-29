@@ -10,6 +10,7 @@ import Invigilator from "./pages/Manager/Invigilator";
 import Semester from "./pages/Manager/Semester";
 import Subject from "./pages/Manager/Subject";
 import ExamSlots from "./pages/Exam/ExamSlots";
+import ConfigSettings from "./pages/Manager/Config";
 
 function App() {
   const [loggedIn, setLoggedIn] = useState(false);
@@ -38,6 +39,7 @@ function App() {
               <Route path="/subjects" element={<Subject />} />
               <Route path="/staffs" element={<Staff />} />
               <Route path="/invigilators" element={<Invigilator />} />
+              <Route path="/exam-slot" element={<ConfigSettings />} />
               <Route path="/requests" element={<Request />} />
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/exam-schedule" element={<ExamSlots />} />

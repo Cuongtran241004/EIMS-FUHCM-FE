@@ -9,17 +9,12 @@ const ENTER_PASSWORD = "Please enter your password!";
 // Staff
 const ADD_STAFF_SUCCESS = "Add staff successfully!";
 const ADD_STAFF_FAILED = "Failed to add staff!";
-
 const EDIT_STAFF_SUCCESS = "Edit staff successfully!";
 const EDIT_STAFF_FAILED = "Failed to edit staff!";
-
 const DELETE_STAFF_SUCCESS = "Delete staff successfully!";
 const DELETE_STAFF_FAILED = "Failed to delete staff!";
-
 const IMPORT_STAFFS_SUCCESS = "Import staffs successfully!";
 const IMPORT_STAFFS_FAILED = "Some staffs could not be imported.";
-const IMPORT_STAFFS_FAILED_SERVER =
-  "Failed to import staffs! Please try again.";
 const FETCH_STAFFS_FAILED = "Failed to fetch staffs data!";
 
 // Semester
@@ -43,17 +38,19 @@ const FETCH_SUBJECTS_FAILED = "Failed to fetch subjects data!";
 // Invigilator
 const ADD_INVIGILATOR_SUCCESS = "Add invigilator successfully!";
 const ADD_INVIGILATOR_FAILED = "Add invigilator failed!";
-
 const EDIT_INVIGILATOR_SUCCESS = "Edit invigilator successfully!";
 const EDIT_INVIGILATOR_FAILED = "Edit invigilator failed!";
-
 const DELETE_INVIGILATOR_SUCCESS = "Delete invigilator successfully!";
 const DELETE_INVIGILATOR_FAILED = "Delete invigilator failed!";
-
 const IMPORT_INVIGILATOR_SUCCESS = "Import invigilators successfully!";
 const IMPORT_INVIGILATOR_FAILED = "Some invigilators could not be imported.";
-
 const FETCH_INVIGILATORS_FAILED = "Failed to fetch invigilators data!";
+
+// Configs
+const FETCH_CONFIG_FAILED = "Failed to fetch configuration data!";
+const UPDATE_CONFIG_SUCCESS = "Update configuration successfully!";
+const UPDATE_CONFIG_FAILED = "Failed to update configuration!";
+
 export {
   LOGIN_NOT_ALLOW,
   LOGIN_FAILED,
@@ -92,4 +89,7 @@ export {
   IMPORT_SUBJECTS_SUCCESS,
   IMPORT_SUBJECTS_FAILED,
   FETCH_SUBJECTS_FAILED,
+  FETCH_CONFIG_FAILED,
+  UPDATE_CONFIG_SUCCESS,
+  UPDATE_CONFIG_FAILED,
 };
