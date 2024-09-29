@@ -1,5 +1,5 @@
 import axios from "axios";
-import { API_BASE_URL } from "../configs/keys";
+import { API_BASE_URL } from "../configs/urlApi.jsx";
 const USER_API_BASE_URL = `${API_BASE_URL}/users`;
 // CUSTOM AXIOS INSTANCE
 // const USER_API = axios.create({
@@ -8,6 +8,12 @@ const USER_API_BASE_URL = `${API_BASE_URL}/users`;
 //     "Content-Type": "application/json",
 //   },
 // });
+
+const handleError = (error) => {
+  console.error("Error with API request:", error);
+  throw error;
+};
+
 const userApi = {
   getAllusers: async ({ filters = {} }) => {
     try {
@@ -16,8 +22,7 @@ const userApi = {
       });
       return response.data;
     } catch (error) {
-      console.error("Error fetching data:", error);
-      throw error;
+      handleError(error);
     }
   },
   getUserByFuId: async (fuId) => {
@@ -25,8 +30,7 @@ const userApi = {
       const response = await axios.get(`${USER_API_BASE_URL}/${fuId}`);
       return response.data;
     } catch (error) {
-      console.error("Error fetching data:", error);
-      throw error;
+      handleError(error);
     }
   },
 
@@ -35,8 +39,7 @@ const userApi = {
       const response = await axios.post(`${USER_API_BASE_URL}`, user);
       return response.data;
     } catch (error) {
-      console.error("Error fetching data:", error);
-      throw error;
+      handleError(error);
     }
   },
   updateUser: async (user) => {
@@ -47,8 +50,7 @@ const userApi = {
       );
       return response.data;
     } catch (error) {
-      console.error("Error fetching data:", error);
-      throw error;
+      handleError(error);
     }
   },
   deleteUser: async (fuId) => {
@@ -56,8 +58,7 @@ const userApi = {
       const response = await axios.delete(`${USER_API_BASE_URL}/${fuId}`);
       return response.data;
     } catch (error) {
-      console.error("Error fetching data:", error);
-      throw error;
+      handleError(error);
     }
   },
 };

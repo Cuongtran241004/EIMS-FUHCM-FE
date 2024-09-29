@@ -2,6 +2,11 @@ import axios from "axios";
 import { API_BASE_URL } from "../configs/urlApi.jsx";
 const SEMESTER_API_BASE_URL = `${API_BASE_URL}/semesters`;
 
+const handleError = (error) => {
+  console.error("Error with API request:", error);
+  throw error;
+};
+
 const semesterApi = {
   getAllSemesters: async ({ filters = {} }) => {
     try {
@@ -10,8 +15,7 @@ const semesterApi = {
       });
       return response.data;
     } catch (error) {
-      console.error("Error fetching data:", error);
-      throw error;
+      handleError(error);
     }
   },
   getSemesterById: async (id) => {
@@ -19,8 +23,7 @@ const semesterApi = {
       const response = await axios.get(`${SEMESTER_API_BASE_URL}/${id}`);
       return response.data;
     } catch (error) {
-      console.error("Error fetching data:", error);
-      throw error;
+      handleError(error);
     }
   },
   addSemester: async (semester) => {
@@ -28,8 +31,7 @@ const semesterApi = {
       const response = await axios.post(`${SEMESTER_API_BASE_URL}`, semester);
       return response.data;
     } catch (error) {
-      console.error("Error fetching data:", error);
-      throw error;
+      handleError(error);
     }
   },
   updateSemester: async (semester) => {
@@ -40,8 +42,7 @@ const semesterApi = {
       );
       return response.data;
     } catch (error) {
-      console.error("Error fetching data:", error);
-      throw error;
+      handleError(error);
     }
   },
   //   deleteSemester: async (code) => {

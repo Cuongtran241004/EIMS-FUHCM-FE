@@ -13,14 +13,15 @@ import {
   Space,
   Popconfirm,
   Upload,
+  Radio,
 } from "antd";
 import {
   EditOutlined,
   DeleteOutlined,
   UploadOutlined,
 } from "@ant-design/icons";
-import { Invigilator_Excel_Template } from "../../utils/Invigilator_Excel_Template";
-import { Invigilator_Import_Excel } from "../../utils/Invigilator_Import_Excel";
+import { User_Excel_Template } from "../../utils/User_Excel_Template";
+import { User_Import_Excel } from "../../utils/User_Import_Excel";
 import {
   ADD_INVIGILATOR_FAILED,
   ADD_INVIGILATOR_FAILED_SERVER,
@@ -36,7 +37,8 @@ import {
   IMPORT_INVIGILATOR_FAILED_SERVER,
   IMPORT_INVIGILATOR_SUCCESS,
 } from "../../configs/messages";
-import { API_BASE_URL } from "../../configs/urlApi";
+import userApi from "../../services/User";
+
 // Ant Design Layout Components
 const { Content, Sider } = Layout;
 const Invigilator = () => {
@@ -45,14 +47,13 @@ const Invigilator = () => {
   const [fileLoading, setFileLoading] = useState(false); // For file upload loading state
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
-  const [editingStaff, setEditingStaff] = useState(null);
+  const [editingInvigilator, setEditingInvigilator] = useState(null);
   const [form] = Form.useForm();
 
   const fetchData = async () => {
     setLoading(true);
     try {
-      const response = await fetch(API_BASE_URL + "/invigilators");
-      const result = await response.json();
+      const result = await userApi.getAllusers({ role: 4 });
       setData(result);
     } catch (error) {
       message.error(FETCH_INVIGILATORS_FAILED);
@@ -79,43 +80,16 @@ const Invigilator = () => {
     try {
       const values = await form.validateFields();
       if (isEditing) {
-        // Update existing staff
-        const response = await fetch(
-          `${API_BASE_URL}/invigilators/${editingStaff.id}`,
-          {
-            method: "PUT",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify(values),
-          }
-        );
-
-        if (response.ok) {
-          message.success(EDIT_INVIGILATOR_SUCCESS);
-          fetchData();
-          handleCancel();
-        } else {
-          throw new Error(EDIT_INVIGILATOR_FAILED);
-        }
+        // Update existing invigilator
+        await userApi.updateUser({ ...editingInvigilator, ...values });
+        message.success(EDIT_INVIGILATOR_SUCCESS);
       } else {
-        // Add new staff
-        const response = await fetch(API_BASE_URL + "/invigilators", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(values),
-        });
-
-        if (response.ok) {
-          message.success(ADD_INVIGILATOR_SUCCESS);
-          fetchData();
-          handleCancel();
-        } else {
-          throw new Error(ADD_INVIGILATOR_FAILED);
-        }
+        // Add new invigilator
+        await userApi.addUser(values);
+        message.success(ADD_INVIGILATOR_SUCCESS);
       }
+      fetchData();
+      handleCancel();
     } catch (error) {
       message.error(
         isEditing
@@ -127,25 +101,23 @@ const Invigilator = () => {
 
   const handleEdit = (staff) => {
     setIsEditing(true);
-    setEditingStaff(staff);
+    setEditingInvigilator(staff);
     form.setFieldsValue({
-      name: staff.name,
+      fuId: staff.fuId,
+      firstName: staff.firstName,
+      lastName: staff.lastName,
       email: staff.email,
+      phoneNumber: staff.phoneNumber,
+      department: staff.department,
+      gender: staff.gender,
     });
     setIsModalVisible(true);
   };
 
-  const handleDelete = async (id) => {
+  const handleDelete = async (fuId) => {
     try {
-      const response = await fetch(`${API_BASE_URL}/invigilators/${id}`, {
-        method: "DELETE",
-      });
-      if (response.ok) {
-        message.success(DELETE_INVIGILATOR_SUCCESS);
-        fetchData();
-      } else {
-        throw new Error(DELETE_INVIGILATOR_FAILED);
-      }
+      await userApi.deleteUser(fuId);
+      message.success(DELETE_INVIGILATOR_SUCCESS);
     } catch (error) {
       message.error(DELETE_INVIGILATOR_FAILED_SERVER);
     }
@@ -154,26 +126,12 @@ const Invigilator = () => {
   const handleFileUpload = async ({ file }) => {
     setFileLoading(true); // Set loading for file upload
     try {
-      const staffData = await Invigilator_Import_Excel(file);
-      const responses = await Promise.all(
-        staffData.map(async (staff) => {
-          const response = await fetch(API_BASE_URL + "/invigilators", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify(staff),
-          });
-          return response.ok;
-        })
+      const staffData = await User_Import_Excel(file);
+      await Promise.all(
+        staffData.map(userApi.addUser) // Add each invigilator to the database
       );
 
-      if (responses.every((response) => response)) {
-        message.success(IMPORT_INVIGILATOR_SUCCESS);
-      } else {
-        message.error(IMPORT_INVIGILATOR_FAILED);
-      }
-
+      message.success(IMPORT_INVIGILATOR_SUCCESS);
       fetchData();
     } catch (error) {
       message.error(IMPORT_INVIGILATOR_FAILED_SERVER);
@@ -184,14 +142,14 @@ const Invigilator = () => {
 
   const columns = [
     {
-      title: "ID",
-      dataIndex: "id",
-      key: "id",
+      title: "FUID",
+      dataIndex: "fuId",
+      key: "fuId",
     },
     {
-      title: "Name",
-      dataIndex: "name",
-      key: "name",
+      title: "Full Name",
+      key: "fullName",
+      render: (text, record) => `${record.firstName} ${record.lastName}`,
     },
     {
       title: "Email",
@@ -199,9 +157,14 @@ const Invigilator = () => {
       key: "email",
     },
     {
-      title: "Phone",
-      dataIndex: "phone",
-      key: "phone",
+      title: "Phone Number",
+      dataIndex: "phoneNumber",
+      key: "phoneNumber",
+    },
+    {
+      title: "Department",
+      dataIndex: "department",
+      key: "department",
     },
     {
       title: "Action",
@@ -258,7 +221,10 @@ const Invigilator = () => {
                 </Button>
               </Upload>
 
-              <Button onClick={Invigilator_Excel_Template} type="default">
+              <Button
+                onClick={() => User_Excel_Template("Invigilator_Template")}
+                type="default"
+              >
                 Download Import Template
               </Button>
             </Space>
@@ -267,7 +233,7 @@ const Invigilator = () => {
               <Table
                 dataSource={data}
                 columns={columns}
-                rowKey={Math.random}
+                rowKey={(record) => record.fuId}
                 pagination={{ pageSize: 8 }}
               />
             </Spin>
@@ -286,39 +252,70 @@ const Invigilator = () => {
       >
         <Form form={form} layout="vertical" name="add_invigilator_form">
           <Form.Item
-            name="name"
-            label="Name"
-            rules={[
-              { required: true, message: "Please input the invigilator name!" },
-            ]}
+            name="fuId"
+            label="FUID"
+            rules={[{ required: true, message: "Please input FUID!" }]}
           >
-            <Input placeholder="Enter invigilator name" />
+            <Input placeholder="Enter fuid" />
           </Form.Item>
+
+          <Form.Item
+            name="firstName"
+            label="First Name"
+            rules={[{ required: true, message: "Please input first name!" }]}
+          >
+            <Input placeholder="Enter first name" />
+          </Form.Item>
+
+          <Form.Item
+            name="lastName"
+            label="Last Name"
+            rules={[{ required: true, message: "Please input last name!" }]}
+          >
+            <Input placeholder="Enter last name" />
+          </Form.Item>
+
           <Form.Item
             name="email"
             label="Email"
             rules={[
-              {
-                required: true,
-                message: "Please input the invigilator email!",
-              },
+              { required: true, message: "Please input email!" },
               { type: "email", message: "Please enter a valid email!" },
             ]}
           >
-            <Input placeholder="Enter invigilator email" />
+            <Input placeholder="Enter the email" />
           </Form.Item>
+
           <Form.Item
-            name="phone"
+            name="phoneNumber"
             label="Phone"
-            rules={[
-              {
-                required: true,
-                message: "Please input the invigilator phone!",
-              },
-              { type: "text", message: "Please enter a valid phone!" },
-            ]}
+            rules={[{ required: true, message: "Please input phone number!" }]}
           >
-            <Input placeholder="Enter invigilator phone" />
+            <Input placeholder="Enter phone number" />
+          </Form.Item>
+
+          <Form.Item
+            name="department"
+            label="Department"
+            rules={[{ required: true, message: "Please input department!" }]}
+          >
+            <Input placeholder="Enter the department" />
+          </Form.Item>
+
+          <Form.Item
+            name="gender"
+            label="Gender"
+            rules={[{ required: true, message: "Please select gender!" }]}
+            initialValue="male"
+          >
+            <Radio.Group>
+              <Radio value="male">Male</Radio>
+              <Radio value="female">Female</Radio>
+            </Radio.Group>
+          </Form.Item>
+          {/* Hidden field */}
+          <Form.Item name="role" initialValue="4" hidden={true}>
+            <Input />
           </Form.Item>
         </Form>
       </Modal>

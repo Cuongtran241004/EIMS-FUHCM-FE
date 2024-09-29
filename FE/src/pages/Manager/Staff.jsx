@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { API_BASE_URL } from "../../configs/urlApi";
+import userApi from "../../services/User.js";
 import {
   Spin,
   Table,
@@ -12,6 +12,7 @@ import {
   Space,
   Popconfirm,
   Upload,
+  Radio,
 } from "antd";
 import {
   EditOutlined,
@@ -33,8 +34,9 @@ import {
   IMPORT_STAFFS_FAILED_SERVER,
   FETCH_STAFFS_FAILED,
 } from "../../configs/messages";
-import { Staff_Import_Excel } from "../../utils/Staff_Import_Excel.js";
-import { Staff_Excel_Template } from "../../utils/Staff_Excel_Template.js";
+import { User_Import_Excel } from "../../utils/User_Import_Excel.js";
+import { User_Excel_Template } from "../../utils/User_Excel_Template.js";
+
 import Header_Manager from "../../components/Header/Header_Manager.jsx";
 import NavBar_Manager from "../../components/NavBar/NavBar_Manager.jsx";
 
@@ -50,16 +52,10 @@ const Staff = () => {
   const [editingStaff, setEditingStaff] = useState(null);
   const [form] = Form.useForm();
 
-  const getIndex = (data) => {
-    data = data.map((item, index) => ({ index: index + 1 }));
-    console.log(data);
-  };
-
   const fetchData = async () => {
     setLoading(true);
     try {
-      const response = await fetch(API_BASE_URL + "staffs");
-      const result = await response.json();
+      const result = await userApi.getAllusers({ role: 3 });
       setData(result);
     } catch (error) {
       message.error(FETCH_STAFFS_FAILED);
@@ -85,44 +81,18 @@ const Staff = () => {
   const handleOk = async () => {
     try {
       const values = await form.validateFields();
+      console.log(values);
       if (isEditing) {
         // Update existing staff
-        const response = await fetch(
-          `${API_BASE_URL}/staffs/${editingStaff.id}`,
-          {
-            method: "PUT",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify(values),
-          }
-        );
-
-        if (response.ok) {
-          message.success(EDIT_STAFF_SUCCESS);
-          fetchData();
-          handleCancel();
-        } else {
-          throw new Error(EDIT_STAFF_FAILED);
-        }
+        await userApi.updateUser({ ...editingStaff, ...values });
+        message.success(EDIT_STAFF_SUCCESS);
       } else {
         // Add new staff
-        const response = await fetch(API_BASE_URL + "/staffs", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(values),
-        });
-
-        if (response.ok) {
-          message.success(ADD_STAFF_SUCCESS);
-          fetchData();
-          handleCancel();
-        } else {
-          throw new Error(ADD_STAFF_FAILED);
-        }
+        await userApi.addUser(values);
+        message.success(ADD_STAFF_SUCCESS);
       }
+      fetchData();
+      handleCancel();
     } catch (error) {
       message.error(
         isEditing ? EDIT_STAFF_FAILED_SERVER : ADD_STAFF_FAILED_SERVER
@@ -134,23 +104,22 @@ const Staff = () => {
     setIsEditing(true);
     setEditingStaff(staff);
     form.setFieldsValue({
-      name: staff.name,
+      fuId: staff.fuId,
+      firstName: staff.firstName,
+      lastName: staff.lastName,
       email: staff.email,
+      phoneNumber: staff.phoneNumber,
+      department: staff.department,
+      gender: staff.gender,
     });
     setIsModalVisible(true);
   };
 
-  const handleDelete = async (id) => {
+  const handleDelete = async (fuId) => {
     try {
-      const response = await fetch(`${API_BASE_URL}/staffs/${id}`, {
-        method: "DELETE",
-      });
-      if (response.ok) {
-        message.success(DELETE_STAFF_SUCCESS);
-        fetchData();
-      } else {
-        throw new Error(DELETE_STAFF_FAILED);
-      }
+      await userApi.deleteUser(fuId);
+      message.success(DELETE_STAFF_SUCCESS);
+      fetchData();
     } catch (error) {
       message.error(DELETE_STAFF_FAILED_SERVER);
     }
@@ -159,26 +128,13 @@ const Staff = () => {
   const handleFileUpload = async ({ file }) => {
     setFileLoading(true); // Set loading for file upload
     try {
-      const staffData = await Staff_Import_Excel(file);
-      const responses = await Promise.all(
-        staffData.map(async (staff) => {
-          const response = await fetch(API_BASE_URL + "/staffs", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify(staff),
-          });
-          return response.ok;
-        })
+      const staffData = await User_Import_Excel(file);
+      await Promise.all(
+        // Add each staff to the database
+        staffData.map(userApi.addUser)
       );
 
-      if (responses.every((response) => response)) {
-        message.success(IMPORT_STAFFS_SUCCESS);
-      } else {
-        message.error(IMPORT_STAFFS_FAILED);
-      }
-
+      message.success(IMPORT_STAFFS_SUCCESS);
       fetchData();
     } catch (error) {
       message.error(IMPORT_STAFFS_FAILED_SERVER);
@@ -189,19 +145,29 @@ const Staff = () => {
 
   const columns = [
     {
-      title: "ID",
-      dataIndex: "id",
-      key: "id",
+      title: "FUID",
+      dataIndex: "fuId",
+      key: "fuId",
     },
     {
-      title: "Name",
-      dataIndex: "name",
-      key: "name",
+      title: "Full Name",
+      key: "fullName",
+      render: (text, record) => `${record.firstName} ${record.lastName}`,
     },
     {
       title: "Email",
       dataIndex: "email",
       key: "email",
+    },
+    {
+      title: "Phone Number",
+      dataIndex: "phoneNumber",
+      key: "phoneNumber",
+    },
+    {
+      title: "Department",
+      dataIndex: "department",
+      key: "department",
     },
     {
       title: "Action",
@@ -214,7 +180,7 @@ const Staff = () => {
           />
           <Popconfirm
             title="Are you sure to delete this staff?"
-            onConfirm={() => handleDelete(record.id)}
+            onConfirm={() => handleDelete(record.fuId)}
             okText="Yes"
             cancelText="No"
           >
@@ -258,7 +224,10 @@ const Staff = () => {
                 </Button>
               </Upload>
 
-              <Button onClick={Staff_Excel_Template} type="default">
+              <Button
+                onClick={() => User_Excel_Template("Staff_Template")}
+                type="default"
+              >
                 Download Import Template
               </Button>
             </Space>
@@ -267,7 +236,7 @@ const Staff = () => {
               <Table
                 dataSource={data}
                 columns={columns}
-                rowKey={getIndex(data)}
+                rowKey={(record) => record.fuId}
                 pagination={{ pageSize: 8 }}
               />
             </Spin>
@@ -286,23 +255,70 @@ const Staff = () => {
       >
         <Form form={form} layout="vertical" name="add_staff_form">
           <Form.Item
-            name="name"
-            label="Name"
-            rules={[
-              { required: true, message: "Please input the staff name!" },
-            ]}
+            name="fuId"
+            label="FUID"
+            rules={[{ required: true, message: "Please input FUID!" }]}
           >
-            <Input placeholder="Enter staff name" />
+            <Input placeholder="Enter fuid" />
           </Form.Item>
+
+          <Form.Item
+            name="firstName"
+            label="First Name"
+            rules={[{ required: true, message: "Please input first name!" }]}
+          >
+            <Input placeholder="Enter first name" />
+          </Form.Item>
+
+          <Form.Item
+            name="lastName"
+            label="Last Name"
+            rules={[{ required: true, message: "Please input last name!" }]}
+          >
+            <Input placeholder="Enter last name" />
+          </Form.Item>
+
           <Form.Item
             name="email"
             label="Email"
             rules={[
-              { required: true, message: "Please input the staff email!" },
+              { required: true, message: "Please input email!" },
               { type: "email", message: "Please enter a valid email!" },
             ]}
           >
-            <Input placeholder="Enter staff email" />
+            <Input placeholder="Enter the email" />
+          </Form.Item>
+
+          <Form.Item
+            name="phoneNumber"
+            label="Phone"
+            rules={[{ required: true, message: "Please input phone number!" }]}
+          >
+            <Input placeholder="Enter phone number" />
+          </Form.Item>
+
+          <Form.Item
+            name="department"
+            label="Department"
+            rules={[{ required: true, message: "Please input department!" }]}
+          >
+            <Input placeholder="Enter the department" />
+          </Form.Item>
+
+          <Form.Item
+            name="gender"
+            label="Gender"
+            rules={[{ required: true, message: "Please select gender!" }]}
+            initialValue="male"
+          >
+            <Radio.Group>
+              <Radio value="male">Male</Radio>
+              <Radio value="female">Female</Radio>
+            </Radio.Group>
+          </Form.Item>
+          {/* Hidden field */}
+          <Form.Item name="role" initialValue="3" hidden={true}>
+            <Input />
           </Form.Item>
         </Form>
       </Modal>

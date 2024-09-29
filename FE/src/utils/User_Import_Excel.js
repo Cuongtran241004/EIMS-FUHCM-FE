@@ -5,7 +5,7 @@ import * as XLSX from "xlsx";
  * @param {File} file - The uploaded Excel file
  * @returns {Promise<Array>} - Promise resolving to an array of staff objects
  */
-export const Invigilator_Import_Excel = (file) => {
+export const User_Import_Excel = (file) => {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
 
@@ -24,13 +24,36 @@ export const Invigilator_Import_Excel = (file) => {
 
       // Validate and map data
       const staffData = data.map((item) => {
-        const { Name, Email, Phone } = item; // Adjust these names based on your Excel column headers
-        if (!Name || !Email || !Phone) {
-          throw new Error(
-            "Invalid data: Each row must contain a Name, Email and Phone number"
-          );
+        const {
+          fuId,
+          firstName,
+          lastName,
+          email,
+          phoneNumber,
+          department,
+          gender,
+        } = item; // Adjust these names based on your Excel column headers
+
+        if (
+          !fuId ||
+          !firstName ||
+          !lastName ||
+          !email ||
+          !phoneNumber ||
+          !department ||
+          !gender
+        ) {
+          throw new Error("Invalid data in Excel file");
         }
-        return { name: Name, email: Email, phone: Phone };
+        return {
+          fuId,
+          firstName,
+          lastName,
+          email,
+          phoneNumber,
+          department,
+          gender,
+        };
       });
 
       resolve(staffData);
