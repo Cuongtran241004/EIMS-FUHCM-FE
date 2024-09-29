@@ -1,13 +1,16 @@
 import HandleLogin from "./HandleLogin";
 import "./Login.css";
 
-function Login({ setLoggedIn }) {
+function Login() {
+  const googleLogin = () => {
+    window.location.href = "http://localhost:8080/eims-fuhcm-be/oauth2/authorization/google";
+  };
   return (
     <div className="login-container">
-      <form className="login-form">
+      <div className="login-form">
         <h1 className="login-h1">Login</h1>
-        <HandleLogin setLoggedIn={setLoggedIn}></HandleLogin>
-      </form>
+        <button onClick={googleLogin}>Login with Google</button>
+      </div>
     </div>
   );
 }
