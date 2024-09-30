@@ -4,6 +4,8 @@ import NavBar_Manager from "../../components/NavBar/NavBar_Manager";
 import "./Home.css";
 
 function Home() {
+
+
   return (
     <div>
       <Header_Manager />

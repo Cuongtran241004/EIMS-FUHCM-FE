@@ -1,8 +1,25 @@
-import HandleLogin from "../../components/Handle/HandleLogin";
-import "./Login.css";
-import LoginForm from "./LoginForm";
+import { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import  GoogleLogin  from '../../components/GoogleLogin';
+import { postLoginToken } from '../../components/api/postLoginToken';
+import './Login.css';
+import LoginForm from './LoginForm';
 
-function Login({ setLoggedIn }) {
+export default function Login({ isLogin, setIsLogin }) {
+  const navigate = useNavigate();
+
+  // https://stackoverflow.com/questions/49819183/react-what-is-the-best-way-to-handle-login-and-authentication
+  const onGoogleSignIn = async res => {
+    const { credential } = res;
+    const result = await postLoginToken(credential, setIsLogin);
+    setIsLogin(result);
+  };
+
+  useEffect(() => {
+    if (!isLogin) return;
+    navigate('/dashboard');
+  }, [isLogin]);
+
   return (
     <div className="login-container">
       <div className="login-form">
@@ -15,12 +32,11 @@ function Login({ setLoggedIn }) {
 
 
           <div className="form-section">
-            <HandleLogin setLoggedIn={setLoggedIn} />
+          <GoogleLogin onGoogleSignIn={onGoogleSignIn} text="Login with Google" />
           </div>
         </div>
       </div>
     </div>
+   
   );
 }
-
-export default Login;

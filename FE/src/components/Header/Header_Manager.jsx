@@ -5,7 +5,9 @@ import { DownOutlined, UserOutlined } from "@ant-design/icons";
 import logo from "../../assets/fpt-university-logo.png";
 import "./Header_Manager.css";
 import Logout from "../Logout";
-import { Link } from "react-router-dom";
+import { Link, Navigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { getUserInfo } from "../API/getUserInfo";
 
 const handleMenuClick = (e) => {
   message.info("Click on menu item.");
@@ -28,7 +30,24 @@ const menuProps = {
   onClick: handleMenuClick,
 };
 
-const Header_Manager = () => {
+const Header_Manager = ({isLogin}) => {
+
+  const [data, setData] = useState({
+    name: '',
+  });
+
+  useEffect(() => {
+    if (!isLogin) Navigate('/');
+
+    const initUserInfo = async () => {
+      const newInfo = await getUserInfo();
+      setData(newInfo);
+    };
+    initUserInfo();
+
+   
+  }, [isLogin]);
+
   return (
     <div className="header">
       <div className="header-left">
@@ -46,10 +65,10 @@ const Header_Manager = () => {
             <Link to="/requests">Request</Link>
           </Button>
 
-          <Dropdown menu={menuProps}>
+          <Dropdown  menu={menuProps}>
             <Button>
               <Space>
-                Quốc Cường
+                {data.name}
                 <DownOutlined />
               </Space>
             </Button>
