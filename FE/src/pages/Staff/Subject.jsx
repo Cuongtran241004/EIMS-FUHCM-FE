@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import Header_Manager from "../../components/Header/Header_Manager";
-import NavBar_Manager from "../../components/NavBar/NavBar_Manager";
+import Header_Manager from "../../components/Header/Header_Manager.jsx";
+import NavBar_Manager from "../../components/NavBar/NavBar_Manager.jsx";
 import {
   Layout,
   Button,
@@ -29,7 +29,7 @@ import { Subject_Excel_Template } from "../../utils/Subject_Excel_Template.js";
 
 // Ant Design Layout Components
 const { Content, Sider } = Layout;
-const Subject = ({isLogin}) => {
+const Subject = ({ isLogin }) => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
   // For file upload loading state
@@ -129,7 +129,7 @@ const Subject = ({isLogin}) => {
 
   return (
     <Layout style={{ height: "100vh" }}>
-      <Header_Manager isLogin={isLogin}/>
+      <Header_Manager isLogin={isLogin} />
       <Layout>
         <Sider width={256} style={{ backgroundColor: "#fff" }}>
           <NavBar_Manager />

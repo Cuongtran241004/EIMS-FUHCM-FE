@@ -52,10 +52,10 @@ const items = [
             key: "5",
             label: <Link to="/semester">Semester</Link>,
           },
-          {
-            key: "6",
-            label: <Link to="/subjects">Subjects</Link>,
-          },
+          // {
+          //   key: "6",
+          //   label: <Link to="/subjects">Subjects</Link>,
+          // },
           {
             key: "7",
             label: <Link to="/exam-slot">Exam Slot</Link>,
@@ -96,7 +96,7 @@ const NavBar_Manager = () => {
     "/invigilator-attendance": { key: "3", openKey: "sub2" },
     "/invigilation-fees": { key: "4", openKey: "sub2" },
     "/semester": { key: "5", openKey: "sub3" },
-    "/subjects": { key: "6", openKey: "sub3" },
+    // "/subjects": { key: "6", openKey: "sub3" },
     "/exam-slot": { key: "7", openKey: "sub3" },
     "/staffs": { key: "8", openKey: "sub3" },
     "/invigilators": { key: "9", openKey: "sub3" },
