@@ -11,7 +11,7 @@ import NavBar_Manager from "../../components/NavBar/NavBar_Manager.jsx";
 
 const { Content, Sider } = Layout;
 
-const ConfigSettings = () => {
+const ConfigSettings = ({isLogin}) => {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
   const [configData, setConfigData] = useState({
@@ -54,7 +54,7 @@ const ConfigSettings = () => {
 
   return (
     <Layout>
-      <Header_Manager />
+      <Header_Manager isLogin={isLogin} />
       <Layout>
         <Sider width={256} style={{ backgroundColor: "#fff" }}>
           <NavBar_Manager />

@@ -27,7 +27,7 @@ import {
 // Ant Design Layout Components
 const { Content, Sider } = Layout;
 
-const Semester = () => {
+const Semester = ({isLogin}) => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -152,7 +152,7 @@ const Semester = () => {
   ];
   return (
     <Layout style={{ height: "100vh" }}>
-      <Header_Manager />
+      <Header_Manager isLogin={isLogin}/>
       <Layout>
         <Sider width={256} style={{ backgroundColor: "#fff" }}>
           <NavBar_Manager />

@@ -29,7 +29,6 @@ function App() {
   return (
     <>
       <div className="container">
-      {isLogin && <Header_Manager isLogin={isLogin} />}
 
         {!isLogin ? (
           <Routes>
@@ -42,14 +41,14 @@ function App() {
               path="/"
               element={<Navigate to="/dashboard" replace />}
             />
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/semester" element={<Semester />} />
-            <Route path="/subjects" element={<Subject />} />
-            <Route path="/staffs" element={<Staff />} />
-            <Route path="/invigilators" element={<Invigilator />} />
-            <Route path="/exam-slot" element={<ConfigSettings />} />
-            <Route path="/requests" element={<Request />} />
-            <Route path="/exam-schedule" element={<ExamSlots />} />
+            <Route path="/dashboard" element={<Dashboard isLogin={isLogin} />} />
+            <Route path="/semester" element={<Semester isLogin={isLogin}/>} />
+            <Route path="/subjects" element={<Subject isLogin={isLogin}/>} />
+            <Route path="/staffs" element={<Staff isLogin={isLogin}/>} />
+            <Route path="/invigilators" element={<Invigilator isLogin={isLogin}/>} />
+            <Route path="/exam-slot" element={<ConfigSettings isLogin={isLogin}/>} />
+            <Route path="/requests" element={<Request isLogin={isLogin}/>} />
+            <Route path="/exam-schedule" element={<ExamSlots isLogin={isLogin}/>} />
             {/* Điều hướng bất kỳ đường dẫn nào không xác định về dashboard */}
             <Route path="*" element={<Navigate to="/dashboard" replace />} />
           </Routes>

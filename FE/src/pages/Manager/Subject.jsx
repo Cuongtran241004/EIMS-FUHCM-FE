@@ -29,7 +29,7 @@ import { Subject_Excel_Template } from "../../utils/Subject_Excel_Template.js";
 
 // Ant Design Layout Components
 const { Content, Sider } = Layout;
-const Subject = () => {
+const Subject = ({isLogin}) => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
   // For file upload loading state
@@ -129,7 +129,7 @@ const Subject = () => {
 
   return (
     <Layout style={{ height: "100vh" }}>
-      <Header_Manager />
+      <Header_Manager isLogin={isLogin}/>
       <Layout>
         <Sider width={256} style={{ backgroundColor: "#fff" }}>
           <NavBar_Manager />

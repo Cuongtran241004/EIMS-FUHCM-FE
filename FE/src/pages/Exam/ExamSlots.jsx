@@ -111,10 +111,10 @@ const columns = [
   ];
   
 
-function ExamSlots() {
+function ExamSlots({isLogin}) {
     return (
         <Layout style={{ height: "120vh" }}>
-            <Header_Manager />
+            <Header_Manager isLogin={isLogin}/>
             <Layout>
                 <Sider width={256} style={{ backgroundColor: "#fff" }}>
                     <NavBar_Manager />

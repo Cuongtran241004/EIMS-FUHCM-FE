@@ -33,7 +33,8 @@ const menuProps = {
 const Header_Manager = ({isLogin}) => {
 
   const [data, setData] = useState({
-    name: '',
+    firstName: '',
+    lastName: '',
   });
 
   useEffect(() => {
@@ -44,6 +45,7 @@ const Header_Manager = ({isLogin}) => {
       setData(newInfo);
     };
     initUserInfo();
+
 
    
   }, [isLogin]);
@@ -68,7 +70,7 @@ const Header_Manager = ({isLogin}) => {
           <Dropdown  menu={menuProps}>
             <Button>
               <Space>
-                {data.name}
+                {data.lastName}{data.firstName}
                 <DownOutlined />
               </Space>
             </Button>
