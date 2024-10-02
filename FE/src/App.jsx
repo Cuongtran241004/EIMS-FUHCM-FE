@@ -14,15 +14,15 @@ import { getUserInfo } from "./components/API/getUserInfo";
 import Header_Manager from "./components/Header/Header_Manager";
 
 function App() {
-  const [isLogin, setIsLogin] = useState(false);
+  // const [isLogin, setIsLogin] = useState(false);
 
-  useEffect(() => {
-    const initLogin = async () => {
-      const name = await getUserInfo();
-      setIsLogin(!!name);
-    };
-    initLogin();
-  }, []);
+  // useEffect(() => {
+  //   const initLogin = async () => {
+  //     const name = await getUserInfo();
+  //     setIsLogin(!!name);
+  //   };
+  //   initLogin();
+  // }, []);
 
   // return (
   //   <>

@@ -1,18 +1,17 @@
-import React from "react";
-import { Dropdown } from "antd";
-import { Button, Space, message } from "antd";
+import React, { useEffect, useState } from "react";
+import { Dropdown, Button, Space, message } from "antd";
 import { DownOutlined, UserOutlined } from "@ant-design/icons";
 import logo from "../../assets/fpt-university-logo.png";
 import "./Header_Manager.css";
 import Logout from "../Logout";
-import { Link, Navigate } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { getUserInfo } from "../API/getUserInfo";
 
 const handleMenuClick = (e) => {
   message.info("Click on menu item.");
   console.log("click", e);
 };
+
 const items = [
   {
     label: "Profile",
@@ -20,42 +19,43 @@ const items = [
     icon: <UserOutlined />,
   },
   {
-    label: "",
+    label: "Logout",
     key: "2",
     icon: <Logout />,
   },
 ];
+
 const menuProps = {
   items,
   onClick: handleMenuClick,
 };
 
-const Header_Manager = ({isLogin}) => {
-
+const Header_Manager = ({ isLogin }) => {
   const [data, setData] = useState({
-    firstName: '',
-    lastName: '',
+    firstName: "",
+    lastName: "",
   });
 
+  const navigate = useNavigate(); // Use the hook for navigation
+
   useEffect(() => {
-    if (!isLogin) Navigate('/');
+    if (!isLogin) {
+      navigate("/"); // Navigate to login page if not logged in
+    }
 
     const initUserInfo = async () => {
       const newInfo = await getUserInfo();
       setData(newInfo);
     };
     initUserInfo();
-
-
-   
-  }, [isLogin]);
+  }, [isLogin, navigate]); // Include navigate in dependency array
 
   return (
     <div className="header">
       <div className="header-left">
-        <a className="logo">
+        <Link to="/" className="logo">
           <img src={logo} alt="logo" />
-        </a>
+        </Link>
       </div>
       <div className="header-right">
         <Space wrap className="header-right-space">
@@ -67,10 +67,10 @@ const Header_Manager = ({isLogin}) => {
             <Link to="/requests">Request</Link>
           </Button>
 
-          <Dropdown  menu={menuProps}>
+          <Dropdown menu={menuProps}>
             <Button>
               <Space>
-                {data.lastName}{data.firstName}
+                {data.lastName} {data.firstName}
                 <DownOutlined />
               </Space>
             </Button>
@@ -80,4 +80,5 @@ const Header_Manager = ({isLogin}) => {
     </div>
   );
 };
+
 export default Header_Manager;

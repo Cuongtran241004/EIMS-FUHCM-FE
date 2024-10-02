@@ -1,0 +1,25 @@
+.header {
+  overflow: hidden;
+  background-color: #f1f1f1;
+  padding: 5px 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+.header-right {
+  float: right;
+  background-color: #f1f1f1;
+}
+
+.header-right .header-right-item {
+  display: inline-block;
+  padding: 10px 15px;
+  text-align: center;
+  text-decoration: none;
+  color: black;
+}
+
+.header-right button {
+  font-size: 16px;
+}

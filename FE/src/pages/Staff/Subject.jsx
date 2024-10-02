@@ -1,5 +1,13 @@
 import React, { useState, useEffect } from "react";
-
+import {
+  ADD_EXAM_SUCCESS,
+  ADD_EXAM_FAILED,
+  EDIT_EXAM_SUCCESS,
+  EDIT_EXAM_FAILED,
+  DELETE_EXAM_SUCCESS,
+  DELETE_EXAM_FAILED,
+  FETCH_EXAM_FAILED,
+} from "../../configs/messages.jsx";
 import {
   Layout,
   Button,
@@ -10,29 +18,17 @@ import {
   Table,
   Input,
   message,
-  Upload,
+  Popconfirm,
 } from "antd";
 import subjectApi from "../../services/Subject.js";
-import { UploadOutlined } from "@ant-design/icons";
-import {
-  ADD_SUBJECT_FAILED,
-  ADD_SUBJECT_SUCCESS,
-  EDIT_SUBJECT_FAILED,
-  EDIT_SUBJECT_SUCCESS,
-  FETCH_SUBJECTS_FAILED,
-  IMPORT_SUBJECTS_FAILED,
-  IMPORT_SUBJECTS_SUCCESS,
-} from "../../configs/messages.jsx";
-import { Subject_Import_Excel } from "../../utils/Subject_Import_Excel.js";
-import { Subject_Excel_Template } from "../../utils/Subject_Excel_Template.js";
+import Header_Staff from "../../components/Header/Header_Staff.jsx";
+import { DeleteOutlined } from "@ant-design/icons";
 
 // Ant Design Layout Components
-const { Content, Sider } = Layout;
+const { Content } = Layout;
 const Subject = ({ isLogin }) => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
-  // For file upload loading state
-  const [fileLoading, setFileLoading] = useState(false);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [editingSubject, setEditingSubject] = useState(null);
@@ -44,7 +40,7 @@ const Subject = ({ isLogin }) => {
       const result = await subjectApi.getAllSubjects();
       setData(result);
     } catch (error) {
-      message.error(FETCH_SUBJECTS_FAILED);
+      message.error(FETCH_EXAM_FAILED);
     } finally {
       setLoading(false);
     }
@@ -64,20 +60,26 @@ const Subject = ({ isLogin }) => {
     form.resetFields();
   };
 
-  const handleFileUpload = async ({ file }) => {
-    setFileLoading(true);
+  const handleEdit = (id) => {
+    console.log(id);
+  };
+
+  const handleDelete = async (id) => {
     try {
-      const data = await Subject_Import_Excel(file);
-      await Promise.all(data.map((item) => subjectApi.addSubject(item)));
-      message.success(IMPORT_SUBJECTS_SUCCESS);
+      await subjectApi.deleteSubject(id);
+      message.success(DELETE_EXAM_SUCCESS);
       fetchData();
     } catch (error) {
-      message.error(IMPORT_SUBJECTS_FAILED);
-    } finally {
-      setFileLoading(false);
+      message.error(DELETE_EXAM_FAILED);
     }
   };
+
   const columns = [
+    {
+      title: "No",
+      dataIndex: "no",
+      key: "no",
+    },
     {
       title: "Code",
       dataIndex: "code",
@@ -86,7 +88,17 @@ const Subject = ({ isLogin }) => {
     {
       title: "Name",
       dataIndex: "name",
-      key: "name",
+      key: "Name",
+    },
+    {
+      title: "Type",
+      dataIndex: "type",
+      key: "type",
+    },
+    {
+      title: "Duration",
+      dataIndex: "duration",
+      key: "duration",
     },
     {
       title: "Action",
@@ -104,6 +116,14 @@ const Subject = ({ isLogin }) => {
           >
             Edit
           </Button>
+          <Popconfirm
+            title="Are you sure to delete this staff?"
+            onConfirm={() => handleDelete(record.fuId)}
+            okText="Yes"
+            cancelText="No"
+          >
+            <DeleteOutlined style={{ color: "red", cursor: "pointer" }} />
+          </Popconfirm>
         </Space>
       ),
     },
@@ -113,79 +133,56 @@ const Subject = ({ isLogin }) => {
       const values = await form.validateFields();
       if (isEditing) {
         await subjectApi.updateSubject({ ...editingSubject, ...values });
-        message.success(EDIT_SUBJECT_SUCCESS);
+        message.success(EDIT_EXAM_SUCCESS);
       } else {
         await subjectApi.addSubject(values);
-        message.success(ADD_SUBJECT_SUCCESS);
+        message.success(ADD_EXAM_SUCCESS);
       }
 
       fetchData();
       handleCancel();
     } catch (error) {
-      message.error(isEditing ? EDIT_SUBJECT_FAILED : ADD_SUBJECT_FAILED);
+      message.error(isEditing ? EDIT_EXAM_FAILED : ADD_EXAM_FAILED);
     }
   };
 
   return (
     <Layout style={{ height: "100vh" }}>
-      <Header_Manager isLogin={isLogin} />
-      <Layout>
-        <Sider width={256} style={{ backgroundColor: "#fff" }}>
-          <NavBar_Manager />
-        </Sider>
-        <Layout style={{ padding: "16px" }}>
-          <Content
-            style={{
-              padding: 24,
-              margin: 0,
-              background: "#fff",
-              minHeight: 280,
-            }}
-          >
-            <Space>
-              <Button type="primary" onClick={showModal}>
-                Add New Subject
-              </Button>
+      <Header_Staff isLogin={isLogin} />
+      <Content
+        style={{
+          padding: 24,
+          margin: 0,
+          background: "#fff",
+          minHeight: 280,
+        }}
+      >
+        <Space>
+          <Button type="primary" onClick={showModal}>
+            Add New Subject
+          </Button>
+        </Space>
 
-              <Upload
-                beforeUpload={() => false}
-                showUploadList={false}
-                onChange={handleFileUpload}
-                maxCount={1}
-                method="POST"
-              >
-                <Button icon={<UploadOutlined />} loading={fileLoading}>
-                  Import Subjects
-                </Button>
-              </Upload>
-
-              <Button onClick={Subject_Excel_Template} type="default">
-                Download Import Template
-              </Button>
-            </Space>
-
-            <Spin spinning={loading}>
-              <Table
-                dataSource={data}
-                columns={columns}
-                rowKey={Math.random}
-                pagination={{ pageSize: 8 }}
-              />
-            </Spin>
-          </Content>
-        </Layout>
-      </Layout>
+        <Spin spinning={loading}>
+          <Table
+            dataSource={data}
+            columns={columns}
+            rowKey={Math.random}
+            pagination={{ pageSize: 8 }}
+          />
+        </Spin>
+      </Content>
 
       {/* Add/Edit Staff Modal */}
       <Modal
-        title={isEditing ? "Edit Subject" : "Add New Subject"}
+        title={isEditing ? "Edit Subject Exam" : "Add New Subject Exam"}
         open={isModalVisible}
         onOk={handleOk}
         onCancel={handleCancel}
         okText="Submit"
         cancelText="Cancel"
       >
-        <Form form={form} layout="vertical" name="add_subject_form">
+        <Form form={form} layout="vertical" name="add_subject_exam_form">
           <Form.Item
             name="code"
             label="Code"
