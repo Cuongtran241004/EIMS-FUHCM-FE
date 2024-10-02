@@ -15,59 +15,59 @@ import Exam_Subject from "./pages/Staff/Exam_Subject";
 import Exam_Schedule from "./pages/Staff/Exam_Schedule";
 
 function App() {
-  // const [isLogin, setIsLogin] = useState(false);
+  const [isLogin, setIsLogin] = useState(false);
 
-  // useEffect(() => {
-  //   const initLogin = async () => {
-  //     const name = await getUserInfo();
-  //     setIsLogin(!!name);
-  //   };
-  //   initLogin();
-  // }, []);
-
-  // return (
-  //   <>
-  //     <div className="container">
-  //       {!isLogin ? (
-  //         <Routes>
-  //           <Route path="/" element={<Login isLogin={isLogin} setIsLogin={setIsLogin} />} />
-  //           <Route path="*" element={<Navigate to="/" replace />} />
-  //         </Routes>
-  //       ) : (
-  //         <Routes>
-  //           <Route
-  //             path="/"
-  //             element={<Navigate to="/dashboard" replace />}
-  //           />
-  //           <Route path="/dashboard" element={<Dashboard isLogin={isLogin} />} />
-  //           <Route path="/semester" element={<Semester isLogin={isLogin}/>} />
-  ////           <Route path="/subjects" element={<Subject isLogin={isLogin}/>} />
-  //           <Route path="/staffs" element={<Staff isLogin={isLogin}/>} />
-  //           <Route path="/invigilators" element={<Invigilator isLogin={isLogin}/>} />
-  //           <Route path="/exam-slot" element={<ConfigSettings isLogin={isLogin}/>} />
-  //           <Route path="/requests" element={<Request isLogin={isLogin}/>} />
-  //           <Route path="/exam-schedule" element={<ExamSlots isLogin={isLogin}/>} />
-
-  //           {/* Điều hướng bất kỳ đường dẫn nào không xác định về dashboard */}
-  //           <Route path="*" element={<Navigate to="/dashboard" replace />} />
-  //         </Routes>
-  //       )};
-  //     </div>
-  //   </>
-  // );
+  useEffect(() => {
+    const initLogin = async () => {
+      const name = await getUserInfo();
+      setIsLogin(!!name);
+    };
+    initLogin();
+  }, []);
 
   return (
     <>
       <div className="container">
-        <Routes>
-          <Route path="/exam-subject" element={<Exam_Subject />} />
-          <Route path="/exam-schedule" element={<Exam_Schedule />} />
-          {/* Điều hướng bất kỳ đường dẫn nào không xác định về dashboard */}
-          <Route path="*" element={<Navigate to="/exam-subject" replace />} />
-        </Routes>
+        {!isLogin ? (
+          <Routes>
+            <Route path="/" element={<Login isLogin={isLogin} setIsLogin={setIsLogin} />} />
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        ) : (
+          <Routes>
+            <Route
+              path="/"
+              element={<Navigate to="/dashboard" replace />}
+            />
+            <Route path="/dashboard" element={<Dashboard isLogin={isLogin} />} />
+            <Route path="/semester" element={<Semester isLogin={isLogin}/>} />
+            <Route path="/subjects" element={<Subject isLogin={isLogin}/>} />
+            <Route path="/staffs" element={<Staff isLogin={isLogin}/>} />
+            <Route path="/invigilators" element={<Invigilator isLogin={isLogin}/>} />
+            <Route path="/exam-slot" element={<ConfigSettings isLogin={isLogin}/>} />
+            <Route path="/requests" element={<Request isLogin={isLogin}/>} />
+            <Route path="/exam-schedule" element={<ExamSlots isLogin={isLogin}/>} />
+
+            {/* Điều hướng bất kỳ đường dẫn nào không xác định về dashboard */}
+            <Route path="*" element={<Navigate to="/dashboard" replace />} />
+          </Routes>
+        )};
       </div>
     </>
   );
+
+  // return (
+  //   <>
+  //     <div className="container">
+  //       <Routes>
+  //         <Route path="/exam-subject" element={<Exam_Subject />} />
+  //         <Route path="/exam-schedule" element={<Exam_Schedule />} />
+  //         {/* Điều hướng bất kỳ đường dẫn nào không xác định về dashboard */}
+  //         <Route path="*" element={<Navigate to="/exam-subject" replace />} />
+  //       </Routes>
+  //     </div>
+  //   </>
+  // );
 }
 
 export default App;
