@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
-import Header_Manager from "../../components/Header/Header_Manager.jsx";
-import NavBar_Manager from "../../components/NavBar/NavBar_Manager.jsx";
+
 import {
   Layout,
   Button,
