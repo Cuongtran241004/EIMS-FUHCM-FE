@@ -51,7 +51,9 @@ const Staff = ({isLogin}) => {
   const fetchData = async () => {
     setLoading(true);
     try {
-      const result = await userApi.getAllusers({ role: 3 });
+      const result = await userApi.getAllUsers({}, {
+
+      });
       setData(result);
     } catch (error) {
       message.error(FETCH_STAFFS_FAILED);
@@ -87,7 +89,7 @@ const Staff = ({isLogin}) => {
         await userApi.addUser(values);
         message.success(ADD_STAFF_SUCCESS);
       }
-      fetchData();
+      await fetchData();
       handleCancel();
     } catch (error) {
       message.error(isEditing ? EDIT_STAFF_FAILED : ADD_STAFF_FAILED);

@@ -31,6 +31,7 @@ export const getUserInfo = async () => {
             headers: {
                 'Content-Type': 'application/json',
                 Accept: 'application/json',
+
             },
             withCredentials: true, // Ensures cookies or credentials are sent with the request
         });

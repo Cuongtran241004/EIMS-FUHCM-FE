@@ -41,7 +41,6 @@ function App() {
             />
             <Route path="/dashboard" element={<Dashboard isLogin={isLogin} />} />
             <Route path="/semester" element={<Semester isLogin={isLogin}/>} />
-            <Route path="/subjects" element={<Subject isLogin={isLogin}/>} />
             <Route path="/staffs" element={<Staff isLogin={isLogin}/>} />
             <Route path="/invigilators" element={<Invigilator isLogin={isLogin}/>} />
             <Route path="/exam-slot" element={<ConfigSettings isLogin={isLogin}/>} />

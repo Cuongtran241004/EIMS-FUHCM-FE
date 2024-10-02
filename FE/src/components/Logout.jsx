@@ -1,34 +1,38 @@
 import React from "react";
-import { Button, message } from "antd"; 
-import axios from "axios"; 
+import { Button, message } from "antd";
+import axios from "axios";
 
 function Logout() {
-  const handleLogout = async () => {
-    const API_URL = import.meta.env.VITE_APP_API_URL;
-    const path = 'v1/oauth/logout';
+    const handleLogout = async () => {
+        const API_URL = import.meta.env.VITE_APP_API_URL;
+        const path = '/v1/oauth/logout';
 
-    try {
-        const response = await axios.post(`${API_URL}${path}`, {
-            headers: {
-                'Content-Type': 'application/json',
-                Accept: 'application/json',
-            },
-            withCredentials: true, 
-        });
+        try {
+            const response = await axios.post(
+                `${API_URL}${path}`,
+                {}, // No body required for logout
+                {
+                    withCredentials: true, // Send cookies to the backend for deletion
+                }
+            );
 
-        
-        return response.data;
-    } catch (e) {
-        console.error('Error: ', e.message);
-        return false;
-    }
-  };
+            if (response.status === 200) {
+                message.success("Logout successful!");
 
-  return (
-    <Button danger onClick={handleLogout}>
-      Logout
-    </Button>
-  );
+                // Optionally redirect the user to a login or home page after logout
+                window.location.href = "/login";
+            }
+        } catch (error) {
+            console.error('Logout error:', error.message);
+            message.error("Logout failed. Please try again.");
+        }
+    };
+
+    return (
+        <Button danger onClick={handleLogout}>
+            Logout
+        </Button>
+    );
 }
 
 export default Logout;
