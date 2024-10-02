@@ -67,7 +67,7 @@ const Header_Staff = ({ isLogin }) => {
 
           <Button size="large">
             <Link to="/exam-schedule" className="header-right-item">
-              Exam schedule
+              Exam Schedule
             </Link>
           </Button>
 

@@ -7,11 +7,12 @@ import Dashboard from "./pages/Dashboard/Dashboard";
 import Request from "./pages/Request/Request";
 import Invigilator from "./pages/Manager/Invigilator";
 import Semester from "./pages/Manager/Semester";
-import Subject from "./pages/Staff/Subject";
 import ExamSlots from "./pages/Exam/ExamSlots";
 import ConfigSettings from "./pages/Manager/Config";
 import { getUserInfo } from "./components/API/getUserInfo";
 import Header_Manager from "./components/Header/Header_Manager";
+import Exam_Subject from "./pages/Staff/Exam_Subject";
+import Exam_Schedule from "./pages/Staff/Exam_Schedule";
 
 function App() {
   // const [isLogin, setIsLogin] = useState(false);
@@ -59,10 +60,10 @@ function App() {
     <>
       <div className="container">
         <Routes>
-          <Route path="/" element={<Subject />} />
-
+          <Route path="/exam-subject" element={<Exam_Subject />} />
+          <Route path="/exam-schedule" element={<Exam_Schedule />} />
           {/* Điều hướng bất kỳ đường dẫn nào không xác định về dashboard */}
-          <Route path="*" element={<Navigate to="/subjects" replace />} />
+          <Route path="*" element={<Navigate to="/exam-subject" replace />} />
         </Routes>
       </div>
     </>

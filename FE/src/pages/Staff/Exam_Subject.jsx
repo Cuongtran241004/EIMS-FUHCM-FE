@@ -26,7 +26,7 @@ import { DeleteOutlined } from "@ant-design/icons";
 
 // Ant Design Layout Components
 const { Content } = Layout;
-const Subject = ({ isLogin }) => {
+const Exam_Subject = ({ isLogin }) => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -159,7 +159,7 @@ const Subject = ({ isLogin }) => {
       >
         <Space>
           <Button type="primary" onClick={showModal}>
-            Add New Subject
+            Add New Exam Subject
           </Button>
         </Space>
 
@@ -201,10 +201,31 @@ const Subject = ({ isLogin }) => {
           >
             <Input placeholder="Enter subject name" />
           </Form.Item>
+
+          <Form.Item
+            name="type"
+            label="Type"
+            rules={[{ required: true, message: "Please input the exam type!" }]}
+          >
+            <Input placeholder="Enter exam type" />
+          </Form.Item>
+
+          <Form.Item
+            name="duration"
+            label="Duration (/h)"
+            rules={[
+              {
+                required: true,
+                message: "Please input the duration!",
+              },
+            ]}
+          >
+            <Input type="number" placeholder="Enter exam duration" />
+          </Form.Item>
         </Form>
       </Modal>
     </Layout>
   );
 };
 
-export default Subject;
+export default Exam_Subject;
