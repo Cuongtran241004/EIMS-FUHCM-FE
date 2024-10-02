@@ -8,10 +8,6 @@ import { Link, Navigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { getUserInfo } from "../API/getUserInfo";
 import "./Header_Staff.css";
-const handleMenuClick = (e) => {
-  message.info("Click on menu item.");
-  console.log("click", e);
-};
 
 const items = [
   {
@@ -27,7 +23,6 @@ const items = [
 ];
 const menuProps = {
   items,
-  onClick: handleMenuClick,
 };
 
 const Header_Staff = ({ isLogin }) => {
@@ -44,11 +39,7 @@ const Header_Staff = ({ isLogin }) => {
   //   };
   //   initUserInfo();
   // }, [isLogin]);
-  const [current, setCurrent] = useState("mail");
-  const onClick = (e) => {
-    console.log("click ", e);
-    setCurrent(e.key);
-  };
+
   return (
     <div className="header">
       <div className="header-left">

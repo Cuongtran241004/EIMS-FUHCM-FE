@@ -7,11 +7,6 @@ import Logout from "../Logout";
 import { Link, useNavigate } from "react-router-dom";
 import { getUserInfo } from "../API/getUserInfo";
 
-const handleMenuClick = (e) => {
-  message.info("Click on menu item.");
-  console.log("click", e);
-};
-
 const items = [
   {
     label: "Profile",
@@ -24,10 +19,8 @@ const items = [
     icon: <Logout />,
   },
 ];
-
 const menuProps = {
   items,
-  onClick: handleMenuClick,
 };
 
 const Header_Manager = ({ isLogin }) => {
