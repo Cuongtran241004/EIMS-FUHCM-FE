@@ -17,9 +17,19 @@ const handleError = (error) => {
 const userApi = {
   getAllusers: async ({ filters = {} }) => {
     try {
-      const response = await axios.get(`${USER_API_BASE_URL}`, {
-        params: filters,
-      });
+      const response = await axios.get(
+        `${USER_API_BASE_URL}`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+          withCredentials: true,
+        },
+        {
+          params: filters,
+        }
+      );
       return response.data;
     } catch (error) {
       handleError(error);
@@ -36,7 +46,17 @@ const userApi = {
 
   addUser: async (user) => {
     try {
-      const response = await axios.post(`${USER_API_BASE_URL}`, user);
+      const response = await axios.post(
+        `${USER_API_BASE_URL}`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+          withCredentials: true,
+        },
+        user
+      );
       return response.data;
     } catch (error) {
       handleError(error);
