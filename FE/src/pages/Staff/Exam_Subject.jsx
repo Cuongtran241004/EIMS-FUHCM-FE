@@ -20,6 +20,8 @@ import {
   message,
   Popconfirm,
   Dropdown,
+  Col,
+  Row,
 } from "antd";
 import subjectApi from "../../services/Subject.js";
 import Header_Staff from "../../components/Header/Header_Staff.jsx";
@@ -219,45 +221,59 @@ const Exam_Subject = ({ isLogin }) => {
         cancelText="Cancel"
       >
         <Form form={form} layout="vertical" name="add_subject_exam_form">
-          <Form.Item
-            name="code"
-            label="Code"
-            rules={[
-              { required: true, message: "Please input the subject code!" },
-            ]}
-          >
-            <Input placeholder="Enter subject code" />
-          </Form.Item>
-          <Form.Item
-            name="name"
-            label="Name"
-            rules={[
-              { required: true, message: "Please input the subject name!" },
-            ]}
-          >
-            <Input placeholder="Enter subject name" />
-          </Form.Item>
+          {/* First Row: Code and Name */}
+          <Row gutter={16}>
+            <Col span={12}>
+              <Form.Item
+                name="code"
+                label="Code"
+                rules={[
+                  { required: true, message: "Please input the subject code!" },
+                ]}
+              >
+                <Input placeholder="Enter subject code" />
+              </Form.Item>
+            </Col>
 
-          <Form.Item
-            name="type"
-            label="Type"
-            rules={[{ required: true, message: "Please input the exam type!" }]}
-          >
-            <Input placeholder="Enter exam type" />
-          </Form.Item>
+            <Col span={12}>
+              <Form.Item
+                name="name"
+                label="Name"
+                rules={[
+                  { required: true, message: "Please input the subject name!" },
+                ]}
+              >
+                <Input placeholder="Enter subject name" />
+              </Form.Item>
+            </Col>
+          </Row>
 
-          <Form.Item
-            name="duration"
-            label="Duration (/h)"
-            rules={[
-              {
-                required: true,
-                message: "Please input the duration!",
-              },
-            ]}
-          >
-            <Input type="number" placeholder="Enter exam duration" />
-          </Form.Item>
+          {/* Second Row: Type and Duration */}
+          <Row gutter={16}>
+            <Col span={12}>
+              <Form.Item
+                name="type"
+                label="Type"
+                rules={[
+                  { required: true, message: "Please input the exam type!" },
+                ]}
+              >
+                <Input placeholder="Enter exam type" />
+              </Form.Item>
+            </Col>
+
+            <Col span={12}>
+              <Form.Item
+                name="duration"
+                label="Duration"
+                rules={[
+                  { required: true, message: "Please input the duration!" },
+                ]}
+              >
+                <Input type="number" placeholder="Enter exam duration" />
+              </Form.Item>
+            </Col>
+          </Row>
         </Form>
       </Modal>
     </Layout>

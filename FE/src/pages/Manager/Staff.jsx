@@ -13,6 +13,8 @@ import {
   Popconfirm,
   Upload,
   Radio,
+  Col,
+  Row,
 } from "antd";
 import {
   EditOutlined,
@@ -250,69 +252,95 @@ const Staff = ({ isLogin }) => {
         cancelText="Cancel"
       >
         <Form form={form} layout="vertical" name="add_staff_form">
-          <Form.Item
-            name="fuId"
-            label="FUID"
-            rules={[{ required: true, message: "Please input FUID!" }]}
-          >
-            <Input placeholder="Enter fuid" />
-          </Form.Item>
+          {/* FUID, First Name, and Last Name in a single line */}
+          <Row gutter={16}>
+            <Col span={8}>
+              <Form.Item
+                name="fuId"
+                label="FUID"
+                rules={[{ required: true, message: "Please input FUID!" }]}
+              >
+                <Input placeholder="Enter FUID" />
+              </Form.Item>
+            </Col>
+            <Col span={8}>
+              <Form.Item
+                name="firstName"
+                label="First Name"
+                rules={[
+                  { required: true, message: "Please input first name!" },
+                ]}
+              >
+                <Input placeholder="Enter first name" />
+              </Form.Item>
+            </Col>
+            <Col span={8}>
+              <Form.Item
+                name="lastName"
+                label="Last Name"
+                rules={[{ required: true, message: "Please input last name!" }]}
+              >
+                <Input placeholder="Enter last name" />
+              </Form.Item>
+            </Col>
+          </Row>
 
-          <Form.Item
-            name="firstName"
-            label="First Name"
-            rules={[{ required: true, message: "Please input first name!" }]}
-          >
-            <Input placeholder="Enter first name" />
-          </Form.Item>
+          {/* Email and Phone Number in a single line */}
+          <Row gutter={16}>
+            <Col span={12}>
+              <Form.Item
+                name="email"
+                label="Email"
+                rules={[
+                  { required: true, message: "Please input email!" },
+                  { type: "email", message: "Please enter a valid email!" },
+                ]}
+              >
+                <Input placeholder="Enter email" />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item
+                name="phoneNumber"
+                label="Phone"
+                rules={[
+                  { required: true, message: "Please input phone number!" },
+                ]}
+              >
+                <Input placeholder="Enter phone number" />
+              </Form.Item>
+            </Col>
+          </Row>
 
-          <Form.Item
-            name="lastName"
-            label="Last Name"
-            rules={[{ required: true, message: "Please input last name!" }]}
-          >
-            <Input placeholder="Enter last name" />
-          </Form.Item>
+          {/* Department and Gender in a single line */}
+          <Row gutter={16}>
+            <Col span={12}>
+              <Form.Item
+                name="department"
+                label="Department"
+                rules={[
+                  { required: true, message: "Please input department!" },
+                ]}
+              >
+                <Input placeholder="Enter department" />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item
+                name="gender"
+                label="Gender"
+                rules={[{ required: true, message: "Please select gender!" }]}
+                initialValue="true"
+              >
+                <Radio.Group>
+                  <Radio value="true">Male</Radio>
+                  <Radio value="false">Female</Radio>
+                </Radio.Group>
+              </Form.Item>
+            </Col>
+          </Row>
 
-          <Form.Item
-            name="email"
-            label="Email"
-            rules={[
-              { required: true, message: "Please input email!" },
-              { type: "email", message: "Please enter a valid email!" },
-            ]}
-          >
-            <Input placeholder="Enter the email" />
-          </Form.Item>
-
-          <Form.Item
-            name="phoneNumber"
-            label="Phone"
-            rules={[{ required: true, message: "Please input phone number!" }]}
-          >
-            <Input placeholder="Enter phone number" />
-          </Form.Item>
-
-          <Form.Item
-            name="department"
-            label="Department"
-            rules={[{ required: true, message: "Please input department!" }]}
-          >
-            <Input placeholder="Enter the department" />
-          </Form.Item>
-
-          <Form.Item
-            name="gender"
-            label="Gender"
-            rules={[{ required: true, message: "Please select gender!" }]}
-            initialValue="true"
-          >
-            <Radio.Group>
-              <Radio value="true">Male</Radio>
-              <Radio value="false">Female</Radio>
-            </Radio.Group>
-          </Form.Item>
-          {/* Hidden field */}
+          {/* Hidden Role Field */}
           <Form.Item name="role" initialValue="3" hidden={true}>
             <Input />
           </Form.Item>
