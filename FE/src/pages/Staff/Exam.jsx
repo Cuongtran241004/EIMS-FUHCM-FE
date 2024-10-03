@@ -192,9 +192,7 @@ const Exam = ({ isLogin }) => {
                 <Form.Item
                   name="type"
                   label="Type"
-                  rules={[
-                    { required: true, message: "Please input the exam type!" },
-                  ]}
+                  rules={[{ required: true, message: "Required" }]}
                 >
                   <Input placeholder="Exam type" />
                 </Form.Item>
@@ -206,7 +204,7 @@ const Exam = ({ isLogin }) => {
                   rules={[
                     {
                       required: true,
-                      message: "Please input the exam duration!",
+                      message: "Required",
                     },
                   ]}
                 >
@@ -218,7 +216,13 @@ const Exam = ({ isLogin }) => {
             {/* Clear and Add buttons */}
             <Row justify="space-between">
               <Col>
-                <Button onClick={handleCancel} danger>
+                <Button
+                  onClick={handleCancel}
+                  style={{
+                    borderColor: "orange",
+                    color: "orange",
+                  }}
+                >
                   Clear
                 </Button>
               </Col>

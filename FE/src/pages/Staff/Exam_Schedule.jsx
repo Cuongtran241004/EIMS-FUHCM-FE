@@ -160,9 +160,24 @@ const Exam_Schedule = ({ isLogin }) => {
               </Select>
             </Form.Item>
 
-            <Button type="primary" htmlType="submit" block>
-              Add Exam Schedule
-            </Button>
+            <Row justify="space-between">
+              <Col>
+                <Button
+                  style={{
+                    borderColor: "orange",
+                    color: "orange",
+                  }}
+                  onClick={() => form.resetFields()}
+                >
+                  Clear
+                </Button>
+              </Col>
+              <Col>
+                <Button type="primary" htmlType="submit">
+                  Add
+                </Button>
+              </Col>
+            </Row>
           </Form>
         </Sider>
 

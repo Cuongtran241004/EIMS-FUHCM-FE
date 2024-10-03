@@ -190,7 +190,13 @@ const Subject = ({ isLogin }) => {
             {/* Add buttons for Clear and Add */}
             <Row justify="space-between">
               <Col>
-                <Button onClick={handleCancel} danger>
+                <Button
+                  onClick={handleCancel}
+                  style={{
+                    borderColor: "orange",
+                    color: "orange",
+                  }}
+                >
                   Clear
                 </Button>
               </Col>
