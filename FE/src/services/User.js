@@ -46,17 +46,13 @@ const userApi = {
 
   addUser: async (user) => {
     try {
-      const response = await axios.post(
-        `${USER_API_BASE_URL}`,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Accept: "application/json",
-          },
-          withCredentials: true,
+      const response = await axios.post(`${USER_API_BASE_URL}`, user, {
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
         },
-        user
-      );
+        withCredentials: true,
+      });
       return response.data;
     } catch (error) {
       handleError(error);

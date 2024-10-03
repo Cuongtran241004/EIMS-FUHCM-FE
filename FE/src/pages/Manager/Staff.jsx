@@ -39,7 +39,7 @@ import NavBar_Manager from "../../components/NavBar/NavBar_Manager.jsx";
 // Ant Design Layout Components
 const { Content, Sider } = Layout;
 
-const Staff = ({isLogin}) => {
+const Staff = ({ isLogin }) => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [fileLoading, setFileLoading] = useState(false); // For file upload loading state
@@ -189,7 +189,7 @@ const Staff = ({isLogin}) => {
 
   return (
     <Layout style={{ height: "100vh" }}>
-      <Header_Manager isLogin={isLogin}/>
+      <Header_Manager isLogin={isLogin} />
       <Layout>
         <Sider width={256} style={{ backgroundColor: "#fff" }}>
           <NavBar_Manager isLogin={isLogin} />
@@ -305,11 +305,11 @@ const Staff = ({isLogin}) => {
             name="gender"
             label="Gender"
             rules={[{ required: true, message: "Please select gender!" }]}
-            initialValue="male"
+            initialValue="true"
           >
             <Radio.Group>
-              <Radio value="male">Male</Radio>
-              <Radio value="female">Female</Radio>
+              <Radio value="true">Male</Radio>
+              <Radio value="false">Female</Radio>
             </Radio.Group>
           </Form.Item>
           {/* Hidden field */}
