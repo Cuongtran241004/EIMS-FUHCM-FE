@@ -12,7 +12,6 @@ import {
   Layout,
   Button,
   Space,
-  Modal,
   Form,
   Spin,
   Table,
@@ -41,12 +40,13 @@ const items = [
     label: "Spring24",
   },
 ];
+
 // Ant Design Layout Components
-const { Content } = Layout;
+const { Content, Sider } = Layout;
+
 const Exam = ({ isLogin }) => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [isModalVisible, setIsModalVisible] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [editingSubject, setEditingSubject] = useState(null);
   const [selectedItem, setSelectedItem] = useState("Fall24");
@@ -65,29 +65,19 @@ const Exam = ({ isLogin }) => {
   };
 
   useEffect(() => {
-    // Fetch data when the component mounts and when selectedItem changes
     fetchData(selectedItem);
-  }, [selectedItem]); // Add selectedItem as a dependency
-
-  const showModal = () => {
-    setIsModalVisible(true);
-  };
+  }, [selectedItem]);
 
   const handleCancel = () => {
-    setIsModalVisible(false);
     setIsEditing(false);
     form.resetFields();
-  };
-
-  const handleEdit = (id) => {
-    console.log(id);
   };
 
   const handleDelete = async (id) => {
     try {
       await subjectApi.deleteSubject(id);
       message.success(DELETE_EXAM_SUCCESS);
-      fetchData();
+      fetchData(selectedItem);
     } catch (error) {
       message.error(DELETE_EXAM_FAILED);
     }
@@ -95,8 +85,25 @@ const Exam = ({ isLogin }) => {
 
   const handleMenuClick = (e) => {
     const newTerm = items.find((item) => item.key === e.key).label;
-    setSelectedItem(newTerm); // Update selectedItem
-    fetchData(newTerm); // Fetch data for the new selected term
+    setSelectedItem(newTerm);
+    fetchData(newTerm);
+  };
+
+  const handleOk = async () => {
+    try {
+      const values = await form.validateFields();
+      if (isEditing) {
+        await subjectApi.updateSubject({ ...editingSubject, ...values });
+        message.success(EDIT_EXAM_SUCCESS);
+      } else {
+        await subjectApi.addSubject(values);
+        message.success(ADD_EXAM_SUCCESS);
+      }
+      fetchData(selectedItem);
+      handleCancel();
+    } catch (error) {
+      message.error(isEditing ? EDIT_EXAM_FAILED : ADD_EXAM_FAILED);
+    }
   };
 
   const columns = [
@@ -113,7 +120,7 @@ const Exam = ({ isLogin }) => {
     {
       title: "Name",
       dataIndex: "name",
-      key: "Name",
+      key: "name",
     },
     {
       title: "Type",
@@ -136,13 +143,12 @@ const Exam = ({ isLogin }) => {
               setIsEditing(true);
               setEditingSubject(record);
               form.setFieldsValue(record);
-              showModal();
             }}
           >
             Edit
           </Button>
           <Popconfirm
-            title="Are you sure to delete this staff?"
+            title="Are you sure to delete this exam?"
             onConfirm={() => handleDelete(record.fuId)}
             okText="Yes"
             cancelText="No"
@@ -153,129 +159,106 @@ const Exam = ({ isLogin }) => {
       ),
     },
   ];
-  const handleOk = async () => {
-    try {
-      const values = await form.validateFields();
-      if (isEditing) {
-        await subjectApi.updateSubject({ ...editingSubject, ...values });
-        message.success(EDIT_EXAM_SUCCESS);
-      } else {
-        await subjectApi.addSubject(values);
-        message.success(ADD_EXAM_SUCCESS);
-      }
-
-      fetchData();
-      handleCancel();
-    } catch (error) {
-      message.error(isEditing ? EDIT_EXAM_FAILED : ADD_EXAM_FAILED);
-    }
-  };
 
   return (
     <Layout style={{ height: "100vh" }}>
       <Header_Staff isLogin={isLogin} />
-      <Content
-        style={{
-          padding: 24,
-          margin: 0,
-          background: "#fff",
-          minHeight: 280,
-        }}
-      >
-        <Space>
-          <Dropdown
-            menu={{
-              items,
-              onClick: handleMenuClick,
-            }}
-          >
-            <Button style={{ width: "100px" }}>
-              <Space>
-                {selectedItem}
-                <DownOutlined />
-              </Space>
-            </Button>
-          </Dropdown>
-          <Button type="primary" onClick={showModal}>
-            Add New Exam
-          </Button>
-        </Space>
+      <Layout>
+        {/* Sider for Form */}
+        <Sider width={300} style={{ background: "#f1f1f1", padding: "24px" }}>
+          <Form form={form} layout="vertical" name="add_exam_form">
+            <Form.Item
+              name="code"
+              label="Code"
+              rules={[
+                { required: true, message: "Please input the exam code!" },
+              ]}
+            >
+              <Input placeholder="Enter exam code" />
+            </Form.Item>
 
-        <Spin spinning={loading}>
-          <Table
-            dataSource={data}
-            columns={columns}
-            rowKey={Math.random}
-            pagination={{ pageSize: 8 }}
-          />
-        </Spin>
-      </Content>
+            <Form.Item
+              name="name"
+              label="Name"
+              rules={[
+                { required: true, message: "Please input the exam name!" },
+              ]}
+            >
+              <Input placeholder="Enter exam name" />
+            </Form.Item>
 
-      {/* Add/Edit Staff Modal */}
-      <Modal
-        title={isEditing ? "Edit Exam" : "Add New  Exam"}
-        open={isModalVisible}
-        onOk={handleOk}
-        onCancel={handleCancel}
-        okText="Submit"
-        cancelText="Cancel"
-      >
-        <Form form={form} layout="vertical" name="add_exam_form">
-          {/* First Row: Code and Name */}
-          <Row gutter={16}>
-            <Col span={12}>
-              <Form.Item
-                name="code"
-                label="Code"
-                rules={[
-                  { required: true, message: "Please input the subject code!" },
-                ]}
-              >
-                <Input placeholder="Enter subject code" />
-              </Form.Item>
-            </Col>
+            <Row gutter={16}>
+              <Col span={12}>
+                <Form.Item
+                  name="type"
+                  label="Type"
+                  rules={[
+                    { required: true, message: "Please input the exam type!" },
+                  ]}
+                >
+                  <Input placeholder="Exam type" />
+                </Form.Item>
+              </Col>
+              <Col span={12}>
+                <Form.Item
+                  name="duration"
+                  label="Duration"
+                  rules={[
+                    {
+                      required: true,
+                      message: "Please input the exam duration!",
+                    },
+                  ]}
+                >
+                  <Input placeholder="duration" />
+                </Form.Item>
+              </Col>
+            </Row>
 
-            <Col span={12}>
-              <Form.Item
-                name="name"
-                label="Name"
-                rules={[
-                  { required: true, message: "Please input the subject name!" },
-                ]}
-              >
-                <Input placeholder="Enter subject name" />
-              </Form.Item>
-            </Col>
-          </Row>
+            {/* Clear and Add buttons */}
+            <Row justify="space-between">
+              <Col>
+                <Button onClick={handleCancel} danger>
+                  Clear
+                </Button>
+              </Col>
+              <Col>
+                <Button type="primary" onClick={handleOk}>
+                  Add
+                </Button>
+              </Col>
+            </Row>
+          </Form>
+        </Sider>
 
-          {/* Second Row: Type and Duration */}
-          <Row gutter={16}>
-            <Col span={12}>
-              <Form.Item
-                name="type"
-                label="Type"
-                rules={[
-                  { required: true, message: "Please input the exam type!" },
-                ]}
-              >
-                <Input placeholder="Enter exam type" />
-              </Form.Item>
-            </Col>
+        {/* Content for Table and Dropdown */}
+        <Content style={{ padding: 24, margin: 0, background: "#fff" }}>
+          <Space>
+            <Dropdown
+              menu={{
+                items,
+                onClick: handleMenuClick,
+              }}
+            >
+              <Button style={{ width: "100px" }}>
+                <Space>
+                  {selectedItem}
+                  <DownOutlined />
+                </Space>
+              </Button>
+            </Dropdown>
+          </Space>
 
-            <Col span={12}>
-              <Form.Item
-                name="duration"
-                label="Duration"
-                rules={[
-                  { required: true, message: "Please input the duration!" },
-                ]}
-              >
-                <Input type="number" placeholder="Enter exam duration" />
-              </Form.Item>
-            </Col>
-          </Row>
-        </Form>
-      </Modal>
+          <Spin spinning={loading}>
+            <Table
+              dataSource={data}
+              columns={columns}
+              rowKey={Math.random}
+              pagination={{ pageSize: 8 }}
+            />
+          </Spin>
+        </Content>
+      </Layout>
     </Layout>
   );
 };

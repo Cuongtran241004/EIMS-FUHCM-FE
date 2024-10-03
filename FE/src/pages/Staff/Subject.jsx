@@ -42,11 +42,10 @@ const items = [
   },
 ];
 // Ant Design Layout Components
-const { Content } = Layout;
+const { Content, Sider } = Layout;
 const Subject = ({ isLogin }) => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [isModalVisible, setIsModalVisible] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [editingSubject, setEditingSubject] = useState(null);
   const [selectedItem, setSelectedItem] = useState("Fall24");
@@ -77,10 +76,6 @@ const Subject = ({ isLogin }) => {
     setIsModalVisible(false);
     setIsEditing(false);
     form.resetFields();
-  };
-
-  const handleEdit = (id) => {
-    console.log(id);
   };
 
   const handleDelete = async (id) => {
@@ -164,15 +159,50 @@ const Subject = ({ isLogin }) => {
   return (
     <Layout style={{ height: "100vh" }}>
       <Header_Staff isLogin={isLogin} />
-      <Content
-        style={{
-          padding: 24,
-          margin: 0,
-          background: "#fff",
-          minHeight: 280,
-        }}
-      >
-        <Space>
+      <Layout>
+        <Sider width={300} style={{ background: "#f1f1f1", padding: "24px" }}>
+          <Form form={form} layout="vertical" name="add_subject_form">
+            <Form.Item
+              name="code"
+              label="Code"
+              rules={[
+                {
+                  required: true,
+                  message: "Please input the subject code!",
+                },
+              ]}
+            >
+              <Input placeholder="Enter subject code" />
+            </Form.Item>
+
+            <Form.Item
+              name="name"
+              label="Name"
+              rules={[
+                {
+                  required: true,
+                  message: "Please input the subject name!",
+                },
+              ]}
+            >
+              <Input placeholder="Enter subject name" />
+            </Form.Item>
+            {/* Add buttons for Clear and Add */}
+            <Row justify="space-between">
+              <Col>
+                <Button onClick={handleCancel} danger>
+                  Clear
+                </Button>
+              </Col>
+              <Col>
+                <Button type="primary" onClick={handleOk}>
+                  Add
+                </Button>
+              </Col>
+            </Row>
+          </Form>
+        </Sider>
+        <Content>
           <Dropdown
             menu={{
               items,
@@ -186,59 +216,16 @@ const Subject = ({ isLogin }) => {
               </Space>
             </Button>
           </Dropdown>
-          <Button type="primary" onClick={showModal}>
-            Add New Subject
-          </Button>
-        </Space>
-
-        <Spin spinning={loading}>
-          <Table
-            dataSource={data}
-            columns={columns}
-            rowKey={Math.random}
-            pagination={{ pageSize: 8 }}
-          />
-        </Spin>
-      </Content>
-
-      {/* Add/Edit Staff Modal */}
-      <Modal
-        title={isEditing ? "Edit Subject" : "Add New Subject"}
-        open={isModalVisible}
-        onOk={handleOk}
-        onCancel={handleCancel}
-        okText="Submit"
-        cancelText="Cancel"
-      >
-        <Form form={form} layout="vertical" name="add_subject_form">
-          {/* First Row: Code and Name */}
-          <Row gutter={16}>
-            <Col span={12}>
-              <Form.Item
-                name="code"
-                label="Code"
-                rules={[
-                  { required: true, message: "Please input the subject code!" },
-                ]}
-              >
-                <Input placeholder="Enter subject code" />
-              </Form.Item>
-            </Col>
-
-            <Col span={12}>
-              <Form.Item
-                name="name"
-                label="Name"
-                rules={[
-                  { required: true, message: "Please input the subject name!" },
-                ]}
-              >
-                <Input placeholder="Enter subject name" />
-              </Form.Item>
-            </Col>
-          </Row>
-        </Form>
-      </Modal>
+          <Spin spinning={loading}>
+            <Table
+              dataSource={data}
+              columns={columns}
+              rowKey={Math.random}
+              pagination={{ pageSize: 8 }}
+            />
+          </Spin>
+        </Content>
+      </Layout>
     </Layout>
   );
 };
