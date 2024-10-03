@@ -51,8 +51,13 @@ const Header_Staff = ({ isLogin }) => {
       <div className="header-right">
         <Space>
           <Button size="large">
-            <Link to="/exam-subject" className="header-right-item">
-              Exam Subject
+            <Link to="/subject" className="header-right-item">
+              Subject
+            </Link>
+          </Button>
+          <Button size="large">
+            <Link to="/exam" className="header-right-item">
+              Exam
             </Link>
           </Button>
 

@@ -15,21 +15,15 @@ const handleError = (error) => {
 };
 
 const userApi = {
-  getAllusers: async ({ filters = {} }) => {
+  getAllusers: async () => {
     try {
-      const response = await axios.get(
-        `${USER_API_BASE_URL}`,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Accept: "application/json",
-          },
-          withCredentials: true,
+      const response = await axios.get(`${USER_API_BASE_URL}`, {
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
         },
-        {
-          params: filters,
-        }
-      );
+        withCredentials: true,
+      });
       return response.data;
     } catch (error) {
       handleError(error);

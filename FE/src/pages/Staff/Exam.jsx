@@ -43,7 +43,7 @@ const items = [
 ];
 // Ant Design Layout Components
 const { Content } = Layout;
-const Exam_Subject = ({ isLogin }) => {
+const Exam = ({ isLogin }) => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -197,7 +197,7 @@ const Exam_Subject = ({ isLogin }) => {
             </Button>
           </Dropdown>
           <Button type="primary" onClick={showModal}>
-            Add New Exam Subject
+            Add New Exam
           </Button>
         </Space>
 
@@ -213,14 +213,14 @@ const Exam_Subject = ({ isLogin }) => {
 
       {/* Add/Edit Staff Modal */}
       <Modal
-        title={isEditing ? "Edit Subject Exam" : "Add New Subject Exam"}
+        title={isEditing ? "Edit Exam" : "Add New  Exam"}
         open={isModalVisible}
         onOk={handleOk}
         onCancel={handleCancel}
         okText="Submit"
         cancelText="Cancel"
       >
-        <Form form={form} layout="vertical" name="add_subject_exam_form">
+        <Form form={form} layout="vertical" name="add_exam_form">
           {/* First Row: Code and Name */}
           <Row gutter={16}>
             <Col span={12}>
@@ -280,4 +280,4 @@ const Exam_Subject = ({ isLogin }) => {
   );
 };
 
-export default Exam_Subject;
+export default Exam;

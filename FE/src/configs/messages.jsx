@@ -25,6 +25,14 @@ const EDIT_SEMESTER_SUCCESS = "Edit semester successfully!";
 const EDIT_SEMESTER_FAILED = "Failed to edit semester!";
 
 // Subject
+const ADD_SUBJECT_SUCCESS = "Add subject successfully!";
+const ADD_SUBJECT_FAILED = "Failed to add subject!";
+const EDIT_SUBJECT_SUCCESS = "Edit subject successfully!";
+const EDIT_SUBJECT_FAILED = "Failed to edit subject!";
+const DELETE_SUBJECT_SUCCESS = "Delete subject successfully!";
+const DELETE_SUBJECT_FAILED = "Failed to delete subject!";
+const FETCH_SUBJECTS_FAILED = "Failed to fetch subjects data!";
+// Exam
 const ADD_EXAM_SUCCESS = "Add exam successfully!";
 const ADD_EXAM_FAILED = "Failed to add exam!";
 const EDIT_EXAM_SUCCESS = "Edit exam successfully!";
@@ -88,4 +96,11 @@ export {
   FETCH_CONFIG_FAILED,
   UPDATE_CONFIG_SUCCESS,
   UPDATE_CONFIG_FAILED,
+  ADD_SUBJECT_SUCCESS,
+  ADD_SUBJECT_FAILED,
+  EDIT_SUBJECT_SUCCESS,
+  EDIT_SUBJECT_FAILED,
+  DELETE_SUBJECT_SUCCESS,
+  DELETE_SUBJECT_FAILED,
+  FETCH_SUBJECTS_FAILED,
 };

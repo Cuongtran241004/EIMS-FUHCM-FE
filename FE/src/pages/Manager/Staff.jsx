@@ -53,7 +53,7 @@ const Staff = ({ isLogin }) => {
   const fetchData = async () => {
     setLoading(true);
     try {
-      const result = await userApi.getAllusers({ role: 3 });
+      const result = await userApi.getAllusers();
       setData(result);
     } catch (error) {
       message.error(FETCH_STAFFS_FAILED);
