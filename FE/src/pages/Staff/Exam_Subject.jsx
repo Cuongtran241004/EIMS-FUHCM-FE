@@ -19,11 +19,26 @@ import {
   Input,
   message,
   Popconfirm,
+  Dropdown,
 } from "antd";
 import subjectApi from "../../services/Subject.js";
 import Header_Staff from "../../components/Header/Header_Staff.jsx";
-import { DeleteOutlined } from "@ant-design/icons";
+import { DeleteOutlined, DownOutlined } from "@ant-design/icons";
 
+const items = [
+  {
+    key: "1",
+    label: "Fall24",
+  },
+  {
+    key: "2",
+    label: "Summer24",
+  },
+  {
+    key: "3",
+    label: "Spring24",
+  },
+];
 // Ant Design Layout Components
 const { Content } = Layout;
 const Exam_Subject = ({ isLogin }) => {
@@ -32,12 +47,13 @@ const Exam_Subject = ({ isLogin }) => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [editingSubject, setEditingSubject] = useState(null);
+  const [selectedItem, setSelectedItem] = useState("Fall24");
   const [form] = Form.useForm();
 
-  const fetchData = async () => {
+  const fetchData = async (term) => {
     setLoading(true);
     try {
-      const result = await subjectApi.getAllSubjects();
+      const result = await subjectApi.getAllSubjects(term);
       setData(result);
     } catch (error) {
       message.error(FETCH_EXAM_FAILED);
@@ -47,8 +63,9 @@ const Exam_Subject = ({ isLogin }) => {
   };
 
   useEffect(() => {
-    fetchData();
-  }, []);
+    // Fetch data when the component mounts and when selectedItem changes
+    fetchData(selectedItem);
+  }, [selectedItem]); // Add selectedItem as a dependency
 
   const showModal = () => {
     setIsModalVisible(true);
@@ -72,6 +89,12 @@ const Exam_Subject = ({ isLogin }) => {
     } catch (error) {
       message.error(DELETE_EXAM_FAILED);
     }
+  };
+
+  const handleMenuClick = (e) => {
+    const newTerm = items.find((item) => item.key === e.key).label;
+    setSelectedItem(newTerm); // Update selectedItem
+    fetchData(newTerm); // Fetch data for the new selected term
   };
 
   const columns = [
@@ -158,6 +181,19 @@ const Exam_Subject = ({ isLogin }) => {
         }}
       >
         <Space>
+          <Dropdown
+            menu={{
+              items,
+              onClick: handleMenuClick,
+            }}
+          >
+            <Button style={{ width: "100px" }}>
+              <Space>
+                {selectedItem}
+                <DownOutlined />
+              </Space>
+            </Button>
+          </Dropdown>
           <Button type="primary" onClick={showModal}>
             Add New Exam Subject
           </Button>
