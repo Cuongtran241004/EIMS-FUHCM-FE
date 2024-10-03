@@ -65,7 +65,13 @@ const userApi = {
   },
   deleteUser: async (fuId) => {
     try {
-      const response = await axios.delete(`${USER_API_BASE_URL}/${fuId}`);
+      const response = await axios.delete(`${USER_API_BASE_URL}/${fuId}`, {
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        withCredentials: true,
+      });
       return response.data;
     } catch (error) {
       handleError(error);

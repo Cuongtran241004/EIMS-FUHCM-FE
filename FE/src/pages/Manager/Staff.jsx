@@ -51,9 +51,8 @@ const Staff = ({isLogin}) => {
   const fetchData = async () => {
     setLoading(true);
     try {
-      const result = await userApi.getAllUsers({}, {
-
-      });
+      setData([]);
+      const result = await userApi.getAllUsers({});
       setData(result);
     } catch (error) {
       message.error(FETCH_STAFFS_FAILED);
@@ -87,9 +86,10 @@ const Staff = ({isLogin}) => {
       } else {
         // Add new staff
         await userApi.addUser(values);
+        console.log(values);
         message.success(ADD_STAFF_SUCCESS);
       }
-      await fetchData();
+       fetchData();
       handleCancel();
     } catch (error) {
       message.error(isEditing ? EDIT_STAFF_FAILED : ADD_STAFF_FAILED);
@@ -310,8 +310,8 @@ const Staff = ({isLogin}) => {
             initialValue="male"
           >
             <Radio.Group>
-              <Radio value="male">Male</Radio>
-              <Radio value="female">Female</Radio>
+              <Radio value="true">Male</Radio>
+              <Radio value="false">Female</Radio>
             </Radio.Group>
           </Form.Item>
           {/* Hidden field */}
