@@ -111,7 +111,7 @@ const availableSlots = [
 
 ];
 
-function InvigilatorRegistration() {
+function InvigilatorRegistration({ isLogin }) {
   const [selectedSlots, setSelectedSlots] = useState([]);
 
   const handleSelectEvent = (event) => {
@@ -135,39 +135,39 @@ function InvigilatorRegistration() {
     }
     const registeredSlots = availableSlots.filter(slot => selectedSlots.includes(slot.id));
     message.success(`Registered for slots: ${registeredSlots.map(slot => slot.title).join(', ')}`);
-    
+
     setSelectedSlots([]);
   };
 
   return (
     <div>
-      <Header />
-        <div style={{ display: 'flex', alignItems: 'flex-start', margin: '20px' }}>
-      <Calendar 
-        localizer={localizer}
-        events={availableSlots}
-        startAccessor="start"
-        endAccessor="end"
-        style={{ height: 450, margin: '50px', width: '70%' }}
-        onSelectEvent={handleSelectEvent}
-        eventPropGetter={(event) => {
-          const isSelected = selectedSlots.includes(event.id);
-          return {
-            style: {
-              backgroundColor: isSelected ? '#1890ff' : '#f0f0f0',
-              border: '1px solid #ddd',
-            },
-          };
-        }}
-      />
-      <Button
-        type="primary" 
-        onClick={handleRegister} 
-        style={{ marginTop: 50, width: '15%' }}
-      >
-        Register
-      </Button>
-    </div>
+      <Header isLogin={isLogin} />
+      <div style={{ display: 'flex', alignItems: 'flex-start', margin: '20px' }}>
+        <Calendar
+          localizer={localizer}
+          events={availableSlots}
+          startAccessor="start"
+          endAccessor="end"
+          style={{ height: 450, margin: '50px', width: '70%' }}
+          onSelectEvent={handleSelectEvent}
+          eventPropGetter={(event) => {
+            const isSelected = selectedSlots.includes(event.id);
+            return {
+              style: {
+                backgroundColor: isSelected ? '#1890ff' : '#f0f0f0',
+                border: '1px solid #ddd',
+              },
+            };
+          }}
+        />
+        <Button
+          type="primary"
+          onClick={handleRegister}
+          style={{ marginTop: 50, width: '15%' }}
+        >
+          Register
+        </Button>
+      </div>
     </div>
   );
 }

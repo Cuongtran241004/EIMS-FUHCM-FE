@@ -18,15 +18,15 @@ import Attendance from "./pages/Staff/Attendance";
 import InvigilatorDashboard from "./pages/Invigilator/InvigilatorDashboard";
 import InvigilatorRegistration from "./pages/Invigilator/InvigilatorRegistration";
 function App() {
-  // const [isLogin, setIsLogin] = useState(false);
+  const [isLogin, setIsLogin] = useState(false);
 
-  // useEffect(() => {
-  //   const initLogin = async () => {
-  //     const name = await getUserInfo();
-  //     setIsLogin(!!name);
-  //   };
-  //   initLogin();
-  // }, []);
+  useEffect(() => {
+    const initLogin = async () => {
+      const name = await getUserInfo();
+      setIsLogin(!!name);
+    };
+    initLogin();
+  }, []);
 
   // return (
   //   <>
@@ -44,7 +44,7 @@ function App() {
   //           />
   //           <Route path="/dashboard" element={<Dashboard isLogin={isLogin} />} />
   //           <Route path="/semester" element={<Semester isLogin={isLogin}/>} />
-  ////           <Route path="/subjects" element={<Subject isLogin={isLogin}/>} />
+  // //           <Route path="/subjects" element={<Subject isLogin={isLogin}/>} />
   //           <Route path="/staffs" element={<Staff isLogin={isLogin}/>} />
   //           <Route path="/invigilators" element={<Invigilator isLogin={isLogin}/>} />
   //           <Route path="/exam-slot" element={<ConfigSettings isLogin={isLogin}/>} />
@@ -77,15 +77,22 @@ function App() {
 
   return (
     <>
-    <div className="container">
-    <Routes>
-    <Route path="/dashboard" element={<InvigilatorDashboard />} />
-    <Route path="/register" element={<InvigilatorRegistration />} />
-    <Route path="*" element={<Navigate to="/dashboard" replace />} />
-      </Routes>
-    </div>
+      <div className="container">
+        {!isLogin ? (
+          <Routes>
+            <Route path="/" element={<Login isLogin={isLogin} setIsLogin={setIsLogin} />} />
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        ) : (
+          <Routes>
+            <Route path="/dashboard" element={<InvigilatorDashboard isLogin={isLogin} />} />
+            <Route path="/register" element={<InvigilatorRegistration isLogin={isLogin} />} />
+            <Route path="*" element={<Navigate to="/dashboard" replace />} />
+          </Routes>
+        )};
+      </div>
     </>
-  )
+  );
 }
 
 export default App;

@@ -30,6 +30,7 @@ function Logout() {
       console.error("Logout Error: ", e.message);
       message.error("Logout failed");
     }
+    localStorage.removeItem("role");
   };
 
   return (
