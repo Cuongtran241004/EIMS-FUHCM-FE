@@ -13,6 +13,8 @@ function Logout() {
                 {}, // No body required for logout
                 {
                     withCredentials: true, // Send cookies to the backend for deletion
+                   
+
                 }
             );
 
