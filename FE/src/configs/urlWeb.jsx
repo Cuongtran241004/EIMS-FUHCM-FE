@@ -1,0 +1,24 @@
+// MANAGER
+const MANAGER_DASHBOARD_URL = "/dashboard";
+const MANAGER_USERS_URL = "/users";
+const MANAGER_SEMESTER_URL = "/semester";
+const MANAGER_REQUESTS_URL = "/requests";
+
+// STAFF
+const STAFF_SUBJECT_URL = "/subject";
+const STAFF_EXAM_URL = "/exam";
+const STAFF_EXAM_SCHEDULE_URL = "/exam-schedule";
+const STAFF_ATTENDANCE_URL = "/attendance";
+
+// INVIGILATOR
+
+export {
+  MANAGER_DASHBOARD_URL,
+  MANAGER_USERS_URL,
+  MANAGER_SEMESTER_URL,
+  MANAGER_REQUESTS_URL,
+  STAFF_SUBJECT_URL,
+  STAFF_EXAM_URL,
+  STAFF_EXAM_SCHEDULE_URL,
+  STAFF_ATTENDANCE_URL,
+};

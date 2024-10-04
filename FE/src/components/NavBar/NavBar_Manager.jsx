@@ -6,6 +6,7 @@ import {
   SettingOutlined,
 } from "@ant-design/icons";
 import { Link, useLocation } from "react-router-dom";
+import { MANAGER_SEMESTER_URL, MANAGER_USERS_URL } from "../../configs/urlWeb";
 
 const items = [
   {
@@ -44,43 +45,19 @@ const items = [
     icon: <SettingOutlined />,
     children: [
       {
-        key: "g1",
-        label: "Configs",
-        type: "group",
-        children: [
-          {
-            key: "5",
-            label: <Link to="/semester">Semester</Link>,
-          },
-          // {
-          //   key: "6",
-          //   label: <Link to="/subjects">Subjects</Link>,
-          // },
-          {
-            key: "7",
-            label: <Link to="/exam-slot">Exam Slot</Link>,
-          },
-        ],
+        key: "5",
+        label: <Link to={MANAGER_SEMESTER_URL}>Semester</Link>,
+      },
+
+      {
+        key: "6",
+        label: <Link to="/exam-slot">Exam Slot</Link>,
       },
       {
-        key: "g2",
-        label: "Users",
-        type: "group",
-        children: [
-          {
-            key: "8",
-            label: <Link to="/staffs">Staffs</Link>,
-          },
-          {
-            key: "9",
-            label: <Link to="/invigilators">Invigilators</Link>,
-          },
-        ],
+        key: "7",
+        label: <Link to={MANAGER_USERS_URL}>Users</Link>,
       },
     ],
-  },
-  {
-    type: "divider",
   },
 ];
 
@@ -96,12 +73,8 @@ const NavBar_Manager = () => {
     "/invigilator-attendance": { key: "3", openKey: "sub2" },
     "/invigilation-fees": { key: "4", openKey: "sub2" },
     "/semester": { key: "5", openKey: "sub3" },
-    // "/subjects": { key: "6", openKey: "sub3" },
-    "/exam-slot": { key: "7", openKey: "sub3" },
-    "/staffs": { key: "8", openKey: "sub3" },
-    "/invigilators": { key: "9", openKey: "sub3" },
-    "/requests": { key: "10", openKey: "grp" },
-    "/dashboard": { key: "11", openKey: "grp" },
+    "/exam-slot": { key: "6", openKey: "sub3" },
+    "/staffs": { key: "7", openKey: "sub3" },
   };
 
   // Set selected key and open key when location changes

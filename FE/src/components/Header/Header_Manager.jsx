@@ -6,6 +6,10 @@ import "./Header_Manager.css";
 import Logout from "../Logout";
 import { Link, useNavigate } from "react-router-dom";
 import { getUserInfo } from "../API/getUserInfo";
+import {
+  MANAGER_DASHBOARD_URL,
+  MANAGER_REQUESTS_URL,
+} from "../../configs/urlWeb";
 
 const items = [
   {
@@ -14,11 +18,11 @@ const items = [
     icon: <UserOutlined />,
   },
   {
-    label: "Logout",
+    label: <Logout />,
     key: "2",
-    icon: <Logout />,
   },
 ];
+
 const menuProps = {
   items,
 };
@@ -53,17 +57,17 @@ const Header_Manager = ({ isLogin }) => {
       <div className="header-right">
         <Space wrap className="header-right-space">
           <Button>
-            <Link to="/dashboard">Dashboard</Link>
+            <Link to={MANAGER_DASHBOARD_URL}>Dashboard</Link>
           </Button>
 
           <Button variant="dashed">
-            <Link to="/requests">Request</Link>
+            <Link to={MANAGER_REQUESTS_URL}>Request</Link>
           </Button>
 
           <Dropdown menu={menuProps}>
             <Button>
               <Space>
-                {data.lastName} {data.firstName}
+                {data.firstName}
                 <DownOutlined />
               </Space>
             </Button>

@@ -15,7 +15,7 @@ const handleError = (error) => {
 };
 
 const userApi = {
-  getAllusers: async () => {
+  getAllUsers: async () => {
     try {
       const response = await axios.get(`${USER_API_BASE_URL}`, {
         headers: {
@@ -56,7 +56,14 @@ const userApi = {
     try {
       const response = await axios.put(
         `${USER_API_BASE_URL}/${user.fuId}`,
-        user
+        user,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+          withCredentials: true,
+        }
       );
       return response.data;
     } catch (error) {

@@ -15,6 +15,7 @@ import {
   Radio,
   Col,
   Row,
+  Select,
 } from "antd";
 import {
   EditOutlined,
@@ -22,41 +23,50 @@ import {
   UploadOutlined,
 } from "@ant-design/icons";
 import {
-  ADD_STAFF_FAILED,
-  ADD_STAFF_SUCCESS,
-  DELETE_STAFF_FAILED,
-  DELETE_STAFF_SUCCESS,
-  EDIT_STAFF_FAILED,
-  EDIT_STAFF_SUCCESS,
-  IMPORT_STAFFS_SUCCESS,
-  IMPORT_STAFFS_FAILED,
-  FETCH_STAFFS_FAILED,
-} from "../../configs/messages";
+  ADD_USER_SUCCESS,
+  ADD_USER_FAILED,
+  EDIT_USER_SUCCESS,
+  EDIT_USER_FAILED,
+  DELETE_USER_SUCCESS,
+  DELETE_USER_FAILED,
+  FETCH_USERS_FAILED,
+  IMPORT_USERS_SUCCESS,
+  IMPORT_USERS_FAILED,
+} from "../../configs/messages.jsx";
 import { User_Import_Excel } from "../../utils/User_Import_Excel.js";
 import { User_Excel_Template } from "../../utils/User_Excel_Template.js";
 
 import Header_Manager from "../../components/Header/Header_Manager.jsx";
 import NavBar_Manager from "../../components/NavBar/NavBar_Manager.jsx";
 
-// Ant Design Layout Components
 const { Content, Sider } = Layout;
 
-const Staff = ({ isLogin }) => {
+const roleOptions = [
+  { label: "Admin", value: 0 },
+  { label: "Manager", value: 1 },
+  { label: "Staff", value: 2 },
+  { label: "Invigilator", value: 3 },
+];
+
+const Users = ({ isLogin }) => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [fileLoading, setFileLoading] = useState(false); // For file upload loading state
+  const [fileLoading, setFileLoading] = useState(false);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
-  const [editingStaff, setEditingStaff] = useState(null);
+  const [editingUser, setEditingUser] = useState(null);
   const [form] = Form.useForm();
 
   const fetchData = async () => {
     setLoading(true);
     try {
-      const result = await userApi.getAllusers();
+      // Fetch the data
+      const result = await userApi.getAllUsers();
+
+      // Ensure that we replace the current data with the new data
       setData(result);
     } catch (error) {
-      message.error(FETCH_STAFFS_FAILED);
+      message.error(FETCH_USERS_FAILED);
     } finally {
       setLoading(false);
     }
@@ -79,34 +89,32 @@ const Staff = ({ isLogin }) => {
   const handleOk = async () => {
     try {
       const values = await form.validateFields();
-      console.log(values);
       if (isEditing) {
-        // Update existing staff
-        await userApi.updateUser({ ...editingStaff, ...values });
-        message.success(EDIT_STAFF_SUCCESS);
+        await userApi.updateUser({ ...editingUser, ...values });
+        message.success(EDIT_USER_SUCCESS);
       } else {
-        // Add new staff
         await userApi.addUser(values);
-        message.success(ADD_STAFF_SUCCESS);
+        message.success(ADD_USER_SUCCESS);
       }
       fetchData();
       handleCancel();
     } catch (error) {
-      message.error(isEditing ? EDIT_STAFF_FAILED : ADD_STAFF_FAILED);
+      message.error(isEditing ? EDIT_USER_FAILED : ADD_USER_FAILED);
     }
   };
 
-  const handleEdit = (staff) => {
+  const handleEdit = (user) => {
     setIsEditing(true);
-    setEditingStaff(staff);
+    setEditingUser(user);
     form.setFieldsValue({
-      fuId: staff.fuId,
-      firstName: staff.firstName,
-      lastName: staff.lastName,
-      email: staff.email,
-      phoneNumber: staff.phoneNumber,
-      department: staff.department,
-      gender: staff.gender,
+      fuId: user.fuId,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      email: user.email,
+      phoneNumber: user.phoneNumber,
+      department: user.department,
+      gender: user.gender,
+      role: user.role,
     });
     setIsModalVisible(true);
   };
@@ -114,30 +122,25 @@ const Staff = ({ isLogin }) => {
   const handleDelete = async (fuId) => {
     try {
       await userApi.deleteUser(fuId);
-      message.success(DELETE_STAFF_SUCCESS);
+      message.success(DELETE_USER_SUCCESS);
+
       fetchData();
     } catch (error) {
-      message.error(DELETE_STAFF_FAILED);
+      message.error(DELETE_USER_FAILED);
     }
   };
 
   const handleFileUpload = async ({ file }) => {
-    setFileLoading(true); // Set loading for file upload
+    setFileLoading(true);
     try {
-      const staffData = await User_Import_Excel(file);
-      // Add role to each staff object
-      const staffWithrole = staffData.map((staff) => ({ ...staff, role: 3 }));
-      await Promise.all(
-        // Add each staff to the database
-        staffWithrole.map((staff) => userApi.addUser(staff))
-      );
-
-      message.success(IMPORT_STAFFS_SUCCESS);
+      const data = await User_Import_Excel(file);
+      await Promise.all(data.map((user) => userApi.addUser(user)));
+      message.success(IMPORT_USERS_SUCCESS);
       fetchData();
     } catch (error) {
-      message.error(IMPORT_STAFFS_FAILED);
+      message.error(IMPORT_USERS_FAILED);
     } finally {
-      setFileLoading(false); // Reset loading state after process
+      setFileLoading(false);
     }
   };
 
@@ -168,6 +171,13 @@ const Staff = ({ isLogin }) => {
       key: "department",
     },
     {
+      title: "Role",
+      dataIndex: "role",
+      key: "role",
+      render: (role) =>
+        roleOptions.find((option) => option.value === role)?.label || "Unknown",
+    },
+    {
       title: "Action",
       key: "action",
       render: (text, record) => (
@@ -177,7 +187,7 @@ const Staff = ({ isLogin }) => {
             style={{ color: "blue", cursor: "pointer" }}
           />
           <Popconfirm
-            title="Are you sure to delete this staff?"
+            title="Are you sure to delete this user?"
             onConfirm={() => handleDelete(record.fuId)}
             okText="Yes"
             cancelText="No"
@@ -207,7 +217,7 @@ const Staff = ({ isLogin }) => {
           >
             <Space>
               <Button type="primary" onClick={showModal}>
-                Add New Staff
+                Add New User
               </Button>
 
               <Upload
@@ -218,14 +228,11 @@ const Staff = ({ isLogin }) => {
                 method="POST"
               >
                 <Button icon={<UploadOutlined />} loading={fileLoading}>
-                  Import Staffs
+                  Import Users
                 </Button>
               </Upload>
 
-              <Button
-                onClick={() => User_Excel_Template("Staff_Template")}
-                type="default"
-              >
+              <Button onClick={() => User_Excel_Template()} type="default">
                 Download Import Template
               </Button>
             </Space>
@@ -234,36 +241,38 @@ const Staff = ({ isLogin }) => {
               <Table
                 dataSource={data}
                 columns={columns}
-                rowKey={(record) => record.fuId}
-                pagination={{ pageSize: 8 }}
+                rowKey={Math.random()}
+                pagination={{
+                  pageSize: 8,
+                  showSizeChanger: true,
+                  pageSizeOptions: ["8", "16", "24"],
+                }}
               />
             </Spin>
           </Content>
         </Layout>
       </Layout>
 
-      {/* Add/Edit Staff Modal */}
       <Modal
-        title={isEditing ? "Edit Staff" : "Add New Staff"}
+        title={isEditing ? "Edit User" : "Add New User"}
         open={isModalVisible}
         onOk={handleOk}
         onCancel={handleCancel}
         okText="Submit"
         cancelText="Cancel"
       >
-        <Form form={form} layout="vertical" name="add_staff_form">
-          {/* FUID, First Name, and Last Name in a single line */}
+        <Form form={form} layout="vertical" name="add_user_form">
           <Row gutter={16}>
-            <Col span={8}>
+            <Col span={6}>
               <Form.Item
                 name="fuId"
                 label="FUID"
-                rules={[{ required: true, message: "Please input FUID!" }]}
+                rules={[{ required: true, message: "Required" }]}
               >
                 <Input placeholder="Enter FUID" />
               </Form.Item>
             </Col>
-            <Col span={8}>
+            <Col span={9}>
               <Form.Item
                 name="firstName"
                 label="First Name"
@@ -274,7 +283,7 @@ const Staff = ({ isLogin }) => {
                 <Input placeholder="Enter first name" />
               </Form.Item>
             </Col>
-            <Col span={8}>
+            <Col span={9}>
               <Form.Item
                 name="lastName"
                 label="Last Name"
@@ -285,9 +294,8 @@ const Staff = ({ isLogin }) => {
             </Col>
           </Row>
 
-          {/* Email and Phone Number in a single line */}
           <Row gutter={16}>
-            <Col span={12}>
+            <Col span={14}>
               <Form.Item
                 name="email"
                 label="Email"
@@ -299,7 +307,7 @@ const Staff = ({ isLogin }) => {
                 <Input placeholder="Enter email" />
               </Form.Item>
             </Col>
-            <Col span={12}>
+            <Col span={10}>
               <Form.Item
                 name="phoneNumber"
                 label="Phone"
@@ -312,9 +320,8 @@ const Staff = ({ isLogin }) => {
             </Col>
           </Row>
 
-          {/* Department and Gender in a single line */}
           <Row gutter={16}>
-            <Col span={12}>
+            <Col span={8}>
               <Form.Item
                 name="department"
                 label="Department"
@@ -325,29 +332,39 @@ const Staff = ({ isLogin }) => {
                 <Input placeholder="Enter department" />
               </Form.Item>
             </Col>
-            <Col span={12}>
+
+            <Col span={8}>
+              <Form.Item
+                name="role"
+                label="Role"
+                rules={[{ required: true, message: "Please select role!" }]}
+              >
+                <Select placeholder="Select role">
+                  {roleOptions.map((role) => (
+                    <Select.Option key={role.value} value={role.value}>
+                      {role.label}
+                    </Select.Option>
+                  ))}
+                </Select>
+              </Form.Item>
+            </Col>
+            <Col span={8}>
               <Form.Item
                 name="gender"
                 label="Gender"
                 rules={[{ required: true, message: "Please select gender!" }]}
-                initialValue="true"
               >
                 <Radio.Group>
-                  <Radio value="true">Male</Radio>
-                  <Radio value="false">Female</Radio>
+                  <Radio value={true}>Male</Radio>
+                  <Radio value={false}>Female</Radio>
                 </Radio.Group>
               </Form.Item>
             </Col>
           </Row>
-
-          {/* Hidden Role Field */}
-          <Form.Item name="role" initialValue="3" hidden={true}>
-            <Input />
-          </Form.Item>
         </Form>
       </Modal>
     </Layout>
   );
 };
 
-export default Staff;
+export default Users;

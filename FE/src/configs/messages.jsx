@@ -6,16 +6,16 @@ const VALID_EMAIL = "Please enter a valid format!";
 const ENTER_PASSWORD = "Please enter your password!";
 
 /*************************** MANAGER **************************/
-// Staff
-const ADD_STAFF_SUCCESS = "Add staff successfully!";
-const ADD_STAFF_FAILED = "Failed to add staff!";
-const EDIT_STAFF_SUCCESS = "Edit staff successfully!";
-const EDIT_STAFF_FAILED = "Failed to edit staff!";
-const DELETE_STAFF_SUCCESS = "Delete staff successfully!";
-const DELETE_STAFF_FAILED = "Failed to delete staff!";
-const IMPORT_STAFFS_SUCCESS = "Import staffs successfully!";
-const IMPORT_STAFFS_FAILED = "Some staffs could not be imported.";
-const FETCH_STAFFS_FAILED = "Failed to fetch staffs data!";
+// Users
+const ADD_USER_SUCCESS = "Add user successfully!";
+const ADD_USER_FAILED = "Failed to add user!";
+const EDIT_USER_SUCCESS = "Edit user successfully!";
+const EDIT_USER_FAILED = "Failed to edit user!";
+const DELETE_USER_SUCCESS = "Delete user successfully!";
+const DELETE_USER_FAILED = "Failed to delete user!";
+const FETCH_USERS_FAILED = "Failed to fetch users data!";
+const IMPORT_USERS_SUCCESS = "Import users successfully!";
+const IMPORT_USERS_FAILED = "Failed to import users!";
 
 // Semester
 const FETCH_SEMESTERS_FAILED = "Failed to fetch semesters data!";
@@ -41,17 +41,6 @@ const DELETE_EXAM_SUCCESS = "Delete exam successfully!";
 const DELETE_EXAM_FAILED = "Failed to delete exam!";
 const FETCH_EXAM_FAILED = "Failed to fetch exam data!";
 
-// Invigilator
-const ADD_INVIGILATOR_SUCCESS = "Add invigilator successfully!";
-const ADD_INVIGILATOR_FAILED = "Add invigilator failed!";
-const EDIT_INVIGILATOR_SUCCESS = "Edit invigilator successfully!";
-const EDIT_INVIGILATOR_FAILED = "Edit invigilator failed!";
-const DELETE_INVIGILATOR_SUCCESS = "Delete invigilator successfully!";
-const DELETE_INVIGILATOR_FAILED = "Delete invigilator failed!";
-const IMPORT_INVIGILATOR_SUCCESS = "Import invigilators successfully!";
-const IMPORT_INVIGILATOR_FAILED = "Some invigilators could not be imported.";
-const FETCH_INVIGILATORS_FAILED = "Failed to fetch invigilators data!";
-
 // Configs
 const FETCH_CONFIG_FAILED = "Failed to fetch configuration data!";
 const UPDATE_CONFIG_SUCCESS = "Update configuration successfully!";
@@ -63,24 +52,15 @@ export {
   ENTER_EMAIL,
   ENTER_PASSWORD,
   VALID_EMAIL,
-  ADD_STAFF_SUCCESS,
-  ADD_STAFF_FAILED,
-  EDIT_STAFF_SUCCESS,
-  EDIT_STAFF_FAILED,
-  DELETE_STAFF_SUCCESS,
-  DELETE_STAFF_FAILED,
-  FETCH_STAFFS_FAILED,
-  IMPORT_STAFFS_SUCCESS,
-  IMPORT_STAFFS_FAILED,
-  ADD_INVIGILATOR_SUCCESS,
-  ADD_INVIGILATOR_FAILED,
-  EDIT_INVIGILATOR_SUCCESS,
-  EDIT_INVIGILATOR_FAILED,
-  DELETE_INVIGILATOR_SUCCESS,
-  DELETE_INVIGILATOR_FAILED,
-  IMPORT_INVIGILATOR_SUCCESS,
-  IMPORT_INVIGILATOR_FAILED,
-  FETCH_INVIGILATORS_FAILED,
+  ADD_USER_SUCCESS,
+  ADD_USER_FAILED,
+  EDIT_USER_SUCCESS,
+  EDIT_USER_FAILED,
+  DELETE_USER_SUCCESS,
+  DELETE_USER_FAILED,
+  FETCH_USERS_FAILED,
+  IMPORT_USERS_SUCCESS,
+  IMPORT_USERS_FAILED,
   FETCH_SEMESTERS_FAILED,
   ADD_SEMESTER_SUCCESS,
   ADD_SEMESTER_FAILED,

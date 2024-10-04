@@ -2,7 +2,7 @@
 import * as XLSX from "xlsx";
 
 // Function to create and download the Excel template
-export const User_Excel_Template = (name) => {
+export const User_Excel_Template = () => {
   // Define the columns for the Excel template
   const worksheetData = [
     {
@@ -24,5 +24,5 @@ export const User_Excel_Template = (name) => {
   XLSX.utils.book_append_sheet(workbook, worksheet, name);
 
   // Generate Excel file and trigger download
-  XLSX.writeFile(workbook, `${name}.xlsx`);
+  XLSX.writeFile(workbook, `User_Template.xlsx`);
 };

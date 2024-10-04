@@ -1,8 +1,8 @@
-import { useEffect } from 'react';
+import { useEffect } from "react";
 
 const useScript = (url, onload) => {
   useEffect(() => {
-    const script = document.createElement('script');
+    const script = document.createElement("script");
 
     script.src = url;
     script.onload = onload;
