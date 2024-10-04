@@ -28,7 +28,7 @@ const Header = () => {
     const { role } = useContext(UserContext);
     const navigate = useNavigate();
 
-    const currentHeader = headerConfig[role] || headerConfig['staff'];
+    const currentHeader = headerConfig[role] || headerConfig['invigilator'];
 
     return (
         <div className="header">

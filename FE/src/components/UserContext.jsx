@@ -1,4 +1,5 @@
 import React, { createContext, useState, useEffect } from 'react';
+import { getUserInfo } from './API/getUserInfo';
 
 
 export const UserContext = createContext();
@@ -8,7 +9,7 @@ export const UserProvider = ({ children }) => {
 
     useEffect(() => {
         const initRole = async () => {
-            const role = await getRole();
+            const role = await getUserInfo();
             setRole(role);
         };
     }, []);

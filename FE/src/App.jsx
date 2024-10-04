@@ -16,6 +16,7 @@ import Exam from "./pages/Staff/Exam";
 import Exam_Schedule from "./pages/Staff/Exam_Schedule";
 import Attendance from "./pages/Staff/Attendance";
 import InvigilatorDashboard from "./pages/Invigilator/InvigilatorDashboard";
+import InvigilatorRegistration from "./pages/Invigilator/InvigilatorRegistration";
 function App() {
   // const [isLogin, setIsLogin] = useState(false);
 
@@ -79,6 +80,7 @@ function App() {
     <div className="container">
     <Routes>
     <Route path="/dashboard" element={<InvigilatorDashboard />} />
+    <Route path="/register" element={<InvigilatorRegistration />} />
     <Route path="*" element={<Navigate to="/dashboard" replace />} />
       </Routes>
     </div>

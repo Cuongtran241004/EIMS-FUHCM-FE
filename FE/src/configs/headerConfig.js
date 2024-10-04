@@ -13,7 +13,7 @@ const headerConfig = {
         { name: "Attendance", path: "/attendance" },
     ],
     invigilator: [
-        { name: "Schedule", path: "/schedule" },
+        { name: "Schedule", path: "/dashboard" },
         { name: "Register", path: "/register" },
         { name: "request", path: "/request" },
     ],
