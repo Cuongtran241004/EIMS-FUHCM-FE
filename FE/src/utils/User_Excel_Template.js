@@ -13,6 +13,7 @@ export const User_Excel_Template = () => {
       phoneNumber: "0123456789", // Example phone number
       department: "IT", // Example department
       gender: "male", // Example gender
+      role: "staff", // Example role
     },
   ];
 

@@ -1,13 +1,6 @@
 import axios from "axios";
 import { API_BASE_URL } from "../configs/urlApi.jsx";
 const USER_API_BASE_URL = `${API_BASE_URL}/users`;
-// CUSTOM AXIOS INSTANCE
-// const USER_API = axios.create({
-//   baseURL: USER_API_BASE_URL,
-//   headers: {
-//     "Content-Type": "application/json",
-//   },
-// });
 
 const handleError = (error) => {
   console.error("Error with API request:", error);
@@ -31,7 +24,13 @@ const userApi = {
   },
   getUserByFuId: async (fuId) => {
     try {
-      const response = await axios.get(`${USER_API_BASE_URL}/${fuId}`);
+      const response = await axios.get(`${USER_API_BASE_URL}/${fuId}`, {
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        withCredentials: true,
+      });
       return response.data;
     } catch (error) {
       handleError(error);
@@ -54,6 +53,7 @@ const userApi = {
   },
   updateUser: async (user) => {
     try {
+      console.log(user.fuId);
       const response = await axios.put(
         `${USER_API_BASE_URL}/${user.fuId}`,
         user,
@@ -72,7 +72,13 @@ const userApi = {
   },
   deleteUser: async (fuId) => {
     try {
-      const response = await axios.delete(`${USER_API_BASE_URL}/${fuId}`);
+      const response = await axios.delete(`${USER_API_BASE_URL}/${fuId}`, {
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        withCredentials: true,
+      });
       return response.data;
     } catch (error) {
       handleError(error);

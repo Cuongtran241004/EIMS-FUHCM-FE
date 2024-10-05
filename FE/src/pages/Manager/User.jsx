@@ -21,6 +21,7 @@ import {
   EditOutlined,
   DeleteOutlined,
   UploadOutlined,
+  DownloadOutlined,
 } from "@ant-design/icons";
 import {
   ADD_USER_SUCCESS,
@@ -89,6 +90,7 @@ const Users = ({ isLogin }) => {
   const handleOk = async () => {
     try {
       const values = await form.validateFields();
+      console.log("Received values of form: ", values);
       if (isEditing) {
         await userApi.updateUser({ ...editingUser, ...values });
         message.success(EDIT_USER_SUCCESS);
@@ -123,7 +125,6 @@ const Users = ({ isLogin }) => {
     try {
       await userApi.deleteUser(fuId);
       message.success(DELETE_USER_SUCCESS);
-
       fetchData();
     } catch (error) {
       message.error(DELETE_USER_FAILED);
@@ -175,7 +176,7 @@ const Users = ({ isLogin }) => {
       dataIndex: "role",
       key: "role",
       render: (role) =>
-        roleOptions.find((option) => option.value === role)?.label || "Unknown",
+        roleOptions.find((option) => option.value === role)?.label || "-",
     },
     {
       title: "Action",
@@ -232,7 +233,11 @@ const Users = ({ isLogin }) => {
                 </Button>
               </Upload>
 
-              <Button onClick={() => User_Excel_Template()} type="default">
+              <Button
+                icon={<DownloadOutlined />}
+                onClick={() => User_Excel_Template()}
+                type="default"
+              >
                 Download Import Template
               </Button>
             </Space>
@@ -261,7 +266,14 @@ const Users = ({ isLogin }) => {
         okText="Submit"
         cancelText="Cancel"
       >
-        <Form form={form} layout="vertical" name="add_user_form">
+        <Form
+          form={form}
+          layout="vertical"
+          name="add_user_form"
+          initialValues={{
+            gender: true, // Male selected by default
+          }}
+        >
           <Row gutter={16}>
             <Col span={6}>
               <Form.Item
@@ -295,7 +307,7 @@ const Users = ({ isLogin }) => {
           </Row>
 
           <Row gutter={16}>
-            <Col span={14}>
+            <Col span={15}>
               <Form.Item
                 name="email"
                 label="Email"
@@ -307,7 +319,7 @@ const Users = ({ isLogin }) => {
                 <Input placeholder="Enter email" />
               </Form.Item>
             </Col>
-            <Col span={10}>
+            <Col span={9}>
               <Form.Item
                 name="phoneNumber"
                 label="Phone"
