@@ -44,13 +44,10 @@ const Header = ({ isLogin }) => {
             setData(newInfo);
         };
         initUserInfo();
-    }, [isLogin, navigate]);
+    }, [isLogin]);
 
-    const currentHeader = headerConfig[role] || headerConfig['invigilator'];
-    console.log('currentHeader:', currentHeader);
-    useEffect(() => {
-        console.log('Role in header:', role);
-    }, [role]);
+    const currentHeader = headerConfig[role] || headerConfig['Invigilator'];
+    
 
     return (
         <div className="header">

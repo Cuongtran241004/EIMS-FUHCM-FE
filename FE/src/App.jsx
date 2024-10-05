@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import Login from "./pages/Login/Login";
-import { Route, Routes, Navigate } from "react-router-dom";
+import { Route, Routes, Navigate, useNavigate  } from "react-router-dom";
 import "./App.css";
 import Staff from "./pages/Manager/Staff";
 import Dashboard from "./pages/Dashboard/Dashboard";
@@ -17,15 +17,20 @@ import Exam_Schedule from "./pages/Staff/Exam_Schedule";
 import Attendance from "./pages/Staff/Attendance";
 import InvigilatorDashboard from "./pages/Invigilator/InvigilatorDashboard";
 import InvigilatorRegistration from "./pages/Invigilator/InvigilatorRegistration";
+import InvigilatorRequest from "./pages/Invigilator/InvigilatorRequest";
 function App() {
   const [isLogin, setIsLogin] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
-    const initLogin = async () => {
-      const name = await getUserInfo();
-      setIsLogin(!!name);
-    };
-    initLogin();
+    const name = localStorage.getItem('firstName');
+    console.log("Name in localStorage:", name);
+    if (name) {
+      setIsLogin(true);
+    } else {
+      setIsLogin(false);
+      navigate('/');
+    }
   }, []);
 
   // return (
@@ -87,6 +92,7 @@ function App() {
           <Routes>
             <Route path="/dashboard" element={<InvigilatorDashboard isLogin={isLogin} />} />
             <Route path="/register" element={<InvigilatorRegistration isLogin={isLogin} />} />
+            <Route path="/request" element={<InvigilatorRequest isLogin= {isLogin}/>}/>
             <Route path="*" element={<Navigate to="/dashboard" replace />} />
           </Routes>
         )};

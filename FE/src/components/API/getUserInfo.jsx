@@ -34,7 +34,10 @@ export const getUserInfo = async () => {
             },
             withCredentials: true, // Ensures cookies or credentials are sent with the request
         });
-
+        localStorage.setItem('role', response.data.role.name);
+        localStorage.setItem('firstName',response.data.firstName);
+        localStorage.setItem('LastName',response.data.lastName);
+        
         // Return the response data (Axios parses JSON automatically)
         return response.data;
     } catch (e) {
