@@ -1,11 +1,10 @@
 import React, { useContext, useState, useEffect } from 'react';
-import { UserContext } from '../UserContext';
+import { UserContext } from '../../components/UserContext';
 import { Link, useNavigate } from 'react-router-dom';
 import headerConfig from '../../configs/headerConfig';
 import { Button, Space, Dropdown } from 'antd';
 import { DownOutlined, UserOutlined } from '@ant-design/icons';
 import logo from '../../assets/fpt-university-logo.png';
-import { getUserInfo } from "../API/getUserInfo";
 import Logout from '../Logout';
 import './Header.css';
 
@@ -25,28 +24,11 @@ const menuProps = {
     items,
 };
 
-const Header = ({ isLogin }) => {
-    const role = useContext(UserContext);
-    const [data, setData] = useState({
-        firstName: "",
-        lastName: "",
-    });
+const Header = () => {
+    const { user } = useContext(UserContext);
+    console.log(user);
 
-    const navigate = useNavigate();
-
-    useEffect(() => {
-        if (!isLogin) {
-            navigate("/");
-        }
-
-        const initUserInfo = async () => {
-            const newInfo = await getUserInfo();
-            setData(newInfo);
-        };
-        initUserInfo();
-    }, [isLogin]);
-
-    const currentHeader = headerConfig[role] || headerConfig['Invigilator'];
+    const currentHeader = headerConfig[user.role] || headerConfig['Invigilator'];
     
 
     return (
@@ -69,7 +51,7 @@ const Header = ({ isLogin }) => {
                     <Dropdown menu={menuProps} trigger={["click"]}>
                         <Button size="large">
                             <Space>
-                                <span> {data.lastName} {data.firstName}</span>
+                                <span> {user.lastName} {user.firstName}</span>
                                 <DownOutlined />
                             </Space>
                         </Button>

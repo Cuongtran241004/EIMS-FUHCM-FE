@@ -3,34 +3,24 @@ import React, { createContext, useState, useEffect } from 'react';
 export const UserContext = createContext();
 
 export const UserProvider = ({ children }) => {
-    const [role, setRole] = useState('');
+  const [user, setUser] = useState({
+    role: localStorage.getItem('role'),
+    firstName: localStorage.getItem('firstName'),
+    lastName: localStorage.getItem('lastName'),
+  });
 
+  useEffect(() => {
+    const storedUser = {
+      role: localStorage.getItem('role'),
+      firstName: localStorage.getItem('firstName'),
+      lastName: localStorage.getItem('lastName'),
+    };
+    setUser(storedUser);
+  }, []);
 
-    useEffect(() => {
-        let roleValue = localStorage.getItem('role');
-            try {
-                
-                const userRole = roleValue || 'Invigilator';
-                setRole(userRole);
-            } catch (error) {
-                setRole('invigilator');
-            }
-       
-    }, [role]);
-
-
-
-
-
-    return (
-        <UserContext.Provider value={role}>
-            {children}
-            {
-                useEffect(() => {
-                    console.log('User role in provider:', role);
-                }, [role])
-
-            }
-        </UserContext.Provider>
-    );
-}
+  return (
+    <UserContext.Provider value={{ user, setUser }}>
+      {children}
+    </UserContext.Provider>
+  );
+};

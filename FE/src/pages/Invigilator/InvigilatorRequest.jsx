@@ -4,12 +4,12 @@ import { DownOutlined, UserOutlined } from '@ant-design/icons';
 import Header from '../../components/Header/Header.jsx';
 
 
-function InvigilatorRequest({isLogin}) {
+function InvigilatorRequest() {
 
 
     return (
         <div>
-           <Header isLogin={isLogin} />
+           <Header  />
         </div>
     );
     

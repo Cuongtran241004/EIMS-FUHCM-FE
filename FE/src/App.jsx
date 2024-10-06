@@ -18,20 +18,23 @@ import Attendance from "./pages/Staff/Attendance";
 import InvigilatorDashboard from "./pages/Invigilator/InvigilatorDashboard";
 import InvigilatorRegistration from "./pages/Invigilator/InvigilatorRegistration";
 import InvigilatorRequest from "./pages/Invigilator/InvigilatorRequest";
+import Header from "./components/Header/Header";
 function App() {
   const [isLogin, setIsLogin] = useState(false);
-  const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const name = localStorage.getItem('firstName');
-    console.log("Name in localStorage:", name);
-    if (name) {
-      setIsLogin(true);
-    } else {
-      setIsLogin(false);
-      navigate('/');
-    }
-  }, []);
+      console.log("Login");
+      const initLogin = async () => {
+        const name = await getUserInfo();
+        setIsLogin(!!name);
+        setIsLoading(false);
+      };
+      initLogin();
+    }, [isLogin]);
+ 
+  
+  
 
   // return (
   //   <>
@@ -85,16 +88,23 @@ function App() {
       <div className="container">
         {!isLogin ? (
           <Routes>
-            <Route path="/" element={<Login isLogin={isLogin} setIsLogin={setIsLogin} />} />
+            <Route path="/" element={<Login setIsLogin={setIsLogin} />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         ) : (
+           <div>
+            {!isLoading && (
+              <>
+              <Header />
+              </>
+          )}
           <Routes>
-            <Route path="/dashboard" element={<InvigilatorDashboard isLogin={isLogin} />} />
-            <Route path="/register" element={<InvigilatorRegistration isLogin={isLogin} />} />
-            <Route path="/request" element={<InvigilatorRequest isLogin= {isLogin}/>}/>
+            <Route path="/dashboard" element={<InvigilatorDashboard />} />
+            <Route path="/register" element={<InvigilatorRegistration />} />
+            <Route path="/request" element={<InvigilatorRequest />}/>
             <Route path="*" element={<Navigate to="/dashboard" replace />} />
           </Routes>
+           </div>
         )};
       </div>
     </>

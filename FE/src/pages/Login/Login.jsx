@@ -41,28 +41,42 @@
 //   );
 // }
 
-
-import { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useContext } from 'react';
+import { UserContext } from '../../components/UserContext';
 import GoogleLogin from '../../components/GoogleLogin';
 import { postLoginToken } from '../../components/api/postLoginToken';
 import './Login.css';
 import LoginForm from './LoginForm';
+import { getUserInfo } from '../../components/API/getUserInfo';
 
-export default function Login({ isLogin, setIsLogin }) {
-  const navigate = useNavigate();
+export default function Login({setIsLogin}) {
+  const { setUser } = useContext(UserContext);
 
   const onGoogleSignIn = async (res) => {
     const { credential } = res;
-    const result = await postLoginToken(credential); // Corrected function call
-    setIsLogin(result); // Update login state based on the result
+    const result = await postLoginToken(credential);
+    console.log('Login result:', result);
+    if(result) {
+      const initInfo = await getUserInfo();
+      const userInfo = {
+        role: initInfo.role.name,
+        firstName: initInfo.firstName,
+        lastName: initInfo.lastName,
+      };
+
+      // Save user information to localStorage
+      localStorage.setItem('role', userInfo.role);
+      localStorage.setItem('firstName', userInfo.firstName);
+      localStorage.setItem('lastName', userInfo.lastName);
+      console.log('user info ',userInfo);
+
+      // Set user information in context
+      setUser(userInfo);
+      setIsLogin(true);
+    }
   };
 
-  useEffect(() => {
-    if (isLogin) {
-      navigate('/dashboard'); // Redirect to dashboard if logged in
-    }
-  }, [isLogin, navigate]); // Added `navigate` to dependency array
+
 
   return (
       <div className="login-container">

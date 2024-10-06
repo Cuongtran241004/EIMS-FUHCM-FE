@@ -12,7 +12,7 @@ import './dashboard.css';
 
 const localizer = momentLocalizer(moment);
 
-function InvigilatorDashboard({ isLogin }) {
+function InvigilatorDashboard() {
   // Mock data
   const mockSchedules = [
     {
@@ -80,7 +80,6 @@ function InvigilatorDashboard({ isLogin }) {
 
   return (
     <div>
-      <Header isLogin={isLogin} />
       <BigCalendar
         localizer={localizer}
         events={events}

@@ -111,7 +111,7 @@ const availableSlots = [
 
 ];
 
-function InvigilatorRegistration({ isLogin }) {
+function InvigilatorRegistration() {
   const [selectedSlots, setSelectedSlots] = useState([]);
 
   const handleSelectEvent = (event) => {
@@ -141,7 +141,7 @@ function InvigilatorRegistration({ isLogin }) {
 
   return (
     <div>
-      <Header isLogin={isLogin} />
+      <Header />
       <div style={{ display: 'flex', alignItems: 'flex-start', margin: '20px' }}>
         <Calendar
           localizer={localizer}
