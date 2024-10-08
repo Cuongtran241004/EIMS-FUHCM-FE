@@ -6,12 +6,12 @@ import {
   UPDATE_CONFIG_SUCCESS,
   UPDATE_CONFIG_FAILED,
 } from "../../configs/messages.jsx";
-import Header_Manager from "../../components/Header/Header_Manager.jsx";
 import NavBar_Manager from "../../components/NavBar/NavBar_Manager.jsx";
+import Header from "../../components/Header/Header.jsx";
 
 const { Content, Sider } = Layout;
 
-const ConfigSettings = ({isLogin}) => {
+const ConfigSettings = () => {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
   const [configData, setConfigData] = useState({
@@ -54,7 +54,7 @@ const ConfigSettings = ({isLogin}) => {
 
   return (
     <Layout>
-      <Header_Manager isLogin={isLogin} />
+      <Header />
       <Layout>
         <Sider width={256} style={{ backgroundColor: "#fff" }}>
           <NavBar_Manager />

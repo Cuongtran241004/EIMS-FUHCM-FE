@@ -37,13 +37,12 @@ import {
 import { User_Import_Excel } from "../../utils/User_Import_Excel.js";
 import { User_Excel_Template } from "../../utils/User_Excel_Template.js";
 
-import Header_Manager from "../../components/Header/Header_Manager.jsx";
 import NavBar_Manager from "../../components/NavBar/NavBar_Manager.jsx";
 
+import Header from "../../components/Header/Header.jsx";
 const { Content, Sider } = Layout;
 
 const roleOptions = [
-  { label: "Admin", value: 0 },
   { label: "Manager", value: 1 },
   { label: "Staff", value: 2 },
   { label: "Invigilator", value: 3 },
@@ -202,7 +201,7 @@ const Users = ({ isLogin }) => {
 
   return (
     <Layout style={{ height: "100vh" }}>
-      <Header_Manager isLogin={isLogin} />
+      <Header />
       <Layout>
         <Sider width={256} style={{ backgroundColor: "#fff" }}>
           <NavBar_Manager isLogin={isLogin} />
@@ -246,7 +245,7 @@ const Users = ({ isLogin }) => {
               <Table
                 dataSource={data}
                 columns={columns}
-                rowKey={Math.random()}
+                rowKey={(record) => record.fuId}
                 pagination={{
                   pageSize: 8,
                   showSizeChanger: true,

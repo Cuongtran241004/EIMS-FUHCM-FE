@@ -9,10 +9,10 @@ import {
   Space,
   Table,
 } from "antd";
-import Header_Staff from "../../components/Header/Header_Staff";
 import React, { useState } from "react";
 import Sider from "antd/es/layout/Sider";
 import { Row, Col } from "antd";
+import Header from "../../components/Header/Header.jsx";
 
 const { Option } = Select;
 const { Content } = Layout;
@@ -73,7 +73,7 @@ const Exam_Schedule = ({ isLogin }) => {
 
   return (
     <Layout style={{ height: "100vh" }}>
-      <Header_Staff isLogin={isLogin} />
+      <Header />
       <Layout>
         <Sider width={300} style={{ background: "#f1f1f1", padding: "24px" }}>
           <Form form={form} layout="vertical" onFinish={handleSubmit}>

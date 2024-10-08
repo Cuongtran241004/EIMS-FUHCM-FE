@@ -24,8 +24,8 @@ import {
   Row,
 } from "antd";
 import subjectApi from "../../services/Subject.js";
-import Header_Staff from "../../components/Header/Header_Staff.jsx";
 import { DeleteOutlined, DownOutlined } from "@ant-design/icons";
+import Header from "../../components/Header/Header.jsx";
 
 const items = [
   {
@@ -158,7 +158,7 @@ const Subject = ({ isLogin }) => {
 
   return (
     <Layout style={{ height: "100vh" }}>
-      <Header_Staff isLogin={isLogin} />
+      <Header />
       <Layout>
         <Sider width={300} style={{ background: "#f1f1f1", padding: "24px" }}>
           <Form form={form} layout="vertical" name="add_subject_form">
@@ -208,7 +208,7 @@ const Subject = ({ isLogin }) => {
             </Row>
           </Form>
         </Sider>
-        <Content>
+        <Content style={{ padding: 24, margin: 0, background: "#fff" }}>
           <Dropdown
             menu={{
               items,

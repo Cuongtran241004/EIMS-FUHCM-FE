@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import Header_Manager from "../../components/Header/Header_Manager";
 import NavBar_Manager from "../../components/NavBar/NavBar_Manager";
 import moment from "moment";
 import {
@@ -23,11 +22,12 @@ import {
   EDIT_SEMESTER_SUCCESS,
   FETCH_SEMESTERS_FAILED,
 } from "../../configs/messages.jsx";
+import Header from "../../components/Header/Header.jsx";
 
 // Ant Design Layout Components
 const { Content, Sider } = Layout;
 
-const Semester = ({isLogin}) => {
+const Semester = ({ isLogin }) => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -152,7 +152,7 @@ const Semester = ({isLogin}) => {
   ];
   return (
     <Layout style={{ height: "100vh" }}>
-      <Header_Manager isLogin={isLogin}/>
+      <Header />
       <Layout>
         <Sider width={256} style={{ backgroundColor: "#fff" }}>
           <NavBar_Manager />

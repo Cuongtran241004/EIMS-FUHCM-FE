@@ -1,10 +1,10 @@
 .header {
   overflow: hidden;
   background-color: #f1f1f1;
-  padding: 5px 10px;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  padding: 10px 20px;
   width: 100%;
 }
 
@@ -13,7 +13,6 @@
   float: left;
   color: black;
   text-align: center;
-  padding: 12px;
   text-decoration: none;
   font-size: s18px;
   line-height: 25px;
@@ -28,11 +27,11 @@
 .header-right {
   float: right;
   background-color: #f1f1f1;
+  padding-right: 1.875rem;
 }
 
 .header-right .header-right-item {
   display: inline-block;
-  padding: 10px 15px;
   text-align: center;
   text-decoration: none;
   color: black;

@@ -1,13 +1,19 @@
 import React from "react";
 import NavBar_Manager from "../../components/NavBar/NavBar_Manager";
-import Header_Manager from "../../components/Header/Header_Manager";
+import Header from "../../components/Header/Header.jsx";
+import { Layout } from "antd";
 
-const Dashboard = ({isLogin}) => {
+const { Sider } = Layout;
+const Dashboard = () => {
   return (
-    <div>
-      <Header_Manager isLogin={isLogin}/>
-      <NavBar_Manager />
-    </div>
+    <Layout style={{ height: "100vh" }}>
+      <Header />
+      <Layout>
+        <Sider width={256} style={{ backgroundColor: "#fff" }}>
+          <NavBar_Manager />
+        </Sider>
+      </Layout>
+    </Layout>
   );
 };
 export default Dashboard;

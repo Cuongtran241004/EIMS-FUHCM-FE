@@ -1,11 +1,11 @@
 import { Layout } from "antd";
 import React from "react";
-import Header_Staff from "../../components/Header/Header_Staff";
+import Header from "../../components/Header/Header.jsx";
 
 const Attendance = () => {
   return (
     <Layout>
-      <Header_Staff />
+      <Header />
     </Layout>
   );
 };

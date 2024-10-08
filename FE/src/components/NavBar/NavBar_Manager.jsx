@@ -6,7 +6,12 @@ import {
   SettingOutlined,
 } from "@ant-design/icons";
 import { Link, useLocation } from "react-router-dom";
-import { MANAGER_SEMESTER_URL, MANAGER_USERS_URL } from "../../configs/urlWeb";
+import {
+  MANAGER_ATTENDENCE_CHECK_URL,
+  MANAGER_EXAM_SCHEDULE_URL,
+  MANAGER_SEMESTER_URL,
+  MANAGER_USERS_URL,
+} from "../../configs/urlWeb";
 
 const items = [
   {
@@ -16,11 +21,11 @@ const items = [
     children: [
       {
         key: "1",
-        label: <Link to="/exam-schedule">Exam Schedule</Link>,
+        label: <Link to={MANAGER_EXAM_SCHEDULE_URL}>Exam Schedule</Link>,
       },
       {
         key: "2",
-        label: <Link to="/attendance-check">Attendance Check</Link>,
+        label: <Link to={MANAGER_ATTENDENCE_CHECK_URL}>Attendance Check</Link>,
       },
     ],
   },

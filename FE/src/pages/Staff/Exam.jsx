@@ -23,8 +23,8 @@ import {
   Row,
 } from "antd";
 import subjectApi from "../../services/Subject.js";
-import Header_Staff from "../../components/Header/Header_Staff.jsx";
 import { DeleteOutlined, DownOutlined } from "@ant-design/icons";
+import Header from "../../components/Header/Header.jsx";
 
 const items = [
   {
@@ -162,7 +162,7 @@ const Exam = ({ isLogin }) => {
 
   return (
     <Layout style={{ height: "100vh" }}>
-      <Header_Staff isLogin={isLogin} />
+      <Header />
       <Layout>
         {/* Sider for Form */}
         <Sider width={300} style={{ background: "#f1f1f1", padding: "24px" }}>
