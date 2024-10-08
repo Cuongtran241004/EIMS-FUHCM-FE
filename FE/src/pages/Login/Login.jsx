@@ -44,7 +44,7 @@
 import React, { useContext } from 'react';
 import { UserContext } from '../../components/UserContext';
 import GoogleLogin from '../../components/GoogleLogin';
-import { postLoginToken } from '../../components/api/postLoginToken';
+import { postLoginToken } from '../../components/API/postLoginToken';
 import './Login.css';
 import LoginForm from './LoginForm';
 import { getUserInfo } from '../../components/API/getUserInfo';
@@ -62,12 +62,14 @@ export default function Login({setIsLogin}) {
         role: initInfo.role.name,
         firstName: initInfo.firstName,
         lastName: initInfo.lastName,
+        id: initInfo.fuId,
       };
 
       // Save user information to localStorage
       localStorage.setItem('role', userInfo.role);
       localStorage.setItem('firstName', userInfo.firstName);
       localStorage.setItem('lastName', userInfo.lastName);
+      localStorage.setItem('id', userInfo.id);
       console.log('user info ',userInfo);
 
       // Set user information in context

@@ -99,10 +99,10 @@ function App() {
               </>
           )}
           <Routes>
-            <Route path="/dashboard" element={<InvigilatorDashboard />} />
+            <Route path="/" element={<InvigilatorDashboard />} />
             <Route path="/register" element={<InvigilatorRegistration />} />
-            <Route path="/request" element={<InvigilatorRequest />}/>
-            <Route path="*" element={<Navigate to="/dashboard" replace />} />
+            <Route path="/requests" element={<InvigilatorRequest />}/>
+            <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
            </div>
         )};

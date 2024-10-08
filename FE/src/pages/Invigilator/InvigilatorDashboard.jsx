@@ -1,93 +1,133 @@
-// src/pages/Invigilator/InvigilatorDashboard.jsx
-
 import React, { useState, useEffect } from 'react';
-import { Calendar, Modal, message } from 'antd';
+import { Calendar, Dropdown, Modal, message, Button, Space, Collapse, Menu } from 'antd';
+import { DownOutlined } from '@ant-design/icons';
+import { getSemester } from '../../components/API/getSemester';
 import moment from 'moment';
-import Header from '../../components/Header/Header';
+import { schedules } from '../../components/API/schedules';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import { Calendar as BigCalendar, momentLocalizer } from 'react-big-calendar';
 import './dashboard.css';
 
-
-
 const localizer = momentLocalizer(moment);
 
 function InvigilatorDashboard() {
-  // Mock data
-  const mockSchedules = [
-    {
-      id: 1,
-      start: new Date('2024-10-20T09:00:00'),
-      end: new Date('2024-10-20T12:00:00'),
-      title: 'Văn học with MAS291 - Phòng 101',
-    },
-    {
-      id: 2,
-      start: new Date('2024-10-21T13:00:00'),
-      end: new Date('2024-10-21T16:00:00'),
-      title: 'Vật Lộn with SWP391 - Hội trường A',
-    },
-    {
-      id: 3,
-      start: new Date('2024-10-22T09:00:00'),
-      end: new Date('2024-10-22T12:00:00'),
-      title: 'Hóa Thành BA with SWR302 - Phòng 102',
-    },
-    {
-      id: 4,
-      start: new Date('2024-10-23T13:00:00'),
-      end: new Date('2024-10-23T16:00:00'),
-      title: 'Sinh ra SWT301 chi? - Phòng 103',
-    },
-    {
-      id: 5,
-      start: new Date('2024-10-24T09:00:00'),
-      end: new Date('2024-10-24T12:00:00'),
-      title: 'Chill with not pass - Hội trường B',
-    },
-    {
-      id: 6,
-      start: new Date('2024-10-24T13:00:00'),
-      end: new Date('2024-10-24T16:00:00'),
-      title: 'Tiếng Meo - Phòng 104',
-    },
-    {
-      id: 7,
-      start: new Date('2024-10-24T07:00:00'),
-      end: new Date('2024-10-24T10:00:00'),
-      title: 'Tiếng Mán - Phòng 104',
-    },
-  ];
+  const [semesters, setSemesters] = useState([]);
+  const [selectedSemester, setSelectedSemester] = useState(null);
+  const [events, setEvents] = useState([]);
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [selectedEvent, setSelectedEvent] = useState(null);
 
-  const [events, setEvents] = useState(mockSchedules);
+  useEffect(() => {
+    const fetchSemester = async () => {
+      try {
+        const response = await getSemester();
+        setSemesters(response);
+      } catch (e) {
+        console.error('getSemester Error: ', e.message);
+      }
+    };
+    fetchSemester();
+  }, []);
+
+  useEffect(() => {
+    if (selectedSemester) {
+      const fetchSchedules = async () => {
+        try {
+          const obj = await schedules(selectedSemester.id);
+          const examSlotDetailSet = obj.semesterInvigilatorAssignment[0].examSlotDetailSet; // Adjust this based on your data structure
+
+          // Map the examSlotDetailSet to events
+          const mappedEvents = examSlotDetailSet.map(slot => ({
+            examSlotId: slot.examSlotId,
+            startAt: new Date(slot.startAt),
+            endAt: new Date(slot.endAt),
+          }));
+
+          setEvents(mappedEvents);
+        } catch (e) {
+          console.error('fetchSchedules Error: ', e.message);
+        }
+      };
+      fetchSchedules();
+    }
+  }, [selectedSemester]);
+
+  const handleMenuClick = (e) => {
+    const selected = semesters.find(semester => semester.id === parseInt(e.key));
+    setSelectedSemester(selected);
+  };
+
+  const menuItems = semesters.map(semester => ({
+    key: semester.id,
+    label: semester.name
+  }));
+
+  const menu = {
+    items: menuItems,
+    onClick: handleMenuClick
+  };
 
   const handleSelectEvent = (event) => {
-    message.info(`Selected: ${event.title}`);
+    setSelectedEvent(event);
+    setIsModalVisible(true);
   };
 
-  const handleSelectSlot = ({ start, end }) => {
-    const title = window.prompt('New Event name');
-    if (title) {
-      const newEvent = {
-        start,
-        end,
-        title,
-      };
-      setEvents([...events, newEvent]);
-      message.success('Event added!');
-    }
+  const handleOk = () => {
+    setIsModalVisible(false);
   };
+
+  const handleCancel = () => {
+    setIsModalVisible(false);
+  };
+
+  const EventComponent = ({ event }) => (
+    <span>
+      {new Date(event.startAt).toLocaleString()} - {new Date(event.endAt).toLocaleString()}
+    </span>
+  );
+
+  const latestSemester = semesters.length > 0 ? semesters.reduce((latest, current) => (current.id > latest.id ? current : latest), semesters[0]) : null;
 
   return (
     <div>
-      <BigCalendar
-        localizer={localizer}
-        events={events}
-        startAccessor="start"
-        endAccessor="end"
-        style={{ height: 500, margin: '50px', width: '90%' }}
-
-      />
+      <div style={{ display: 'flex', alignItems: 'flex-start' }}>
+        <BigCalendar
+          localizer={localizer}
+          events={events}
+          onSelectEvent={handleSelectEvent}
+          startAccessor="startAt" // Adjusted for the new event object structure
+          endAccessor="endAt" // Adjusted for the new event object structure
+          style={{ height: 500, margin: '50px', width: '70%' }}
+          components={{
+            event: EventComponent,
+          }}
+        />
+        <Modal
+          title="Details"
+          open={isModalVisible}
+          onOk={handleOk}
+          onClose={handleCancel}
+          onCancel={handleCancel}
+        >
+          {selectedEvent && (
+            <div>
+              <p>Exam Slot ID: {selectedEvent.examSlotId}</p> {/* Displaying exam slot ID */}
+              <p>Start: {selectedEvent.startAt.toLocaleString()}</p>
+              <p>End: {selectedEvent.endAt.toLocaleString()}</p>
+            </div>
+          )}
+        </Modal>
+        <div style={{ marginTop: 50 }}>
+          <Dropdown menu={menu} trigger={['click']}>
+            <Button size="large">
+              <Space>
+                {selectedSemester ? selectedSemester.name : (latestSemester ? latestSemester.name : 'No Semesters Available')}
+                <DownOutlined />
+              </Space>
+            </Button>
+          </Dropdown>
+        </div>
+      </div>
     </div>
   );
 }

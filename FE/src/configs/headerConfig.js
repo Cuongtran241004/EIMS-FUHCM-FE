@@ -19,10 +19,7 @@ const headerConfig = {
     ],
     Admin: [
         { name: "Dashboard", path: "/dashboard" },
-        { name: "Semester", path: "/semester" },
-        { name: "Subject", path: "/subjects" },
-        { name: "Staff", path: "/staffs" },
-        { name: "Invigilator", path: "/invigilators" },
+        { name: "Register", path: "/register" },
         { name: "Exam Slot", path: "/exam-slot" },
         { name: "Requests", path: "/requests" },
         { name: "Exam Schedule", path: "/exam-schedule" },

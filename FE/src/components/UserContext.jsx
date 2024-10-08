@@ -7,6 +7,7 @@ export const UserProvider = ({ children }) => {
     role: localStorage.getItem('role'),
     firstName: localStorage.getItem('firstName'),
     lastName: localStorage.getItem('lastName'),
+    id: localStorage.getItem('id'),
   });
 
   useEffect(() => {
@@ -14,6 +15,7 @@ export const UserProvider = ({ children }) => {
       role: localStorage.getItem('role'),
       firstName: localStorage.getItem('firstName'),
       lastName: localStorage.getItem('lastName'),
+      id: localStorage.getItem('id'),
     };
     setUser(storedUser);
   }, []);
