@@ -40,7 +40,7 @@ const Header = () => {
       <div className="header-right">
         <Space>
           {currentHeader.map((item, index) => (
-            <Button key={index} size="large">
+            <Button key={index} size="large" style={{ width: "150px" }}>
               <Link to={item.path} className="header-right-item">
                 {item.name}
               </Link>

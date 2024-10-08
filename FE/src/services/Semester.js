@@ -69,20 +69,5 @@ const semesterApi = {
       handleError(error);
     }
   },
-  deleteSemester: async (code) => {
-    try {
-      const response = await axios.delete(`${SEMESTER_API_BASE_URL}/${code}`, {
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-        },
-        withCredentials: true,
-      });
-      return response.data;
-    } catch (error) {
-      console.error("Error fetching data:", error);
-      throw error;
-    }
-  },
 };
 export default semesterApi;

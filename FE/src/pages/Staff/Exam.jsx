@@ -1,14 +1,5 @@
 import React, { useState, useEffect } from "react";
 import {
-  ADD_EXAM_SUCCESS,
-  ADD_EXAM_FAILED,
-  EDIT_EXAM_SUCCESS,
-  EDIT_EXAM_FAILED,
-  DELETE_EXAM_SUCCESS,
-  DELETE_EXAM_FAILED,
-  FETCH_EXAM_FAILED,
-} from "../../configs/messages.jsx";
-import {
   Layout,
   Button,
   Space,
@@ -21,31 +12,36 @@ import {
   Dropdown,
   Col,
   Row,
+  Select,
 } from "antd";
 import subjectApi from "../../services/Subject.js";
-import semesterApi from "../../services/Semester.js"; // Import semesterApi
+import semesterApi from "../../services/Semester.js";
 import { DeleteOutlined, DownOutlined, EditOutlined } from "@ant-design/icons";
 import Header from "../../components/Header/Header.jsx";
+import examApi from "../../services/Exam.js";
 
-// Ant Design Layout Components
 const { Content, Sider } = Layout;
+const { Option } = Select;
 
-const Exam = ({ isLogin }) => {
+const Exam = () => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [editingSubject, setEditingSubject] = useState(null);
-  const [selectedSemester, setSelectedSemester] = useState(null); // Initialize to null
-  const [semesters, setSemesters] = useState([]); // State for semesters
+  const [selectedSemester, setSelectedSemester] = useState(null);
+  const [semesters, setSemesters] = useState([]);
+  const [subjects, setSubjects] = useState([]);
+  const [filteredSubjects, setFilteredSubjects] = useState([]);
   const [form] = Form.useForm();
 
+  // Fetch exam data
   const fetchData = async (term) => {
     setLoading(true);
     try {
-      const result = await subjectApi.getAllSubjects(term);
+      const result = await examApi.getExamById();
       setData(result);
     } catch (error) {
-      message.error(FETCH_EXAM_FAILED);
+      message.error("Failed to fetch exams");
     } finally {
       setLoading(false);
     }
@@ -55,36 +51,49 @@ const Exam = ({ isLogin }) => {
     fetchData(selectedSemester);
   }, [selectedSemester]);
 
+  // Fetch semesters and subjects on initial load
   useEffect(() => {
     const fetchSemesters = async () => {
       try {
-        const result = await semesterApi.getAllSemesters(); // Fetch semesters
-        setSemesters(result); // Assuming result is an array of { id, name, startAt }
-
-        // Sort semesters by startAt date to get the latest one
+        const result = await semesterApi.getAllSemesters();
+        setSemesters(result);
         const sortedSemesters = result.sort(
           (a, b) => new Date(b.startAt) - new Date(a.startAt)
         );
-        setSelectedSemester(sortedSemesters[0]?.name); // Set the latest semester as default
-        fetchData(sortedSemesters[0]?.id); // Fetch subjects for the latest semester
+        setSelectedSemester(sortedSemesters[0]?.name);
+        fetchData(sortedSemesters[0]?.id);
       } catch (error) {
         message.error("Failed to fetch semesters");
       }
     };
 
+    const fetchSubjects = async () => {
+      try {
+        const result = await subjectApi.getAllSubjects();
+        setSubjects(result);
+        setFilteredSubjects(result);
+      } catch (error) {
+        message.error("Failed to fetch subjects");
+      }
+    };
+
     fetchSemesters();
+    fetchSubjects();
   }, []);
 
-  const items = semesters.map((semester) => ({
-    key: semester.id,
-    label: semester.name,
-  }));
+  // Handle subject search in dropdown
+  const handleSearch = (value) => {
+    const filtered = subjects.filter((subject) =>
+      subject.name.toLowerCase().includes(value.toLowerCase())
+    );
+    setFilteredSubjects(filtered);
+  };
 
   const handleMenuClick = (e) => {
-    const selected = items.find((item) => item.key == e.key);
+    const selected = semesters.find((semester) => semester.id == e.key);
     if (selected) {
-      setSelectedSemester(selected.label);
-      fetchData(selected.key); // Fetch data based on the new selected semester
+      setSelectedSemester(selected.name);
+      fetchData(selected.id);
     }
   };
 
@@ -96,10 +105,10 @@ const Exam = ({ isLogin }) => {
   const handleDelete = async (id) => {
     try {
       await subjectApi.deleteSubject(id);
-      message.success(DELETE_EXAM_SUCCESS);
-      fetchData(selectedItem);
+      message.success("Exam deleted successfully");
+      fetchData(selectedSemester);
     } catch (error) {
-      message.error(DELETE_EXAM_FAILED);
+      message.error("Failed to delete exam");
     }
   };
 
@@ -108,18 +117,19 @@ const Exam = ({ isLogin }) => {
       const values = await form.validateFields();
       if (isEditing) {
         await subjectApi.updateSubject({ ...editingSubject, ...values });
-        message.success(EDIT_EXAM_SUCCESS);
+        message.success("Exam updated successfully");
       } else {
         await subjectApi.addSubject(values);
-        message.success(ADD_EXAM_SUCCESS);
+        message.success("Exam added successfully");
       }
-      fetchData(selectedItem);
+      fetchData(selectedSemester);
       handleCancel();
     } catch (error) {
-      message.error(isEditing ? EDIT_EXAM_FAILED : ADD_EXAM_FAILED);
+      message.error("Failed to submit exam");
     }
   };
 
+  // Table columns
   const columns = [
     {
       title: "No",
@@ -127,14 +137,9 @@ const Exam = ({ isLogin }) => {
       key: "no",
     },
     {
-      title: "Code",
-      dataIndex: "code",
-      key: "code",
-    },
-    {
-      title: "Name",
-      dataIndex: "name",
-      key: "name",
+      title: "Subject",
+      dataIndex: "subject",
+      key: "subject",
     },
     {
       title: "Type",
@@ -157,12 +162,11 @@ const Exam = ({ isLogin }) => {
               setIsEditing(true);
               setEditingSubject(record);
               form.setFieldsValue(record);
-              showModal();
             }}
           />
           <Popconfirm
             title="Are you sure to delete this exam?"
-            onConfirm={() => handleDelete(record.fuId)}
+            onConfirm={() => handleDelete(record.id)}
             okText="Yes"
             cancelText="No"
           >
@@ -180,26 +184,27 @@ const Exam = ({ isLogin }) => {
         {/* Sider for Form */}
         <Sider width={300} style={{ background: "#f1f1f1", padding: "24px" }}>
           <Form form={form} layout="vertical" name="add_exam_form">
+            {/* Subject Field */}
             <Form.Item
-              name="code"
-              label="Code"
-              rules={[
-                { required: true, message: "Please input the exam code!" },
-              ]}
+              name="subject"
+              label="Subject"
+              rules={[{ required: true, message: "Please select a subject!" }]}
             >
-              <Input placeholder="Enter exam code" />
+              <Select
+                showSearch
+                placeholder="Select subject"
+                onSearch={handleSearch}
+                filterOption={false} // Use custom search logic
+              >
+                {filteredSubjects.map((subject) => (
+                  <Option key={subject.id} value={subject.name}>
+                    {subject.name}
+                  </Option>
+                ))}
+              </Select>
             </Form.Item>
 
-            <Form.Item
-              name="name"
-              label="Name"
-              rules={[
-                { required: true, message: "Please input the exam name!" },
-              ]}
-            >
-              <Input placeholder="Enter exam name" />
-            </Form.Item>
-
+            {/* Type Field */}
             <Row gutter={16}>
               <Col span={12}>
                 <Form.Item
@@ -207,41 +212,43 @@ const Exam = ({ isLogin }) => {
                   label="Type"
                   rules={[{ required: true, message: "Required" }]}
                 >
-                  <Input placeholder="Exam type" />
+                  <Select placeholder="Exam type" disabled={isEditing}>
+                    <Option value="PE">PE</Option>
+                    <Option value="FE">FE</Option>
+                    <Option value="PE&FE">PE&FE</Option>
+                  </Select>
                 </Form.Item>
               </Col>
+
+              {/* Duration Field */}
               <Col span={12}>
                 <Form.Item
                   name="duration"
                   label="Duration"
-                  rules={[
-                    {
-                      required: true,
-                      message: "Required",
-                    },
-                  ]}
+                  rules={[{ required: true, message: "Required" }]}
                 >
-                  <Input placeholder="duration" />
+                  <Input
+                    type="number"
+                    placeholder="Duration"
+                    disabled={isEditing}
+                  />
                 </Form.Item>
               </Col>
             </Row>
 
-            {/* Clear and Add buttons */}
+            {/* Clear and Add/Submit buttons */}
             <Row justify="space-between">
               <Col>
                 <Button
                   onClick={handleCancel}
-                  style={{
-                    borderColor: "orange",
-                    color: "orange",
-                  }}
+                  style={{ borderColor: "orange", color: "orange" }}
                 >
                   Clear
                 </Button>
               </Col>
               <Col>
                 <Button type="primary" onClick={handleOk}>
-                  Add
+                  {isEditing ? "Save" : "Add"}
                 </Button>
               </Col>
             </Row>
@@ -253,11 +260,14 @@ const Exam = ({ isLogin }) => {
           <Space>
             <Dropdown
               menu={{
-                items,
+                items: semesters.map((semester) => ({
+                  key: semester.id,
+                  label: semester.name,
+                })),
                 onClick: handleMenuClick,
               }}
             >
-              <Button style={{ width: "100px" }}>
+              <Button style={{ width: "150px" }}>
                 <Space>
                   {selectedSemester}
                   <DownOutlined />
@@ -270,7 +280,7 @@ const Exam = ({ isLogin }) => {
             <Table
               dataSource={data}
               columns={columns}
-              rowKey={Math.random}
+              rowKey={(record) => record.id}
               pagination={{ pageSize: 8 }}
             />
           </Spin>

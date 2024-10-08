@@ -225,7 +225,7 @@ const Subject = () => {
               onClick: handleMenuClick,
             }}
           >
-            <Button style={{ width: "100px" }}>
+            <Button style={{ width: "150px" }}>
               <Space>
                 {selectedSemester}
                 <DownOutlined />
