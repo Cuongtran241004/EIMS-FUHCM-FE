@@ -129,6 +129,25 @@ const Users = ({ isLogin }) => {
       message.error(DELETE_USER_FAILED);
     }
   };
+  // Validate file type and size before upload
+  const beforeUpload = (file) => {
+    const isXlsx =
+      file.type ===
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+    const isLt4M = file.size / 1024 / 1024 < 4;
+
+    if (!isXlsx) {
+      message.error("You can only upload .xlsx files!");
+      return false; // Prevent upload if file type is not .xlsx
+    }
+
+    if (!isLt4M) {
+      message.error("File must be smaller than 4MB!");
+      return false; // Prevent upload if file is larger than 4MB
+    }
+
+    return true; // Accept file if both conditions are met
+  };
 
   const handleFileUpload = async ({ file }) => {
     setFileLoading(true);
@@ -221,9 +240,14 @@ const Users = ({ isLogin }) => {
               </Button>
 
               <Upload
-                beforeUpload={() => false}
+                beforeUpload={(file) => {
+                  const isValid = beforeUpload(file);
+                  if (isValid) {
+                    handleFileUpload({ file }); // Trigger file upload only if valid
+                  }
+                  return false; // Prevent default upload behavior
+                }}
                 showUploadList={false}
-                onChange={handleFileUpload}
                 maxCount={1}
                 method="POST"
               >

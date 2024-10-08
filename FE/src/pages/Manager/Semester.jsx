@@ -12,6 +12,7 @@ import {
   Input,
   message,
   DatePicker,
+  InputNumber,
 } from "antd";
 
 import semesterApi from "../../services/Semester.js";
@@ -127,7 +128,17 @@ const Semester = ({ isLogin }) => {
     {
       title: "End Date",
       dataIndex: "endAt",
-      key: "  endAt",
+      key: "endAt",
+    },
+    {
+      title: "Hour Rate",
+      dataIndex: "hourRate",
+      key: "hourRate",
+    },
+    {
+      title: "Max Slot",
+      dataIndex: "maxSlot",
+      key: "maxSlot",
     },
     {
       title: "Action",
@@ -201,30 +212,73 @@ const Semester = ({ isLogin }) => {
           >
             <Input placeholder="Enter semester name" />
           </Form.Item>
-          <Form.Item
-            name="startAt"
-            label="Start Date"
-            rules={[
-              { required: true, message: "Please select the start date!" },
-            ]}
-          >
-            <DatePicker
-              placeholder="Select start date"
-              style={{ width: "100%" }}
-            />
+
+          <Form.Item style={{ marginBottom: 0 }}>
+            <Form.Item
+              label="Start date"
+              name="startAt"
+              rules={[
+                { required: true, message: "Please select the start date!" },
+              ]}
+              style={{
+                display: "inline-block",
+                width: "calc(50% - 8px)",
+                marginRight: "8px",
+              }} // Adjust width and margin
+            >
+              <DatePicker
+                placeholder="Select start date"
+                style={{ width: "100%" }}
+              />
+            </Form.Item>
+            <Form.Item
+              label="End date"
+              name="endAt"
+              rules={[
+                { required: true, message: "Please select the end date!" },
+                { validator: validateEndDate },
+              ]}
+              style={{ display: "inline-block", width: "calc(50% - 8px)" }} // Adjust width
+            >
+              <DatePicker
+                placeholder="Select end date"
+                style={{ width: "100%" }}
+              />
+            </Form.Item>
           </Form.Item>
-          <Form.Item
-            name="endAt"
-            label="End Date"
-            rules={[
-              { required: true, message: "Please select the end date!" },
-              { validator: validateEndDate }, // Custom validator for end date
-            ]}
-          >
-            <DatePicker
-              placeholder="Select end date"
-              style={{ width: "100%" }}
-            />
+
+          <Form.Item style={{ marginBottom: 0 }}>
+            <Form.Item
+              label="Hour rate"
+              name="hourRate"
+              initialValue={100000}
+              rules={[{ required: true, message: "Please input hour rate!" }]}
+              style={{
+                display: "inline-block",
+                width: "calc(50% - 8px)",
+                marginRight: "8px",
+              }}
+              // Adjust width and margin
+            >
+              <InputNumber
+                min={1}
+                placeholder="Enter hour rate"
+                style={{ width: "100%" }}
+                formatter={(value) =>
+                  `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",") + " ₫"
+                }
+                parser={(value) => value.replace(/\s?₫|(,*)/g, "")}
+              />
+            </Form.Item>
+            <Form.Item
+              label="Max slot"
+              name="maxSlot"
+              initialValue={15}
+              rules={[{ required: true, message: "Please input max slot!" }]}
+              style={{ display: "inline-block", width: "calc(50% - 8px)" }} // Adjust width
+            >
+              <Input placeholder="Enter max slot" type="number" />
+            </Form.Item>
           </Form.Item>
         </Form>
       </Modal>

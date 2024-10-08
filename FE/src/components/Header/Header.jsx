@@ -28,7 +28,7 @@ const Header = () => {
   const { user } = useContext(UserContext);
   console.log(user);
 
-  const currentHeader = headerConfig[user.role] || headerConfig["Staff"];
+  const currentHeader = headerConfig[user.role] || headerConfig["Manager"];
 
   return (
     <div className="header">

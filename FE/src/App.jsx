@@ -44,24 +44,25 @@ function App() {
         {!isLogin ? (
           <Routes>
             <Route path="/" element={<Login setIsLogin={setIsLogin} />} />
+            <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         ) : (
           <Routes>
-            {/* <Route path={MANAGER_DASHBOARD_URL} element={<Dashboard />} />
-              <Route path={MANAGER_SEMESTER_URL} element={<Semester />} />
-              <Route path={MANAGER_USERS_URL} element={<User />} />
+            <Route path={MANAGER_DASHBOARD_URL} element={<Dashboard />} />
+            <Route path={MANAGER_SEMESTER_URL} element={<Semester />} />
+            <Route path={MANAGER_USERS_URL} element={<User />} />
 
-              <Route path="/exam-slot" element={<ConfigSettings />} />
-              <Route path={MANAGER_REQUESTS_URL} element={<Request />} />
-              <Route path={MANAGER_EXAM_SCHEDULE_URL} element={<ExamSlots />} />
+            <Route path="/exam-slot" element={<ConfigSettings />} />
+            <Route path={MANAGER_REQUESTS_URL} element={<Request />} />
+            <Route path={MANAGER_EXAM_SCHEDULE_URL} element={<ExamSlots />} />
 
-              <Route path="*" element={<Navigate to="/dashboard" replace />} /> */}
+            <Route path="*" element={<Navigate to="/dashboard" replace />} />
 
-            <Route path={STAFF_SUBJECT_URL} element={<Subject />} />
+            {/* <Route path={STAFF_SUBJECT_URL} element={<Subject />} />
             <Route path={STAFF_EXAM_URL} element={<Exam />} />
             <Route path={STAFF_EXAM_SCHEDULE_URL} element={<Exam_Schedule />} />
             <Route path={STAFF_ATTENDANCE_URL} element={<Attendance />} />
-            <Route path="*" element={<Navigate to="/subject" replace />} />
+            <Route path="*" element={<Navigate to="/subject" replace />} /> */}
           </Routes>
         )}
       </div>
