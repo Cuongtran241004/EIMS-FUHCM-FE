@@ -13,8 +13,9 @@ import {
   message,
   DatePicker,
   InputNumber,
+  Row,
+  Col,
 } from "antd";
-
 import semesterApi from "../../services/Semester.js";
 import {
   ADD_SEMESTER_FAILED,
@@ -24,9 +25,10 @@ import {
   FETCH_SEMESTERS_FAILED,
 } from "../../configs/messages.jsx";
 import Header from "../../components/Header/Header.jsx";
+import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
 
-// Ant Design Layout Components
 const { Content, Sider } = Layout;
+const { RangePicker } = DatePicker;
 
 const Semester = ({ isLogin }) => {
   const [data, setData] = useState([]);
@@ -40,7 +42,12 @@ const Semester = ({ isLogin }) => {
     setLoading(true);
     try {
       const result = await semesterApi.getAllSemesters();
-      setData(result);
+      // Sort the semesters by endAt date in ascending order
+      const sortedSemesters = result.sort(
+        (a, b) => new Date(b.endAt) - new Date(a.endAt)
+      );
+
+      setData(sortedSemesters);
     } catch (error) {
       message.error(FETCH_SEMESTERS_FAILED);
     } finally {
@@ -52,14 +59,6 @@ const Semester = ({ isLogin }) => {
     fetchData();
   }, []);
 
-  const validateEndDate = (_, value) => {
-    const { startAt } = form.getFieldsValue();
-    if (value && startAt && value.isBefore(startAt)) {
-      return Promise.reject(new Error("End date cannot be before start date!"));
-    }
-    return Promise.resolve();
-  };
-
   const showModal = () => {
     setIsModalVisible(true);
   };
@@ -69,29 +68,26 @@ const Semester = ({ isLogin }) => {
     setIsEditing(false);
     form.resetFields();
   };
+
   const handleOk = async () => {
     try {
       const values = await form.validateFields();
-      const { startAt, endAt } = values;
-
-      // Convert moment objects to date strings if necessary
-      const formattedStartAt = startAt.format("YYYY-MM-DD");
-      const formattedEndAt = endAt.format("YYYY-MM-DD");
+      const { dateRange } = values;
+      const [startAt, endAt] = dateRange;
 
       if (isEditing) {
-        // Update existing semester
         await semesterApi.updateSemester({
           ...editingSemester,
-          startAt: formattedStartAt,
-          endAt: formattedEndAt,
+          startAt: startAt.format("YYYY-MM-DD"),
+          endAt: endAt.format("YYYY-MM-DD"),
+          ...values,
         });
         message.success(EDIT_SEMESTER_SUCCESS);
       } else {
-        // Add new semester
         await semesterApi.addSemester({
           ...values,
-          startAt: formattedStartAt,
-          endAt: formattedEndAt,
+          startAt: startAt.format("YYYY-MM-DD"),
+          endAt: endAt.format("YYYY-MM-DD"),
         });
         message.success(ADD_SEMESTER_SUCCESS);
       }
@@ -107,38 +103,44 @@ const Semester = ({ isLogin }) => {
     setEditingSemester(semester);
     form.setFieldsValue({
       name: semester.name,
-      // Use moment for date formatting
-      startAt: moment(semester.startAt),
-      endAt: moment(semester.endAt),
+      dateRange: [moment(semester.startAt), moment(semester.endAt)],
+      hourlyConfig: semester.hourlyConfig,
+      allowedSlotConfig: semester.allowedSlotConfig,
     });
     setIsModalVisible(true);
   };
+
   const columns = [
     {
       title: "Name",
       dataIndex: "name",
       key: "name",
     },
-
     {
       title: "Start Date",
       dataIndex: "startAt",
       key: "startAt",
+      render: (text) => moment(text).format("YYYY-MM-DD"),
     },
     {
       title: "End Date",
       dataIndex: "endAt",
       key: "endAt",
+      render: (text) => moment(text).format("YYYY-MM-DD"),
     },
     {
       title: "Hour Rate",
-      dataIndex: "hourRate",
-      key: "hourRate",
+      dataIndex: "hourlyConfig",
+      key: "hourlyConfig",
+      render: (text) => {
+        // Format the value as Vietnamese currency
+        return `${text.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")} ₫`;
+      },
     },
     {
       title: "Max Slot",
-      dataIndex: "maxSlot",
-      key: "maxSlot",
+      dataIndex: "allowedSlotConfig",
+      key: "allowedSlotConfig",
     },
     {
       title: "Action",
@@ -149,18 +151,11 @@ const Semester = ({ isLogin }) => {
             onClick={() => handleEdit(record)}
             style={{ color: "blue", cursor: "pointer" }}
           />
-          <Popconfirm
-            title="Are you sure to delete this staff?"
-            onConfirm={() => handleDelete(record.fuId)}
-            okText="Yes"
-            cancelText="No"
-          >
-            <DeleteOutlined style={{ color: "red", cursor: "pointer" }} />
-          </Popconfirm>
         </Space>
       ),
     },
   ];
+
   return (
     <Layout style={{ height: "100vh" }}>
       <Header />
@@ -187,7 +182,7 @@ const Semester = ({ isLogin }) => {
               <Table
                 dataSource={data}
                 columns={columns}
-                rowKey={Math.random}
+                rowKey="id" // Use a unique key, assuming semester objects have an id property
                 pagination={{ pageSize: 8 }}
               />
             </Spin>
@@ -195,7 +190,7 @@ const Semester = ({ isLogin }) => {
         </Layout>
       </Layout>
 
-      {/* Add/Edit Staff Modal */}
+      {/* Add/Edit Semester Modal */}
       <Modal
         title={isEditing ? "Edit Semester" : "Add New Semester"}
         open={isModalVisible}
@@ -205,52 +200,51 @@ const Semester = ({ isLogin }) => {
         cancelText="Cancel"
       >
         <Form form={form} layout="vertical" name="add_semester_form">
-          <Form.Item
-            name="name"
-            label="Name"
-            rules={[{ required: true, message: "Please input semester name!" }]}
-          >
-            <Input placeholder="Enter semester name" />
-          </Form.Item>
-
-          <Form.Item style={{ marginBottom: 0 }}>
-            <Form.Item
-              label="Start date"
-              name="startAt"
-              rules={[
-                { required: true, message: "Please select the start date!" },
-              ]}
-              style={{
-                display: "inline-block",
-                width: "calc(50% - 8px)",
-                marginRight: "8px",
-              }} // Adjust width and margin
-            >
-              <DatePicker
-                placeholder="Select start date"
-                style={{ width: "100%" }}
-              />
-            </Form.Item>
-            <Form.Item
-              label="End date"
-              name="endAt"
-              rules={[
-                { required: true, message: "Please select the end date!" },
-                { validator: validateEndDate },
-              ]}
-              style={{ display: "inline-block", width: "calc(50% - 8px)" }} // Adjust width
-            >
-              <DatePicker
-                placeholder="Select end date"
-                style={{ width: "100%" }}
-              />
-            </Form.Item>
-          </Form.Item>
+          <Row gutter={16}>
+            <Col span={8}>
+              <Form.Item
+                name="name"
+                label="Name"
+                rules={[
+                  { required: true, message: "Please input semester name!" },
+                ]}
+              >
+                <Input placeholder="Semester name" />
+              </Form.Item>
+            </Col>
+            <Col span={16}>
+              <Form.Item style={{ marginBottom: 0 }}>
+                <Form.Item
+                  label="Date"
+                  name="dateRange"
+                  rules={[
+                    {
+                      required: true,
+                      message: "Please select the date range!",
+                    },
+                  ]}
+                  style={{ display: "inline-block", width: "calc(100% - 8px)" }}
+                >
+                  <RangePicker
+                    style={{ width: "100%" }}
+                    onChange={(dates) => {
+                      if (dates) {
+                        form.setFieldsValue({
+                          startAt: dates[0],
+                          endAt: dates[1],
+                        });
+                      }
+                    }}
+                  />
+                </Form.Item>
+              </Form.Item>
+            </Col>
+          </Row>
 
           <Form.Item style={{ marginBottom: 0 }}>
             <Form.Item
               label="Hour rate"
-              name="hourRate"
+              name="hourlyConfig"
               initialValue={100000}
               rules={[{ required: true, message: "Please input hour rate!" }]}
               style={{
@@ -258,7 +252,6 @@ const Semester = ({ isLogin }) => {
                 width: "calc(50% - 8px)",
                 marginRight: "8px",
               }}
-              // Adjust width and margin
             >
               <InputNumber
                 min={1}
@@ -272,10 +265,10 @@ const Semester = ({ isLogin }) => {
             </Form.Item>
             <Form.Item
               label="Max slot"
-              name="maxSlot"
+              name="allowedSlotConfig"
               initialValue={15}
               rules={[{ required: true, message: "Please input max slot!" }]}
-              style={{ display: "inline-block", width: "calc(50% - 8px)" }} // Adjust width
+              style={{ display: "inline-block", width: "calc(50% - 8px)" }}
             >
               <Input placeholder="Enter max slot" type="number" />
             </Form.Item>

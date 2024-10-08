@@ -153,10 +153,33 @@ const Users = ({ isLogin }) => {
     setFileLoading(true);
     try {
       const data = await User_Import_Excel(file);
-      await Promise.all(data.map((user) => userApi.addUser(user)));
-      message.success(IMPORT_USERS_SUCCESS);
-      fetchData();
+
+      // Mapping definitions
+      const roleMapping = {
+        manager: 1,
+        staff: 2,
+        invigilator: 3,
+      };
+
+      const genderMapping = {
+        male: true,
+        female: false,
+      };
+
+      // Transform the user data
+      const transformedData = data.map((user) => ({
+        ...user,
+        role: roleMapping[user.role] || null, // Map role to backend value
+        gender: genderMapping[user.gender] || null, // Map gender to backend value
+      }));
+
+      // Send transformed data to backend
+      await userApi.addMultipleUsers(transformedData);
+
+      message.success("Users imported successfully!");
+      fetchData(); // Refresh data after import
     } catch (error) {
+      console.error("Import error:", error);
       message.error(IMPORT_USERS_FAILED);
     } finally {
       setFileLoading(false);

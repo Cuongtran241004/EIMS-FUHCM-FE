@@ -1,6 +1,5 @@
 import {
   Layout,
-  Divider,
   Select,
   DatePicker,
   TimePicker,
@@ -8,16 +7,17 @@ import {
   Form,
   Space,
   Table,
+  Row,
+  Col,
 } from "antd";
 import React, { useState } from "react";
 import Sider from "antd/es/layout/Sider";
-import { Row, Col } from "antd";
 import Header from "../../components/Header/Header.jsx";
 
 const { Option } = Select;
 const { Content } = Layout;
 
-const Exam_Schedule = ({ isLogin }) => {
+const Exam_Schedule = () => {
   const [form] = Form.useForm();
   const [examSchedule, setExamSchedule] = useState([]);
 

@@ -51,6 +51,21 @@ const userApi = {
       handleError(error);
     }
   },
+  addMultipleUsers: async (users) => {
+    try {
+      const response = await axios.post(`${USER_API_BASE_URL}/bulk`, users, {
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        withCredentials: true,
+      });
+      return response.data;
+    } catch (error) {
+      handleError(error);
+    }
+  },
+
   updateUser: async (user) => {
     try {
       console.log(user.fuId);

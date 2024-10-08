@@ -8,10 +8,14 @@ const handleError = (error) => {
 };
 
 const semesterApi = {
-  getAllSemesters: async ({ filters = {} }) => {
+  getAllSemesters: async () => {
     try {
       const response = await axios.get(`${SEMESTER_API_BASE_URL}`, {
-        params: filters,
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        withCredentials: true,
       });
       return response.data;
     } catch (error) {
@@ -20,7 +24,13 @@ const semesterApi = {
   },
   getSemesterById: async (id) => {
     try {
-      const response = await axios.get(`${SEMESTER_API_BASE_URL}/${id}`);
+      const response = await axios.get(`${SEMESTER_API_BASE_URL}/${id}`, {
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        withCredentials: true,
+      });
       return response.data;
     } catch (error) {
       handleError(error);
@@ -28,7 +38,13 @@ const semesterApi = {
   },
   addSemester: async (semester) => {
     try {
-      const response = await axios.post(`${SEMESTER_API_BASE_URL}`, semester);
+      const response = await axios.post(`${SEMESTER_API_BASE_URL}`, semester, {
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        withCredentials: true,
+      });
       return response.data;
     } catch (error) {
       handleError(error);
@@ -36,23 +52,37 @@ const semesterApi = {
   },
   updateSemester: async (semester) => {
     try {
+      console.log(semester);
       const response = await axios.put(
         `${SEMESTER_API_BASE_URL}/${semester.id}`,
-        semester
+        semester,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+          withCredentials: true,
+        }
       );
       return response.data;
     } catch (error) {
       handleError(error);
     }
   },
-  //   deleteSemester: async (code) => {
-  //     try {
-  //       const response = await axios.delete(`${SEMESTER_API_BASE_URL}/${code}`);
-  //       return response.data;
-  //     } catch (error) {
-  //       console.error("Error fetching data:", error);
-  //       throw error;
-  //     }
-  //   },
+  deleteSemester: async (code) => {
+    try {
+      const response = await axios.delete(`${SEMESTER_API_BASE_URL}/${code}`, {
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        withCredentials: true,
+      });
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching data:", error);
+      throw error;
+    }
+  },
 };
 export default semesterApi;

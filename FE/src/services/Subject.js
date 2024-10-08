@@ -3,10 +3,14 @@ import { API_BASE_URL } from "../configs/urlApi.jsx";
 const SUBJECT_API_BASE_URL = `${API_BASE_URL}/subjects`;
 
 const subjectApi = {
-  getAllSubjects: async ({ filters = {} }) => {
+  getAllSubjects: async () => {
     try {
       const response = await axios.get(`${SUBJECT_API_BASE_URL}`, {
-        params: filters,
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        withCredentials: true,
       });
       return response.data;
     } catch (error) {
@@ -16,7 +20,13 @@ const subjectApi = {
   },
   getSubjectByCode: async (code) => {
     try {
-      const response = await axios.get(`${SUBJECT_API_BASE_URL}/${code}`);
+      const response = await axios.get(`${SUBJECT_API_BASE_URL}/${code}`, {
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        withCredentials: true,
+      });
       return response.data;
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -25,7 +35,13 @@ const subjectApi = {
   },
   addSubject: async (subject) => {
     try {
-      const response = await axios.post(`${SUBJECT_API_BASE_URL}`, subject);
+      const response = await axios.post(`${SUBJECT_API_BASE_URL}`, subject, {
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        withCredentials: true,
+      });
       return response.data;
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -34,9 +50,19 @@ const subjectApi = {
   },
   updateSubject: async (subject) => {
     try {
+      const transferSubject = { ...subject, semesterId: 0 };
+      console.log(transferSubject);
+      delete transferSubject.semesterName;
       const response = await axios.put(
-        `${SUBJECT_API_BASE_URL}/${subject.code}`,
-        subject
+        `${SUBJECT_API_BASE_URL}/${subject.id}`,
+        transferSubject,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+          withCredentials: true,
+        }
       );
       return response.data;
     } catch (error) {
@@ -44,14 +70,20 @@ const subjectApi = {
       throw error;
     }
   },
-  //   deleteSubject: async (code) => {
-  //     try {
-  //       const response = await axios.delete(`${SUBJECT_API_BASE_URL}/${code}`);
-  //       return response.data;
-  //     } catch (error) {
-  //       console.error("Error fetching data:", error);
-  //       throw error;
-  //     }
-  //   },
+  deleteSubject: async (code) => {
+    try {
+      const response = await axios.delete(`${SUBJECT_API_BASE_URL}/${code}`, {
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        withCredentials: true,
+      });
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching data:", error);
+      throw error;
+    }
+  },
 };
 export default subjectApi;

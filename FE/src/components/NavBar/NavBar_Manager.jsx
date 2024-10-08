@@ -55,10 +55,6 @@ const items = [
       },
 
       {
-        key: "6",
-        label: <Link to="/exam-slot">Exam Slot</Link>,
-      },
-      {
         key: "7",
         label: <Link to={MANAGER_USERS_URL}>Users</Link>,
       },

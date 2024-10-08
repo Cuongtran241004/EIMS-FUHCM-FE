@@ -23,23 +23,9 @@ import {
   Row,
 } from "antd";
 import subjectApi from "../../services/Subject.js";
-import { DeleteOutlined, DownOutlined } from "@ant-design/icons";
+import semesterApi from "../../services/Semester.js"; // Import semesterApi
+import { DeleteOutlined, DownOutlined, EditOutlined } from "@ant-design/icons";
 import Header from "../../components/Header/Header.jsx";
-
-const items = [
-  {
-    key: "1",
-    label: "Fall24",
-  },
-  {
-    key: "2",
-    label: "Summer24",
-  },
-  {
-    key: "3",
-    label: "Spring24",
-  },
-];
 
 // Ant Design Layout Components
 const { Content, Sider } = Layout;
@@ -49,7 +35,8 @@ const Exam = ({ isLogin }) => {
   const [loading, setLoading] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [editingSubject, setEditingSubject] = useState(null);
-  const [selectedItem, setSelectedItem] = useState("Fall24");
+  const [selectedSemester, setSelectedSemester] = useState(null); // Initialize to null
+  const [semesters, setSemesters] = useState([]); // State for semesters
   const [form] = Form.useForm();
 
   const fetchData = async (term) => {
@@ -65,8 +52,41 @@ const Exam = ({ isLogin }) => {
   };
 
   useEffect(() => {
-    fetchData(selectedItem);
-  }, [selectedItem]);
+    fetchData(selectedSemester);
+  }, [selectedSemester]);
+
+  useEffect(() => {
+    const fetchSemesters = async () => {
+      try {
+        const result = await semesterApi.getAllSemesters(); // Fetch semesters
+        setSemesters(result); // Assuming result is an array of { id, name, startAt }
+
+        // Sort semesters by startAt date to get the latest one
+        const sortedSemesters = result.sort(
+          (a, b) => new Date(b.startAt) - new Date(a.startAt)
+        );
+        setSelectedSemester(sortedSemesters[0]?.name); // Set the latest semester as default
+        fetchData(sortedSemesters[0]?.id); // Fetch subjects for the latest semester
+      } catch (error) {
+        message.error("Failed to fetch semesters");
+      }
+    };
+
+    fetchSemesters();
+  }, []);
+
+  const items = semesters.map((semester) => ({
+    key: semester.id,
+    label: semester.name,
+  }));
+
+  const handleMenuClick = (e) => {
+    const selected = items.find((item) => item.key == e.key);
+    if (selected) {
+      setSelectedSemester(selected.label);
+      fetchData(selected.key); // Fetch data based on the new selected semester
+    }
+  };
 
   const handleCancel = () => {
     setIsEditing(false);
@@ -81,12 +101,6 @@ const Exam = ({ isLogin }) => {
     } catch (error) {
       message.error(DELETE_EXAM_FAILED);
     }
-  };
-
-  const handleMenuClick = (e) => {
-    const newTerm = items.find((item) => item.key === e.key).label;
-    setSelectedItem(newTerm);
-    fetchData(newTerm);
   };
 
   const handleOk = async () => {
@@ -137,16 +151,15 @@ const Exam = ({ isLogin }) => {
       key: "action",
       render: (text, record) => (
         <Space size="middle">
-          <Button
-            type="primary"
+          <EditOutlined
+            style={{ color: "blue", cursor: "pointer" }}
             onClick={() => {
               setIsEditing(true);
               setEditingSubject(record);
               form.setFieldsValue(record);
+              showModal();
             }}
-          >
-            Edit
-          </Button>
+          />
           <Popconfirm
             title="Are you sure to delete this exam?"
             onConfirm={() => handleDelete(record.fuId)}
@@ -246,7 +259,7 @@ const Exam = ({ isLogin }) => {
             >
               <Button style={{ width: "100px" }}>
                 <Space>
-                  {selectedItem}
+                  {selectedSemester}
                   <DownOutlined />
                 </Space>
               </Button>

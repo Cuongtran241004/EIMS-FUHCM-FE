@@ -7,8 +7,8 @@ const MANAGER_SEMESTER_URL = "/semester";
 const MANAGER_REQUESTS_URL = "/requests";
 
 // STAFF
-const STAFF_SUBJECT_URL = "/subject";
-const STAFF_EXAM_URL = "/exam";
+const STAFF_SUBJECT_URL = "/subjects";
+const STAFF_EXAM_URL = "/exams";
 const STAFF_EXAM_SCHEDULE_URL = "/exam-schedule";
 const STAFF_ATTENDANCE_URL = "/attendance";
 

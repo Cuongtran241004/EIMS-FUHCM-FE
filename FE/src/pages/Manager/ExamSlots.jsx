@@ -1,7 +1,7 @@
 import React from "react";
 import { Layout, Calendar, Card, Row, Col, Table } from "antd";
 import NavBar_Manager from "../../components/NavBar/NavBar_Manager";
-import Header from "../../components/Header/Header";
+import Header from "../../components/Header/Header.jsx";
 
 const { Content, Sider } = Layout;
 
@@ -106,7 +106,7 @@ const data = [
   },
 ];
 
-function ExamSlots({ isLogin }) {
+const ExamSlots = () => {
   return (
     <Layout style={{ height: "120vh" }}>
       <Header />
@@ -135,6 +135,6 @@ function ExamSlots({ isLogin }) {
       </Layout>
     </Layout>
   );
-}
+};
 
 export default ExamSlots;

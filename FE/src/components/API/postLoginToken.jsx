@@ -19,7 +19,6 @@ export const postLoginToken = async (idToken) => {
 
     // Login successful, cookie should be set automatically by the browser
     if (response.status === 200) {
-      console.log("Login successful. Cookie set by backend.");
       return true;
     }
   } catch (error) {

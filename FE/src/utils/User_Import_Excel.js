@@ -32,6 +32,7 @@ export const User_Import_Excel = (file) => {
           phoneNumber,
           department,
           gender,
+          role,
         } = item; // Adjust these names based on your Excel column headers
 
         if (
@@ -41,7 +42,8 @@ export const User_Import_Excel = (file) => {
           !email ||
           !phoneNumber ||
           !department ||
-          !gender
+          !gender ||
+          !role
         ) {
           throw new Error("Invalid data in Excel file");
         }
@@ -53,6 +55,7 @@ export const User_Import_Excel = (file) => {
           phoneNumber,
           department,
           gender,
+          role,
         };
       });
 
