@@ -27,7 +27,6 @@ const HeaderManager = ({ isLogin }) => {
         setUser(userInfo);
       } catch (error) {
         message.error("Failed to load user information.");
-        console.error("Error fetching user info:", error);
       } finally {
         setLoading(false);
       }
