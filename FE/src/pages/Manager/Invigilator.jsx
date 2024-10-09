@@ -37,7 +37,7 @@ import userApi from "../../services/User";
 
 // Ant Design Layout Components
 const { Content, Sider } = Layout;
-const Invigilator = ({isLogin}) => {
+const Invigilator = () => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [fileLoading, setFileLoading] = useState(false); // For file upload loading state
@@ -189,7 +189,6 @@ const Invigilator = ({isLogin}) => {
 
   return (
     <Layout style={{ height: "100vh" }}>
-      <Header_Manager isLogin={isLogin}/>
       <Layout>
         <Sider width={256} style={{ backgroundColor: "#fff" }}>
           <NavBar_Manager />

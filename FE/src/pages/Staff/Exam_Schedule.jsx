@@ -17,7 +17,7 @@ import { Row, Col } from "antd";
 const { Option } = Select;
 const { Content } = Layout;
 
-const Exam_Schedule = ({ isLogin }) => {
+const Exam_Schedule = () => {
   const [form] = Form.useForm();
   const [examSchedule, setExamSchedule] = useState([]);
 
@@ -73,7 +73,6 @@ const Exam_Schedule = ({ isLogin }) => {
 
   return (
     <Layout style={{ height: "100vh" }}>
-      <Header_Staff isLogin={isLogin} />
       <Layout>
         <Sider width={300} style={{ background: "#f1f1f1", padding: "24px" }}>
           <Form form={form} layout="vertical" onFinish={handleSubmit}>

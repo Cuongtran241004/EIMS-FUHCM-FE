@@ -5,7 +5,7 @@ import Header_Staff from "../../components/Header/Header_Staff";
 const Attendance = () => {
   return (
     <Layout>
-      <Header_Staff />
+      
     </Layout>
   );
 };

@@ -35,7 +35,7 @@ function InvigilatorDashboard() {
         try {
           const obj = await schedules(selectedSemester.id);
           const examSlotDetailSet = obj.semesterInvigilatorAssignment[0].examSlotDetailSet; 
-
+           sessionStorage.setItem('examSlotDetailSet', examSlotDetailSet.length);
           const mappedEvents = examSlotDetailSet.map(slot => ({
             examSlotId: slot.examSlotId,
             startAt: new Date(slot.startAt),

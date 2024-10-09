@@ -41,7 +41,7 @@ import NavBar_Manager from "../../components/NavBar/NavBar_Manager.jsx";
 // Ant Design Layout Components
 const { Content, Sider } = Layout;
 
-const Staff = ({ isLogin }) => {
+const Staff = () => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [fileLoading, setFileLoading] = useState(false); // For file upload loading state
@@ -191,10 +191,9 @@ const Staff = ({ isLogin }) => {
 
   return (
     <Layout style={{ height: "100vh" }}>
-      <Header_Manager isLogin={isLogin} />
       <Layout>
         <Sider width={256} style={{ backgroundColor: "#fff" }}>
-          <NavBar_Manager isLogin={isLogin} />
+          <NavBar_Manager />
         </Sider>
         <Layout style={{ padding: "16px" }}>
           <Content

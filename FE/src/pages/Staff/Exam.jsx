@@ -43,7 +43,7 @@ const items = [
 ];
 // Ant Design Layout Components
 const { Content } = Layout;
-const Exam = ({ isLogin }) => {
+const Exam = () => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -173,7 +173,6 @@ const Exam = ({ isLogin }) => {
 
   return (
     <Layout style={{ height: "100vh" }}>
-      <Header_Staff isLogin={isLogin} />
       <Content
         style={{
           padding: 24,

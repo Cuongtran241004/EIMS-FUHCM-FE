@@ -25,7 +25,7 @@ const menuProps = {
   items,
 };
 
-const Header_Staff = ({ isLogin }) => {
+const Header_Staff = () => {
   // const [data, setData] = useState({
   //   firstName: "",
   //   lastName: "",
