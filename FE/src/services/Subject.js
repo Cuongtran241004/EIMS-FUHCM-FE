@@ -18,7 +18,7 @@ const subjectApi = {
       throw error;
     }
   },
-  getSubjectByCode: async (code) => {
+  getSubjectBySemester: async (code) => {
     try {
       const response = await axios.get(`${SUBJECT_API_BASE_URL}/${code}`, {
         headers: {
@@ -50,12 +50,9 @@ const subjectApi = {
   },
   updateSubject: async (subject) => {
     try {
-      const transferSubject = { ...subject, semesterId: 0 };
-      console.log(transferSubject);
-      delete transferSubject.semesterName;
       const response = await axios.put(
         `${SUBJECT_API_BASE_URL}/${subject.id}`,
-        transferSubject,
+        subject,
         {
           headers: {
             "Content-Type": "application/json",

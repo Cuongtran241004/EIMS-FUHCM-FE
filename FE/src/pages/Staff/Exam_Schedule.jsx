@@ -14,9 +14,8 @@ import React, { useState, useEffect } from "react";
 import Sider from "antd/es/layout/Sider";
 import Header from "../../components/Header/Header.jsx";
 import semesterApi from "../../services/Semester.js";
-import subjectApi from "../../services/Subject.js";
 import examApi from "../../services/Exam.js";
-import roomApi from "../../services/Room.js";
+import examSlotApi from "../../services/ExamSlot.js";
 
 const { Option } = Select;
 const { Content } = Layout;
@@ -26,9 +25,8 @@ const Exam_Schedule = () => {
   const [examSchedule, setExamSchedule] = useState([]);
   const [semesters, setSemesters] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [subjects, setSubjects] = useState([]);
-  const [filteredSubjects, setFilteredSubjects] = useState([]);
-  const [rooms, setRooms] = useState([]);
+  const [exams, setExams] = useState([]);
+  const [filteredExams, setFilteredExams] = useState([]);
   const [selectedSemester, setSelectedSemester] = useState(null);
 
   useEffect(() => {
@@ -41,39 +39,25 @@ const Exam_Schedule = () => {
         );
         setSelectedSemester(sortedSemesters[0]?.name);
       } catch (error) {
-        console.error("Failed to fetch semesters:", error);
         message.error("Failed to load semesters. Please try again.");
       } finally {
         setLoading(false);
       }
     };
 
-    const fetchSubjects = async () => {
+    const fetchExams = async () => {
       try {
-        const result = await subjectApi.getAllSubjects();
-        console.log(result);
-        setSubjects(result);
-        setFilteredSubjects(result); // Set filtered subjects initially
+        const result = await examApi.getAllExams();
+
+        setExams(result);
+        setFilteredExams(result);
       } catch (error) {
-        console.error("Failed to fetch subjects:", error);
         message.error("Failed to load subjects. Please try again.");
       }
     };
 
-    const fetchRooms = async () => {
-      try {
-        const result = await roomApi.getAllRooms();
-        console.log(result);
-        setRooms(result);
-      } catch (error) {
-        console.error("Failed to fetch rooms:", error);
-        message.error("Failed to load rooms. Please try again.");
-      }
-    };
-
     fetchSemesters();
-    fetchSubjects();
-    fetchRooms();
+    fetchExams();
   }, []);
 
   useEffect(() => {
@@ -85,67 +69,97 @@ const Exam_Schedule = () => {
 
   const fetchExamSchedule = async (semester) => {
     try {
-      const result = await examApi.getScheduleBySemester(semester);
+      const result = await examSlotApi.getAllExamSlots();
       setExamSchedule(result);
     } catch (error) {
-      console.error("Failed to fetch exam schedule:", error);
       message.error("Failed to load exam schedule. Please try again.");
     }
   };
 
-  const handleSubjectSearch = (value) => {
+  const handleExamSearch = (value) => {
     if (value) {
-      const filtered = subjects.filter((subject) =>
-        subject.name.toLowerCase().includes(value.toLowerCase())
+      const filtered = exams.filter((exam) =>
+        exam.subjectName.toLowerCase().includes(value.toLowerCase())
       );
-      setFilteredSubjects(filtered);
+      setFilteredExams(filtered);
     } else {
-      setFilteredSubjects(subjects); // Reset to original list if search is empty
+      setFilteredExams(exams); // Reset to original list if search is empty
     }
   };
 
   const columns = [
     {
-      title: "Semester",
-      dataIndex: "semester",
-      key: "semester",
-    },
-    {
       title: "Subject",
-      dataIndex: "subject",
+      dataIndex: "subjectExamId.subjectId.name",
       key: "subject",
     },
     {
+      title: "Exam Type",
+      dataIndex: "subjectExamId.examType",
+      key: "examType",
+    },
+    {
       title: "Date",
-      dataIndex: "date",
+      dataIndex: "startAt", // Use startAt to extract date
       key: "date",
+      render: (text) => {
+        // Format the date as needed (e.g., YYYY-MM-DD)
+        return new Date(text).toLocaleDateString(); // Adjust formatting as needed
+      },
     },
     {
       title: "Start Time",
-      dataIndex: "startTime",
+      dataIndex: "startAt",
       key: "startTime",
+      render: (text) => {
+        // Format the time as needed (e.g., HH:mm)
+        return new Date(text).toLocaleTimeString([], {
+          hour: "2-digit",
+          minute: "2-digit",
+        });
+      },
     },
     {
       title: "End Time",
-      dataIndex: "endTime",
+      dataIndex: "endAt",
       key: "endTime",
+      render: (text) => {
+        // Format the time as needed (e.g., HH:mm)
+        return new Date(text).toLocaleTimeString([], {
+          hour: "2-digit",
+          minute: "2-digit",
+        });
+      },
     },
     {
-      title: "Room",
-      dataIndex: "room",
-      key: "room",
+      title: "Action",
+      key: "action",
+      render: (text, record) => <Button>Room</Button>,
     },
   ];
 
-  const handleSubmit = (values) => {
-    const newSchedule = {
-      ...values,
-      date: values.date.format("YYYY-MM-DD"),
-      startTime: values.startTime.format("HH:mm"),
-      endTime: values.endTime.format("HH:mm"),
+  const handleSubmit = async (values) => {
+    const selectedExam = exams.find((exam) => exam.id === values.exam);
+
+    // Combine date with start and end time to create full datetime strings
+    const selectedDate = values.date.format("YYYY-MM-DD");
+    const startTime = values.startTime.format("HH:mm");
+    const endTime = values.endTime.format("HH:mm");
+
+    const newExamSlot = {
+      subjectExamId: selectedExam.id,
+      startAt: `${selectedDate}T${startTime}:00Z`, // Combine date and time in ISO format
+      endAt: `${selectedDate}T${endTime}:00Z`, // Combine date and time in ISO format
     };
-    setExamSchedule([...examSchedule, newSchedule]);
-    form.resetFields();
+    console.log(newExamSlot);
+    try {
+      await examSlotApi.addExamSlot(newExamSlot);
+      message.success("Exam slot added successfully.");
+      setExamSchedule((prev) => [...prev, newExamSlot]);
+      form.resetFields();
+    } catch (error) {
+      message.error("Failed to add exam slot.");
+    }
   };
 
   const validateTime = (rule, value) => {
@@ -182,7 +196,7 @@ const Exam_Schedule = () => {
             </Form.Item>
 
             <Form.Item
-              name="subject"
+              name="exam"
               label="Exam"
               rules={[{ required: true, message: "Required" }]}
             >
@@ -190,13 +204,13 @@ const Exam_Schedule = () => {
                 placeholder="Select Subject"
                 style={{ width: "100%" }}
                 showSearch
-                onSearch={handleSubjectSearch} // Handle search
+                onSearch={handleExamSearch} // Handle search
                 optionFilterProp="children"
                 filterOption={false} // Prevent default filtering
               >
-                {filteredSubjects.map((subject) => (
-                  <Option key={subject.id} value={subject.name}>
-                    {subject.name}
+                {filteredExams.map((exam) => (
+                  <Option key={exam.id} value={exam.id}>
+                    {exam.subjectName} - {exam.examType}
                   </Option>
                 ))}
               </Select>
@@ -235,20 +249,6 @@ const Exam_Schedule = () => {
               </Col>
             </Row>
 
-            <Form.Item
-              name="room"
-              label="Room"
-              rules={[{ required: true, message: "Please select a room!" }]}
-            >
-              <Select placeholder="Select Room" style={{ width: "100%" }}>
-                {rooms.map((room) => (
-                  <Option key={room.id} value={room.roomName}>
-                    {room.roomName}
-                  </Option>
-                ))}
-              </Select>
-            </Form.Item>
-
             <Row justify="space-between">
               <Col>
                 <Button
@@ -272,9 +272,8 @@ const Exam_Schedule = () => {
 
         <Content style={{ padding: "24px", background: "#fff" }}>
           <Table
-            dataSource={examSchedule}
+            dataSource={examSchedule.map((item) => ({ ...item, key: item.id }))}
             columns={columns}
-            rowKey={(record, index) => index}
             pagination={{ pageSize: 5 }}
           />
         </Content>

@@ -27,7 +27,7 @@ const menuProps = {
 const Header = () => {
   const { user } = useContext(UserContext);
 
-  const currentHeader = headerConfig[user.role] || headerConfig["Staff"];
+  const currentHeader = headerConfig["Staff"];
 
   return (
     <div className="header">

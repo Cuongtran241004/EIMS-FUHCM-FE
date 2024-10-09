@@ -34,14 +34,20 @@ const Subject = () => {
   const [loading, setLoading] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [editingSubject, setEditingSubject] = useState(null);
-  const [selectedSemester, setSelectedSemester] = useState(null); // Initialize to null
+  const [selectedSemester, setSelectedSemester] = useState({
+    id: null,
+    name: null,
+  }); // Store both semesterId and semesterName
   const [semesters, setSemesters] = useState([]); // State for semesters
+  const [isModalVisible, setIsModalVisible] = useState(false);
   const [form] = Form.useForm();
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 8;
 
-  const fetchData = async (term) => {
+  const fetchData = async (semesterId) => {
     setLoading(true);
     try {
-      const result = await subjectApi.getAllSubjects(term);
+      const result = await subjectApi.getAllSubjects(semesterId);
       setData(result);
     } catch (error) {
       message.error(FETCH_SUBJECTS_FAILED);
@@ -54,13 +60,18 @@ const Subject = () => {
     const fetchSemesters = async () => {
       try {
         const result = await semesterApi.getAllSemesters(); // Fetch semesters
-        setSemesters(result); // Assuming result is an array of { id, name, startAt }
+        setSemesters(result);
 
         // Sort semesters by startAt date to get the latest one
         const sortedSemesters = result.sort(
           (a, b) => new Date(b.startAt) - new Date(a.startAt)
         );
-        setSelectedSemester(sortedSemesters[0]?.name); // Set the latest semester as default
+
+        // Set default semester to the latest one
+        setSelectedSemester({
+          id: sortedSemesters[0]?.id,
+          name: sortedSemesters[0]?.name,
+        });
         fetchData(sortedSemesters[0]?.id); // Fetch subjects for the latest semester
       } catch (error) {
         message.error("Failed to fetch semesters");
@@ -78,16 +89,12 @@ const Subject = () => {
   const handleMenuClick = (e) => {
     const selected = items.find((item) => item.key == e.key);
     if (selected) {
-      setSelectedSemester(selected.label);
+      setSelectedSemester({
+        id: selected.key, // Store semesterId
+        name: selected.label, // Store semesterName
+      });
       fetchData(selected.key); // Fetch data based on the new selected semester
     }
-  };
-
-  const showModal = () => {
-    setIsEditing(false);
-    form.resetFields();
-    setEditingSubject(null);
-    setIsModalVisible(true);
   };
 
   const handleCancel = () => {
@@ -100,10 +107,17 @@ const Subject = () => {
     try {
       await subjectApi.deleteSubject(id);
       message.success(DELETE_SUBJECT_SUCCESS);
-      fetchData(selectedSemester); // Fetch subjects for the current selected semester
+      fetchData(selectedSemester.id); // Fetch subjects for the current selected semester
     } catch (error) {
       message.error(DELETE_SUBJECT_FAILED);
     }
+  };
+
+  const handleEdit = (record) => {
+    setIsEditing(true);
+    setEditingSubject(record);
+    form.setFieldsValue(record); // Populate the form with the current data
+    setIsModalVisible(true); // Show the modal after setting the form values
   };
 
   const columns = [
@@ -111,6 +125,7 @@ const Subject = () => {
       title: "No",
       dataIndex: "no",
       key: "no",
+      render: (_, __, index) => (currentPage - 1) * pageSize + index + 1,
     },
     {
       title: "Code",
@@ -129,12 +144,7 @@ const Subject = () => {
         <Space size="middle">
           <EditOutlined
             style={{ color: "blue", cursor: "pointer" }}
-            onClick={() => {
-              setIsEditing(true);
-              setEditingSubject(record);
-              form.setFieldsValue(record);
-              showModal();
-            }}
+            onClick={() => handleEdit(record)} // Use handleEdit to open modal and set form values
           />
           <Popconfirm
             title="Are you sure to delete this subject?"
@@ -152,15 +162,22 @@ const Subject = () => {
   const handleOk = async () => {
     try {
       const values = await form.validateFields();
+
+      // Include the semesterId in the subject object
+      const subjectData = {
+        ...values,
+        semesterId: selectedSemester.id, // Use semesterId from selectedSemester
+      };
+
       if (isEditing) {
-        await subjectApi.updateSubject({ ...editingSubject, ...values });
+        await subjectApi.updateSubject({ ...editingSubject, ...subjectData });
         message.success(EDIT_SUBJECT_SUCCESS);
       } else {
-        await subjectApi.addSubject(values);
+        await subjectApi.addSubject(subjectData);
         message.success(ADD_SUBJECT_SUCCESS);
       }
 
-      fetchData(selectedSemester); // Fetch subjects for the current selected semester
+      fetchData(subjectData.semesterId); // Fetch subjects for the current selected semester
       handleCancel();
     } catch (error) {
       message.error(isEditing ? EDIT_SUBJECT_FAILED : ADD_SUBJECT_FAILED);
@@ -212,7 +229,7 @@ const Subject = () => {
               </Col>
               <Col>
                 <Button type="primary" onClick={handleOk}>
-                  Add
+                  {isEditing ? "Save" : "Add"}
                 </Button>
               </Col>
             </Row>
@@ -227,17 +244,20 @@ const Subject = () => {
           >
             <Button style={{ width: "150px" }}>
               <Space>
-                {selectedSemester}
+                {selectedSemester.name}
                 <DownOutlined />
               </Space>
             </Button>
           </Dropdown>
           <Spin spinning={loading}>
             <Table
-              dataSource={data}
+              dataSource={data.map((item) => ({ ...item, key: item.id }))}
               columns={columns}
-              rowKey={(record) => record.id}
-              pagination={{ pageSize: 8 }}
+              pagination={{
+                pageSize,
+                current: currentPage,
+                onChange: (page) => setCurrentPage(page), // Handle page change
+              }}
             />
           </Spin>
         </Content>

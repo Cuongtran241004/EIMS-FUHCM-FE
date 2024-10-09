@@ -1,6 +1,6 @@
 import axios from "axios";
 import { API_BASE_URL } from "../configs/urlApi.jsx";
-const EXAM_API_BASE_URL = `${API_BASE_URL}/subject-exams`;
+const EXAM_API_BASE_URL = `${API_BASE_URL}/subjectexams`;
 
 const handleError = (error) => {
   console.error("Error fetching data:", error);
@@ -36,10 +36,10 @@ const examApi = {
       handleError(error);
     }
   },
-  getExamBySubjectId: async (subjectId) => {
+  getExamBySemesterId: async (semesterId) => {
     try {
       const response = await axios.get(
-        `${EXAM_API_BASE_URL}/by-subject/${subjectId}`,
+        `${EXAM_API_BASE_URL}/by-semester/${semesterId}`,
         {
           headers: {
             "Content-Type": "application/json",

@@ -27,18 +27,19 @@ const Exam = () => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
-  const [editingSubject, setEditingSubject] = useState(null);
+  const [editingExam, setEditingExam] = useState(null);
   const [selectedSemester, setSelectedSemester] = useState(null);
   const [semesters, setSemesters] = useState([]);
   const [subjects, setSubjects] = useState([]);
   const [filteredSubjects, setFilteredSubjects] = useState([]);
   const [form] = Form.useForm();
-
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 8;
   // Fetch exam data
   const fetchData = async (term) => {
     setLoading(true);
     try {
-      const result = await examApi.getExamById();
+      const result = await examApi.getAllExams();
       setData(result);
     } catch (error) {
       message.error("Failed to fetch exams");
@@ -104,7 +105,7 @@ const Exam = () => {
 
   const handleDelete = async (id) => {
     try {
-      await subjectApi.deleteSubject(id);
+      await examApi.deleteExam(id);
       message.success("Exam deleted successfully");
       fetchData(selectedSemester);
     } catch (error) {
@@ -115,11 +116,16 @@ const Exam = () => {
   const handleOk = async () => {
     try {
       const values = await form.validateFields();
+      // find subject id from subject name
+      const subject = subjects.find((sub) => sub.name === values.subjectName);
+      values.subjectId = subject.id;
+
       if (isEditing) {
-        await subjectApi.updateSubject({ ...editingSubject, ...values });
+        values.id = editingExam.id;
+        await examApi.updateExam(values);
         message.success("Exam updated successfully");
       } else {
-        await subjectApi.addSubject(values);
+        await examApi.addExam(values);
         message.success("Exam added successfully");
       }
       fetchData(selectedSemester);
@@ -135,16 +141,17 @@ const Exam = () => {
       title: "No",
       dataIndex: "no",
       key: "no",
+      render: (_, __, index) => (currentPage - 1) * pageSize + index + 1,
     },
     {
       title: "Subject",
-      dataIndex: "subject",
-      key: "subject",
+      dataIndex: "subjectName",
+      key: "subjectName",
     },
     {
       title: "Type",
-      dataIndex: "type",
-      key: "type",
+      dataIndex: "examType",
+      key: "examType",
     },
     {
       title: "Duration",
@@ -160,7 +167,7 @@ const Exam = () => {
             style={{ color: "blue", cursor: "pointer" }}
             onClick={() => {
               setIsEditing(true);
-              setEditingSubject(record);
+              setEditingExam(record);
               form.setFieldsValue(record);
             }}
           />
@@ -186,7 +193,7 @@ const Exam = () => {
           <Form form={form} layout="vertical" name="add_exam_form">
             {/* Subject Field */}
             <Form.Item
-              name="subject"
+              name="subjectName"
               label="Subject"
               rules={[{ required: true, message: "Please select a subject!" }]}
             >
@@ -208,14 +215,15 @@ const Exam = () => {
             <Row gutter={16}>
               <Col span={12}>
                 <Form.Item
-                  name="type"
+                  name="examType"
                   label="Type"
                   rules={[{ required: true, message: "Required" }]}
                 >
-                  <Select placeholder="Exam type" disabled={isEditing}>
+                  <Select placeholder="Exam type">
                     <Option value="PE">PE</Option>
                     <Option value="FE">FE</Option>
                     <Option value="PE&FE">PE&FE</Option>
+                    <Option value="Midterm">Midterm</Option>
                   </Select>
                 </Form.Item>
               </Col>
@@ -227,11 +235,7 @@ const Exam = () => {
                   label="Duration"
                   rules={[{ required: true, message: "Required" }]}
                 >
-                  <Input
-                    type="number"
-                    placeholder="Duration"
-                    disabled={isEditing}
-                  />
+                  <Input type="number" placeholder="Duration" />
                 </Form.Item>
               </Col>
             </Row>
@@ -278,10 +282,13 @@ const Exam = () => {
 
           <Spin spinning={loading}>
             <Table
-              dataSource={data}
+              dataSource={data.map((item) => ({ ...item, key: item.id }))}
               columns={columns}
-              rowKey={(record) => record.id}
-              pagination={{ pageSize: 8 }}
+              pagination={{
+                pageSize,
+                current: currentPage,
+                onChange: (page) => setCurrentPage(page), // Handle page change
+              }}
             />
           </Spin>
         </Content>
