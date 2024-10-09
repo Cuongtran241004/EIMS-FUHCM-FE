@@ -11,14 +11,12 @@ function InvigilatorRequest() {
     const [examSlots, setExamSlots] = useState([]);
     const [form] = Form.useForm();
 
-    // Retrieve user's firstName and lastName from localStorage
     const firstName = localStorage.getItem('firstName') || '';
     const lastName = localStorage.getItem('lastName') || '';
     const id = localStorage.getItem('id') || '';
     const fullName = `${lastName} ${firstName}`;
 
     useEffect(() => {
-        // Fetch semesters when component mounts
         const fetchSemester = async () => {
             try {
                 const response = await getSemester();
@@ -65,7 +63,6 @@ function InvigilatorRequest() {
             };
             console.log('Request Payload:', requestPayload);
 
-            // Call API to send the request (replace with your API call)
             message.success('Request submitted successfully');
         } catch (e) {
             console.error('Submit Error:', e.message);

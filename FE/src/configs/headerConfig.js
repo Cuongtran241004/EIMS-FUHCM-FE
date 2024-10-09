@@ -18,7 +18,7 @@ const headerConfig = {
         { name: "request", path: "/request" },
     ],
     Admin: [
-        { name: "Dashboard", path: "/dashboard" },
+        { name: "Dashboard", path: "/" },
         { name: "Register", path: "/register" },
         { name: "Exam Slot", path: "/exam-slot" },
         { name: "Requests", path: "/requests" },

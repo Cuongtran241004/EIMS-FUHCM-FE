@@ -1,45 +1,53 @@
 .header {
-    overflow: hidden;
-    background-color: #f1f1f1;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0;
-    width: 100%;
-  }
-  
-  /* Style the header links */
-  .header-left a {
-    float: left;
-    color: black;
-    text-align: center;
-    text-decoration: none;
-    font-size: s18px;
-    line-height: 25px;
-    border-radius: 4px;
-  }
-  
-  .header a img {
-    height: 55px;
-    aspect-ratio: 3.5 /1;
-  }
-  
-  .header-right {
-    float: right;
-    background-color: #f1f1f1;
-    padding-right: 1.875rem;
-  }
-  
-  .header-right .header-right-item {
-    display: inline-block;
-    text-align: center;
-    text-decoration: none;
-    color: black;
-  }
-  
-  .header-right button {
-    font-size: 16px;
-  }
+  overflow: hidden;
+  background-color: #f1f1f1;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0;
+  width: 100%;
+}
+
+/* Style the header links */
+.header-left a {
+  float: left;
+  color: black;
+  text-align: center;
+  text-decoration: none;
+  font-size: s18px;
+  line-height: 25px;
+  border-radius: 4px;
+}
+
+.header a img {
+  height: 55px;
+  aspect-ratio: 3.5 /1;
+}
+
+.header-right {
+  float: right;
+  background-color: #f1f1f1;
+  padding-right: 1.875rem;
+}
+
+.header-right .header-right-item {
+  display: inline-block;
+  text-align: center;
+  text-decoration: none;
+  color: inherit;
+}
+
+.header-right button {
+  font-size: 16px;
+}
+
+.button-item:active {
+  background-color: #1890ff;
+  color: #fff;
+}
 
 
-  
+/* Nếu bạn muốn tùy chỉnh thêm */
+.button-item.active {
+  color: white;
+}

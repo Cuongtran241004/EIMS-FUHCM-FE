@@ -34,9 +34,8 @@ function InvigilatorDashboard() {
       const fetchSchedules = async () => {
         try {
           const obj = await schedules(selectedSemester.id);
-          const examSlotDetailSet = obj.semesterInvigilatorAssignment[0].examSlotDetailSet; // Adjust this based on your data structure
+          const examSlotDetailSet = obj.semesterInvigilatorAssignment[0].examSlotDetailSet; 
 
-          // Map the examSlotDetailSet to events
           const mappedEvents = examSlotDetailSet.map(slot => ({
             examSlotId: slot.examSlotId,
             startAt: new Date(slot.startAt),
@@ -95,8 +94,8 @@ function InvigilatorDashboard() {
           localizer={localizer}
           events={events}
           onSelectEvent={handleSelectEvent}
-          startAccessor="startAt" // Adjusted for the new event object structure
-          endAccessor="endAt" // Adjusted for the new event object structure
+          startAccessor="startAt" 
+          endAccessor="endAt" 
           style={{ height: 500, margin: '50px', width: '70%' }}
           components={{
             event: EventComponent,
@@ -111,7 +110,7 @@ function InvigilatorDashboard() {
         >
           {selectedEvent && (
             <div>
-              <p>Exam Slot ID: {selectedEvent.examSlotId}</p> {/* Displaying exam slot ID */}
+              <p>Exam Slot ID: {selectedEvent.examSlotId}</p> 
               <p>Start: {selectedEvent.startAt.toLocaleString()}</p>
               <p>End: {selectedEvent.endAt.toLocaleString()}</p>
             </div>
