@@ -16,30 +16,31 @@ import {
 } from "antd";
 import subjectApi from "../../services/Subject.js";
 import semesterApi from "../../services/Semester.js";
+import examApi from "../../services/Exam.js";
 import { DeleteOutlined, DownOutlined, EditOutlined } from "@ant-design/icons";
 import Header from "../../components/Header/Header.jsx";
-import examApi from "../../services/Exam.js";
 
 const { Content, Sider } = Layout;
 const { Option } = Select;
 
 const Exam = () => {
-  const [data, setData] = useState([]);
+  const [data, setData] = useState([]); // For exam data
   const [loading, setLoading] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [editingExam, setEditingExam] = useState(null);
-  const [selectedSemester, setSelectedSemester] = useState(null);
+  const [selectedSemester, setSelectedSemester] = useState(null); // Initialize with null to wait for semester loading
   const [semesters, setSemesters] = useState([]);
   const [subjects, setSubjects] = useState([]);
   const [filteredSubjects, setFilteredSubjects] = useState([]);
   const [form] = Form.useForm();
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 8;
-  // Fetch exam data
-  const fetchData = async (term) => {
+
+  // Fetch exam data based on selected semester
+  const fetchExams = async (semesterId) => {
     setLoading(true);
     try {
-      const result = await examApi.getAllExams();
+      const result = await examApi.getExamBySemesterId(semesterId);
       setData(result);
     } catch (error) {
       message.error("Failed to fetch exams");
@@ -48,11 +49,18 @@ const Exam = () => {
     }
   };
 
-  useEffect(() => {
-    fetchData(selectedSemester);
-  }, [selectedSemester]);
+  // Fetch subjects based on selected semester
+  const fetchSubjects = async (semesterId) => {
+    try {
+      const result = await subjectApi.getSubjectBySemester(semesterId);
+      setSubjects(result);
+      setFilteredSubjects(result);
+    } catch (error) {
+      message.error("Failed to fetch subjects");
+    }
+  };
 
-  // Fetch semesters and subjects on initial load
+  // Fetch semesters and set the default selected semester
   useEffect(() => {
     const fetchSemesters = async () => {
       try {
@@ -61,26 +69,29 @@ const Exam = () => {
         const sortedSemesters = result.sort(
           (a, b) => new Date(b.startAt) - new Date(a.startAt)
         );
-        setSelectedSemester(sortedSemesters[0]?.name);
-        fetchData(sortedSemesters[0]?.id);
+
+        // Set the latest semester as the selected semester
+        if (sortedSemesters.length > 0) {
+          setSelectedSemester({
+            id: sortedSemesters[0]?.id,
+            name: sortedSemesters[0]?.name,
+          });
+        }
       } catch (error) {
         message.error("Failed to fetch semesters");
       }
     };
 
-    const fetchSubjects = async () => {
-      try {
-        const result = await subjectApi.getAllSubjects();
-        setSubjects(result);
-        setFilteredSubjects(result);
-      } catch (error) {
-        message.error("Failed to fetch subjects");
-      }
-    };
-
     fetchSemesters();
-    fetchSubjects();
   }, []);
+
+  // When selectedSemester changes, fetch both exams and subjects
+  useEffect(() => {
+    if (selectedSemester?.id) {
+      fetchExams(selectedSemester.id); // Fetch exams for the selected semester
+      fetchSubjects(selectedSemester.id); // Fetch subjects for the selected semester
+    }
+  }, [selectedSemester]);
 
   // Handle subject search in dropdown
   const handleSearch = (value) => {
@@ -90,11 +101,16 @@ const Exam = () => {
     setFilteredSubjects(filtered);
   };
 
+  // Handle semester selection change
   const handleMenuClick = (e) => {
+    console.log(semesters);
     const selected = semesters.find((semester) => semester.id == e.key);
+    console.log(selected);
     if (selected) {
-      setSelectedSemester(selected.name);
-      fetchData(selected.id);
+      setSelectedSemester({
+        id: selected.id,
+        name: selected.name,
+      });
     }
   };
 
@@ -107,7 +123,7 @@ const Exam = () => {
     try {
       await examApi.deleteExam(id);
       message.success("Exam deleted successfully");
-      fetchData(selectedSemester);
+      fetchExams(selectedSemester.id); // Reload exams after deletion
     } catch (error) {
       message.error("Failed to delete exam");
     }
@@ -116,7 +132,6 @@ const Exam = () => {
   const handleOk = async () => {
     try {
       const values = await form.validateFields();
-      // find subject id from subject name
       const subject = subjects.find((sub) => sub.name === values.subjectName);
       values.subjectId = subject.id;
 
@@ -128,7 +143,7 @@ const Exam = () => {
         await examApi.addExam(values);
         message.success("Exam added successfully");
       }
-      fetchData(selectedSemester);
+      fetchExams(selectedSemester.id); // Reload exams after adding/updating
       handleCancel();
     } catch (error) {
       message.error("Failed to submit exam");
@@ -154,7 +169,7 @@ const Exam = () => {
       key: "examType",
     },
     {
-      title: "Duration",
+      title: "Duration (minutes)",
       dataIndex: "duration",
       key: "duration",
     },
@@ -264,16 +279,16 @@ const Exam = () => {
           <Space>
             <Dropdown
               menu={{
-                items: semesters.map((semester) => ({
-                  key: semester.id,
-                  label: semester.name,
+                items: semesters.map((sem) => ({
+                  key: sem.id,
+                  label: sem.name,
                 })),
                 onClick: handleMenuClick,
               }}
             >
               <Button style={{ width: "150px" }}>
                 <Space>
-                  {selectedSemester}
+                  {selectedSemester?.name || "Select Semester"}
                   <DownOutlined />
                 </Space>
               </Button>
@@ -287,7 +302,7 @@ const Exam = () => {
               pagination={{
                 pageSize,
                 current: currentPage,
-                onChange: (page) => setCurrentPage(page), // Handle page change
+                onChange: (page) => setCurrentPage(page),
               }}
             />
           </Spin>

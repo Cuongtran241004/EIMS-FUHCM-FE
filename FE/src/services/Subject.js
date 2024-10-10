@@ -18,15 +18,18 @@ const subjectApi = {
       throw error;
     }
   },
-  getSubjectBySemester: async (code) => {
+  getSubjectBySemester: async (semesterId) => {
     try {
-      const response = await axios.get(`${SUBJECT_API_BASE_URL}/${code}`, {
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-        },
-        withCredentials: true,
-      });
+      const response = await axios.get(
+        `${SUBJECT_API_BASE_URL}/by-semester/${semesterId}`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+          withCredentials: true,
+        }
+      );
       return response.data;
     } catch (error) {
       console.error("Error fetching data:", error);

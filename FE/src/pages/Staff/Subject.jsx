@@ -23,7 +23,7 @@ import {
   Row,
 } from "antd";
 import subjectApi from "../../services/Subject.js";
-import semesterApi from "../../services/Semester.js"; // Import semesterApi
+import semesterApi from "../../services/Semester.js";
 import { DeleteOutlined, DownOutlined, EditOutlined } from "@ant-design/icons";
 import Header from "../../components/Header/Header.jsx";
 
@@ -37,32 +37,20 @@ const Subject = () => {
   const [selectedSemester, setSelectedSemester] = useState({
     id: null,
     name: null,
-  }); // Store both semesterId and semesterName
-  const [semesters, setSemesters] = useState([]); // State for semesters
+  });
+  const [semesters, setSemesters] = useState([]);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [form] = Form.useForm();
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 8;
 
-  const fetchData = async (semesterId) => {
-    setLoading(true);
-    try {
-      const result = await subjectApi.getAllSubjects(semesterId);
-      setData(result);
-    } catch (error) {
-      message.error(FETCH_SUBJECTS_FAILED);
-    } finally {
-      setLoading(false);
-    }
-  };
-
+  // Fetch semesters and set the default selected semester
   useEffect(() => {
     const fetchSemesters = async () => {
       try {
-        const result = await semesterApi.getAllSemesters(); // Fetch semesters
+        const result = await semesterApi.getAllSemesters();
         setSemesters(result);
 
-        // Sort semesters by startAt date to get the latest one
         const sortedSemesters = result.sort(
           (a, b) => new Date(b.startAt) - new Date(a.startAt)
         );
@@ -72,7 +60,6 @@ const Subject = () => {
           id: sortedSemesters[0]?.id,
           name: sortedSemesters[0]?.name,
         });
-        fetchData(sortedSemesters[0]?.id); // Fetch subjects for the latest semester
       } catch (error) {
         message.error("Failed to fetch semesters");
       }
@@ -80,6 +67,25 @@ const Subject = () => {
 
     fetchSemesters();
   }, []);
+
+  // Fetch subjects whenever the selected semester changes
+  useEffect(() => {
+    if (selectedSemester.id) {
+      fetchData(selectedSemester.id);
+    }
+  }, [selectedSemester.id]); // This will run whenever selectedSemester.id changes
+
+  const fetchData = async (semesterId) => {
+    setLoading(true);
+    try {
+      const result = await subjectApi.getSubjectBySemester(semesterId);
+      setData(result);
+    } catch (error) {
+      message.error(FETCH_SUBJECTS_FAILED);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const items = semesters.map((semester) => ({
     key: semester.id,
@@ -90,10 +96,9 @@ const Subject = () => {
     const selected = items.find((item) => item.key == e.key);
     if (selected) {
       setSelectedSemester({
-        id: selected.key, // Store semesterId
-        name: selected.label, // Store semesterName
+        id: selected.key,
+        name: selected.label,
       });
-      fetchData(selected.key); // Fetch data based on the new selected semester
     }
   };
 
@@ -107,7 +112,7 @@ const Subject = () => {
     try {
       await subjectApi.deleteSubject(id);
       message.success(DELETE_SUBJECT_SUCCESS);
-      fetchData(selectedSemester.id); // Fetch subjects for the current selected semester
+      fetchData(selectedSemester.id);
     } catch (error) {
       message.error(DELETE_SUBJECT_FAILED);
     }
@@ -116,8 +121,8 @@ const Subject = () => {
   const handleEdit = (record) => {
     setIsEditing(true);
     setEditingSubject(record);
-    form.setFieldsValue(record); // Populate the form with the current data
-    setIsModalVisible(true); // Show the modal after setting the form values
+    form.setFieldsValue(record);
+    setIsModalVisible(true);
   };
 
   const columns = [
@@ -144,11 +149,11 @@ const Subject = () => {
         <Space size="middle">
           <EditOutlined
             style={{ color: "blue", cursor: "pointer" }}
-            onClick={() => handleEdit(record)} // Use handleEdit to open modal and set form values
+            onClick={() => handleEdit(record)}
           />
           <Popconfirm
             title="Are you sure to delete this subject?"
-            onConfirm={() => handleDelete(record.id)} // Ensure you're using the correct ID
+            onConfirm={() => handleDelete(record.id)}
             okText="Yes"
             cancelText="No"
           >
@@ -163,10 +168,9 @@ const Subject = () => {
     try {
       const values = await form.validateFields();
 
-      // Include the semesterId in the subject object
       const subjectData = {
         ...values,
-        semesterId: selectedSemester.id, // Use semesterId from selectedSemester
+        semesterId: selectedSemester.id,
       };
 
       if (isEditing) {
@@ -177,7 +181,7 @@ const Subject = () => {
         message.success(ADD_SUBJECT_SUCCESS);
       }
 
-      fetchData(subjectData.semesterId); // Fetch subjects for the current selected semester
+      fetchData(subjectData.semesterId);
       handleCancel();
     } catch (error) {
       message.error(isEditing ? EDIT_SUBJECT_FAILED : ADD_SUBJECT_FAILED);
@@ -256,7 +260,7 @@ const Subject = () => {
               pagination={{
                 pageSize,
                 current: currentPage,
-                onChange: (page) => setCurrentPage(page), // Handle page change
+                onChange: (page) => setCurrentPage(page),
               }}
             />
           </Spin>

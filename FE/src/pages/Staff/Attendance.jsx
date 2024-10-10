@@ -1,9 +1,18 @@
 import React, { useState, useEffect } from "react";
 import Header from "../../components/Header/Header.jsx";
-import { Table, Spin, message, Select, Layout } from "antd";
+import {
+  Table,
+  Spin,
+  message,
+  Select,
+  Layout,
+  Space,
+  Dropdown,
+  Button,
+} from "antd";
 import examSlotApi from "../../services/ExamSlot.js";
 import semesterApi from "../../services/Semester.js";
-
+import { DownOutlined } from "@ant-design/icons";
 const { Content, Sider } = Layout;
 const { Option } = Select;
 
@@ -14,7 +23,7 @@ const Attendance = () => {
   const [semesters, setSemesters] = useState([]);
 
   // Fetch attendance data
-  const fetchData = async (term) => {
+  const fetchExams = async (term) => {
     setLoading(true);
     try {
       const result = await examSlotApi.getExamSlotBySemesterId(term);
@@ -27,13 +36,6 @@ const Attendance = () => {
   };
 
   useEffect(() => {
-    if (selectedSemester) {
-      fetchData(selectedSemester);
-    }
-  }, [selectedSemester]);
-
-  // Fetch semesters on initial load
-  useEffect(() => {
     const fetchSemesters = async () => {
       try {
         const result = await semesterApi.getAllSemesters();
@@ -41,15 +43,42 @@ const Attendance = () => {
         const sortedSemesters = result.sort(
           (a, b) => new Date(b.startAt) - new Date(a.startAt)
         );
-        setSelectedSemester(sortedSemesters[0]?.id); // Set the default semester ID
-        fetchData(sortedSemesters[0]?.id); // Fetch data for the default semester
+        // Set the latest semester as the selected semester
+        if (sortedSemesters.length > 0) {
+          setSelectedSemester({
+            id: sortedSemesters[0]?.id,
+            name: sortedSemesters[0]?.name,
+          });
+        }
       } catch (error) {
-        message.error("Failed to fetch semesters");
+        message.error("Failed to load semesters. Please try again.");
+      } finally {
+        setLoading(false);
       }
     };
 
     fetchSemesters();
   }, []);
+
+  useEffect(() => {
+    if (selectedSemester?.id) {
+      fetchExams(selectedSemester.id);
+      // fetchExamSchedule(selectedSemester.id);
+    }
+  }, [selectedSemester]);
+
+  // Handle semester selection change
+  const handleMenuClick = (e) => {
+    console.log(semesters);
+    const selected = semesters.find((semester) => semester.id == e.key);
+    console.log(selected);
+    if (selected) {
+      setSelectedSemester({
+        id: selected.id,
+        name: selected.name,
+      });
+    }
+  };
 
   // Define columns for the Table
   const columns = [
@@ -87,23 +116,31 @@ const Attendance = () => {
       <Header />
       <Layout>
         {/* Sider for Form */}
-        <Sider width={300} style={{ background: "#f1f1f1", padding: "24px" }}>
-          <Select
-            placeholder="Select Semester"
-            style={{ width: "100%" }}
-            onChange={(value) => setSelectedSemester(value)} // Update selected semester
-            value={selectedSemester}
-          >
-            {semesters.map((semester) => (
-              <Option key={semester.id} value={semester.id}>
-                {semester.name}
-              </Option>
-            ))}
-          </Select>
-        </Sider>
+        <Sider
+          width={300}
+          style={{ background: "#f1f1f1", padding: "24px" }}
+        ></Sider>
 
         {/* Content for Table */}
         <Content style={{ padding: 24, margin: 0, background: "#fff" }}>
+          <Space>
+            <Dropdown
+              menu={{
+                items: semesters.map((sem) => ({
+                  key: sem.id,
+                  label: sem.name,
+                })),
+                onClick: handleMenuClick,
+              }}
+            >
+              <Button style={{ width: "150px" }}>
+                <Space>
+                  {selectedSemester?.name || "Select Semester"}
+                  <DownOutlined />
+                </Space>
+              </Button>
+            </Dropdown>
+          </Space>
           <Spin spinning={loading}>
             <Table
               dataSource={data}

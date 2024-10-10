@@ -9,6 +9,10 @@ import {
   Row,
   Col,
   message,
+  Popconfirm,
+  Space,
+  Dropdown,
+  Spin,
 } from "antd";
 import React, { useState, useEffect } from "react";
 import Sider from "antd/es/layout/Sider";
@@ -16,6 +20,7 @@ import Header from "../../components/Header/Header.jsx";
 import semesterApi from "../../services/Semester.js";
 import examApi from "../../services/Exam.js";
 import examSlotApi from "../../services/ExamSlot.js";
+import { DeleteOutlined, EditOutlined, DownOutlined } from "@ant-design/icons";
 
 const { Option } = Select;
 const { Content } = Layout;
@@ -28,6 +33,31 @@ const Exam_Schedule = () => {
   const [exams, setExams] = useState([]);
   const [filteredExams, setFilteredExams] = useState([]);
   const [selectedSemester, setSelectedSemester] = useState(null);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editingExamSlot, setEditingExamSlot] = useState(null);
+
+  const fetchExams = async (semesterId) => {
+    try {
+      setLoading(true);
+      const result = await examApi.getExamBySemesterId(semesterId);
+      setExams(result);
+      setFilteredExams(result);
+    } catch (error) {
+      message.error("Failed to load subjects. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchExamSchedule = async (semesterId) => {
+    try {
+      const result = await examSlotApi.getExamSlotBySemesterId(semesterId);
+      console.log(result);
+      setExamSchedule(result);
+    } catch (error) {
+      message.error("Failed to load exam schedule. Please try again.");
+    }
+  };
 
   useEffect(() => {
     const fetchSemesters = async () => {
@@ -37,7 +67,13 @@ const Exam_Schedule = () => {
         const sortedSemesters = result.sort(
           (a, b) => new Date(b.startAt) - new Date(a.startAt)
         );
-        setSelectedSemester(sortedSemesters[0]?.name);
+        // Set the latest semester as the selected semester
+        if (sortedSemesters.length > 0) {
+          setSelectedSemester({
+            id: sortedSemesters[0]?.id,
+            name: sortedSemesters[0]?.name,
+          });
+        }
       } catch (error) {
         message.error("Failed to load semesters. Please try again.");
       } finally {
@@ -45,36 +81,15 @@ const Exam_Schedule = () => {
       }
     };
 
-    const fetchExams = async () => {
-      try {
-        const result = await examApi.getAllExams();
-
-        setExams(result);
-        setFilteredExams(result);
-      } catch (error) {
-        message.error("Failed to load subjects. Please try again.");
-      }
-    };
-
     fetchSemesters();
-    fetchExams();
   }, []);
 
   useEffect(() => {
-    if (selectedSemester) {
-      form.setFieldsValue({ semester: selectedSemester });
-      fetchExamSchedule(selectedSemester);
+    if (selectedSemester?.id) {
+      fetchExams(selectedSemester.id);
+      fetchExamSchedule(selectedSemester.id);
     }
-  }, [selectedSemester, form]);
-
-  const fetchExamSchedule = async (semester) => {
-    try {
-      const result = await examSlotApi.getAllExamSlots();
-      setExamSchedule(result);
-    } catch (error) {
-      message.error("Failed to load exam schedule. Please try again.");
-    }
-  };
+  }, [selectedSemester]);
 
   const handleExamSearch = (value) => {
     if (value) {
@@ -87,79 +102,140 @@ const Exam_Schedule = () => {
     }
   };
 
+  const handleDelete = async (id) => {
+    try {
+      await examSlotApi.deleteExamSlot(id);
+      message.success("Exam deleted successfully");
+      fetchExamSchedule(selectedSemester.id); // Refresh schedule
+    } catch (error) {
+      message.error("Failed to delete exam");
+    }
+  };
+
   const columns = [
     {
       title: "Subject",
-      dataIndex: "subjectExamId.subjectId.name",
-      key: "subject",
+      dataIndex: "subjectName",
+      key: "subjectName",
     },
     {
       title: "Exam Type",
-      dataIndex: "subjectExamId.examType",
+      dataIndex: "examType",
       key: "examType",
     },
     {
       title: "Date",
       dataIndex: "startAt", // Use startAt to extract date
       key: "date",
-      render: (text) => {
-        // Format the date as needed (e.g., YYYY-MM-DD)
-        return new Date(text).toLocaleDateString(); // Adjust formatting as needed
-      },
+      render: (text) => new Date(text).toLocaleDateString(), // Format date
     },
     {
       title: "Start Time",
       dataIndex: "startAt",
       key: "startTime",
-      render: (text) => {
-        // Format the time as needed (e.g., HH:mm)
-        return new Date(text).toLocaleTimeString([], {
+      render: (text) =>
+        new Date(text).toLocaleTimeString([], {
           hour: "2-digit",
           minute: "2-digit",
-        });
-      },
+        }),
     },
     {
       title: "End Time",
       dataIndex: "endAt",
       key: "endTime",
-      render: (text) => {
-        // Format the time as needed (e.g., HH:mm)
-        return new Date(text).toLocaleTimeString([], {
+      render: (text) =>
+        new Date(text).toLocaleTimeString([], {
           hour: "2-digit",
           minute: "2-digit",
-        });
-      },
+        }),
+    },
+    {
+      title: "Room",
+      render: (text, record) => <Button>Room</Button>,
     },
     {
       title: "Action",
       key: "action",
-      render: (text, record) => <Button>Room</Button>,
+      render: (text, record) => (
+        <Space size="middle">
+          <EditOutlined
+            style={{ color: "blue", cursor: "pointer" }}
+            onClick={() => {
+              setIsEditing(true);
+              setEditingExamSlot(record);
+              form.setFieldsValue({
+                exam: record.subjectExamId.id,
+                date: moment(record.startAt), // Ensure you have 'moment' imported
+                startTime: moment(record.startAt),
+                endTime: moment(record.endAt),
+              });
+            }}
+          />
+          <Popconfirm
+            title="Are you sure to delete this exam?"
+            onConfirm={() => handleDelete(record.id)}
+            okText="Yes"
+            cancelText="No"
+          >
+            <DeleteOutlined style={{ color: "red", cursor: "pointer" }} />
+          </Popconfirm>
+        </Space>
+      ),
     },
   ];
-
+  // Handle semester selection change
+  const handleMenuClick = (e) => {
+    console.log(semesters);
+    const selected = semesters.find((semester) => semester.id == e.key);
+    console.log(selected);
+    if (selected) {
+      setSelectedSemester({
+        id: selected.id,
+        name: selected.name,
+      });
+    }
+  };
   const handleSubmit = async (values) => {
     const selectedExam = exams.find((exam) => exam.id === values.exam);
-
-    // Combine date with start and end time to create full datetime strings
     const selectedDate = values.date.format("YYYY-MM-DD");
     const startTime = values.startTime.format("HH:mm");
     const endTime = values.endTime.format("HH:mm");
 
-    const newExamSlot = {
+    const examSlotData = {
+      examSlotId: isEditing ? editingExamSlot.id : null,
       subjectExamId: selectedExam.id,
-      startAt: `${selectedDate}T${startTime}:00Z`, // Combine date and time in ISO format
-      endAt: `${selectedDate}T${endTime}:00Z`, // Combine date and time in ISO format
+      startAt: `${selectedDate}T${startTime}:00Z`,
+      endAt: `${selectedDate}T${endTime}:00Z`,
+      requiredInvigilators: 15,
     };
-    console.log(newExamSlot);
-    try {
-      await examSlotApi.addExamSlot(newExamSlot);
-      message.success("Exam slot added successfully.");
-      setExamSchedule((prev) => [...prev, newExamSlot]);
-      form.resetFields();
-    } catch (error) {
-      message.error("Failed to add exam slot.");
+    if (isEditing) {
+      try {
+        await examSlotApi.updateExamSlot(examSlotData); // API call to update exam slot
+        message.success("Exam slot updated successfully.");
+        setExamSchedule((prev) =>
+          prev.map((slot) =>
+            slot.id === editingExamSlot.id ? examSlotData : slot
+          )
+        );
+      } catch (error) {
+        message.error("Failed to update exam slot.");
+      }
+    } else {
+      try {
+        console.log(examSlotData);
+        await examSlotApi.addExamSlot(examSlotData); // API call to create new exam slot
+        message.success("Exam slot added successfully.");
+        setExamSchedule((prev) => [...prev, examSlotData]);
+      } catch (error) {
+        message.error("Failed to add exam slot.");
+      }
     }
+    handleCancel();
+  };
+
+  const handleCancel = () => {
+    setIsEditing(false);
+    form.resetFields();
   };
 
   const validateTime = (rule, value) => {
@@ -177,25 +253,6 @@ const Exam_Schedule = () => {
         <Sider width={300} style={{ background: "#f1f1f1", padding: "24px" }}>
           <Form form={form} layout="vertical" onFinish={handleSubmit}>
             <Form.Item
-              name="semester"
-              label="Semester"
-              rules={[{ required: true, message: "Required" }]}
-            >
-              <Select
-                placeholder="Select Semester"
-                style={{ width: "100%" }}
-                loading={loading}
-                onChange={(value) => setSelectedSemester(value)}
-              >
-                {semesters.map((semester) => (
-                  <Option key={semester.id} value={semester.name}>
-                    {semester.name}
-                  </Option>
-                ))}
-              </Select>
-            </Form.Item>
-
-            <Form.Item
               name="exam"
               label="Exam"
               rules={[{ required: true, message: "Required" }]}
@@ -204,13 +261,13 @@ const Exam_Schedule = () => {
                 placeholder="Select Subject"
                 style={{ width: "100%" }}
                 showSearch
-                onSearch={handleExamSearch} // Handle search
+                onSearch={handleExamSearch}
                 optionFilterProp="children"
-                filterOption={false} // Prevent default filtering
+                filterOption={false}
               >
                 {filteredExams.map((exam) => (
                   <Option key={exam.id} value={exam.id}>
-                    {exam.subjectName} - {exam.examType}
+                    {exam.subjectCode} - {exam.examType}
                   </Option>
                 ))}
               </Select>
@@ -256,7 +313,7 @@ const Exam_Schedule = () => {
                     borderColor: "orange",
                     color: "orange",
                   }}
-                  onClick={() => form.resetFields()}
+                  onClick={handleCancel}
                 >
                   Clear
                 </Button>
@@ -271,11 +328,37 @@ const Exam_Schedule = () => {
         </Sider>
 
         <Content style={{ padding: "24px", background: "#fff" }}>
-          <Table
-            dataSource={examSchedule.map((item) => ({ ...item, key: item.id }))}
-            columns={columns}
-            pagination={{ pageSize: 5 }}
-          />
+          <Space>
+            <Dropdown
+              menu={{
+                items: semesters.map((sem) => ({
+                  key: sem.id,
+                  label: sem.name,
+                })),
+                onClick: handleMenuClick,
+              }}
+            >
+              <Button style={{ width: "150px" }}>
+                <Space>
+                  {selectedSemester?.name || "Select Semester"}
+                  <DownOutlined />
+                </Space>
+              </Button>
+            </Dropdown>
+          </Space>
+          <Spin spinning={loading}>
+            <Table
+              dataSource={examSchedule.map((item) => ({
+                subjectName: item.subjectExamId.subjectId.name,
+                examType: item.subjectExamId.examType,
+                startAt: item.startAt,
+                endAt: item.endAt,
+                key: item.id,
+              }))}
+              columns={columns}
+              pagination={{ pageSize: 8 }}
+            />
+          </Spin>
         </Content>
       </Layout>
     </Layout>
