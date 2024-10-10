@@ -49,7 +49,7 @@ const Header = () => {
                   to={item.path}
                   className={`header-right-item ${isActive ? 'active' : ''}`}
                 >
-                  {item.name}
+                  <span className={`button-name ${isActive ? 'active' : ''}`}>{item.name}</span>
                 </Link>
               </Button>
             );

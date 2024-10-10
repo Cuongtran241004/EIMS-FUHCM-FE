@@ -11,39 +11,38 @@ function InvigilatorRequest() {
     const [examSlots, setExamSlots] = useState([]);
     const [form] = Form.useForm();
 
-    const firstName = localStorage.getItem('firstName') || '';
-    const lastName = localStorage.getItem('lastName') || '';
     const id = localStorage.getItem('id') || '';
-    const fullName = `${lastName} ${firstName}`;
 
     useEffect(() => {
         const fetchSemester = async () => {
-            try {
-                const response = await getSemester();
-                setSemesters(response);
-            } catch (e) {
-                console.error('getSemester Error: ', e.message);
-            }
+          try {
+            const response = await getSemester();
+            setSemesters(response);
+          } catch (e) {
+            console.error('getSemester Error: ', e.message);
+          }
         };
         fetchSemester();
-    }, []);
-
-    useEffect(() => {
+      }, []);
+    
+      useEffect(() => {
         if (selectedSemester) {
-            // Fetch exam slots based on selected semester
-            form.setFieldsValue({ examSlot: undefined });
+            console.log('Selected Semester:', selectedSemester);
             const fetchSchedules = async () => {
                 try {
                     const obj = await schedules(selectedSemester);
-                    const slotDetails = obj.semesterInvigilatorAssignment[0].examSlotDetailSet || [];
-                    setExamSlots(slotDetails);
+                    const examSlotDetailSet = obj.semesterInvigilatorAssignment[0].examSlotDetailSet; 
+                    const mappedEvents = examSlotDetailSet.map(slot => ({
+                        examSlotId: slot.examSlotId,
+                        startAt: new Date(slot.startAt),
+                        endAt: new Date(slot.endAt),
+                    }));
+                    setExamSlots(mappedEvents);
                 } catch (e) {
                     console.error('fetchSchedules Error: ', e.message);
                 }
             };
             fetchSchedules();
-        } else {
-            setExamSlots([]);
         }
     }, [selectedSemester]);
 
@@ -52,7 +51,6 @@ function InvigilatorRequest() {
             const { examSlot, reason } = values;
             const requestPayload = {
                 fuId: id, 
-                name: fullName,
                 semesterInvigilatorAssignment: [
                     {
                         semesterId: selectedSemester,
@@ -74,7 +72,7 @@ function InvigilatorRequest() {
         <div style={{ paddingLeft: 100, paddingRight: 100, paddingTop: 10 }}>
             <Form form={form} layout="vertical" onFinish={onFinish}>
 
-                <Form.Item label="Semester" rules={[{ required: true, message: 'Please select a semester' }]}>
+                <Form.Item label="Semester" name="semester" rules={[{ required: true, message: 'Please select a semester' }]}>
                     <Select
                         placeholder="Select Semester"
                         onChange={(value) => setSelectedSemester(value)}
@@ -87,7 +85,7 @@ function InvigilatorRequest() {
                     </Select>
                 </Form.Item>
 
-                <Form.Item label="Exam slots" name="examSlot" rules={[{ required: true, message: 'Please select an exam slot' }]}>
+                <Form.Item label="Exam slot" name="examSlot" rules={[{ required: true, message: 'Please select an exam slot' }]}>
                     <Select placeholder="Select Exam Slot">
                         {examSlots.map((slot) => (
                             <Option key={slot.examSlotId} value={slot.examSlotId}>

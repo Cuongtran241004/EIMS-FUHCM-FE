@@ -5,6 +5,7 @@ import { DownOutlined } from '@ant-design/icons';
 import { postRegisterSlots } from '../../components/API/postRegisterSlots';
 import { getSemester } from '../../components/API/getSemester';
 import { availableSlots } from '../../components/API/availableSlots';
+import { schedules } from '../../components/API/schedules';
 import { Calendar, momentLocalizer } from 'react-big-calendar';
 import moment from 'moment';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
@@ -17,9 +18,8 @@ function InvigilatorRegistration() {
   const [semesters, setSemesters] = useState([]);
   const [events, setEvents] = useState([]);
   const [selectedSlots, setSelectedSlots] = useState([]);
+  const [examSlotDetail, setExamSlotDetail] = useState(0)
   const allowedSlots = selectedSemester?.allowedSlotConfig ;
-
- const examSlotDetailSet = sessionStorage.getItem('examSlotDetailSet');
 
   useEffect(() => {
     const fetchSemester = async () => {
@@ -63,6 +63,22 @@ function InvigilatorRegistration() {
     }
   }, [selectedSemester]);
 
+  useEffect(() => {
+    if (selectedSemester) {
+      const fetchSchedules = async () => {
+        try {
+          const obj = await schedules(selectedSemester.id);
+          const examSlotDetailSet = obj.semesterInvigilatorAssignment[0].examSlotDetailSet; 
+          setExamSlotDetail(examSlotDetailSet.length);
+          
+        } catch (e) {
+          console.error('fetchSchedules Error: ', e.message);
+        }
+      };
+      fetchSchedules();
+    }
+  }, [selectedSemester]);
+
 
   const handleMenuClick = (e) => {
     const selected = semesters.find((semester) => semester.id === parseInt(e.key));
@@ -92,7 +108,7 @@ function InvigilatorRegistration() {
     if (selectedSlots.includes(id)) {
       setSelectedSlots(selectedSlots.filter((slotId) => slotId !== id));
     } else {
-      if (selectedSlots.length < allowedSlots) {
+      if ((examSlotDetail + selectedSlots.length) < allowedSlots) {
         setSelectedSlots([...selectedSlots, id]);
       } else {
         message.warning(`You can only select up to ${allowedSlots} slots.`);
@@ -177,7 +193,8 @@ function InvigilatorRegistration() {
           >
             Register
           </Button>
-          <p>Alloted Slots: {examSlotDetailSet} / {allowedSlots}</p>
+          <p>Registered Slots: {examSlotDetail} / {allowedSlots}</p>
+          <p>Selected Slots: {selectedSlots.length}</p>
         </div>
       </div>
     </div>
