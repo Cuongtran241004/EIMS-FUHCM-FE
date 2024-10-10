@@ -70,11 +70,10 @@ export default function Login({setIsLogin}) {
       localStorage.setItem('firstName', userInfo.firstName);
       localStorage.setItem('lastName', userInfo.lastName);
       localStorage.setItem('id', userInfo.id);
-      console.log('user info ',userInfo);
 
-      // Set user information in context
       setUser(userInfo);
       setIsLogin(true);
+      window.location.reload();
     }
   };
 

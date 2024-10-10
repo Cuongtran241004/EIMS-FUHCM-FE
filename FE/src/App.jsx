@@ -18,7 +18,7 @@ import Attendance from "./pages/Staff/Attendance";
 import InvigilatorDashboard from "./pages/Invigilator/InvigilatorDashboard";
 import InvigilatorRegistration from "./pages/Invigilator/InvigilatorRegistration";
 import InvigilatorRequest from "./pages/Invigilator/InvigilatorRequest";
-import headerConfig from "./configs/headerConfig";
+import { SemesterProvider } from "./components/SemesterContext";
 
 function App() {
   const [isLogin, setIsLogin] = useState(false);
@@ -28,18 +28,28 @@ function App() {
   useEffect(() => {
     const initLogin = async () => {
       const name = await getUserInfo();
-      const userRole = localStorage.getItem("role");
+      if (name) {
+        const userRole = name.role.name || null;
+        setRole(userRole);
+      }
       setIsLogin(!!name);
-      setRole(userRole);
       setIsLoading(false);
     };
     initLogin();
   }, []);
 
+
+  useEffect(() => {
+
+    if (isLogin) {
+
+    }
+  }, [isLogin]);
+
   const renderRoutes = () => {
     return (
       <Routes>
-        {role === "Manager" && (
+        {role === "manager" && (
           <>
             <Route path="/" element={<Dashboard />} />
             <Route path="/semester" element={<Semester />} />
@@ -49,7 +59,7 @@ function App() {
           </>
         )}
 
-        {role === "Staff" && (
+        {role === "staff" && (
           <>
             <Route path="/" element={<Subject />} />
             <Route path="/exam" element={<Exam />} />
@@ -58,7 +68,7 @@ function App() {
           </>
         )}
 
-        {role === "Invigilator" && (
+        {role === "invigilator" && (
           <>
             <Route path="/" element={<InvigilatorDashboard />} />
             <Route path="/register" element={<InvigilatorRegistration />} />
@@ -73,6 +83,7 @@ function App() {
 
   return (
     <>
+    
       <div className="container">
         {isLoading ? (
           <div>Loading...</div>
@@ -82,10 +93,15 @@ function App() {
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         ) : (
-
           <>
             <Header />
-            {renderRoutes()}
+            {role === "invigilator" ? (
+              <SemesterProvider>
+                {renderRoutes()}
+              </SemesterProvider>
+            ) : (
+              renderRoutes()
+            )}
           </>
         )}
       </div>
