@@ -25,7 +25,6 @@ export const SemesterProvider = ({ children }) => {
     }
   }, [semesters]);
 
-  console.log('availableSlotsData', availableSlotsData)
   return (
     <SemesterContext.Provider
       value={{

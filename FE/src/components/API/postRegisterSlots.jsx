@@ -13,7 +13,7 @@ export const postRegisterSlots = async (slots) => {
       },
     });
 
-    return response.status === 200;
+    return response.status === 201;
   } catch (e) {
     throw new Error(e.response?.data?.message || 'Error registering for slots.');
   }

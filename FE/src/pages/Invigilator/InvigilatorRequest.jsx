@@ -1,14 +1,13 @@
 import React, { useState } from 'react';
 import { Form, Input, Button, Select, message } from 'antd';
 import { useSemester } from '../../components/SemesterContext';
+import { postRequest } from '../../components/API/postRequest';
 
 const { Option } = Select;
 
 function InvigilatorRequest() {
   const {
-    semesters = [],
     selectedSemester,
-    setSelectedSemester,
     examSlotDetail: examSlots = [],
     loadingSemesters,
     loadingSchedules,
@@ -22,27 +21,31 @@ function InvigilatorRequest() {
       const { examSlot, reason } = values;
       const requestPayload = {
         fuId: id,
-        semesterInvigilatorAssignment: [
-          {
-            semesterId: selectedSemester,
-            examSlotDetailSet: [{ examSlotId: examSlot }],
-          },
-        ],
+        examSlotId: examSlot,
         reason,
       };
       console.log('Request Payload:', requestPayload);
+      try {
+        const success = await postRequest(requestPayload);
+        if (success) {
+          message.success('Request submitted successfully');
+          form.resetFields();
+        } else {
+          message.error('Error Request.');
+        }
+      } catch (e) {
+        message.error(e.message || 'Error Request.');
+      }
 
-      message.success('Request submitted successfully');
+      
     } catch (e) {
       console.error('Submit Error:', e.message);
       message.error('Error submitting the request');
     }
   };
+ 
 
-  const handleSemesterChange = (value) => {
-    const selected = semesters.find((semester) => semester.id === parseInt(value));
-    setSelectedSemester(selected);
-  };
+
 
   return (
     <div style={{ paddingLeft: 100, paddingRight: 100, paddingTop: 10 }}>
@@ -50,23 +53,6 @@ function InvigilatorRequest() {
         <div>Loading...</div>
       ) : (
         <Form form={form} layout="vertical" onFinish={onFinish}>
-          <Form.Item
-            label="Semester"
-            name="semester"
-            rules={[{ required: true, message: 'Please select a semester' }]}
-          >
-            <Select
-              placeholder="Select Semester"
-              onChange={handleSemesterChange}
-              value={selectedSemester?.id}
-            >
-              {semesters.map((semester) => (
-                <Option key={semester.id} value={semester.id}>
-                  {semester.name}
-                </Option>
-              ))}
-            </Select>
-          </Form.Item>
 
           <Form.Item
             label="Exam slot"

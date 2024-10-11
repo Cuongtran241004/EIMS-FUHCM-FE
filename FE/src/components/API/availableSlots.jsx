@@ -2,7 +2,7 @@ import axios from 'axios';
 
 export const availableSlots = async (semesterId) => {
   const API_URL = import.meta.env.VITE_APP_API_URL;
-  const path = '/examslots/by-semester/';
+  const path = '/invigilators/register/semesterid=';
   try {
     const response = await axios.get(`${API_URL}${path}${semesterId}`, {
       withCredentials: true,

@@ -6,6 +6,7 @@ import { postRegisterSlots } from '../../components/API/postRegisterSlots';
 import { getSemester } from '../../components/API/getSemester';
 import { availableSlots } from '../../components/API/availableSlots';
 import { schedules } from '../../components/API/schedules';
+import { useSemester } from '../../components/SemesterContext';
 import { Calendar, momentLocalizer } from 'react-big-calendar';
 import moment from 'moment';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
@@ -14,71 +15,18 @@ const localizer = momentLocalizer(moment);
 
 function InvigilatorRegistration() {
   const { user } = useContext(UserContext);
-  const [selectedSemester, setSelectedSemester] = useState(null);
-  const [semesters, setSemesters] = useState([]);
+  const { semesters = [], selectedSemester, setSelectedSemester, examSlotDetail, availableSlotsData } = useSemester();
   const [events, setEvents] = useState([]);
   const [selectedSlots, setSelectedSlots] = useState([]);
-  const [examSlotDetail, setExamSlotDetail] = useState(0)
-  const allowedSlots = selectedSemester?.allowedSlotConfig ;
+  const allowedSlots = selectedSemester?.allowedSlotConfig;
 
-  useEffect(() => {
-    const fetchSemester = async () => {
-      try {
-        const response = await getSemester();
-        setSemesters(response);
 
-        // Set selectedSemester to the latest semester
-        if (response.length > 0) {
-          const latest = response.reduce(
-            (latest, current) => (current.id > latest.id ? current : latest),
-            response[0]
-          );
-          setSelectedSemester(latest);
-        }
-      } catch (e) {
-        console.error('getSemester Error: ', e.message);
-        message.error(e.message || 'Error fetching semesters.');
-      }
-    };
-    fetchSemester();
-  }, []);
 
   useEffect(() => {
     if (selectedSemester) {
-      const fetchSchedules = async () => {
-        try {
-          const obj = await availableSlots(selectedSemester.id);
-          const arrayFromObject = [];
-          const objectPro = Object.entries(obj || {});
-          for (const [key, value] of objectPro) {
-            arrayFromObject.push(value);
-          }
-          setEvents(arrayFromObject);
-        } catch (e) {
-          console.error('fetchSchedules Error: ', e.message);
-          message.error(e.message || 'Error fetching available slots.');
-        }
-      };
-      fetchSchedules();
+      setEvents(availableSlotsData);
     }
   }, [selectedSemester]);
-
-  useEffect(() => {
-    if (selectedSemester) {
-      const fetchSchedules = async () => {
-        try {
-          const obj = await schedules(selectedSemester.id);
-          const examSlotDetailSet = obj.semesterInvigilatorAssignment[0].examSlotDetailSet; 
-          setExamSlotDetail(examSlotDetailSet.length);
-          
-        } catch (e) {
-          console.error('fetchSchedules Error: ', e.message);
-        }
-      };
-      fetchSchedules();
-    }
-  }, [selectedSemester]);
-
 
   const handleMenuClick = (e) => {
     const selected = semesters.find((semester) => semester.id === parseInt(e.key));
@@ -96,25 +44,26 @@ function InvigilatorRegistration() {
   };
 
   const handleSelectEvent = (event) => {
-    const { id } = event;
+    const { examSlotId } = event;
 
     if (!selectedSemester) {
       message.warning('Please select a semester first.');
       return;
     }
 
-    
 
-    if (selectedSlots.includes(id)) {
-      setSelectedSlots(selectedSlots.filter((slotId) => slotId !== id));
+
+    if (selectedSlots.includes(examSlotId)) {
+      setSelectedSlots(selectedSlots.filter((slotId) => slotId !== examSlotId));
     } else {
-      if ((examSlotDetail + selectedSlots.length) < allowedSlots) {
-        setSelectedSlots([...selectedSlots, id]);
+      if ((examSlotDetail.length + selectedSlots.length) < allowedSlots) {
+        setSelectedSlots([...selectedSlots, examSlotId]);
       } else {
         message.warning(`You can only select up to ${allowedSlots} slots.`);
       }
     }
   };
+  console.log('selectedSlots:', selectedSlots);
 
   const handleRegister = async () => {
     if (!selectedSemester) {
@@ -127,8 +76,17 @@ function InvigilatorRegistration() {
       return;
     }
 
-    const registeredSlots = events.filter((slot) => selectedSlots.includes(slot.id));
-    const slotIds = registeredSlots.map((slot) => slot.id);
+    const flatEvents = events.flatMap((subArray) => subArray);
+
+    const registeredSlots = flatEvents.filter((slot) =>
+      selectedSlots.includes(slot.examSlotId)
+    );
+
+
+
+    console.log('registeredSlots:', registeredSlots)
+
+    const slotIds = registeredSlots.map((slot) => slot.examSlotId);
     const slots = {
       fuId: user.id,
       examSlotId: slotIds,
@@ -148,6 +106,7 @@ function InvigilatorRegistration() {
     }
   };
 
+
   const EventComponent = ({ event }) => (
     <span>
       {new Date(event.startAt).toLocaleTimeString()} - {new Date(event.endAt).toLocaleTimeString()}
@@ -159,26 +118,46 @@ function InvigilatorRegistration() {
       <div style={{ display: 'flex', alignItems: 'flex-start' }}>
         <Calendar
           localizer={localizer}
-          events={events}
+          events={events[1]}
           startAccessor={(event) => new Date(event.startAt)}
           endAccessor={(event) => new Date(event.endAt)}
           style={{ height: 500, margin: '50px', width: '70%' }}
           components={{ event: EventComponent }}
           onSelectEvent={handleSelectEvent}
           eventPropGetter={(event) => {
-            const isSelected = selectedSlots.includes(event.id);
+            const isSelected = selectedSlots.includes(event.examSlotId);
+            let backgroundColor;
+            let isSelectable = true; 
+            switch (event.status) {
+              case 'REGISTERED':
+                backgroundColor = '#52c41a'; 
+                isSelectable = false; 
+                break;
+              case 'FULL':
+                backgroundColor = '#ff4d4f';
+                isSelectable = false;
+                break;
+              case 'NOT_FULL':
+              default:
+                backgroundColor = isSelected ? '#1890ff' : '#ddd'; 
+                isSelectable = true;
+                break;
+            }
+          
             return {
               style: {
-                backgroundColor: isSelected ? '#1890ff' : '#ddd',
+                backgroundColor,
                 border: '1px solid #ddd',
-                color: isSelected ? 'white' : 'black',
+                color: backgroundColor === '#ddd' ? 'black' : 'white',
+                cursor: isSelectable ? 'pointer' : 'not-allowed',
               },
             };
           }}
+          
         />
         <div style={{ marginTop: 40 }}>
-          <Dropdown menu={menu} trigger={['click'] } >
-            <Button size="large" style={{width: '100%'}}>
+          <Dropdown menu={menu} trigger={['click']} >
+            <Button size="large" style={{ width: '100%' }}>
               <Space>
                 {selectedSemester ? selectedSemester.name : 'No Semesters Available'}
                 <DownOutlined />
@@ -193,7 +172,7 @@ function InvigilatorRegistration() {
           >
             Register
           </Button>
-          <p>Registered Slots: {examSlotDetail} / {allowedSlots}</p>
+          <p>Registered Slots: {examSlotDetail.length} / {allowedSlots}</p>
           <p>Selected Slots: {selectedSlots.length}</p>
         </div>
       </div>

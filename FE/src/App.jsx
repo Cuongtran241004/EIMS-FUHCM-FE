@@ -19,6 +19,7 @@ import InvigilatorDashboard from "./pages/Invigilator/InvigilatorDashboard";
 import InvigilatorRegistration from "./pages/Invigilator/InvigilatorRegistration";
 import InvigilatorRequest from "./pages/Invigilator/InvigilatorRequest";
 import { SemesterProvider } from "./components/SemesterContext";
+import InvigilatorRequestsList from "./pages/Invigilator/InvigilatorRequestList";
 
 function App() {
   const [isLogin, setIsLogin] = useState(false);
@@ -70,9 +71,10 @@ function App() {
 
         {role === "invigilator" && (
           <>
-            <Route path="/" element={<InvigilatorDashboard />} />
+            <Route path="/" element={<InvigilatorDashboard />}/>
             <Route path="/register" element={<InvigilatorRegistration />} />
-            <Route path="/request" element={<InvigilatorRequest />} />
+            <Route path="/request/send" element={<InvigilatorRequest />} />
+            <Route path="/request/view" element={<InvigilatorRequestsList />} />
           </>
         )}
 

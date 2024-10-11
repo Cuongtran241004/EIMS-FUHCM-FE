@@ -15,7 +15,13 @@ const headerConfig = {
     Invigilator: [
       { name: "Dashboard", path: "/" },
       { name: "Register", path: "/register" },
-      { name: "Request", path: "/request" },
+      {
+        name: "Request",
+        subMenu: [
+          { name: "Send request", path: "/request/send" },
+          { name: "View requests", path: "/request/view" },
+        ],
+      },
     ],
   };
   
