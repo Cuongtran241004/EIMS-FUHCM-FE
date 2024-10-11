@@ -53,7 +53,7 @@ const Exam_Schedule = () => {
     try {
       const result = await examSlotApi.getExamSlotBySemesterId(semesterId);
       console.log(result);
-      setExamSchedule(result);
+      setExamSchedule(result || []);
     } catch (error) {
       message.error("Failed to load exam schedule. Please try again.");
     }
@@ -111,7 +111,51 @@ const Exam_Schedule = () => {
       message.error("Failed to delete exam");
     }
   };
+  const handleSubmit = async (values) => {
+    const selectedExam = exams.find((exam) => exam.id === values.exam);
+    const selectedDate = values.date.format("YYYY-MM-DD");
+    const startTime = values.startTime.format("HH:mm");
+    const endTime = values.endTime.format("HH:mm");
 
+    const examSlotData = {
+      examSlotId: isEditing ? editingExamSlot.id : null,
+      subjectExamId: selectedExam.id,
+      startAt: `${selectedDate}T${startTime}:00Z`,
+      endAt: `${selectedDate}T${endTime}:00Z`,
+      requiredInvigilators: 15,
+    };
+    if (isEditing) {
+      try {
+        await examSlotApi.updateExamSlot(examSlotData); // API call to update exam slot
+        message.success("Exam slot updated successfully.");
+        fetchExamSchedule(selectedSemester.id); // Refresh schedule
+        setExamSchedule((prev) =>
+          prev.map((slot) =>
+            slot.id === editingExamSlot.id ? examSlotData : slot
+          )
+        );
+      } catch (error) {
+        message.error("Failed to update exam slot.");
+      }
+    } else {
+      try {
+        console.log(examSlotData);
+        await examSlotApi.addExamSlot(examSlotData); // API call to create new exam slot
+        message.success("Exam slot added successfully.");
+        fetchExamSchedule(selectedSemester.id); // Refresh schedule
+        setExamSchedule((prev) => [...prev, examSlotData]);
+      } catch (error) {
+        message.error("Failed to add exam slot.");
+      }
+    }
+
+    handleCancel();
+  };
+
+  const handleCancel = () => {
+    setIsEditing(false);
+    form.resetFields();
+  };
   const columns = [
     {
       title: "Subject",
@@ -185,57 +229,13 @@ const Exam_Schedule = () => {
   ];
   // Handle semester selection change
   const handleMenuClick = (e) => {
-    console.log(semesters);
     const selected = semesters.find((semester) => semester.id == e.key);
-    console.log(selected);
     if (selected) {
       setSelectedSemester({
         id: selected.id,
         name: selected.name,
       });
     }
-  };
-  const handleSubmit = async (values) => {
-    const selectedExam = exams.find((exam) => exam.id === values.exam);
-    const selectedDate = values.date.format("YYYY-MM-DD");
-    const startTime = values.startTime.format("HH:mm");
-    const endTime = values.endTime.format("HH:mm");
-
-    const examSlotData = {
-      examSlotId: isEditing ? editingExamSlot.id : null,
-      subjectExamId: selectedExam.id,
-      startAt: `${selectedDate}T${startTime}:00Z`,
-      endAt: `${selectedDate}T${endTime}:00Z`,
-      requiredInvigilators: 15,
-    };
-    if (isEditing) {
-      try {
-        await examSlotApi.updateExamSlot(examSlotData); // API call to update exam slot
-        message.success("Exam slot updated successfully.");
-        setExamSchedule((prev) =>
-          prev.map((slot) =>
-            slot.id === editingExamSlot.id ? examSlotData : slot
-          )
-        );
-      } catch (error) {
-        message.error("Failed to update exam slot.");
-      }
-    } else {
-      try {
-        console.log(examSlotData);
-        await examSlotApi.addExamSlot(examSlotData); // API call to create new exam slot
-        message.success("Exam slot added successfully.");
-        setExamSchedule((prev) => [...prev, examSlotData]);
-      } catch (error) {
-        message.error("Failed to add exam slot.");
-      }
-    }
-    handleCancel();
-  };
-
-  const handleCancel = () => {
-    setIsEditing(false);
-    form.resetFields();
   };
 
   const validateTime = (rule, value) => {
@@ -349,8 +349,8 @@ const Exam_Schedule = () => {
           <Spin spinning={loading}>
             <Table
               dataSource={examSchedule.map((item) => ({
-                subjectName: item.subjectExamId.subjectId.name,
-                examType: item.subjectExamId.examType,
+                subjectName: item.subjectExamId?.subjectId?.name || "Loading",
+                examType: item.subjectExamId?.examType || "Loading",
                 startAt: item.startAt,
                 endAt: item.endAt,
                 key: item.id,

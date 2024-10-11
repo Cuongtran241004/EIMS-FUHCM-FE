@@ -387,7 +387,20 @@ const Users = ({ isLogin }) => {
                   { required: true, message: "Please input department!" },
                 ]}
               >
-                <Input placeholder="Enter department" />
+                <Select placeholder="Select department">
+                  <Select.Option value="English">English</Select.Option>
+                  <Select.Option value="Japanese">Japanese</Select.Option>
+                  <Select.Option value="Soft Skill">Soft Skill</Select.Option>
+                  <Select.Option value="Computer Science">
+                    Computer Science
+                  </Select.Option>
+                  <Select.Option value="Graphic Design">
+                    Graphic Design
+                  </Select.Option>
+                  <Select.Option value="International Bussiness">
+                    International Bussiness
+                  </Select.Option>
+                </Select>
               </Form.Item>
             </Col>
 
