@@ -10,7 +10,7 @@ function InvigilatorRequestsList() {
         const fetchRequests = async () => {
             setLoading(true);
             try {
-                const response = await getRequests(); // Gọi API mà không cần truyền gì cả
+                const response = await getRequests(); 
                 setRequests(response);
             } catch (error) {
                 console.error('fetchRequests Error:', error.message);
@@ -59,6 +59,7 @@ function InvigilatorRequestsList() {
             title: 'Reason',
             dataIndex: 'reason',
             key: 'reason',
+            width: 200, 
         },
         {
             title: 'Status',
@@ -79,22 +80,37 @@ function InvigilatorRequestsList() {
                   default:
                     color = '#000';
                 }
-          
                 return <span style={{ color, fontWeight: 'bold' }}>{status}</span>;
-              },
+            },
         },
+        {
+            title: 'Updated At',
+            dataIndex: 'updatedAt',
+            key: 'updatedAt',
+            render: (text, record) => {
+                if (record.status === 'APPROVED' || record.status === 'REJECTED') {
+                    return new Date(text).toLocaleString();
+                }
+                return null;
+            },
+        }
     ];
 
-
     return (
-        <div style={{ padding: 20 }}>
+        <div style={{ padding: 20, height: '100%' }}>
             <h2>Submitted Requests</h2>
             <Table
                 columns={columns}
                 dataSource={requests}
                 loading={loading}
                 rowKey="requestId"
-                pagination={{ pageSize: 10 }}
+                pagination={{
+                    pageSize: 4,
+                    showSizeChanger: false, 
+                    showQuickJumper: false,
+                    position: ['bottomCenter'], 
+                }}
+                style={{ maxWidth: '100%', minWidth: '800px' }}
             />
         </div>
     );

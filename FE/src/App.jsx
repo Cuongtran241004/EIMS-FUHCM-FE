@@ -56,7 +56,7 @@ function App() {
             <Route path="/semester" element={<Semester />} />
             <Route path="/staffs" element={<Staff />} />
             <Route path="/invigilators" element={<Invigilator />} />
-            <Route path="/exam-slot" element={<ConfigSettings />} />
+            <Route path="/request" element={<Request />} />
           </>
         )}
 
