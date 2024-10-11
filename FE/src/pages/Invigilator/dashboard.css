@@ -1,0 +1,61 @@
+/* Custom styles for react-big-calendar to match Ant Design */
+
+.rbc-calendar {
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  background-color: #fff; /* Ant Design background color */
+}
+
+.rbc-header {
+  background-color: #f0f0f0; /* Light grey for header */
+  border-bottom: 1px solid #ddd; /*Border to separate header*/
+  text-align: center;
+  font-weight: 500;
+  color: rgba(0, 0, 0, 0.85);
+}
+
+.rbc-day-slot {
+  border-right: 1px solid #ddd; /* Right border for slots */
+}
+
+.rbc-event {
+  background-color: #1890ff; /* Primary color for events (Ant Design blue) */
+  color: white; /* White text for contrast */
+  border-radius: 4px; /* Rounded corners */
+  padding: 5px;
+  text-align: center;
+  cursor: pointer; /* Pointer on hover */
+}
+
+.rbc-event:hover {
+  background-color: #40a9ff; /* Lighter blue on hover */
+}
+
+.rbc-selected {
+  background-color: #40a9ff; /* Light blue for selected events */
+}
+
+.rbc-month-view {
+  overflow: hidden; /* Prevent overflow */
+}
+
+.rbc-month-view .rbc-row {
+  border-bottom: 1px solid #f0f0f0; /* Separator between rows */
+}
+
+.rbc-day-slot .rbc-time-slot {
+  border: none; /* Remove border between time slots */
+}
+
+/* Optional: Styles for today’s date */
+.rbc-today {
+  background-color: #e6f7ff; /* Light blue background for today */
+}
+
+.rbc-month-row .rbc-row {
+  border-bottom: none;
+}
+
+.rbc-agenda-time-cell {
+  border-left: 1px solid #ddd;
+}

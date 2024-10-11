@@ -1,5 +1,5 @@
 import React, { useContext, useState, useEffect } from "react";
-import { UserContext } from "../API/UserContext";
+import { UserContext } from "../UserContext.jsx";
 import { Link, useNavigate } from "react-router-dom";
 import headerConfig from "./Header";
 import { Button, Space, Dropdown } from "antd";
@@ -27,7 +27,7 @@ const menuProps = {
 const Header = () => {
   const { user } = useContext(UserContext);
 
-  const currentHeader = headerConfig["Staff"];
+  const currentHeader = headerConfig[user.role];
 
   return (
     <div className="header">

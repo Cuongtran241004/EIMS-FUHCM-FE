@@ -1,5 +1,5 @@
 import React, { useContext } from "react";
-import { UserContext } from "../../components/API/UserContext";
+import { UserContext } from "../../components/UserContext";
 import GoogleLogin from "../../components/API/GoogleLogin";
 import { postLoginToken } from "../../components/api/postLoginToken";
 import "./Login.css";

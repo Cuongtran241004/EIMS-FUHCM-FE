@@ -12,6 +12,9 @@ import Subject from "./pages/Staff/Subject";
 import Exam from "./pages/Staff/Exam";
 import Exam_Schedule from "./pages/Staff/Exam_Schedule";
 import Attendance from "./pages/Staff/Attendance";
+import InvigilatorDashboard from "./pages/Invigilator/InvigilatorDashboard";
+import InvigilatorRegistration from "./pages/Invigilator/InvigilatorRegistration";
+import InvigilatorRequest from "./pages/Invigilator/InvigilatorRequest";
 import {
   MANAGER_ATTENDENCE_CHECK_URL,
   MANAGER_DASHBOARD_URL,
@@ -29,27 +32,32 @@ import AttendanceCheck from "./pages/Manager/AttendanceCheck";
 function App() {
   const [isLogin, setIsLogin] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [role, setRole] = useState(null);
 
   useEffect(() => {
     const initLogin = async () => {
       const name = await getUserInfo();
+      if (name) {
+        const userRole = name.role.name || null;
+        setRole(userRole);
+      }
       setIsLogin(!!name);
       setIsLoading(false);
     };
     initLogin();
+  }, []);
+
+  useEffect(() => {
+    if (isLogin) {
+    }
   }, [isLogin]);
 
-  return (
-    <>
-      <div className="container">
-        {!isLogin ? (
-          <Routes>
-            <Route path="/" element={<Login setIsLogin={setIsLogin} />} />
-            <Route path="*" element={<Navigate to="/" replace />} />
-          </Routes>
-        ) : (
-          <Routes>
-            {/* <Route path={MANAGER_DASHBOARD_URL} element={<Dashboard />} />
+  const renderRoutes = () => {
+    return (
+      <Routes>
+        {role === "manager" && (
+          <>
+            <Route path={MANAGER_DASHBOARD_URL} element={<Dashboard />} />
             <Route path={MANAGER_SEMESTER_URL} element={<Semester />} />
             <Route path={MANAGER_USERS_URL} element={<User />} />
             <Route path={MANAGER_REQUESTS_URL} element={<Request />} />
@@ -61,8 +69,12 @@ function App() {
             <Route
               path="*"
               element={<Navigate to={MANAGER_DASHBOARD_URL} replace />}
-            /> */}
+            />
+          </>
+        )}
 
+        {role === "staff" && (
+          <>
             <Route path={STAFF_SUBJECT_URL} element={<Subject />} />
             <Route path={STAFF_EXAM_URL} element={<Exam />} />
             <Route path={STAFF_EXAM_SCHEDULE_URL} element={<Exam_Schedule />} />
@@ -71,7 +83,30 @@ function App() {
               path="*"
               element={<Navigate to={STAFF_SUBJECT_URL} replace />}
             />
+          </>
+        )}
+
+        {role === "invigilator" && (
+          <>
+            <Route path="/" element={<InvigilatorDashboard />} />
+            <Route path="/register" element={<InvigilatorRegistration />} />
+            <Route path="/request" element={<InvigilatorRequest />} />
+          </>
+        )}
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    );
+  };
+  return (
+    <>
+      <div className="container">
+        {!isLogin ? (
+          <Routes>
+            <Route path="/" element={<Login setIsLogin={setIsLogin} />} />
+            <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
+        ) : (
+          renderRoutes()
         )}
       </div>
     </>
