@@ -19,7 +19,7 @@ import semesterApi from "../../services/Semester.js";
 import examApi from "../../services/Exam.js";
 import { DeleteOutlined, DownOutlined, EditOutlined } from "@ant-design/icons";
 import Header from "../../components/Header/Header.jsx";
-
+import { useSemester } from "../../components/Context/SemesterContext.jsx";
 const { Content, Sider } = Layout;
 const { Option } = Select;
 
@@ -28,7 +28,7 @@ const Exam = () => {
   const [loading, setLoading] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [editingExam, setEditingExam] = useState(null);
-  const [selectedSemester, setSelectedSemester] = useState(null); // Initialize with null to wait for semester loading
+  const { selectedSemester, setSelectedSemester } = useSemester(); // Access shared semester state
   const [semesters, setSemesters] = useState([]);
   const [subjects, setSubjects] = useState([]);
   const [filteredSubjects, setFilteredSubjects] = useState([]);

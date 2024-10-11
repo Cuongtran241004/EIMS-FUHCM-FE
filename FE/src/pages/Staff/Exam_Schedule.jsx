@@ -21,7 +21,8 @@ import semesterApi from "../../services/Semester.js";
 import examApi from "../../services/Exam.js";
 import examSlotApi from "../../services/ExamSlot.js";
 import { DeleteOutlined, EditOutlined, DownOutlined } from "@ant-design/icons";
-
+import moment from "moment";
+import { useSemester } from "../../components/Context/SemesterContext";
 const { Option } = Select;
 const { Content } = Layout;
 
@@ -32,7 +33,7 @@ const Exam_Schedule = () => {
   const [loading, setLoading] = useState(true);
   const [exams, setExams] = useState([]);
   const [filteredExams, setFilteredExams] = useState([]);
-  const [selectedSemester, setSelectedSemester] = useState(null);
+  const { selectedSemester, setSelectedSemester } = useSemester(); // Access shared semester state
   const [isEditing, setIsEditing] = useState(false);
   const [editingExamSlot, setEditingExamSlot] = useState(null);
 
@@ -98,7 +99,7 @@ const Exam_Schedule = () => {
       );
       setFilteredExams(filtered);
     } else {
-      setFilteredExams(exams); // Reset to original list if search is empty
+      setFilteredExams(exams);
     }
   };
 
@@ -113,15 +114,15 @@ const Exam_Schedule = () => {
   };
   const handleSubmit = async (values) => {
     const selectedExam = exams.find((exam) => exam.id === values.exam);
-    const selectedDate = values.date.format("YYYY-MM-DD");
+    const selectedDate = values.date.format("DD-MM-YYYY");
     const startTime = values.startTime.format("HH:mm");
     const endTime = values.endTime.format("HH:mm");
 
     const examSlotData = {
       examSlotId: isEditing ? editingExamSlot.id : null,
       subjectExamId: selectedExam.id,
-      startAt: `${selectedDate}T${startTime}:00Z`,
-      endAt: `${selectedDate}T${endTime}:00Z`,
+      startAt: `${selectedDate}T${startTime}:00+07:00`,
+      endAt: `${selectedDate}T${endTime}:00+07:00`,
       requiredInvigilators: 15,
     };
     if (isEditing) {
@@ -171,7 +172,7 @@ const Exam_Schedule = () => {
       title: "Date",
       dataIndex: "startAt", // Use startAt to extract date
       key: "date",
-      render: (text) => new Date(text).toLocaleDateString(), // Format date
+      render: (text) => moment(text).format("DD-MM-YYYY"), // Format as DD-MM-YYYY
     },
     {
       title: "Start Time",

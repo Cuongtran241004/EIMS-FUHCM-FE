@@ -26,7 +26,7 @@ import subjectApi from "../../services/Subject.js";
 import semesterApi from "../../services/Semester.js";
 import { DeleteOutlined, DownOutlined, EditOutlined } from "@ant-design/icons";
 import Header from "../../components/Header/Header.jsx";
-
+import { useSemester } from "../../components/Context/SemesterContext.jsx";
 const { Content, Sider } = Layout;
 
 const Subject = () => {
@@ -34,10 +34,7 @@ const Subject = () => {
   const [loading, setLoading] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [editingSubject, setEditingSubject] = useState(null);
-  const [selectedSemester, setSelectedSemester] = useState({
-    id: null,
-    name: null,
-  });
+  const { selectedSemester, setSelectedSemester } = useSemester(); // Access shared semester state
   const [semesters, setSemesters] = useState([]);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [form] = Form.useForm();

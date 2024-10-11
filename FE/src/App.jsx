@@ -35,22 +35,24 @@ function App() {
   const [isLoading, setIsLoading] = useState(true);
   const [role, setRole] = useState(null);
 
-  const initLogin = async () => {
-    try {
-      const user = await getUserInfo();
-      if (user) {
-        const userRole = user.role.name || null;
-        setRole(userRole);
-        setIsLogin(true);
+  useEffect(() => {
+    const initLogin = async () => {
+      try {
+        const user = await getUserInfo();
+        if (user) {
+          const userRole = user.role.name || null;
+          setRole(userRole);
+          setIsLogin(true);
+        }
+      } catch (error) {
+        console.error("Failed to get user info:", error);
+      } finally {
+        setIsLoading(false);
       }
-    } catch (error) {
-      console.error("Failed to get user info:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+    };
 
-  initLogin();
+    initLogin();
+  }, []);
 
   const renderRoutes = () => {
     if (isLoading) {
@@ -116,7 +118,15 @@ function App() {
     );
   };
 
-  return <div className="container">{renderRoutes()}</div>;
+  return (
+    <div className="container">
+      {role === "staff" ? (
+        <SemesterProvider>{renderRoutes()}</SemesterProvider>
+      ) : (
+        renderRoutes()
+      )}
+    </div>
+  );
 }
 
 export default App;
