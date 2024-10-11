@@ -7,7 +7,7 @@ import {
   DELETE_SUBJECT_SUCCESS,
   DELETE_SUBJECT_FAILED,
   FETCH_SUBJECTS_FAILED,
-} from "../../configs/messages.jsx";
+} from "../../configs/messages.js";
 import {
   Layout,
   Button,
@@ -23,7 +23,6 @@ import {
   Row,
 } from "antd";
 import subjectApi from "../../services/Subject.js";
-import semesterApi from "../../services/Semester.js";
 import { DeleteOutlined, DownOutlined, EditOutlined } from "@ant-design/icons";
 import Header from "../../components/Header/Header.jsx";
 import { useSemester } from "../../components/Context/SemesterContext.jsx";
@@ -34,36 +33,11 @@ const Subject = () => {
   const [loading, setLoading] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [editingSubject, setEditingSubject] = useState(null);
-  const { selectedSemester, setSelectedSemester } = useSemester(); // Access shared semester state
-  const [semesters, setSemesters] = useState([]);
+  const { selectedSemester, setSelectedSemester, semesters } = useSemester(); // Access shared semester state
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [form] = Form.useForm();
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 8;
-
-  // Fetch semesters and set the default selected semester
-  useEffect(() => {
-    const fetchSemesters = async () => {
-      try {
-        const result = await semesterApi.getAllSemesters();
-        setSemesters(result);
-
-        const sortedSemesters = result.sort(
-          (a, b) => new Date(b.startAt) - new Date(a.startAt)
-        );
-
-        // Set default semester to the latest one
-        setSelectedSemester({
-          id: sortedSemesters[0]?.id,
-          name: sortedSemesters[0]?.name,
-        });
-      } catch (error) {
-        message.error("Failed to fetch semesters");
-      }
-    };
-
-    fetchSemesters();
-  }, []);
 
   // Fetch subjects whenever the selected semester changes
   useEffect(() => {
@@ -230,26 +204,31 @@ const Subject = () => {
               </Col>
               <Col>
                 <Button type="primary" onClick={handleOk}>
-                  {isEditing ? "Save" : "Add"}
+                  {isEditing ? "Update" : "Add"}
                 </Button>
               </Col>
             </Row>
           </Form>
         </Sider>
-        <Content style={{ padding: 24, margin: 0, background: "#fff" }}>
-          <Dropdown
-            menu={{
-              items,
-              onClick: handleMenuClick,
-            }}
-          >
-            <Button style={{ width: "150px" }}>
-              <Space>
-                {selectedSemester.name}
-                <DownOutlined />
-              </Space>
-            </Button>
-          </Dropdown>
+        <Content style={{ padding: 12, margin: 0, background: "#fff" }}>
+          <div style={{ display: "flex", alignItems: "center" }}>
+            <Dropdown
+              menu={{
+                items,
+                onClick: handleMenuClick,
+              }}
+            >
+              <Button style={{ width: "150px" }}>
+                <Space>
+                  {selectedSemester.name}
+                  <DownOutlined />
+                </Space>
+              </Button>
+            </Dropdown>
+            <span style={{ margin: "0 25%", fontSize: "20px" }}>
+              <h2>Subject Management</h2>
+            </span>
+          </div>
           <Spin spinning={loading}>
             <Table
               dataSource={data.map((item) => ({ ...item, key: item.id }))}

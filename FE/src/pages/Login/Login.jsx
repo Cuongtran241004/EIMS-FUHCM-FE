@@ -28,6 +28,7 @@ export default function Login({ setIsLogin }) {
         // Set user information in context
         setUser(userInfo);
         setIsLogin(true);
+        window.location.reload();
       }
     }
   };

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Form, Input, Button, Select, message } from "antd";
-import { useSemester } from "../../components/SemesterContext";
+import { useSemester } from "../../components/SemesterContext.jsx";
 
 const { Option } = Select;
 

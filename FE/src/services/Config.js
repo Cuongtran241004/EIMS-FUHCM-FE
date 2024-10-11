@@ -1,5 +1,5 @@
 import axios from "axios";
-import { API_BASE_URL } from "../configs/urlApi";
+import { API_BASE_URL } from "../configs/urlApi.js";
 const CONFIG_API_BASE_URL = `${API_BASE_URL}/config`;
 
 const handleError = (error) => {

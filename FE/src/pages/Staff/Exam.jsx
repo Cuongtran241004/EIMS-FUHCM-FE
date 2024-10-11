@@ -15,11 +15,11 @@ import {
   Select,
 } from "antd";
 import subjectApi from "../../services/Subject.js";
-import semesterApi from "../../services/Semester.js";
 import examApi from "../../services/Exam.js";
 import { DeleteOutlined, DownOutlined, EditOutlined } from "@ant-design/icons";
 import Header from "../../components/Header/Header.jsx";
 import { useSemester } from "../../components/Context/SemesterContext.jsx";
+import { examType } from "../../configs/data.js";
 const { Content, Sider } = Layout;
 const { Option } = Select;
 
@@ -28,8 +28,7 @@ const Exam = () => {
   const [loading, setLoading] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [editingExam, setEditingExam] = useState(null);
-  const { selectedSemester, setSelectedSemester } = useSemester(); // Access shared semester state
-  const [semesters, setSemesters] = useState([]);
+  const { selectedSemester, setSelectedSemester, semesters } = useSemester(); // Access shared semester state
   const [subjects, setSubjects] = useState([]);
   const [filteredSubjects, setFilteredSubjects] = useState([]);
   const [form] = Form.useForm();
@@ -59,31 +58,6 @@ const Exam = () => {
       message.error("Failed to fetch subjects");
     }
   };
-
-  // Fetch semesters and set the default selected semester
-  useEffect(() => {
-    const fetchSemesters = async () => {
-      try {
-        const result = await semesterApi.getAllSemesters();
-        setSemesters(result);
-        const sortedSemesters = result.sort(
-          (a, b) => new Date(b.startAt) - new Date(a.startAt)
-        );
-
-        // Set the latest semester as the selected semester
-        if (sortedSemesters.length > 0) {
-          setSelectedSemester({
-            id: sortedSemesters[0]?.id,
-            name: sortedSemesters[0]?.name,
-          });
-        }
-      } catch (error) {
-        message.error("Failed to fetch semesters");
-      }
-    };
-
-    fetchSemesters();
-  }, []);
 
   // When selectedSemester changes, fetch both exams and subjects
   useEffect(() => {
@@ -235,10 +209,11 @@ const Exam = () => {
                   rules={[{ required: true, message: "Required" }]}
                 >
                   <Select placeholder="Exam type">
-                    <Option value="PE">PE</Option>
-                    <Option value="FE">FE</Option>
-                    <Option value="PE&FE">PE&FE</Option>
-                    <Option value="Midterm">Midterm</Option>
+                    {examType.map((type) => (
+                      <Option key={type} value={type}>
+                        {type}
+                      </Option>
+                    ))}
                   </Select>
                 </Form.Item>
               </Col>
@@ -267,7 +242,7 @@ const Exam = () => {
               </Col>
               <Col>
                 <Button type="primary" onClick={handleOk}>
-                  {isEditing ? "Save" : "Add"}
+                  {isEditing ? "Update" : "Add"}
                 </Button>
               </Col>
             </Row>
@@ -275,8 +250,8 @@ const Exam = () => {
         </Sider>
 
         {/* Content for Table and Dropdown */}
-        <Content style={{ padding: 24, margin: 0, background: "#fff" }}>
-          <Space>
+        <Content style={{ padding: 12, margin: 0, background: "#fff" }}>
+          <div style={{ display: "flex", alignItems: "center" }}>
             <Dropdown
               menu={{
                 items: semesters.map((sem) => ({
@@ -293,7 +268,10 @@ const Exam = () => {
                 </Space>
               </Button>
             </Dropdown>
-          </Space>
+            <span style={{ margin: "0 25%", fontSize: "20px" }}>
+              <h2>Exam Management</h2>
+            </span>
+          </div>
 
           <Spin spinning={loading}>
             <Table

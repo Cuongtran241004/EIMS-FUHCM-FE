@@ -33,13 +33,14 @@ import {
   FETCH_USERS_FAILED,
   IMPORT_USERS_SUCCESS,
   IMPORT_USERS_FAILED,
-} from "../../configs/messages.jsx";
+} from "../../configs/messages.js";
 import { User_Import_Excel } from "../../utils/User_Import_Excel.js";
 import { User_Excel_Template } from "../../utils/User_Excel_Template.js";
 
 import NavBar_Manager from "../../components/NavBar/NavBar_Manager.jsx";
 
 import Header from "../../components/Header/Header.jsx";
+import { departments } from "../../configs/data.js";
 const { Content, Sider } = Layout;
 
 const roleOptions = [
@@ -330,7 +331,7 @@ const Users = ({ isLogin }) => {
                 <Input placeholder="Enter FUID" />
               </Form.Item>
             </Col>
-            <Col span={9}>
+            <Col span={8}>
               <Form.Item
                 name="firstName"
                 label="First Name"
@@ -341,7 +342,7 @@ const Users = ({ isLogin }) => {
                 <Input placeholder="Enter first name" />
               </Form.Item>
             </Col>
-            <Col span={9}>
+            <Col span={10}>
               <Form.Item
                 name="lastName"
                 label="Last Name"
@@ -353,7 +354,7 @@ const Users = ({ isLogin }) => {
           </Row>
 
           <Row gutter={16}>
-            <Col span={15}>
+            <Col span={16}>
               <Form.Item
                 name="email"
                 label="Email"
@@ -365,7 +366,7 @@ const Users = ({ isLogin }) => {
                 <Input placeholder="Enter email" />
               </Form.Item>
             </Col>
-            <Col span={9}>
+            <Col span={8}>
               <Form.Item
                 name="phoneNumber"
                 label="Phone"
@@ -373,13 +374,13 @@ const Users = ({ isLogin }) => {
                   { required: true, message: "Please input phone number!" },
                 ]}
               >
-                <Input placeholder="Enter phone number" />
+                <Input placeholder="Phone number" />
               </Form.Item>
             </Col>
           </Row>
 
           <Row gutter={16}>
-            <Col span={8}>
+            <Col span={16}>
               <Form.Item
                 name="department"
                 label="Department"
@@ -388,18 +389,11 @@ const Users = ({ isLogin }) => {
                 ]}
               >
                 <Select placeholder="Select department">
-                  <Select.Option value="English">English</Select.Option>
-                  <Select.Option value="Japanese">Japanese</Select.Option>
-                  <Select.Option value="Soft Skill">Soft Skill</Select.Option>
-                  <Select.Option value="Computer Science">
-                    Computer Science
-                  </Select.Option>
-                  <Select.Option value="Graphic Design">
-                    Graphic Design
-                  </Select.Option>
-                  <Select.Option value="International Bussiness">
-                    International Bussiness
-                  </Select.Option>
+                  {departments.map((department) => (
+                    <Select.Option key={department} value={department}>
+                      {department}
+                    </Select.Option>
+                  ))}
                 </Select>
               </Form.Item>
             </Col>
@@ -419,19 +413,17 @@ const Users = ({ isLogin }) => {
                 </Select>
               </Form.Item>
             </Col>
-            <Col span={8}>
-              <Form.Item
-                name="gender"
-                label="Gender"
-                rules={[{ required: true, message: "Please select gender!" }]}
-              >
-                <Radio.Group>
-                  <Radio value={true}>Male</Radio>
-                  <Radio value={false}>Female</Radio>
-                </Radio.Group>
-              </Form.Item>
-            </Col>
           </Row>
+          <Form.Item
+            name="gender"
+            label="Gender"
+            rules={[{ required: true, message: "Please select gender!" }]}
+          >
+            <Radio.Group>
+              <Radio value={true}>Male</Radio>
+              <Radio value={false}>Female</Radio>
+            </Radio.Group>
+          </Form.Item>
         </Form>
       </Modal>
     </Layout>

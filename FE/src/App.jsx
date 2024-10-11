@@ -15,7 +15,7 @@ import InvigilatorRegistration from "./pages/Invigilator/InvigilatorRegistration
 import InvigilatorRequest from "./pages/Invigilator/InvigilatorRequest";
 import AttendanceCheck from "./pages/Manager/AttendanceCheck";
 import { getUserInfo } from "./components/API/getUserInfo";
-import { SemesterProvider } from "./components/SemesterContext";
+import { SemesterProvider } from "./components/Context/SemesterContext.jsx";
 import {
   MANAGER_ATTENDENCE_CHECK_URL,
   MANAGER_DASHBOARD_URL,
@@ -27,7 +27,7 @@ import {
   STAFF_EXAM_SCHEDULE_URL,
   STAFF_EXAM_URL,
   STAFF_SUBJECT_URL,
-} from "./configs/urlWeb";
+} from "./configs/urlWeb.js";
 import "./App.css";
 
 function App() {
@@ -35,30 +35,25 @@ function App() {
   const [isLoading, setIsLoading] = useState(true);
   const [role, setRole] = useState(null);
 
-  useEffect(() => {
-    const initLogin = async () => {
-      try {
-        const user = await getUserInfo();
-        if (user) {
-          const userRole = user.role.name || null;
-          setRole(userRole);
-          setIsLogin(true);
-        }
-      } catch (error) {
-        console.error("Failed to get user info:", error);
-      } finally {
-        setIsLoading(false);
+  const initLogin = async () => {
+    try {
+      const user = await getUserInfo();
+      if (user) {
+        const userRole = user.role.name || null;
+        setRole(userRole);
+        setIsLogin(true);
       }
-    };
-
+    } catch (error) {
+      console.error("Failed to get user info:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  useEffect(() => {
     initLogin();
   }, []);
 
   const renderRoutes = () => {
-    if (isLoading) {
-      return <div>Loading...</div>; // Display a spinner or a loading message while loading
-    }
-
     if (!isLogin) {
       return (
         <Routes>

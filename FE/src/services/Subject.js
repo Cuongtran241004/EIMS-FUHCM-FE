@@ -1,5 +1,5 @@
 import axios from "axios";
-import { API_BASE_URL } from "../configs/urlApi.jsx";
+import { API_BASE_URL } from "../configs/urlApi.js";
 const SUBJECT_API_BASE_URL = `${API_BASE_URL}/subjects`;
 
 const subjectApi = {

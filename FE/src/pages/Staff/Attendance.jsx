@@ -122,8 +122,8 @@ const Attendance = () => {
         ></Sider>
 
         {/* Content for Table */}
-        <Content style={{ padding: 24, margin: 0, background: "#fff" }}>
-          <Space>
+        <Content style={{ padding: 12, margin: 0, background: "#fff" }}>
+          <div style={{ display: "flex", alignItems: "center" }}>
             <Dropdown
               menu={{
                 items: semesters.map((sem) => ({
@@ -140,7 +140,11 @@ const Attendance = () => {
                 </Space>
               </Button>
             </Dropdown>
-          </Space>
+            <span style={{ margin: "0 25%", fontSize: "20px" }}>
+              <h2>Attendance Management</h2>
+            </span>
+          </div>
+
           <Spin spinning={loading}>
             <Table
               dataSource={data}

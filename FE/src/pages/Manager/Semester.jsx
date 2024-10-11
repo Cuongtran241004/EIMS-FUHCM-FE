@@ -23,7 +23,7 @@ import {
   EDIT_SEMESTER_FAILED,
   EDIT_SEMESTER_SUCCESS,
   FETCH_SEMESTERS_FAILED,
-} from "../../configs/messages.jsx";
+} from "../../configs/messages.js";
 import Header from "../../components/Header/Header.jsx";
 import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
 

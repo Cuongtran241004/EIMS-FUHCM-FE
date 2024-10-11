@@ -1,5 +1,5 @@
 import axios from "axios";
-import { API_BASE_URL } from "../configs/urlApi.jsx";
+import { API_BASE_URL } from "../configs/urlApi.js";
 const EXAM_SLOT_API_BASE_URL = `${API_BASE_URL}/examslots`;
 
 const handleError = (error) => {
@@ -36,7 +36,7 @@ const examSlotApi = {
       handleError(error);
     }
   },
-  getExamSlotBySemesterId: async (semesterId) => {
+  getExamSlotBySemesterId: async (semesterId, page = 1) => {
     try {
       const response = await axios.get(
         `${EXAM_SLOT_API_BASE_URL}/by-semester/${semesterId}`,
@@ -45,9 +45,13 @@ const examSlotApi = {
             "Content-Type": "application/json",
             Accept: "application/json",
           },
+          params: {
+            page,
+          },
           withCredentials: true,
         }
       );
+
       return response.data;
     } catch (error) {
       handleError(error);

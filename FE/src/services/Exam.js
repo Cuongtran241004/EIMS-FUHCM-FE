@@ -1,5 +1,5 @@
 import axios from "axios";
-import { API_BASE_URL } from "../configs/urlApi.jsx";
+import { API_BASE_URL } from "../configs/urlApi.js";
 const EXAM_API_BASE_URL = `${API_BASE_URL}/subjectexams`;
 
 const handleError = (error) => {
