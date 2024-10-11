@@ -1,13 +1,11 @@
 import { useState, useEffect } from "react";
-import Login from "./pages/Login/Login";
 import { Route, Routes, Navigate } from "react-router-dom";
-import "./App.css";
+import Login from "./pages/Login/Login";
 import User from "./pages/Manager/User";
 import Dashboard from "./pages/Manager/Dashboard";
 import Request from "./pages/Manager/Request";
 import Semester from "./pages/Manager/Semester";
 import ExamSlots from "./pages/Manager/ExamSlots";
-import { getUserInfo } from "./components/API/getUserInfo";
 import Subject from "./pages/Staff/Subject";
 import Exam from "./pages/Staff/Exam";
 import Exam_Schedule from "./pages/Staff/Exam_Schedule";
@@ -15,6 +13,9 @@ import Attendance from "./pages/Staff/Attendance";
 import InvigilatorDashboard from "./pages/Invigilator/InvigilatorDashboard";
 import InvigilatorRegistration from "./pages/Invigilator/InvigilatorRegistration";
 import InvigilatorRequest from "./pages/Invigilator/InvigilatorRequest";
+import AttendanceCheck from "./pages/Manager/AttendanceCheck";
+import { getUserInfo } from "./components/API/getUserInfo";
+import { SemesterProvider } from "./components/SemesterContext";
 import {
   MANAGER_ATTENDENCE_CHECK_URL,
   MANAGER_DASHBOARD_URL,
@@ -27,34 +28,47 @@ import {
   STAFF_EXAM_URL,
   STAFF_SUBJECT_URL,
 } from "./configs/urlWeb";
-import AttendanceCheck from "./pages/Manager/AttendanceCheck";
+import "./App.css";
 
 function App() {
   const [isLogin, setIsLogin] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [role, setRole] = useState(null);
 
-  useEffect(() => {
-    const initLogin = async () => {
-      const name = await getUserInfo();
-      if (name) {
-        const userRole = name.role.name || null;
+  const initLogin = async () => {
+    try {
+      const user = await getUserInfo();
+      if (user) {
+        const userRole = user.role.name || null;
         setRole(userRole);
+        setIsLogin(true);
       }
-      setIsLogin(!!name);
+    } catch (error) {
+      console.error("Failed to get user info:", error);
+    } finally {
       setIsLoading(false);
-    };
-    initLogin();
-  }, []);
-
-  useEffect(() => {
-    if (isLogin) {
     }
-  }, [isLogin]);
+  };
+
+  initLogin();
 
   const renderRoutes = () => {
+    if (isLoading) {
+      return <div>Loading...</div>; // Display a spinner or a loading message while loading
+    }
+
+    if (!isLogin) {
+      return (
+        <Routes>
+          <Route path="/" element={<Login setIsLogin={setIsLogin} />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      );
+    }
+
     return (
       <Routes>
+        {/* Manager Routes */}
         {role === "manager" && (
           <>
             <Route path={MANAGER_DASHBOARD_URL} element={<Dashboard />} />
@@ -73,6 +87,7 @@ function App() {
           </>
         )}
 
+        {/* Staff Routes */}
         {role === "staff" && (
           <>
             <Route path={STAFF_SUBJECT_URL} element={<Subject />} />
@@ -86,31 +101,22 @@ function App() {
           </>
         )}
 
+        {/* Invigilator Routes */}
         {role === "invigilator" && (
           <>
             <Route path="/" element={<InvigilatorDashboard />} />
             <Route path="/register" element={<InvigilatorRegistration />} />
             <Route path="/request" element={<InvigilatorRequest />} />
+            <Route path="*" element={<Navigate to="/" replace />} />
           </>
         )}
+
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     );
   };
-  return (
-    <>
-      <div className="container">
-        {!isLogin ? (
-          <Routes>
-            <Route path="/" element={<Login setIsLogin={setIsLogin} />} />
-            <Route path="*" element={<Navigate to="/" replace />} />
-          </Routes>
-        ) : (
-          renderRoutes()
-        )}
-      </div>
-    </>
-  );
+
+  return <div className="container">{renderRoutes()}</div>;
 }
 
 export default App;

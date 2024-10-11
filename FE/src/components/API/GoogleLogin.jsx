@@ -1,24 +1,36 @@
-import { useRef } from "react";
+import { useRef, useEffect } from "react";
+import PropTypes from "prop-types";
 import useScript from "../Hook/useScript";
-// https://github.com/anthonyjgrove/react-google-login/issues/502
-// https://developers.google.com/identity/gsi/web/reference/js-reference#CredentialResponse
-function GoogleLogin({ onGoogleSignIn = () => {}, text = "signin_with" }) {
+
+function GoogleLogin({
+  onGoogleSignIn = () => {},
+  text = "Sign in with Google",
+}) {
   const googleSignInButton = useRef(null);
 
   useScript("https://accounts.google.com/gsi/client", () => {
-    // https://developers.google.com/identity/gsi/web/reference/js-reference#google.accounts.id.initialize
-    window.google.accounts.id.initialize({
-      client_id: import.meta.env.VITE_APP_GOOGLE_CLIENT_ID,
-      callback: onGoogleSignIn,
-    });
-    // https://developers.google.com/identity/gsi/web/reference/js-reference#google.accounts.id.renderButton
-    window.google.accounts.id.renderButton(
-      googleSignInButton.current,
-      { theme: "filled_blue", size: "large", text, width: "250" } // customization attributes
-    );
+    try {
+      window.google.accounts.id.initialize({
+        client_id: import.meta.env.VITE_APP_GOOGLE_CLIENT_ID,
+        callback: onGoogleSignIn,
+      });
+      window.google.accounts.id.renderButton(googleSignInButton.current, {
+        theme: "filled_blue",
+        size: "large",
+        text,
+        width: "250",
+      });
+    } catch (error) {
+      console.error("Google Sign-In initialization error:", error);
+    }
   });
 
-  return <div ref={googleSignInButton}></div>;
+  return <div ref={googleSignInButton} aria-label={text}></div>;
 }
+
+GoogleLogin.propTypes = {
+  onGoogleSignIn: PropTypes.func,
+  text: PropTypes.string,
+};
 
 export default GoogleLogin;

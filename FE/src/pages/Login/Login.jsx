@@ -14,20 +14,21 @@ export default function Login({ setIsLogin }) {
     const result = await postLoginToken(credential);
     if (result) {
       const initInfo = await getUserInfo();
-      const userInfo = {
-        role: initInfo.role.name,
-        firstName: initInfo.firstName,
-        lastName: initInfo.lastName,
-      };
+      if (initInfo) {
+        const userInfo = {
+          role: initInfo.role.name,
+          firstName: initInfo.firstName,
+          lastName: initInfo.lastName,
+        };
+        // Save user information to localStorage
+        localStorage.setItem("role", userInfo.role);
+        localStorage.setItem("firstName", userInfo.firstName);
+        localStorage.setItem("lastName", userInfo.lastName);
 
-      // Save user information to localStorage
-      localStorage.setItem("role", userInfo.role);
-      localStorage.setItem("firstName", userInfo.firstName);
-      localStorage.setItem("lastName", userInfo.lastName);
-
-      // Set user information in context
-      setUser(userInfo);
-      setIsLogin(true);
+        // Set user information in context
+        setUser(userInfo);
+        setIsLogin(true);
+      }
     }
   };
 
