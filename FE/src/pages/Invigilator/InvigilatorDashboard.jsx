@@ -49,6 +49,7 @@ function InvigilatorDashboard() {
   );
   return (
     <div>
+      <h2 style={{marginTop: 10, marginBottom: 0, marginLeft: 50}}>Invigilator Dashboard</h2>
       <div style={{ display: 'flex', alignItems: 'flex-start' }}>
         <BigCalendar
           localizer={localizer}

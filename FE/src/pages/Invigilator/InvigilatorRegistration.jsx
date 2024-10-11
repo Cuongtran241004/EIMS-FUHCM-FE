@@ -115,6 +115,7 @@ function InvigilatorRegistration() {
 
   return (
     <div>
+      <h2 style={{marginTop: 10, marginBottom: 0, marginLeft: 50}}>Invigilator Register</h2>
       <div style={{ display: 'flex', alignItems: 'flex-start' }}>
         <Calendar
           localizer={localizer}
