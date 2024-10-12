@@ -40,12 +40,6 @@ function App() {
   }, []);
 
 
-  useEffect(() => {
-
-    if (isLogin) {
-
-    }
-  }, [isLogin]);
 
   const renderRoutes = () => {
     return (
@@ -71,7 +65,7 @@ function App() {
 
         {role === "invigilator" && (
           <>
-            <Route path="/" element={<InvigilatorDashboard />}/>
+            <Route path="/" element={<InvigilatorDashboard />} />
             <Route path="/register" element={<InvigilatorRegistration />} />
             <Route path="/request/send" element={<InvigilatorRequest />} />
             <Route path="/request/view" element={<InvigilatorRequestsList />} />
@@ -85,7 +79,7 @@ function App() {
 
   return (
     <>
-    
+
       <div className="container">
         {isLoading ? (
           <div>Loading...</div>
@@ -99,10 +93,35 @@ function App() {
             <Header />
             {role === "invigilator" ? (
               <SemesterProvider>
-                {renderRoutes()}
+                {/* {renderRoutes()} */}
+                <Routes>
+                  <Route path="/" element={<InvigilatorDashboard />} />
+                  <Route path="/register" element={<InvigilatorRegistration />} />
+                  <Route path="/request/send" element={<InvigilatorRequest />} />
+                  <Route path="/request/view" element={<InvigilatorRequestsList />} />
+                </Routes>
               </SemesterProvider>
             ) : (
-              renderRoutes()
+              <>
+                {role === "staff" ? (
+                  <Routes>
+                    <Route path="/" element={<Subject />} />
+                    <Route path="/exam" element={<Exam />} />
+                    <Route path="/exam-schedule" element={<Exam_Schedule />} />
+                    <Route path="/attendance" element={<Attendance />} />
+                  </Routes>
+                ) : ( //role is Manager
+                  <Routes>
+                    <Route path="/" element={<Dashboard />} />
+                    <Route path="/semester" element={<Semester />} />
+                    <Route path="/staffs" element={<Staff />} />
+                    <Route path="/invigilators" element={<Invigilator />} />
+                    <Route path="/request" element={<Request />} />
+                  </Routes>
+                )}
+              </>
+              // renderRoutes()
+
             )}
           </>
         )}

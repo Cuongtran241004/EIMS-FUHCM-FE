@@ -13,6 +13,4 @@ export const schedules = async (semesterId) => {
         }
     );
     return response.data;
-
-
 }

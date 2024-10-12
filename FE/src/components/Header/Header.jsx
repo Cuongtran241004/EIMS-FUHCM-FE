@@ -21,8 +21,6 @@ const Header = () => {
       label: (
         <div>
           <strong>{user.lastName} {user.firstName}</strong>
-          <br />
-          <span>{user.email}</span>
         </div>
       ),
     },

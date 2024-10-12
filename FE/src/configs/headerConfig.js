@@ -1,18 +1,18 @@
 const headerConfig = {
-    Manager: [
+    manager: [
       { name: "Dashboard", path: "/" },
       { name: "Semester", path: "/semester" },
       { name: "Staffs", path: "/staffs" },
       { name: "Invigilators", path: "/invigilators" },
       { name: "Exam Slot", path: "/exam-slot" },
     ],
-    Staff: [
+    staff: [
       { name: "Subject", path: "/" },
       { name: "Exam", path: "/exam" },
       { name: "Exam Schedule", path: "/exam-schedule" },
       { name: "Attendance", path: "/attendance" },
     ],
-    Invigilator: [
+    invigilator: [
       { name: "Dashboard", path: "/" },
       { name: "Register", path: "/register" },
       {

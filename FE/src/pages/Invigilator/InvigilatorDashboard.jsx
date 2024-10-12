@@ -44,12 +44,16 @@ function InvigilatorDashboard() {
 
   const EventComponent = ({ event }) => (
     <span>
-      {new Date(event.startAt).toLocaleString()} - {new Date(event.endAt).toLocaleString()}
+      {/* {new Date(event.startAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} - 
+       {new Date(event.endAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} */}
     </span>
   );
+
+ 
+
   return (
     <div>
-      <h2 style={{marginTop: 10, marginBottom: 0, marginLeft: 50}}>Invigilator Dashboard</h2>
+      <h2 style={{ marginTop: 10, marginBottom: 0, marginLeft: 50 }}>Invigilator Dashboard</h2>
       <div style={{ display: 'flex', alignItems: 'flex-start' }}>
         <BigCalendar
           localizer={localizer}
@@ -59,8 +63,9 @@ function InvigilatorDashboard() {
           endAccessor="endAt"
           style={{ height: 500, margin: '50px', width: '70%' }}
           components={{
-            event: EventComponent,
+          event: EventComponent,
           }}
+         
         />
         <Modal
           title="Details"
@@ -71,9 +76,9 @@ function InvigilatorDashboard() {
         >
           {selectedEvent && (
             <div>
-              <p>Exam Slot ID: {selectedEvent.examSlotId}</p>
-              <p>Start: {selectedEvent.startAt.toLocaleString()}</p>
-              <p>End: {selectedEvent.endAt.toLocaleString()}</p>
+              <p><strong>Date:</strong> {new Date(selectedEvent.startAt).toLocaleDateString()}</p>
+              <p><strong>Start Time:</strong> {new Date(selectedEvent.startAt).toLocaleTimeString()}</p>
+              <p><strong>End Time:</strong> {new Date(selectedEvent.endAt).toLocaleTimeString()}</p>
             </div>
           )}
         </Modal>

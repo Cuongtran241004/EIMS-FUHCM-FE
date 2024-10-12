@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Table, message } from 'antd';
+import { Table, message, Tag } from 'antd';
 import { getRequests } from '../../components/API/getRequests';
 
 function InvigilatorRequestsList() {
@@ -10,7 +10,7 @@ function InvigilatorRequestsList() {
         const fetchRequests = async () => {
             setLoading(true);
             try {
-                const response = await getRequests(); 
+                const response = await getRequests();
                 setRequests(response);
             } catch (error) {
                 console.error('fetchRequests Error:', error.message);
@@ -38,10 +38,12 @@ function InvigilatorRequestsList() {
             title: 'Slot Details',
             key: 'slotDetails',
             render: (record) => {
-                const startTime = new Date(record.startAt).toLocaleString();
-                const endTime = new Date(record.endAt).toLocaleString();
+                const date = new Date(record.startAt).toLocaleDateString();
+                const startTime = new Date(record.startAt).toLocaleTimeString();
+                const endTime = new Date(record.endAt).toLocaleTimeString();
                 return (
                     <div>
+                        <div><strong>Date:</strong> {date}</div>
                         <div><strong>Start:</strong> {startTime}</div>
                         <div><strong>End:</strong> {endTime}</div>
                     </div>
@@ -59,7 +61,7 @@ function InvigilatorRequestsList() {
             title: 'Reason',
             dataIndex: 'reason',
             key: 'reason',
-            width: 200, 
+            width: 200,
         },
         {
             title: 'Status',
@@ -68,20 +70,26 @@ function InvigilatorRequestsList() {
             render: (status) => {
                 let color;
                 switch (status) {
-                  case 'PENDING':
-                    color = '#faad14';
-                    break;
-                  case 'APPROVED':
-                    color = '#52c41a';
-                    break;
-                  case 'REJECTED':
-                    color = '#ff4d4f';
-                    break;
-                  default:
-                    color = '#000';
+                    case 'PENDING':
+                        color = 'orange';
+                        break;
+                    case 'APPROVED':
+                        color = 'green';
+                        break;
+                    case 'REJECTED':
+                        color = 'red';
+                        break;
+                    default:
+                        color = 'default';
                 }
-                return <span style={{ color, fontWeight: 'bold' }}>{status}</span>;
+                return <Tag color={color}>{status}</Tag>;
             },
+        },
+        {
+            title: 'Note',
+            dataIndex: 'note',
+            key: 'note',
+            width: 200,
         },
         {
             title: 'Updated At',
@@ -93,7 +101,7 @@ function InvigilatorRequestsList() {
                 }
                 return null;
             },
-        }
+        },
     ];
 
     return (
@@ -106,9 +114,9 @@ function InvigilatorRequestsList() {
                 rowKey="requestId"
                 pagination={{
                     pageSize: 4,
-                    showSizeChanger: false, 
+                    showSizeChanger: false,
                     showQuickJumper: false,
-                    position: ['bottomCenter'], 
+                    position: ['bottomCenter'],
                 }}
                 style={{ maxWidth: '100%', minWidth: '800px' }}
             />

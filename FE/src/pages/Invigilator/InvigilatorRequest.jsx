@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Form, Input, Button, Select, message } from 'antd';
 import { useSemester } from '../../components/SemesterContext';
 import { postRequest } from '../../components/API/postRequest';
@@ -7,7 +7,6 @@ const { Option } = Select;
 
 function InvigilatorRequest() {
   const {
-    selectedSemester,
     examSlotDetail: examSlots = [],
     loadingSemesters,
     loadingSchedules,
@@ -24,7 +23,6 @@ function InvigilatorRequest() {
         examSlotId: examSlot,
         reason,
       };
-      console.log('Request Payload:', requestPayload);
       try {
         const success = await postRequest(requestPayload);
         if (success) {

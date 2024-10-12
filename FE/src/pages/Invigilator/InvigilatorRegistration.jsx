@@ -84,7 +84,6 @@ function InvigilatorRegistration() {
 
 
 
-    console.log('registeredSlots:', registeredSlots)
 
     const slotIds = registeredSlots.map((slot) => slot.examSlotId);
     const slots = {
@@ -108,43 +107,46 @@ function InvigilatorRegistration() {
 
 
   const EventComponent = ({ event }) => (
-    <span>
-      {new Date(event.startAt).toLocaleTimeString()} - {new Date(event.endAt).toLocaleTimeString()}
-    </span>
-  );
+    <div>
+      {/* <p style={{margin: 0, fontSize: 12}}>{new Date(event.startAt).toLocaleTimeString()}</p>
+      <p style={{margin: 0, fontSize: 12}}>{new Date(event.endAt).toLocaleTimeString()}</p> */}
+      
+    </div>
 
+
+  );
+  console.log('Event:', events);
   return (
     <div>
-      <h2 style={{marginTop: 10, marginBottom: 0, marginLeft: 50}}>Invigilator Register</h2>
+      <h2 style={{ marginTop: 10, marginBottom: 0, marginLeft: 50 }}>Invigilator Register</h2>
       <div style={{ display: 'flex', alignItems: 'flex-start' }}>
         <Calendar
           localizer={localizer}
-          events={events[1]}
+          events={availableSlotsData}
           startAccessor={(event) => new Date(event.startAt)}
           endAccessor={(event) => new Date(event.endAt)}
-          style={{ height: 500, margin: '50px', width: '70%' }}
+          style={{ height: 550, margin: '50px', width: '70%' }}
           components={{ event: EventComponent }}
           onSelectEvent={handleSelectEvent}
           eventPropGetter={(event) => {
             const isSelected = selectedSlots.includes(event.examSlotId);
             let backgroundColor;
-            let isSelectable = true; 
+            let isSelectable = true;
             switch (event.status) {
               case 'REGISTERED':
-                backgroundColor = '#52c41a'; 
-                isSelectable = false; 
+                backgroundColor = '#52c41a';
+                isSelectable = false;
                 break;
               case 'FULL':
                 backgroundColor = '#ff4d4f';
                 isSelectable = false;
                 break;
-              case 'NOT_FULL':
               default:
-                backgroundColor = isSelected ? '#1890ff' : '#ddd'; 
+                backgroundColor = isSelected ? '#1890ff' : '#ddd';
                 isSelectable = true;
                 break;
             }
-          
+
             return {
               style: {
                 backgroundColor,
@@ -154,7 +156,7 @@ function InvigilatorRegistration() {
               },
             };
           }}
-          
+
         />
         <div style={{ marginTop: 40 }}>
           <Dropdown menu={menu} trigger={['click']} >
@@ -173,6 +175,7 @@ function InvigilatorRegistration() {
           >
             Register
           </Button>
+          <Button>Cancel</Button>
           <p>Registered Slots: {examSlotDetail.length} / {allowedSlots}</p>
           <p>Selected Slots: {selectedSlots.length}</p>
         </div>

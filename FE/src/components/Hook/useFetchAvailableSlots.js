@@ -14,7 +14,7 @@ export const useFetchAvailableSlots = (semesterId) => {
       try {
         const response = await availableSlots(semesterId);
         const arrayFromObject = Object.values(response || {});
-        setAvailableSlotsData(arrayFromObject);
+        setAvailableSlotsData(arrayFromObject[1]);
       } catch (e) {
         console.error('Error fetching available slots:', e.message);
         setError(e.message || 'Error fetching available slots.');
