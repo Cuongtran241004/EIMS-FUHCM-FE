@@ -2,3 +2,7 @@
     font-weight: 900;
     display: none;
 }
+
+.ant-checkbox-wrapper {
+    justify-content: center;
+}
