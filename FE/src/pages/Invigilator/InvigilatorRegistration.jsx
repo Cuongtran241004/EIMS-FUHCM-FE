@@ -10,6 +10,7 @@ import { useSemester } from '../../components/SemesterContext';
 import { Calendar, momentLocalizer } from 'react-big-calendar';
 import moment from 'moment';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
+import './invigilatorRegistration.css'
 
 const localizer = momentLocalizer(moment);
 
@@ -108,8 +109,8 @@ function InvigilatorRegistration() {
 
   const EventComponent = ({ event }) => (
     <div>
-      {/* <p style={{margin: 0, fontSize: 12}}>{new Date(event.startAt).toLocaleTimeString()}</p>
-      <p style={{margin: 0, fontSize: 12}}>{new Date(event.endAt).toLocaleTimeString()}</p> */}
+      <p style={{margin: 0, fontWeight: 500, fontSize: 13.33333}}>{new Date(event.startAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}-
+      {new Date(event.endAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
       
     </div>
 
@@ -120,12 +121,12 @@ function InvigilatorRegistration() {
     <div>
       <h2 style={{ marginTop: 10, marginBottom: 0, marginLeft: 50 }}>Invigilator Register</h2>
       <div style={{ display: 'flex', alignItems: 'flex-start' }}>
-        <Calendar
+        <Calendar 
           localizer={localizer}
           events={availableSlotsData}
           startAccessor={(event) => new Date(event.startAt)}
           endAccessor={(event) => new Date(event.endAt)}
-          style={{ height: 550, margin: '50px', width: '70%' }}
+          style={{ height: 500, margin: '50px', width: '70%', fontWeight: 'lighter' }}
           components={{ event: EventComponent }}
           onSelectEvent={handleSelectEvent}
           eventPropGetter={(event) => {
@@ -138,7 +139,7 @@ function InvigilatorRegistration() {
                 isSelectable = false;
                 break;
               case 'FULL':
-                backgroundColor = '#ff4d4f';
+                backgroundColor = '#d9363e';
                 isSelectable = false;
                 break;
               default:
