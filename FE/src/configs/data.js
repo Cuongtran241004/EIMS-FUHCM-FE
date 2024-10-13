@@ -6,6 +6,7 @@ const departments = [
   "English",
   "English Preparation Course",
   "Entrepreneurship Development",
+  "Examination",
   "Finance",
   "Graduate",
   "Graphic Design",

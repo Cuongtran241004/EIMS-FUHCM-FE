@@ -172,11 +172,15 @@ const Semester = ({ isLogin }) => {
               minHeight: 280,
             }}
           >
-            <Space>
+            <div style={{ display: "flex", alignItems: "center" }}>
+              {" "}
               <Button type="primary" onClick={showModal}>
                 Add New Semester
               </Button>
-            </Space>
+              <span style={{ margin: "0 25%", fontSize: "20px" }}>
+                <h2>Semester Management</h2>
+              </span>
+            </div>
 
             <Spin spinning={loading}>
               <Table

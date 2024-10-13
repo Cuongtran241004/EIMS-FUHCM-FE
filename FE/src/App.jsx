@@ -31,10 +31,12 @@ import {
   STAFF_SUBJECT_URL,
 } from "./configs/urlWeb.js";
 import "./App.css";
+import ProfilePage from "./pages/Home/Profile.jsx";
 
 function App() {
   const [isLogin, setIsLogin] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [user, setUser] = useState(null);
   const [role, setRole] = useState(null);
 
   const initLogin = async () => {
@@ -43,6 +45,7 @@ function App() {
       if (user) {
         const userRole = user.role.name || null;
         setRole(userRole);
+        setUser(user);
         setIsLogin(true);
       }
     } catch (error) {
@@ -113,7 +116,7 @@ function App() {
             <Route path="*" element={<Navigate to="/" replace />} />
           </>
         )}
-
+        <Route path="profile" element={<ProfilePage user={user} />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     );
@@ -121,7 +124,7 @@ function App() {
 
   return (
     <div className="container">
-      {role === "staff" ? (
+      {role === "staff" || role === "manager" ? (
         <SemesterProvider>{renderRoutes()}</SemesterProvider>
       ) : (
         renderRoutes()

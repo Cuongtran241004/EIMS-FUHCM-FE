@@ -258,11 +258,14 @@ const Users = ({ isLogin }) => {
               minHeight: 280,
             }}
           >
-            <Space>
+            <div style={{ display: "flex", alignItems: "center" }}>
               <Button type="primary" onClick={showModal}>
                 Add New User
               </Button>
 
+              <span style={{ margin: "0 20%", fontSize: "20px" }}>
+                <h2>User Management</h2>
+              </span>
               <Upload
                 beforeUpload={(file) => {
                   const isValid = beforeUpload(file);
@@ -275,7 +278,11 @@ const Users = ({ isLogin }) => {
                 maxCount={1}
                 method="POST"
               >
-                <Button icon={<UploadOutlined />} loading={fileLoading}>
+                <Button
+                  icon={<UploadOutlined />}
+                  loading={fileLoading}
+                  style={{ marginRight: "15px" }}
+                >
                   Import Users
                 </Button>
               </Upload>
@@ -285,9 +292,9 @@ const Users = ({ isLogin }) => {
                 onClick={() => User_Excel_Template()}
                 type="default"
               >
-                Download Import Template
+                Download Template
               </Button>
-            </Space>
+            </div>
 
             <Spin spinning={loading}>
               <Table
@@ -384,6 +391,7 @@ const Users = ({ isLogin }) => {
               <Form.Item
                 name="department"
                 label="Department"
+                initialValue="Examination"
                 rules={[
                   { required: true, message: "Please input department!" },
                 ]}

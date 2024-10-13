@@ -16,7 +16,7 @@ import {
 const items = [
   {
     key: "sub1",
-    label: "Exam Management",
+    label: <h3>Exam Management</h3>,
     icon: <MailOutlined />,
     children: [
       {
@@ -31,7 +31,7 @@ const items = [
   },
   {
     key: "sub2",
-    label: "Invigilation Management",
+    label: <h3>Invigilation Management</h3>,
     icon: <AppstoreOutlined />,
     children: [
       {
@@ -46,7 +46,7 @@ const items = [
   },
   {
     key: "sub3",
-    label: "Settings",
+    label: <h3>Settings</h3>,
     icon: <SettingOutlined />,
     children: [
       {
@@ -75,7 +75,7 @@ const NavBar_Manager = () => {
     "/invigilation-fees": { key: "4", openKey: "sub2" },
     "/semester": { key: "5", openKey: "sub3" },
     "/exam-slot": { key: "6", openKey: "sub3" },
-    "/staffs": { key: "7", openKey: "sub3" },
+    "/users": { key: "7", openKey: "sub3" },
   };
 
   // Set selected key and open key when location changes

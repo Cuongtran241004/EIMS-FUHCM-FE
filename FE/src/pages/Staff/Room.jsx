@@ -2,8 +2,9 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import roomApi from "../../services/Room";
 import examSlotApi from "../../services/ExamSlot";
-import { Button, Row, Col, Layout, Spin } from "antd";
+import { Button, Row, Col, Layout, Spin, message } from "antd";
 import moment from "moment";
+import examSlotHallApi from "../../services/ExamSlotHall";
 
 const { Content } = Layout;
 
@@ -14,6 +15,7 @@ const RoomSelectionPage = () => {
   const [loading, setLoading] = useState(true);
   const [examSlot, setExamSlot] = useState(null);
   const [groupedRooms, setGroupedRooms] = useState([]);
+  const [loadingSubmit, setLoadingSubmit] = useState(false);
 
   useEffect(() => {
     const fetchRooms = async () => {
@@ -103,13 +105,30 @@ const RoomSelectionPage = () => {
     setGroupedRooms(newGroups);
   };
 
-  const handleSave = () => {
-    // only return roomName
-    const response = groupedRooms.map((group) =>
-      group.map((room) => room.roomName)
-    );
-    console.log("Grouped Rooms:", response);
-    // You can also implement additional save logic here if needed
+  const handleSave = async () => {
+    setLoadingSubmit(true);
+    try {
+      // only return roomName
+      const roomIds = groupedRooms.map((group) =>
+        group.map((room) => room.roomName)
+      );
+
+      const data = {
+        examSlotId: examSlotId,
+        roomIds: roomIds,
+      };
+      await examSlotHallApi.addExamSlotHall(data);
+
+      message.success("Rooms grouped successfully");
+      // return history to previous page
+      window.history.back();
+      console.log("Grouped Rooms:", data);
+      // You can also implement additional save logic here if needed
+    } catch (error) {
+      message.error("Failed to group rooms");
+    } finally {
+      setLoadingSubmit(false);
+    }
   };
 
   const addGroup = () => {
@@ -273,6 +292,7 @@ const RoomSelectionPage = () => {
                 color: "white",
                 float: "right",
               }}
+              loading={loadingSubmit}
             >
               Save
             </Button>

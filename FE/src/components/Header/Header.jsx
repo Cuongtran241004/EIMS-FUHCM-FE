@@ -10,7 +10,7 @@ import "./Header.css";
 
 const items = [
   {
-    label: "Profile",
+    label: <Link to="/profile">Profile</Link>,
     key: "1",
     icon: <UserOutlined />,
   },
@@ -47,11 +47,8 @@ const Header = () => {
             </Button>
           ))}
           <Dropdown menu={menuProps} trigger={["click"]}>
-            <Button size="large">
-              <Space>
-                <span>{user.firstName}</span>
-                <DownOutlined />
-              </Space>
+            <Button size="large" style={{ borderRadius: "100%" }}>
+              <UserOutlined />
             </Button>
           </Dropdown>
         </Space>

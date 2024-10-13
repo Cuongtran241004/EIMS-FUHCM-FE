@@ -39,13 +39,6 @@ const Subject = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 8;
 
-  // Fetch subjects whenever the selected semester changes
-  useEffect(() => {
-    if (selectedSemester.id) {
-      fetchData(selectedSemester.id);
-    }
-  }, [selectedSemester.id]); // This will run whenever selectedSemester.id changes
-
   const fetchData = async (semesterId) => {
     setLoading(true);
     try {
@@ -57,6 +50,13 @@ const Subject = () => {
       setLoading(false);
     }
   };
+
+  // Fetch subjects whenever the selected semester changes
+  useEffect(() => {
+    if (selectedSemester.id) {
+      fetchData(selectedSemester.id);
+    }
+  }, [selectedSemester.id]); // This will run whenever selectedSemester.id changes
 
   const items = semesters.map((semester) => ({
     key: semester.id,
