@@ -139,7 +139,7 @@ function InvigilatorRegistration() {
       onOk: async () => {
         try {
           const cancelPromises = selectedCancelSlots.map((slotId) => cancelRegisteredSlot(slotId));
-          await Promise.all(cancelPromises);
+          await Promise.all(cancelPromises); 
           message.success('Slot(s) cancelled successfully');
           setSelectedCancelSlots([]);
           setCancelModalVisible(false);
