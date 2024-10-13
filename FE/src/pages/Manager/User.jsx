@@ -56,6 +56,7 @@ const Users = ({ isLogin }) => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [editingUser, setEditingUser] = useState(null);
+  const [loadingSubmit, setLoadingSubmit] = useState(false);
   const [form] = Form.useForm();
 
   const fetchData = async () => {
@@ -88,6 +89,7 @@ const Users = ({ isLogin }) => {
   };
 
   const handleOk = async () => {
+    setLoadingSubmit(true);
     try {
       const values = await form.validateFields();
       console.log("Received values of form: ", values);
@@ -102,6 +104,8 @@ const Users = ({ isLogin }) => {
       handleCancel();
     } catch (error) {
       message.error(isEditing ? EDIT_USER_FAILED : ADD_USER_FAILED);
+    } finally {
+      setLoadingSubmit(false);
     }
   };
 
@@ -318,6 +322,7 @@ const Users = ({ isLogin }) => {
         onOk={handleOk}
         onCancel={handleCancel}
         okText="Submit"
+        loading={loadingSubmit}
         cancelText="Cancel"
       >
         <Form

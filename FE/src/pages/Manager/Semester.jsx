@@ -36,6 +36,7 @@ const Semester = ({ isLogin }) => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [editingSemester, setEditingSemester] = useState(null);
+  const [loadingSubmit, setLoadingSubmit] = useState(false);
   const [form] = Form.useForm();
 
   const fetchData = async () => {
@@ -70,6 +71,7 @@ const Semester = ({ isLogin }) => {
   };
 
   const handleOk = async () => {
+    setLoadingSubmit(true);
     try {
       const values = await form.validateFields();
       const { dateRange } = values;
@@ -95,6 +97,8 @@ const Semester = ({ isLogin }) => {
       handleCancel();
     } catch (error) {
       message.error(isEditing ? EDIT_SEMESTER_FAILED : ADD_SEMESTER_FAILED);
+    } finally {
+      setLoadingSubmit(false);
     }
   };
 
@@ -200,6 +204,7 @@ const Semester = ({ isLogin }) => {
         open={isModalVisible}
         onOk={handleOk}
         onCancel={handleCancel}
+        loading={loadingSubmit}
         okText="Submit"
         cancelText="Cancel"
       >

@@ -27,6 +27,7 @@ const Exam = () => {
   const [data, setData] = useState([]); // For exam data
   const [loading, setLoading] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
+  const [loadingSubmit, setLoadingSubmit] = useState(false);
   const [editingExam, setEditingExam] = useState(null);
   const { selectedSemester, setSelectedSemester, semesters } = useSemester(); // Access shared semester state
   const [subjects, setSubjects] = useState([]);
@@ -104,6 +105,7 @@ const Exam = () => {
   };
 
   const handleOk = async () => {
+    setLoadingSubmit(true);
     try {
       const values = await form.validateFields();
       const subject = subjects.find((sub) => sub.name === values.subjectName);
@@ -121,6 +123,8 @@ const Exam = () => {
       handleCancel();
     } catch (error) {
       message.error("Failed to submit exam");
+    } finally {
+      setLoadingSubmit(false);
     }
   };
 
@@ -241,7 +245,11 @@ const Exam = () => {
                 </Button>
               </Col>
               <Col>
-                <Button type="primary" onClick={handleOk}>
+                <Button
+                  type="primary"
+                  onClick={handleOk}
+                  loading={loadingSubmit}
+                >
                   {isEditing ? "Update" : "Add"}
                 </Button>
               </Col>

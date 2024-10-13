@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import Header from "../../components/Header/Header.jsx";
 import {
   Table,
@@ -11,7 +11,7 @@ import {
   Button,
 } from "antd";
 import examSlotApi from "../../services/ExamSlot.js";
-import semesterApi from "../../services/Semester.js";
+import { useSemester } from "../../components/Context/SemesterContext.jsx";
 import { DownOutlined } from "@ant-design/icons";
 const { Content, Sider } = Layout;
 const { Option } = Select;
@@ -19,8 +19,7 @@ const { Option } = Select;
 const Attendance = () => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [selectedSemester, setSelectedSemester] = useState(null);
-  const [semesters, setSemesters] = useState([]);
+  const { selectedSemester, setSelectedSemester, semesters } = useSemester(); // Access shared semester state
 
   // Fetch attendance data
   const fetchExams = async (term) => {
@@ -34,31 +33,6 @@ const Attendance = () => {
       setLoading(false);
     }
   };
-
-  useEffect(() => {
-    const fetchSemesters = async () => {
-      try {
-        const result = await semesterApi.getAllSemesters();
-        setSemesters(result);
-        const sortedSemesters = result.sort(
-          (a, b) => new Date(b.startAt) - new Date(a.startAt)
-        );
-        // Set the latest semester as the selected semester
-        if (sortedSemesters.length > 0) {
-          setSelectedSemester({
-            id: sortedSemesters[0]?.id,
-            name: sortedSemesters[0]?.name,
-          });
-        }
-      } catch (error) {
-        message.error("Failed to load semesters. Please try again.");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchSemesters();
-  }, []);
 
   useEffect(() => {
     if (selectedSemester?.id) {

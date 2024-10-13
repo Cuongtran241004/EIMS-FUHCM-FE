@@ -35,6 +35,7 @@ const Subject = () => {
   const [editingSubject, setEditingSubject] = useState(null);
   const { selectedSemester, setSelectedSemester, semesters } = useSemester(); // Access shared semester state
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [loadingSubmit, setLoadingSubmit] = useState(false);
   const [form] = Form.useForm();
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 8;
@@ -136,6 +137,7 @@ const Subject = () => {
   ];
 
   const handleOk = async () => {
+    setLoadingSubmit(true);
     try {
       const values = await form.validateFields();
 
@@ -156,6 +158,8 @@ const Subject = () => {
       handleCancel();
     } catch (error) {
       message.error(isEditing ? EDIT_SUBJECT_FAILED : ADD_SUBJECT_FAILED);
+    } finally {
+      setLoadingSubmit(false);
     }
   };
 
@@ -203,7 +207,11 @@ const Subject = () => {
                 </Button>
               </Col>
               <Col>
-                <Button type="primary" onClick={handleOk}>
+                <Button
+                  type="primary"
+                  onClick={handleOk}
+                  loading={loadingSubmit}
+                >
                   {isEditing ? "Update" : "Add"}
                 </Button>
               </Col>
