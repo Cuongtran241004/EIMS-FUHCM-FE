@@ -11,6 +11,7 @@ const STAFF_SUBJECT_URL = "/subjects";
 const STAFF_EXAM_URL = "/exams";
 const STAFF_EXAM_SCHEDULE_URL = "/exam-schedule";
 const STAFF_ATTENDANCE_URL = "/attendance";
+const STAFF_ROOM_SELECTION_URL = "/exam-schedule/:examSlotId/room";
 
 // INVIGILATOR
 
@@ -25,4 +26,5 @@ export {
   STAFF_EXAM_URL,
   STAFF_EXAM_SCHEDULE_URL,
   STAFF_ATTENDANCE_URL,
+  STAFF_ROOM_SELECTION_URL,
 };

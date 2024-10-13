@@ -16,6 +16,7 @@ import {
   Tag,
 } from "antd";
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import Sider from "antd/es/layout/Sider";
 import Header from "../../components/Header/Header.jsx";
 import examApi from "../../services/Exam.js";
@@ -23,6 +24,7 @@ import examSlotApi from "../../services/ExamSlot.js";
 import { DeleteOutlined, EditOutlined, DownOutlined } from "@ant-design/icons";
 import moment from "moment";
 import { useSemester } from "../../components/Context/SemesterContext.jsx";
+import RoomSelectionPopover from "./Room.jsx";
 const { Option } = Select;
 const { Content } = Layout;
 const PAGE_SIZE = 6;
@@ -44,6 +46,7 @@ const Exam_Schedule = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalItems, setTotalItems] = useState(1);
   const [loadingSubmit, setLoadingSubmit] = useState(false);
+  const navigate = useNavigate();
 
   const fetchExamSchedule = async (semesterId, page) => {
     setLoading(true);
@@ -178,6 +181,11 @@ const Exam_Schedule = () => {
     }
   };
 
+  const handleRoomClick = (examSlotId) => {
+    // Navigate to RoomSelectionPage with the exam slot ID in the URL
+    navigate(`/exam-schedule/${examSlotId}/room`);
+  };
+
   const validateTime = (rule, value) => {
     const startTime = form.getFieldValue("startTime");
     if (startTime && value && value.isBefore(startTime)) {
@@ -203,7 +211,7 @@ const Exam_Schedule = () => {
       key: "examType",
     },
     {
-      title: "Date(D-M-Y)",
+      title: "Date (DD-MM-YYYY)",
       dataIndex: "startAt", // Use startAt to extract date
       key: "date",
       render: (text) => moment(text).format("DD-MM-YYYY"), // Format as DD-MM-YYYY
@@ -225,7 +233,9 @@ const Exam_Schedule = () => {
     },
     {
       title: "Room",
-      render: (text, record) => <Button>Room</Button>,
+      render: (text, record) => (
+        <Button onClick={() => handleRoomClick(record.id)}>Room</Button>
+      ),
     },
     {
       title: "Status",
@@ -236,20 +246,24 @@ const Exam_Schedule = () => {
         let text = "";
         // Define color and label based on the status value
         switch (status) {
-          case "completed":
-            color = "green";
-            text = "Completed";
+          case "NEEDS_ROOM_ASSIGNMENT":
+            color = "blue";
+            text = "Needs room";
             break;
-          case "pending":
+          case "PENDING":
             color = "orange";
             text = "Pending";
             break;
-          case "canceled":
+          case "APPROVED":
+            color = "green";
+            text = "Approved";
+            break;
+          case "REJECTED":
             color = "red";
-            text = "Canceled";
+            text = "Rejected";
             break;
           default:
-            color = "blue";
+            color = "black";
             text = "Unknown";
         }
 
@@ -385,12 +399,13 @@ const Exam_Schedule = () => {
             <Table
               dataSource={examSchedule.map((item) => ({
                 id: item.id,
-                examId: item.subjectExamId?.id,
-                subjectCode: item.subjectExamId?.subjectId?.code || "Loading",
-                subjectName: item.subjectExamId?.subjectId?.name || "Loading",
-                examType: item.subjectExamId?.examType || "Loading",
+                examId: item.subjectExamDTO?.subjectExamId,
+                subjectCode: item.subjectExamDTO?.subjectCode || "Loading",
+                subjectName: item.subjectExamDTO?.subjectName || "Loading",
+                examType: item.subjectExamDTO?.examType || "Loading",
                 startAt: item.startAt,
                 endAt: item.endAt,
+                status: item.status,
                 key: item.id,
               }))}
               columns={columns}

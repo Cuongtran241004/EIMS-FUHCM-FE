@@ -14,6 +14,7 @@ import InvigilatorDashboard from "./pages/Invigilator/InvigilatorDashboard";
 import InvigilatorRegistration from "./pages/Invigilator/InvigilatorRegistration";
 import InvigilatorRequest from "./pages/Invigilator/InvigilatorRequest";
 import AttendanceCheck from "./pages/Manager/AttendanceCheck";
+import RoomSelectionPage from "./pages/Staff/Room";
 import { getUserInfo } from "./components/API/getUserInfo";
 import { SemesterProvider } from "./components/Context/SemesterContext.jsx";
 import {
@@ -26,6 +27,7 @@ import {
   STAFF_ATTENDANCE_URL,
   STAFF_EXAM_SCHEDULE_URL,
   STAFF_EXAM_URL,
+  STAFF_ROOM_SELECTION_URL,
   STAFF_SUBJECT_URL,
 } from "./configs/urlWeb.js";
 import "./App.css";
@@ -91,6 +93,10 @@ function App() {
             <Route path={STAFF_EXAM_URL} element={<Exam />} />
             <Route path={STAFF_EXAM_SCHEDULE_URL} element={<Exam_Schedule />} />
             <Route path={STAFF_ATTENDANCE_URL} element={<Attendance />} />
+            <Route
+              path={STAFF_ROOM_SELECTION_URL}
+              element={<RoomSelectionPage />}
+            />
             <Route
               path="*"
               element={<Navigate to={STAFF_SUBJECT_URL} replace />}
