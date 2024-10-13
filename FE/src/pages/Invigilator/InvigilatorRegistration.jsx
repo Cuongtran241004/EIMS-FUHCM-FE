@@ -138,11 +138,12 @@ function InvigilatorRegistration() {
       content: 'This action cannot be undone.',
       onOk: async () => {
         try {
-          const promises = selectedCancelSlots.map((slotId) => cancelRegisteredSlot(slotId));
-          await Promise.all(promises);
+          const cancelPromises = selectedCancelSlots.map((slotId) => cancelRegisteredSlot(slotId));
+          await Promise.all(cancelPromises);
           message.success('Slot(s) cancelled successfully');
           setSelectedCancelSlots([]);
           setCancelModalVisible(false);
+          
         } catch (error) {
           message.error('Error cancelling slot(s)');
           console.error(error);
@@ -152,8 +153,6 @@ function InvigilatorRegistration() {
     });
   };
 
-  // semesterInvigilatorRegistration.examSlotDetailSet.
-  // eslint-disable-next-line react/prop-types
   const EventComponent = ({ event }) => (
     <div>
       <p style={{ margin: 0, fontWeight: 500, fontSize: 13.33333 }}>
