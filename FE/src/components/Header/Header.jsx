@@ -1,6 +1,6 @@
 import React, { useContext, useState, useEffect } from "react";
 import { UserContext } from "../UserContext.jsx";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import headerConfig from "./Header";
 import { Button, Space, Dropdown } from "antd";
 import { DownOutlined, UserOutlined } from "@ant-design/icons";
@@ -26,7 +26,7 @@ const menuProps = {
 
 const Header = () => {
   const { user } = useContext(UserContext);
-
+  const location = useLocation();
   const currentHeader = headerConfig[user.role];
 
   return (
@@ -39,13 +39,60 @@ const Header = () => {
 
       <div className="header-right">
         <Space>
-          {currentHeader.map((item, index) => (
-            <Button key={index} size="large" style={{ width: "150px" }}>
-              <Link to={item.path} className="header-right-item">
-                {item.name}
-              </Link>
-            </Button>
-          ))}
+          {currentHeader.map((item, index) => {
+            if (item.subMenu) {
+              const isActive = item.subMenu.some(
+                (subItem) => location.pathname === subItem.path
+              );
+              const subMenuItems = item.subMenu.map((subItem, subIndex) => ({
+                key: subItem.path,
+                label: (
+                  <Link
+                    to={subItem.path}
+                    className={
+                      location.pathname === subItem.path ? "active" : ""
+                    }
+                  >
+                    {subItem.name}
+                  </Link>
+                ),
+              }));
+
+              return (
+                <Dropdown
+                  key={index}
+                  menu={{ items: subMenuItems }}
+                  trigger={["click"]}
+                >
+                  <Button size="large" type={isActive ? "primary" : "default"}>
+                    <Space>
+                      {item.name}
+                      <DownOutlined />
+                    </Space>
+                  </Button>
+                </Dropdown>
+              );
+            }
+
+            const isActive = location.pathname === item.path;
+            return (
+              <Button
+                key={index}
+                size="large"
+                type={isActive ? "primary" : "default"}
+              >
+                <Link
+                  to={item.path}
+                  className={`header-right-item ${isActive ? "active" : ""}`}
+                >
+                  <span className={`button-name ${isActive ? "active" : ""}`}>
+                    {item.name}
+                  </span>
+                </Link>
+              </Button>
+            );
+          })}
+
           <Dropdown menu={menuProps} trigger={["click"]}>
             <Button size="large" style={{ borderRadius: "100%" }}>
               <UserOutlined />

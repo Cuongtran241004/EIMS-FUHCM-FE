@@ -162,7 +162,6 @@ const Request = () => {
                 key: request.requestId,
               }))} // Add a key property to each request object
               columns={columns}
-              rowKey="id" // Use a unique key, assuming semester objects have an id property
               pagination={{ pageSize: 8 }}
             />
           </Spin>
