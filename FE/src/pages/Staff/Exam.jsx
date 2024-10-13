@@ -13,6 +13,7 @@ import {
   Col,
   Row,
   Select,
+  Tag,
 } from "antd";
 import subjectApi from "../../services/Subject.js";
 import examApi from "../../services/Exam.js";
@@ -137,7 +138,12 @@ const Exam = () => {
       render: (_, __, index) => (currentPage - 1) * pageSize + index + 1,
     },
     {
-      title: "Subject",
+      title: "Subject Code",
+      dataIndex: "subjectCode",
+      key: "subjectCode",
+    },
+    {
+      title: "Subject Name",
       dataIndex: "subjectName",
       key: "subjectName",
     },
@@ -145,6 +151,22 @@ const Exam = () => {
       title: "Type",
       dataIndex: "examType",
       key: "examType",
+      // using tag of ant to display
+      render: (text) => {
+        if (text === "PE") {
+          const color = "blue";
+          return <Tag color={color}>{text}</Tag>;
+        } else if (text === "FE") {
+          const color = "green";
+          return <Tag color={color}>{text}</Tag>;
+        } else if (text === "PE&TE") {
+          const color = "orange";
+          return <Tag color={color}>{text}</Tag>;
+        } else {
+          const color = "red";
+          return <Tag color={color}>{text}</Tag>;
+        }
+      },
     },
     {
       title: "Duration (minutes)",

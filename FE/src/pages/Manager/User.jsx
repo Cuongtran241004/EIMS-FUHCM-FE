@@ -16,6 +16,7 @@ import {
   Col,
   Row,
   Select,
+  Tag,
 } from "antd";
 import {
   EditOutlined,
@@ -64,6 +65,11 @@ const Users = ({ isLogin }) => {
     try {
       // Fetch the data
       const result = await userApi.getAllUsers();
+      // sort user by fuId, fuid is a string
+
+      result.sort((a, b) => {
+        return b.fuId.localeCompare(a.fuId);
+      });
 
       // Ensure that we replace the current data with the new data
       setData(result);
@@ -221,8 +227,16 @@ const Users = ({ isLogin }) => {
       title: "Role",
       dataIndex: "role",
       key: "role",
-      render: (role) =>
-        roleOptions.find((option) => option.value === role)?.label || "-",
+      // using tag of ant design to display role
+      render: (text, record) => {
+        const role = roleOptions.find((role) => role.value === record.role);
+        if (role.label === "Manager") {
+          return <Tag color="orange">{role.label}</Tag>;
+        } else if (role.label === "Staff") {
+          return <Tag color="blue">{role.label}</Tag>;
+        }
+        return <Tag color="green">{role.label}</Tag>;
+      },
     },
     {
       title: "Action",
@@ -306,7 +320,7 @@ const Users = ({ isLogin }) => {
                 columns={columns}
                 rowKey={(record) => record.fuId}
                 pagination={{
-                  pageSize: 8,
+                  pageSize: 7,
                   showSizeChanger: true,
                   pageSizeOptions: ["8", "16", "24"],
                 }}
@@ -396,12 +410,18 @@ const Users = ({ isLogin }) => {
               <Form.Item
                 name="department"
                 label="Department"
-                initialValue="Examination"
                 rules={[
-                  { required: true, message: "Please input department!" },
+                  { required: true, message: "Please select department!" },
                 ]}
               >
-                <Select placeholder="Select department">
+                <Select
+                  placeholder="Select department"
+                  showSearch
+                  optionFilterProp="children" // Allows searching based on option text
+                  filterOption={(input, option) =>
+                    option.children.toLowerCase().includes(input.toLowerCase())
+                  } // Filters options based on input
+                >
                   {departments.map((department) => (
                     <Select.Option key={department} value={department}>
                       {department}

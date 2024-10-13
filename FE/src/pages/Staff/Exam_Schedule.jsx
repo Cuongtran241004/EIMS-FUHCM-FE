@@ -209,6 +209,21 @@ const Exam_Schedule = () => {
       title: "Exam Type",
       dataIndex: "examType",
       key: "examType",
+      render: (text) => {
+        if (text === "PE") {
+          const color = "blue";
+          return <Tag color={color}>{text}</Tag>;
+        } else if (text === "FE") {
+          const color = "green";
+          return <Tag color={color}>{text}</Tag>;
+        } else if (text === "PE&TE") {
+          const color = "orange";
+          return <Tag color={color}>{text}</Tag>;
+        } else {
+          const color = "red";
+          return <Tag color={color}>{text}</Tag>;
+        }
+      },
     },
     {
       title: "Date (DD-MM-YYYY)",

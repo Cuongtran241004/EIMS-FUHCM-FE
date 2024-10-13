@@ -93,12 +93,16 @@ const ProfilePage = ({ user }) => {
                   border: "2px solid #f05123",
                 }}
               />
-              <div style={{ marginTop: 10, color: "#f05123" }}>
-                <Button icon={<PlusOutlined />} style={{ borderRadius: "4px" }}>
-                  Change Avatar
-                </Button>
-              </div>
             </Upload>
+            <div style={{ marginTop: 10, color: "#f05123" }}>
+              <Button
+                icon={<PlusOutlined />}
+                style={{ borderRadius: "4px" }}
+                onClick={() => message.info("This feature is developing!")}
+              >
+                Change Avatar
+              </Button>
+            </div>
           </Col>
         </Row>
 
