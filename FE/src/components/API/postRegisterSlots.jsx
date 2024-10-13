@@ -5,6 +5,8 @@ export const postRegisterSlots = async (slots) => {
   const path = '/invigilators';
 
   try {
+    console.log(slots);
+    
     const response = await axios.post(`${API_URL}${path}`, slots, {
       withCredentials: true,
       headers: {
