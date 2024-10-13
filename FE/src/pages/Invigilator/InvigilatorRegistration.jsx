@@ -152,6 +152,8 @@ function InvigilatorRegistration() {
     });
   };
 
+  // semesterInvigilatorRegistration.examSlotDetailSet.
+  // eslint-disable-next-line react/prop-types
   const EventComponent = ({ event }) => (
     <div>
       <p style={{ margin: 0, fontWeight: 500, fontSize: 13.33333 }}>

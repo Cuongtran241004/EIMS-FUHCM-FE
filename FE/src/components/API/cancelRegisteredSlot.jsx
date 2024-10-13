@@ -2,7 +2,7 @@ import axios from "axios";
 
 export const cancelRegisteredSlot = async (slotId) => {
     const API_URL = import.meta.env.VITE_APP_API_URL;
-    const path = '';
+    const path = '/invigilators/myinfo/register';
     console.log(slotId);
     try {
       const response = await axios.post(`${API_URL}${path}`, slotId, {

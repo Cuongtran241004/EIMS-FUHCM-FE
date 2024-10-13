@@ -43,6 +43,7 @@ function InvigilatorDashboard() {
   };
 
   const EventComponent = ({ event }) => (
+    
     <span>
     <p style={{margin: 0, fontWeight: 500, fontSize: 13.33333}}>{new Date(event.startAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}-
     {new Date(event.endAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
