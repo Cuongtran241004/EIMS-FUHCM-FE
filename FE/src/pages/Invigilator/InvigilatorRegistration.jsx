@@ -149,7 +149,6 @@ function InvigilatorRegistration() {
     confirm({
       title: 'Do you want to cancel these slots?',
       icon: <ExclamationCircleOutlined />,
-      content: 'This action cannot be undone.',
       onOk: async () => {
         try {
           const success = await cancelRegisteredSlot(selectedCancelSlots);
@@ -160,13 +159,11 @@ function InvigilatorRegistration() {
             reloadAvailableSlots();
           }
         } catch (error) {
-          message.error('Error cancelling slot(s)');
+          message.error('There are no slot(s) to cancel');
           console.error(error);
         }
       },
-      onCancel() {
-        message.info('Cancelled action');
-      },
+      
     });
   };
 
