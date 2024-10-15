@@ -206,7 +206,7 @@ const Users = ({ isLogin }) => {
     {
       title: "Full Name",
       key: "fullName",
-      render: (text, record) => `${record.firstName} ${record.lastName}`,
+      render: (text, record) => `${record.lastName} ${record.firstName} `,
     },
     {
       title: "Email",
@@ -264,7 +264,7 @@ const Users = ({ isLogin }) => {
     <Layout style={{ height: "100vh" }}>
       <Header />
       <Layout>
-        <Sider width={256} style={{ backgroundColor: "#fff" }}>
+        <Sider width={256} style={{ backgroundColor: "#4D908E" }}>
           <NavBar_Manager isLogin={isLogin} />
         </Sider>
         <Layout style={{ padding: "16px" }}>

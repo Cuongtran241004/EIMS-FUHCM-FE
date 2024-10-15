@@ -111,7 +111,7 @@ const ExamSlots = () => {
     <Layout style={{ height: "120vh" }}>
       <Header />
       <Layout>
-        <Sider width={256} style={{ backgroundColor: "#fff" }}>
+        <Sider width={256} style={{ backgroundColor: "#4D908E" }}>
           <NavBar_Manager />
         </Sider>
         <Layout>

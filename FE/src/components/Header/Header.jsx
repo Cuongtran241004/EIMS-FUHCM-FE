@@ -79,7 +79,7 @@ const Header = () => {
               <Button
                 key={index}
                 size="large"
-                type={isActive ? "primary" : "default"}
+                style={{ backgroundColor: isActive ? "#4D908E" : "" }}
               >
                 <Link
                   to={item.path}

@@ -8,9 +8,7 @@ import {
   Table,
   Spin,
   Tag,
-  Row,
-  Col,
-  Popover,
+  Modal,
   Select,
 } from "antd";
 import { DownOutlined } from "@ant-design/icons";
@@ -29,8 +27,8 @@ const Request = () => {
   const { selectedSemester, setSelectedSemester, semesters } = useSemester(); // Access shared semester state
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 8;
-  const [popoverVisible, setPopoverVisible] = useState({});
-  const [alternativeUser, setAlternativeUser] = useState({}); // Store selected alternative user
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [selectedRequest, setSelectedRequest] = useState(null); // Store selected request details
 
   // Example list of alternative users
   const [users, setUsers] = useState([
@@ -78,19 +76,14 @@ const Request = () => {
     }
   };
 
-  const handleApproveClick = (record) => {
-    // Toggle popover visibility for the selected request
-    setPopoverVisible((prevVisible) => ({
-      ...prevVisible,
-      [record.requestId]: !prevVisible[record.requestId],
-    }));
+  const handleDetailClick = (record) => {
+    setSelectedRequest(record); // Set the selected request data
+    setIsModalVisible(true); // Show modal
   };
 
-  const handleUserChange = (value, requestId) => {
-    setAlternativeUser((prevUser) => ({
-      ...prevUser,
-      [requestId]: value,
-    }));
+  const handleModalClose = () => {
+    setIsModalVisible(false); // Hide modal
+    setSelectedRequest(null); // Clear selected request data
   };
 
   const columns = [
@@ -127,14 +120,14 @@ const Request = () => {
       },
     },
     {
-      title: "Reason",
-      dataIndex: "reason",
-      key: "reason",
-    },
-    {
-      title: "Note",
-      dataIndex: "note",
-      key: "note",
+      title: "Time",
+      dataIndex: "time",
+      key: "time",
+      render: (text, record) => {
+        return `${moment(record.startAt).format("HH:mm")} - ${moment(
+          record.endAt
+        ).format("HH:mm")}`;
+      },
     },
     {
       title: "Status",
@@ -142,11 +135,23 @@ const Request = () => {
       key: "status",
       render: (status) => {
         if (status === "PENDING") {
-          return <Tag color="orange">{status}</Tag>;
+          return (
+            <Tag color="orange">
+              <strong>{status}</strong>
+            </Tag>
+          );
         } else if (status === "APPROVED") {
-          return <Tag color="green">{status}</Tag>;
+          return (
+            <Tag color="green">
+              <strong>{status}</strong>
+            </Tag>
+          );
         } else {
-          return <Tag color="red">{status}</Tag>;
+          return (
+            <Tag color="red">
+              <strong>{status}</strong>
+            </Tag>
+          );
         }
       },
     },
@@ -156,79 +161,68 @@ const Request = () => {
       key: "action",
       render: (text, record) => (
         <Space size="large">
-          <Popover
-            content={
-              <div>
-                <p>Choose alternative invigilator</p>
-                <Select
-                  style={{ width: "100%" }}
-                  placeholder="Select alternative user"
-                  onChange={(value) =>
-                    handleUserChange(value, record.requestId)
-                  }
-                >
-                  {users.map((user) => (
-                    <Option key={user.id} value={user.id}>
-                      {user.name}
-                    </Option>
-                  ))}
-                </Select>
-                <Button
-                  type="primary"
-                  onClick={() => {
-                    // Logic to handle approval and alternative assignment here
-                    message.success(
-                      `Approved with alternative user ID: ${
-                        alternativeUser[record.requestId]
-                      }`
-                    );
-                  }}
-                  style={{ marginTop: 8, width: "100%" }}
-                >
-                  Save
-                </Button>
-              </div>
-            }
-            title="Approve Request"
-            trigger="click"
-            open={popoverVisible[record.requestId] || false}
-            onOpenChange={() => handleApproveClick(record)}
-          >
-            <Button type="default" color="blue">
-              Approve
-            </Button>
-          </Popover>
+          <Button type="primary" onClick={() => handleDetailClick(record)}>
+            Detail
+          </Button>
+          <Button type="primary" style={buttonStyle}>
+            Approve
+          </Button>
           <Button danger>Reject</Button>
         </Space>
       ),
     },
   ];
 
+  const buttonStyle = {
+    backgroundColor: "#43AA8B",
+    borderColor: "#43AA8B",
+    color: "#fff",
+    borderRadius: "5px",
+  };
+
+  const titleStyle = {
+    color: "#333",
+    fontSize: "24px",
+    fontWeight: "bold",
+    margin: "20px 0",
+  };
+
+  const contentStyle = {
+    padding: "20px",
+    background: "#f9f9f9",
+  };
+
   return (
-    <Layout style={{ height: "100vh" }}>
+    <Layout style={{ minHeight: "100vh" }}>
       <Header />
       <Layout>
-        <Sider width={256} style={{ backgroundColor: "#fff" }}>
+        <Sider width={256} style={{ backgroundColor: "#4D908E" }}>
           <NavBar_Manager />
         </Sider>
-        <Content style={{ padding: 12, margin: 0, background: "#fff" }}>
-          <div style={{ display: "flex", alignItems: "center" }}>
+        <Content
+          style={{ padding: "20px", margin: "0", background: "#f9f9f9" }}
+        >
+          <div style={{ marginBottom: "20px", textAlign: "center" }}>
+            <h2 style={titleStyle}>Request Management</h2>
+          </div>
+
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              marginBottom: "20px",
+            }}
+          >
             <Dropdown
-              menu={{
-                items,
-                onClick: handleMenuClick,
-              }}
+              menu={{ items, onClick: handleMenuClick }}
+              style={{ marginRight: "auto" }}
             >
-              <Button style={{ width: "150px" }}>
+              <Button style={{ width: "200px", ...buttonStyle }}>
                 <Space>
-                  {selectedSemester.name}
-                  <DownOutlined />
+                  {selectedSemester.name} <DownOutlined />
                 </Space>
               </Button>
             </Dropdown>
-            <span style={{ margin: "0 25%", fontSize: "20px" }}>
-              <h2>Request Management</h2>
-            </span>
           </div>
 
           <Spin spinning={loading}>
@@ -247,11 +241,40 @@ const Request = () => {
                 status: request.status,
                 note: request.note,
                 key: request.requestId,
-              }))} // Add a key property to each request object
+              }))}
               columns={columns}
-              pagination={{ pageSize: 8 }}
+              pagination={{ pageSize: pageSize }}
+              rowClassName="table-row"
             />
           </Spin>
+
+          {/* Modal for displaying request details */}
+          {selectedRequest && (
+            <Modal
+              title="Request Details"
+              open={isModalVisible}
+              onCancel={handleModalClose}
+              footer={[
+                <Button key="close" onClick={handleModalClose}>
+                  Close
+                </Button>,
+              ]}
+            >
+              <p>
+                <strong>FU ID:</strong> {selectedRequest.fuId}
+              </p>
+
+              <p>
+                <strong>Email:</strong> {selectedRequest.email}
+              </p>
+              <p>
+                <strong>Reason:</strong> {selectedRequest.reason}
+              </p>
+              <p>
+                <strong>Note:</strong> {selectedRequest.note}
+              </p>
+            </Modal>
+          )}
         </Content>
       </Layout>
     </Layout>

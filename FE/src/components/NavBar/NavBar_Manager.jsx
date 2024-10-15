@@ -16,47 +16,71 @@ import {
 const items = [
   {
     key: "sub1",
-    label: <h3>Exam Management</h3>,
-    icon: <MailOutlined />,
+    label: <h3 style={{ color: "#fff" }}>Exam Management</h3>,
+    icon: <MailOutlined style={{ color: "#fff" }} />,
     children: [
       {
         key: "1",
-        label: <Link to={MANAGER_EXAM_SCHEDULE_URL}>Exam Schedule</Link>,
+        label: (
+          <Link to={MANAGER_EXAM_SCHEDULE_URL} style={{ color: "#fff" }}>
+            Exam Schedule
+          </Link>
+        ),
       },
       {
         key: "2",
-        label: <Link to={MANAGER_ATTENDENCE_CHECK_URL}>Attendance Check</Link>,
+        label: (
+          <Link to={MANAGER_ATTENDENCE_CHECK_URL} style={{ color: "#fff" }}>
+            Attendance Check
+          </Link>
+        ),
       },
     ],
   },
   {
     key: "sub2",
-    label: <h3>Invigilation Management</h3>,
-    icon: <AppstoreOutlined />,
+    label: <h3 style={{ color: "#fff" }}>Invigilation</h3>,
+    icon: <AppstoreOutlined style={{ color: "#fff" }} />,
     children: [
       {
         key: "3",
-        label: <Link to="/invigilator-attendance">Invigilator Attendance</Link>,
+        label: (
+          <Link to="/invigilator-attendance" style={{ color: "#fff" }}>
+            Invigilator Attendance
+          </Link>
+        ),
       },
       {
         key: "4",
-        label: <Link to="/invigilation-fees">Invigilation Fees</Link>,
+        label: (
+          <Link to="/invigilation-fees" style={{ color: "#fff" }}>
+            Invigilation Fees
+          </Link>
+        ),
       },
     ],
   },
   {
     key: "sub3",
-    label: <h3>Settings</h3>,
-    icon: <SettingOutlined />,
+    label: <h3 style={{ color: "#fff" }}>Settings</h3>,
+    icon: <SettingOutlined style={{ color: "#fff" }} />,
     children: [
       {
         key: "5",
-        label: <Link to={MANAGER_SEMESTER_URL}>Semester</Link>,
+        label: (
+          <Link to={MANAGER_SEMESTER_URL} style={{ color: "#fff" }}>
+            Semester
+          </Link>
+        ),
       },
 
       {
         key: "7",
-        label: <Link to={MANAGER_USERS_URL}>Users</Link>,
+        label: (
+          <Link to={MANAGER_USERS_URL} style={{ color: "#fff" }}>
+            Users
+          </Link>
+        ),
       },
     ],
   },
@@ -102,7 +126,7 @@ const NavBar_Manager = () => {
   };
   return (
     <Menu
-      style={{ width: 256 }}
+      style={{ width: 256, backgroundColor: "#4D908E" }}
       mode="inline"
       selectedKeys={selectedKeys}
       openKeys={openKeys} // Control open keys
