@@ -19,9 +19,15 @@ const headerConfig = {
     { name: "Attendance", path: STAFF_ATTENDANCE_URL },
   ],
   invigilator: [
-    { name: "Schedule", path: "/dashboard" },
+    { name: "Dashboard", path: "/" },
     { name: "Register", path: "/register" },
-    { name: "request", path: "/request" },
+    {
+      name: "Request",
+      subMenu: [
+        { name: "Send request", path: "/request/send" },
+        { name: "View requests", path: "/request/view" },
+      ],
+    },
   ],
 };
 

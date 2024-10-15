@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { availableSlots } from "../../components/API/availableSlots";
 import { message } from "antd";
 
-export const useFetchAvailableSlots = (semesterId) => {
+export const useFetchAvailableSlots = (semesterId, reloadSlots) => {
   const [availableSlotsData, setAvailableSlotsData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -13,8 +13,10 @@ export const useFetchAvailableSlots = (semesterId) => {
     const fetchAvailableSlots = async () => {
       try {
         const response = await availableSlots(semesterId);
-        const arrayFromObject = Object.values(response || {});
-        setAvailableSlotsData(arrayFromObject);
+        const examSlotDetailSet = response.examSlotDetails;
+        console.log(examSlotDetailSet);
+
+        setAvailableSlotsData(examSlotDetailSet);
       } catch (e) {
         console.error("Error fetching available slots:", e.message);
         setError(e.message || "Error fetching available slots.");
@@ -25,7 +27,7 @@ export const useFetchAvailableSlots = (semesterId) => {
     };
 
     fetchAvailableSlots();
-  }, [semesterId]);
+  }, [semesterId, reloadSlots]);
 
   return { availableSlotsData, loading, error };
 };

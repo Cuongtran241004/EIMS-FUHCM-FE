@@ -59,3 +59,12 @@
 .rbc-agenda-time-cell {
   border-left: 1px solid #ddd;
 }
+
+.ant-modal-title {
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.ant-modal .ant-modal-title {
+  font-size: 20px;
+  font-weight: 500;
+}

@@ -6,17 +6,19 @@ import Dashboard from "./pages/Manager/Dashboard";
 import Request from "./pages/Manager/Request";
 import Semester from "./pages/Manager/Semester";
 import ExamSlots from "./pages/Manager/ExamSlots";
+import AttendanceCheck from "./pages/Manager/AttendanceCheck";
 import Subject from "./pages/Staff/Subject";
 import Exam from "./pages/Staff/Exam";
+import RoomSelectionPage from "./pages/Staff/Room";
 import Exam_Schedule from "./pages/Staff/Exam_Schedule";
 import Attendance from "./pages/Staff/Attendance";
 import InvigilatorDashboard from "./pages/Invigilator/InvigilatorDashboard";
 import InvigilatorRegistration from "./pages/Invigilator/InvigilatorRegistration";
 import InvigilatorRequest from "./pages/Invigilator/InvigilatorRequest";
-import AttendanceCheck from "./pages/Manager/AttendanceCheck";
-import RoomSelectionPage from "./pages/Staff/Room";
+import InvigilatorRequestsList from "./pages/Invigilator/InvigilatorRequestList";
 import { getUserInfo } from "./components/API/getUserInfo";
 import { SemesterProvider } from "./components/Context/SemesterContext.jsx";
+import { SemesterProviderInvigilator } from "./components/SemesterContext.jsx";
 import {
   MANAGER_ATTENDENCE_CHECK_URL,
   MANAGER_DASHBOARD_URL,
@@ -32,6 +34,7 @@ import {
 } from "./configs/urlWeb.js";
 import "./App.css";
 import ProfilePage from "./pages/Home/Profile.jsx";
+import Header from "./components/Header/Header.jsx";
 
 function App() {
   const [isLogin, setIsLogin] = useState(false);
@@ -112,8 +115,8 @@ function App() {
           <>
             <Route path="/" element={<InvigilatorDashboard />} />
             <Route path="/register" element={<InvigilatorRegistration />} />
-            <Route path="/request" element={<InvigilatorRequest />} />
-            <Route path="*" element={<Navigate to="/" replace />} />
+            <Route path="/request/send" element={<InvigilatorRequest />} />
+            <Route path="/request/view" element={<InvigilatorRequestsList />} />
           </>
         )}
         <Route path="profile" element={<ProfilePage user={user} />} />
@@ -127,7 +130,12 @@ function App() {
       {role === "staff" || role === "manager" ? (
         <SemesterProvider>{renderRoutes()}</SemesterProvider>
       ) : (
-        renderRoutes()
+        <>
+          {role === "invigilator" && <Header />}
+          <SemesterProviderInvigilator>
+            {renderRoutes()}
+          </SemesterProviderInvigilator>
+        </>
       )}
     </div>
   );

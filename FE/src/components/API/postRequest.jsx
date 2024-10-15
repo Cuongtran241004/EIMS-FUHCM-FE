@@ -1,11 +1,11 @@
 import axios from "axios";
 
-export const postRegisterSlots = async (slots) => {
+export const postRequest = async (data) => {
   const API_URL = import.meta.env.VITE_APP_API_URL;
-  const path = "/invigilators";
+  const path = "/requests";
 
   try {
-    const response = await axios.post(`${API_URL}${path}`, slots, {
+    const response = await axios.post(`${API_URL}${path}`, data, {
       withCredentials: true,
       headers: {
         Accept: "application/json",

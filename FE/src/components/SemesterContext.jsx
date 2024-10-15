@@ -7,11 +7,12 @@ const SemesterContext = createContext();
 
 export const useSemester = () => useContext(SemesterContext);
 
-export const SemesterProvider = ({ children }) => {
+export const SemesterProviderInvigilator = ({ children }) => {
   const { semesters, loading: loadingSemesters } = useFetchSemesters();
   const [selectedSemester, setSelectedSemester] = useState(null);
+  const [reloadSlots, setReloadSlots] = useState(0);
   const { availableSlotsData, loading: loadingAvailableSlots } =
-    useFetchAvailableSlots(selectedSemester?.id);
+    useFetchAvailableSlots(selectedSemester?.id, reloadSlots);
   const { examSlotDetail, loading: loadingSchedules } = useFetchSchedules(
     selectedSemester?.id
   );
@@ -22,12 +23,14 @@ export const SemesterProvider = ({ children }) => {
         (latest, current) => (current.id > latest.id ? current : latest),
         semesters[0]
       );
-
       setSelectedSemester(latestSemester);
     }
-  }, [semesters]);
+  }, [semesters, availableSlotsData]);
 
-  console.log("availableSlotsData", availableSlotsData);
+  const reloadAvailableSlots = () => {
+    setReloadSlots(reloadSlots + 1);
+  };
+
   return (
     <SemesterContext.Provider
       value={{
@@ -39,6 +42,7 @@ export const SemesterProvider = ({ children }) => {
         loadingSemesters,
         loadingAvailableSlots,
         loadingSchedules,
+        reloadAvailableSlots,
       }}
     >
       {children}
