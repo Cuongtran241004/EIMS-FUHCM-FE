@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { schedules } from "../API/schedules";
 
-export function useFetchSchedules(selectedSemester) {
+export function useFetchSchedules(selectedSemester, reloadSlots) {
   const [examSlotDetail, setExamSlotDetail] = useState([]);
 
   useEffect(() => {
@@ -24,7 +24,7 @@ export function useFetchSchedules(selectedSemester) {
     };
 
     fetchSchedules();
-  }, [selectedSemester]);
+  }, [selectedSemester, reloadSlots]);
 
   return { examSlotDetail };
 }

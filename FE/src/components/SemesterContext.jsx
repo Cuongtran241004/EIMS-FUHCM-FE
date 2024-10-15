@@ -14,7 +14,7 @@ export const SemesterProviderInvigilator = ({ children }) => {
   const { availableSlotsData, loading: loadingAvailableSlots } =
     useFetchAvailableSlots(selectedSemester?.id, reloadSlots);
   const { examSlotDetail, loading: loadingSchedules } = useFetchSchedules(
-    selectedSemester?.id
+    selectedSemester?.id, reloadSlots
   );
 
   useEffect(() => {

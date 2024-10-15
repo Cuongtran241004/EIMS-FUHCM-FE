@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import { UserContext } from "../../components/UserContext";
 import GoogleLogin from "../../components/API/GoogleLogin";
 import { postLoginToken } from "../../components/api/postLoginToken";
@@ -8,6 +8,7 @@ import { getUserInfo } from "../../components/API/getUserInfo";
 
 export default function Login({ setIsLogin }) {
   const { setUser } = useContext(UserContext);
+  const [errorMessage, setErrorMessage] = useState("");
 
   const onGoogleSignIn = async (res) => {
     const { credential } = res;
@@ -30,6 +31,9 @@ export default function Login({ setIsLogin }) {
         setIsLogin(true);
         window.location.reload();
       }
+    } else {
+      setErrorMessage("You don't have permission to access.");
+      return;
     }
   };
 
@@ -47,6 +51,7 @@ export default function Login({ setIsLogin }) {
               onGoogleSignIn={onGoogleSignIn}
               text="Login with Google"
             />
+         {errorMessage && <p style={{color: 'red'}} className="error-message">{errorMessage}</p>}
           </div>
         </div>
       </div>
