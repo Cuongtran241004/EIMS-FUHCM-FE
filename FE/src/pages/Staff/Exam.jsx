@@ -33,7 +33,12 @@ const Exam = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [loadingSubmit, setLoadingSubmit] = useState(false);
   const [editingExam, setEditingExam] = useState(null);
-  const { selectedSemester, setSelectedSemester, semesters } = useSemester(); // Access shared semester state
+  const {
+    selectedSemester,
+    setSelectedSemester,
+    semesters,
+    availableSemesters,
+  } = useSemester(); // Access shared semester state
   const [subjects, setSubjects] = useState([]);
   const [filteredSubjects, setFilteredSubjects] = useState([]);
   const [form] = Form.useForm();
@@ -99,13 +104,31 @@ const Exam = () => {
     form.resetFields();
   };
 
+  const handleEdit = (record) => {
+    if (
+      availableSemesters.find((semester) => semester.id === selectedSemester.id)
+    ) {
+      setIsEditing(true);
+      setEditingExam(record);
+      form.setFieldsValue(record);
+    } else {
+      message.error("You cannot edit this exam!");
+    }
+  };
+
   const handleDelete = async (id) => {
-    try {
-      await examApi.deleteExam(id);
-      message.success("Exam deleted successfully");
-      fetchExams(selectedSemester.id); // Reload exams after deletion
-    } catch (error) {
-      message.error("Failed to delete exam");
+    if (
+      availableSemesters.find((semester) => semester.id === selectedSemester.id)
+    ) {
+      try {
+        await examApi.deleteExam(id);
+        message.success("Exam deleted successfully");
+        fetchExams(selectedSemester.id); // Reload exams after deletion
+      } catch (error) {
+        message.error("Failed to delete exam");
+      }
+    } else {
+      message.error("You cannot delete this exam!");
     }
   };
 
@@ -169,11 +192,7 @@ const Exam = () => {
         <Space size="middle">
           <EditOutlined
             style={{ color: "blue", cursor: "pointer" }}
-            onClick={() => {
-              setIsEditing(true);
-              setEditingExam(record);
-              form.setFieldsValue(record);
-            }}
+            onClick={() => handleEdit(record)}
           />
           <Popconfirm
             title="Are you sure to delete this exam?"
@@ -195,6 +214,24 @@ const Exam = () => {
         {/* Sider for Form */}
         <Sider width={300} style={{ background: "#4D908E", padding: "24px" }}>
           <Form form={form} layout="vertical" name="add_exam_form">
+            <Form.Item
+              name="semesterId"
+              label="Semester"
+              rules={[
+                {
+                  required: true,
+                  message: "Please select semester!",
+                },
+              ]}
+            >
+              <Select placeholder="Select semester">
+                {availableSemesters.map((semester) => (
+                  <Select.Option key={semester.id} value={semester.id}>
+                    {semester.name}
+                  </Select.Option>
+                ))}
+              </Select>
+            </Form.Item>
             {/* Subject Field */}
             <Form.Item
               name="subjectName"

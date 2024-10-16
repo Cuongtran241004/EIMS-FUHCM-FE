@@ -23,7 +23,7 @@ import {
   Select,
 } from "antd";
 import subjectApi from "../../services/Subject.js";
-import { DownOutlined } from "@ant-design/icons";
+import { CloseOutlined, DownOutlined } from "@ant-design/icons";
 import Header from "../../components/Header/Header.jsx";
 import { useSemester } from "../../components/Context/SemesterContext.jsx";
 import { subjectTable } from "../../design-systems/CustomTable.jsx";
@@ -51,8 +51,10 @@ const Subject = () => {
   const fetchData = async (semesterId) => {
     setLoading(true);
     try {
-      const result = await subjectApi.getSubjectBySemester(semesterId);
-      setData(result);
+      const response = await subjectApi.getSubjectBySemester(semesterId);
+      // sort by id
+      const result = response.sort((a, b) => b.id - a.id);
+      setData(result || []);
     } catch (error) {
       message.error(FETCH_SUBJECTS_FAILED);
     } finally {
@@ -89,20 +91,37 @@ const Subject = () => {
   };
 
   const handleDelete = async (id) => {
-    try {
-      await subjectApi.deleteSubject(id);
-      message.success(DELETE_SUBJECT_SUCCESS);
-      fetchData(selectedSemester.id);
-    } catch (error) {
-      message.error(DELETE_SUBJECT_FAILED);
+    if (
+      availableSemesters.find((semester) => semester.id === selectedSemester.id)
+    ) {
+      try {
+        await subjectApi.deleteSubject(id);
+        message.success(DELETE_SUBJECT_SUCCESS);
+        fetchData(selectedSemester.id);
+      } catch (error) {
+        message.error(DELETE_SUBJECT_FAILED);
+      }
+    } else {
+      message.error("You cannot delete this subject!");
     }
   };
 
   const handleEdit = (record) => {
-    setIsEditing(true);
-    setEditingSubject(record);
-    form.setFieldsValue(record);
-    setIsModalVisible(true);
+    // only allow when availableSemesters contains selectedSemester
+    if (
+      availableSemesters.find((semester) => semester.id === selectedSemester.id)
+    ) {
+      setIsEditing(true);
+      setEditingSubject(record);
+      form.setFieldsValue({
+        code: record.code,
+        name: record.name,
+        semesterId: record.semesterName,
+      });
+      setIsModalVisible(true);
+    } else {
+      message.error("You cannot edit this subject!");
+    }
   };
 
   const handleOk = async () => {
@@ -110,19 +129,19 @@ const Subject = () => {
       setLoadingSubmit(true);
       try {
         const values = await form.validateFields();
-        const subjectData = {
-          ...values,
-          semesterId: selectedSemester.id,
-        };
 
+        console.log(subjectData);
         if (isEditing) {
           await subjectApi.updateSubject({ ...editingSubject, ...subjectData });
           message.success(EDIT_SUBJECT_SUCCESS);
         } else {
-          await subjectApi.addSubject(subjectData);
+          await subjectApi.addSubject(values);
           message.success(ADD_SUBJECT_SUCCESS);
         }
-        fetchData(subjectData.semesterId);
+        if (selectedSemester.id === values.semesterId) {
+          fetchData(subjectData.semesterId);
+        }
+
         handleCancel();
       } catch (error) {
         message.error(isEditing ? EDIT_SUBJECT_FAILED : ADD_SUBJECT_FAILED);
@@ -139,7 +158,7 @@ const Subject = () => {
         <Sider width={300} style={{ background: "#4D908E", padding: "24px" }}>
           <Form form={form} layout="vertical" name="add_subject_form">
             <Form.Item
-              name="semester"
+              name="semesterId"
               label="Semester"
               rules={[
                 {
@@ -148,10 +167,13 @@ const Subject = () => {
                 },
               ]}
             >
-              <Select
-                placeholder="Select semester"
-                onChange={(value) => setSelectedSemester(value)}
-              />
+              <Select placeholder="Select semester">
+                {availableSemesters.map((semester) => (
+                  <Select.Option key={semester.id} value={semester.id}>
+                    {semester.name}
+                  </Select.Option>
+                ))}
+              </Select>
             </Form.Item>
 
             <Form.Item
@@ -189,6 +211,7 @@ const Subject = () => {
                   }}
                 >
                   Clear
+                  <CloseOutlined />
                 </Button>
               </Col>
               <Col>

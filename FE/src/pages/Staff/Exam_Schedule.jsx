@@ -19,13 +19,14 @@ import Sider from "antd/es/layout/Sider";
 import Header from "../../components/Header/Header.jsx";
 import examApi from "../../services/Exam.js";
 import examSlotApi from "../../services/ExamSlot.js";
-import { DownOutlined } from "@ant-design/icons";
+import { CloseOutlined, DownOutlined } from "@ant-design/icons";
 import moment from "moment";
 import { useSemester } from "../../components/Context/SemesterContext.jsx";
 import { selectButtonStyle } from "../../design-systems/CSS/Button.js";
 import { staffMapperUtil } from "../../utils/Mapper/StaffMapperUtil.jsx";
 import { examScheduleTable } from "../../design-systems/CustomTable.jsx";
 import { titleStyle } from "../../design-systems/CSS/Title.js";
+import "./CustomForm.css";
 const { Option } = Select;
 const { Content } = Layout;
 const PAGE_SIZE = 6;
@@ -40,6 +41,7 @@ const Exam_Schedule = () => {
     selectedSemester,
     setSelectedSemester,
     semesters,
+    availableSemesters,
     loading: semesterLoading,
   } = useSemester(); // Access shared semester state
   const [isEditing, setIsEditing] = useState(false);
@@ -97,26 +99,37 @@ const Exam_Schedule = () => {
   };
 
   const handleDelete = async (id) => {
-    try {
-      await examSlotApi.deleteExamSlot(id);
-      message.success("Exam slot deleted successfully");
-      fetchExamSchedule(selectedSemester.id); // Refresh schedule
-    } catch (error) {
-      message.error("Failed to delete exam");
+    if (
+      availableSemesters.find((semester) => semester.id === selectedSemester.id)
+    ) {
+      try {
+        await examSlotApi.deleteExamSlot(id);
+        message.success("Exam slot deleted successfully");
+        fetchExamSchedule(selectedSemester.id); // Refresh schedule
+      } catch (error) {
+        message.error("Failed to delete exam");
+      }
+    } else {
+      message.error("You cannot delete this exam slot!");
     }
   };
 
   const handleEdit = (record) => {
-    console.log(record);
-    setIsEditing(true);
-    setEditingExamSlot(record);
-    form.setFieldsValue({
-      id: record.id,
-      exam: record.examId,
-      date: moment(record.startAt),
-      startTime: moment(record.startAt),
-      endTime: moment(record.endAt),
-    });
+    if (
+      availableSemesters.find((semester) => semester.id === selectedSemester.id)
+    ) {
+      setIsEditing(true);
+      setEditingExamSlot(record);
+      form.setFieldsValue({
+        id: record.id,
+        exam: record.examId,
+        date: moment(record.startAt),
+        startTime: moment(record.startAt),
+        endTime: moment(record.endAt),
+      });
+    } else {
+      message.error("You cannot edit this exam slot!");
+    }
   };
 
   const handleOK = async () => {
@@ -202,8 +215,26 @@ const Exam_Schedule = () => {
         <Sider width={300} style={{ background: "#4D908E", padding: "24px" }}>
           <Form form={form} layout="vertical" name="add_exam_slot_form">
             <Form.Item
+              name="semesterId"
+              label={<span className="custom-label">Semester</span>}
+              rules={[
+                {
+                  required: true,
+                  message: "Please select semester!",
+                },
+              ]}
+            >
+              <Select placeholder="Select semester">
+                {availableSemesters.map((semester) => (
+                  <Select.Option key={semester.id} value={semester.id}>
+                    {semester.name}
+                  </Select.Option>
+                ))}
+              </Select>
+            </Form.Item>
+            <Form.Item
               name="exam"
-              label="Exam"
+              label={<span className="custom-label">Exam</span>}
               rules={[{ required: true, message: "Required" }]}
             >
               <Select
@@ -223,7 +254,7 @@ const Exam_Schedule = () => {
             </Form.Item>
             <Form.Item
               name="date"
-              label="Date"
+              label={<span className="custom-label">Date</span>}
               rules={[{ required: true, message: "Required" }]}
             >
               <DatePicker format="DD-MM-YYYY" style={{ width: "100%" }} />
@@ -232,7 +263,7 @@ const Exam_Schedule = () => {
               <Col span={12}>
                 <Form.Item
                   name="startTime"
-                  label="Start Time"
+                  label={<span className="custom-label">Start Time</span>}
                   rules={[{ required: true, message: "Required" }]}
                 >
                   <TimePicker format="HH:mm" style={{ width: "100%" }} />
@@ -242,7 +273,7 @@ const Exam_Schedule = () => {
               <Col span={12}>
                 <Form.Item
                   name="endTime"
-                  label="End Time"
+                  label={<span className="custom-label">End Time</span>}
                   rules={[
                     { required: true, message: "Required" },
                     { validator: validateTime },
@@ -262,6 +293,7 @@ const Exam_Schedule = () => {
                   onClick={handleCancel}
                 >
                   Clear
+                  <CloseOutlined />
                 </Button>
               </Col>
               <Col>
