@@ -7,7 +7,6 @@ export const cancelRegisteredSlot = async (slotId) => {
 
   const queryString = slotIds.map((id) => `id=${id}`).join("&");
   const path = `/invigilators/myinfo/register?${queryString}`;
-  console.log(slotId);
   try {
     const response = await axios.delete(`${API_URL}${path}`, {
       withCredentials: true,

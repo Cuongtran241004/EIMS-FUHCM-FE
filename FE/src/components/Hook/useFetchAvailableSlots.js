@@ -14,7 +14,6 @@ export const useFetchAvailableSlots = (semesterId, reloadSlots) => {
       try {
         const response = await availableSlots(semesterId);
         const examSlotDetailSet = response.examSlotDetails;
-        console.log(examSlotDetailSet);
 
         setAvailableSlotsData(examSlotDetailSet);
       } catch (e) {
