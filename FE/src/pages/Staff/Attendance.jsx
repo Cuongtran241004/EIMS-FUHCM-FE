@@ -1,18 +1,32 @@
 import React, { useState, useEffect, useContext } from "react";
 import Header from "../../components/Header/Header.jsx";
-import { Table, Spin, message, Layout, Space, Dropdown, Button } from "antd";
+import {
+  Table,
+  Spin,
+  message,
+  Layout,
+  Space,
+  Dropdown,
+  Button,
+  Form,
+  Select,
+} from "antd";
 import examSlotApi from "../../services/ExamSlot.js";
 import { useSemester } from "../../components/Context/SemesterContext.jsx";
 import { DownOutlined } from "@ant-design/icons";
 const { Content, Sider } = Layout;
 import { selectButtonStyle } from "../../design-systems/CSS/Button.js";
 import { titleStyle } from "../../design-systems/CSS/Title.js";
-import { Form } from "react-router-dom";
-
+import "./CustomForm.css";
 const Attendance = () => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
-  const { selectedSemester, setSelectedSemester, semesters } = useSemester(); // Access shared semester state
+  const {
+    selectedSemester,
+    setSelectedSemester,
+    semesters,
+    availableSemesters,
+  } = useSemester(); // Access shared semester state
   const [form] = Form.useForm();
   // Fetch attendance data
   const fetchExams = async (term) => {
@@ -85,7 +99,26 @@ const Attendance = () => {
         {/* Sider for Form */}
         <Sider width={300} style={{ background: "#4D908E", padding: "24px" }}>
           {/* Add form components here */}
-          <Form form={form} layout="vertical" name="add_exam_slot_form"></Form>
+          <Form form={form} layout="vertical" name="add_exam_slot_form">
+            <Form.Item
+              name="semesterId"
+              label={<span className="custom-label">Semester</span>}
+              rules={[
+                {
+                  required: true,
+                  message: "Please select semester!",
+                },
+              ]}
+            >
+              <Select placeholder="Select semester">
+                {availableSemesters.map((semester) => (
+                  <Select.Option key={semester.id} value={semester.id}>
+                    {semester.name}
+                  </Select.Option>
+                ))}
+              </Select>
+            </Form.Item>
+          </Form>
         </Sider>
 
         {/* Content for Table */}
