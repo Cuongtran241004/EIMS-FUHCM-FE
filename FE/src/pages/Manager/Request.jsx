@@ -17,6 +17,8 @@ import Header from "../../components/Header/Header.jsx";
 import { useSemester } from "../../components/Context/SemesterContext.jsx";
 import requestApi from "../../services/Request.js";
 import moment from "moment";
+import { requestTag } from "../../design-systems/CustomTag.jsx";
+import { managerMapperUtil } from "../../utils/Mapper/ManagerMapperUtil.jsx";
 
 const { Content, Sider } = Layout;
 const { Option } = Select;
@@ -30,18 +32,11 @@ const Request = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedRequest, setSelectedRequest] = useState(null); // Store selected request details
 
-  // Example list of alternative users
-  const [users, setUsers] = useState([
-    { id: 1, name: "Invigilator A" },
-    { id: 2, name: "Invigilator B" },
-    { id: 3, name: "Invigilator C" },
-  ]);
-
   const fetchData = async (semesterId) => {
     setLoading(true);
     try {
-      const result = await requestApi.getAllRequestsBySemesterId(semesterId);
-
+      const response = await requestApi.getAllRequestsBySemesterId(semesterId);
+      const result = managerMapperUtil.mapRequest(response); // Map response data to table data
       // sort request by createdAt
       result.sort((a, b) => {
         return new Date(b.requestId) - new Date(a.requestId);
@@ -134,25 +129,7 @@ const Request = () => {
       dataIndex: "status",
       key: "status",
       render: (status) => {
-        if (status === "PENDING") {
-          return (
-            <Tag color="orange">
-              <strong>{status}</strong>
-            </Tag>
-          );
-        } else if (status === "APPROVED") {
-          return (
-            <Tag color="green">
-              <strong>{status}</strong>
-            </Tag>
-          );
-        } else {
-          return (
-            <Tag color="red">
-              <strong>{status}</strong>
-            </Tag>
-          );
-        }
+        requestTag(status);
       },
     },
     {
@@ -227,21 +204,7 @@ const Request = () => {
 
           <Spin spinning={loading}>
             <Table
-              dataSource={requests.map((request) => ({
-                requestId: request.requestId,
-                reason: request.reason,
-                examSlotId: request.examSlotDetail?.examSlotId,
-                startAt: request.examSlotDetail?.startAt,
-                endAt: request.examSlotDetail?.endAt,
-                fuId: request.fuId,
-                email: request.email,
-                subjectName: request.subject?.name,
-                subjectCode: request.subject?.code,
-                examType: request.examSlotDetail?.examType,
-                status: request.status,
-                note: request.note,
-                key: request.requestId,
-              }))}
+              dataSource={requests}
               columns={columns}
               pagination={{ pageSize: pageSize }}
               rowClassName="table-row"

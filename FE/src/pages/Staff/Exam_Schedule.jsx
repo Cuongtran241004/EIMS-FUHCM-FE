@@ -24,7 +24,12 @@ import examSlotApi from "../../services/ExamSlot.js";
 import { DeleteOutlined, EditOutlined, DownOutlined } from "@ant-design/icons";
 import moment from "moment";
 import { useSemester } from "../../components/Context/SemesterContext.jsx";
-import RoomSelectionPopover from "./Room.jsx";
+import {
+  examScheduleTag,
+  examTypeTag,
+} from "../../design-systems/CustomTag.jsx";
+import { staffMapperUtil } from "../../utils/Mapper/StaffMapperUtil.jsx";
+import { examScheduleTable } from "../../design-systems/CustomTable.jsx";
 const { Option } = Select;
 const { Content } = Layout;
 const PAGE_SIZE = 6;
@@ -51,11 +56,11 @@ const Exam_Schedule = () => {
   const fetchExamSchedule = async (semesterId, page) => {
     setLoading(true);
     try {
-      const result = await examSlotApi.getExamSlotBySemesterId(
+      const response = await examSlotApi.getExamSlotBySemesterId(
         semesterId,
         page
       );
-
+      const result = staffMapperUtil.mapExamSchedule(response);
       setExamSchedule(result || []);
       setTotalItems(result.length || 0);
     } catch (error) {
@@ -194,118 +199,6 @@ const Exam_Schedule = () => {
     return Promise.resolve();
   };
 
-  const columns = [
-    {
-      title: "Code",
-      dataIndex: "subjectCode",
-      key: "subjectCode",
-    },
-    {
-      title: "Subject",
-      dataIndex: "subjectName",
-      key: "subjectName",
-    },
-    {
-      title: "Exam Type",
-      dataIndex: "examType",
-      key: "examType",
-      render: (text) => {
-        if (text === "PE") {
-          const color = "blue";
-          return <Tag color={color}>{text}</Tag>;
-        } else if (text === "FE") {
-          const color = "green";
-          return <Tag color={color}>{text}</Tag>;
-        } else if (text === "PE&TE") {
-          const color = "orange";
-          return <Tag color={color}>{text}</Tag>;
-        } else {
-          const color = "red";
-          return <Tag color={color}>{text}</Tag>;
-        }
-      },
-    },
-    {
-      title: "Date (DD-MM-YYYY)",
-      dataIndex: "startAt", // Use startAt to extract date
-      key: "date",
-      render: (text) => moment(text).format("DD-MM-YYYY"), // Format as DD-MM-YYYY
-    },
-    {
-      title: "Time",
-      key: "time",
-      render: (text, record) => {
-        const startTime = new Date(record.startAt).toLocaleTimeString([], {
-          hour: "2-digit",
-          minute: "2-digit",
-        });
-        const endTime = new Date(record.endAt).toLocaleTimeString([], {
-          hour: "2-digit",
-          minute: "2-digit",
-        });
-        return `${startTime} - ${endTime}`; // Combine start and end time
-      },
-    },
-    {
-      title: "Room",
-      render: (text, record) => (
-        <Button onClick={() => handleRoomClick(record.id)}>Room</Button>
-      ),
-    },
-    {
-      title: "Status",
-      dataIndex: "status",
-      key: "status",
-      render: (status) => {
-        let color = "";
-        let text = "";
-        // Define color and label based on the status value
-        switch (status) {
-          case "NEEDS_ROOM_ASSIGNMENT":
-            color = "blue";
-            text = "Needs room";
-            break;
-          case "PENDING":
-            color = "orange";
-            text = "Pending";
-            break;
-          case "APPROVED":
-            color = "green";
-            text = "Approved";
-            break;
-          case "REJECTED":
-            color = "red";
-            text = "Rejected";
-            break;
-          default:
-            color = "black";
-            text = "Unknown";
-        }
-
-        return <Tag color={color}>{text}</Tag>;
-      },
-    },
-    {
-      title: "Action",
-      key: "action",
-      render: (text, record) => (
-        <Space size="middle">
-          <EditOutlined
-            style={{ color: "blue", cursor: "pointer" }}
-            onClick={() => handleEdit(record)}
-          />
-          <Popconfirm
-            title="Are you sure to delete this exam slot?"
-            onConfirm={() => handleDelete(record.id)}
-            okText="Yes"
-            cancelText="No"
-          >
-            <DeleteOutlined style={{ color: "red", cursor: "pointer" }} />
-          </Popconfirm>
-        </Space>
-      ),
-    },
-  ];
   return (
     <Layout style={{ height: "100vh" }}>
       <Header />
@@ -412,18 +305,12 @@ const Exam_Schedule = () => {
           </div>
           <Spin spinning={loading}>
             <Table
-              dataSource={examSchedule.map((item) => ({
-                id: item.id,
-                examId: item.subjectExamDTO?.subjectExamId,
-                subjectCode: item.subjectExamDTO?.subjectCode || "Loading",
-                subjectName: item.subjectExamDTO?.subjectName || "Loading",
-                examType: item.subjectExamDTO?.examType || "Loading",
-                startAt: item.startAt,
-                endAt: item.endAt,
-                status: item.status,
-                key: item.id,
-              }))}
-              columns={columns}
+              dataSource={examSchedule}
+              columns={examScheduleTable(
+                handleRoomClick,
+                handleEdit,
+                handleDelete
+              )}
               pagination={{
                 pageSize: PAGE_SIZE,
                 total: totalItems,

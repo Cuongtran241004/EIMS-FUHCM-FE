@@ -1,4 +1,5 @@
 const examType = ["PE", "FE", "PE&TE"];
+
 const departments = [
   "Chinese",
   "Computer Science",
@@ -28,4 +29,10 @@ const departments = [
   "Vietnamese",
 ];
 
-export { examType, departments };
+const roleOptions = [
+  { label: "Manager", value: 1 },
+  { label: "Staff", value: 2 },
+  { label: "Invigilator", value: 3 },
+];
+
+export { examType, departments, roleOptions };

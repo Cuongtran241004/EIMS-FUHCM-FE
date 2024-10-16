@@ -21,6 +21,7 @@ import { DeleteOutlined, DownOutlined, EditOutlined } from "@ant-design/icons";
 import Header from "../../components/Header/Header.jsx";
 import { useSemester } from "../../components/Context/SemesterContext.jsx";
 import { examType } from "../../configs/data.js";
+import { examTypeTag } from "../../design-systems/CustomTag.jsx";
 const { Content, Sider } = Layout;
 const { Option } = Select;
 
@@ -153,19 +154,7 @@ const Exam = () => {
       key: "examType",
       // using tag of ant to display
       render: (text) => {
-        if (text === "PE") {
-          const color = "blue";
-          return <Tag color={color}>{text}</Tag>;
-        } else if (text === "FE") {
-          const color = "green";
-          return <Tag color={color}>{text}</Tag>;
-        } else if (text === "PE&TE") {
-          const color = "orange";
-          return <Tag color={color}>{text}</Tag>;
-        } else {
-          const color = "red";
-          return <Tag color={color}>{text}</Tag>;
-        }
+        examTypeTag(text);
       },
     },
     {

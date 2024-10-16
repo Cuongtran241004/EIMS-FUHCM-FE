@@ -26,6 +26,7 @@ import subjectApi from "../../services/Subject.js";
 import { DeleteOutlined, DownOutlined, EditOutlined } from "@ant-design/icons";
 import Header from "../../components/Header/Header.jsx";
 import { useSemester } from "../../components/Context/SemesterContext.jsx";
+import { subjectTable } from "../../design-systems/CustomTable.jsx";
 const { Content, Sider } = Layout;
 
 const Subject = () => {
@@ -96,45 +97,6 @@ const Subject = () => {
     form.setFieldsValue(record);
     setIsModalVisible(true);
   };
-
-  const columns = [
-    {
-      title: "No",
-      dataIndex: "no",
-      key: "no",
-      render: (_, __, index) => (currentPage - 1) * pageSize + index + 1,
-    },
-    {
-      title: "Code",
-      dataIndex: "code",
-      key: "code",
-    },
-    {
-      title: "Name",
-      dataIndex: "name",
-      key: "name",
-    },
-    {
-      title: "Action",
-      key: "action",
-      render: (text, record) => (
-        <Space size="middle">
-          <EditOutlined
-            style={{ color: "blue", cursor: "pointer" }}
-            onClick={() => handleEdit(record)}
-          />
-          <Popconfirm
-            title="Are you sure to delete this subject?"
-            onConfirm={() => handleDelete(record.id)}
-            okText="Yes"
-            cancelText="No"
-          >
-            <DeleteOutlined style={{ color: "red", cursor: "pointer" }} />
-          </Popconfirm>
-        </Space>
-      ),
-    },
-  ];
 
   const handleOk = async () => {
     setLoadingSubmit(true);
@@ -240,7 +202,12 @@ const Subject = () => {
           <Spin spinning={loading}>
             <Table
               dataSource={data.map((item) => ({ ...item, key: item.id }))}
-              columns={columns}
+              columns={subjectTable(
+                currentPage,
+                pageSize,
+                handleEdit,
+                handleDelete
+              )}
               pagination={{
                 pageSize,
                 current: currentPage,

@@ -35,20 +35,15 @@ import {
   IMPORT_USERS_SUCCESS,
   IMPORT_USERS_FAILED,
 } from "../../configs/messages.js";
-import { User_Import_Excel } from "../../utils/User_Import_Excel.js";
-import { User_Excel_Template } from "../../utils/User_Excel_Template.js";
-
+import { User_Import_Excel } from "../../utils/Import-Excel/User_Import_Excel.js";
+import { User_Excel_Template } from "../../utils/Import-Excel/User_Excel_Template.js";
 import NavBar_Manager from "../../components/NavBar/NavBar_Manager.jsx";
-
 import Header from "../../components/Header/Header.jsx";
-import { departments } from "../../configs/data.js";
-const { Content, Sider } = Layout;
+import { departments, roleOptions } from "../../configs/data.js";
+import { userRoleTag } from "../../design-systems/CustomTag.jsx";
+import { userTable } from "../../design-systems/CustomTable.jsx";
 
-const roleOptions = [
-  { label: "Manager", value: 1 },
-  { label: "Staff", value: 2 },
-  { label: "Invigilator", value: 3 },
-];
+const { Content, Sider } = Layout;
 
 const Users = ({ isLogin }) => {
   const [data, setData] = useState([]);
@@ -63,15 +58,12 @@ const Users = ({ isLogin }) => {
   const fetchData = async () => {
     setLoading(true);
     try {
-      // Fetch the data
       const result = await userApi.getAllUsers();
-      // sort user by fuId, fuid is a string
 
       result.sort((a, b) => {
         return b.fuId.localeCompare(a.fuId);
       });
 
-      // Ensure that we replace the current data with the new data
       setData(result);
     } catch (error) {
       message.error(FETCH_USERS_FAILED);
@@ -197,69 +189,6 @@ const Users = ({ isLogin }) => {
     }
   };
 
-  const columns = [
-    {
-      title: "FUID",
-      dataIndex: "fuId",
-      key: "fuId",
-    },
-    {
-      title: "Full Name",
-      key: "fullName",
-      render: (text, record) => `${record.lastName} ${record.firstName} `,
-    },
-    {
-      title: "Email",
-      dataIndex: "email",
-      key: "email",
-    },
-    {
-      title: "Phone Number",
-      dataIndex: "phoneNumber",
-      key: "phoneNumber",
-    },
-    {
-      title: "Department",
-      dataIndex: "department",
-      key: "department",
-    },
-    {
-      title: "Role",
-      dataIndex: "role",
-      key: "role",
-      // using tag of ant design to display role
-      render: (text, record) => {
-        const role = roleOptions.find((role) => role.value === record.role);
-        if (role.label === "Manager") {
-          return <Tag color="orange">{role.label}</Tag>;
-        } else if (role.label === "Staff") {
-          return <Tag color="blue">{role.label}</Tag>;
-        }
-        return <Tag color="green">{role.label}</Tag>;
-      },
-    },
-    {
-      title: "Action",
-      key: "action",
-      render: (text, record) => (
-        <Space size="middle">
-          <EditOutlined
-            onClick={() => handleEdit(record)}
-            style={{ color: "blue", cursor: "pointer" }}
-          />
-          <Popconfirm
-            title="Are you sure to delete this user?"
-            onConfirm={() => handleDelete(record.fuId)}
-            okText="Yes"
-            cancelText="No"
-          >
-            <DeleteOutlined style={{ color: "red", cursor: "pointer" }} />
-          </Popconfirm>
-        </Space>
-      ),
-    },
-  ];
-
   return (
     <Layout style={{ height: "100vh" }}>
       <Header />
@@ -317,7 +246,7 @@ const Users = ({ isLogin }) => {
             <Spin spinning={loading}>
               <Table
                 dataSource={data}
-                columns={columns}
+                columns={userTable(handleEdit, handleDelete)}
                 rowKey={(record) => record.fuId}
                 pagination={{
                   pageSize: 7,
