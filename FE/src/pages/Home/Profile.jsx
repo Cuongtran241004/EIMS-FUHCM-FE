@@ -59,7 +59,7 @@ const ProfilePage = ({ user }) => {
         boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
       }}
     >
-      <Title level={2} style={{ textAlign: "center", color: "#f05123" }}>
+      <Title level={2} style={{ textAlign: "center", color: "#4D908E" }}>
         User Profile
       </Title>
 
@@ -92,11 +92,11 @@ const ProfilePage = ({ user }) => {
                 style={{
                   cursor: "pointer",
                   margin: "0 auto",
-                  border: "2px solid #f05123",
+                  border: "2px solid #4D908E",
                 }}
               />
             </Upload>
-            <div style={{ marginTop: 10, color: "#f05123" }}>
+            <div style={{ marginTop: 10, color: "#4D908E" }}>
               <Button
                 icon={<PlusOutlined />}
                 style={{ borderRadius: "4px" }}
@@ -194,8 +194,8 @@ const ProfilePage = ({ user }) => {
             style={{
               float: "right",
               borderRadius: "4px",
-              backgroundColor: "#f05123",
-              borderColor: "#f05123",
+              backgroundColor: "#4D908E",
+              borderColor: "#4D908E",
             }}
           >
             Update

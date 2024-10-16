@@ -1,5 +1,10 @@
 import { Button, Popconfirm, Space } from "antd";
-import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
+import {
+  DeleteOutlined,
+  EditOutlined,
+  EyeOutlined,
+  PlusSquareOutlined,
+} from "@ant-design/icons";
 import moment from "moment";
 import { examScheduleTag, examTypeTag, userRoleTag } from "./CustomTag.jsx";
 import { roleOptions } from "../configs/data.js";
@@ -45,7 +50,9 @@ const examScheduleTable = (handleRoomClick, handleEdit, handleDelete) => [
   {
     title: "Room",
     render: (text, record) => (
-      <Button onClick={() => handleRoomClick(record.id)}>Room</Button>
+      <Button type="text" onClick={() => handleRoomClick(record.id)}>
+        <PlusSquareOutlined style={{ fontSize: "20px", color: "#43AA8B" }} />
+      </Button>
     ),
   },
   {

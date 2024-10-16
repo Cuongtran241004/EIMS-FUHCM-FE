@@ -30,7 +30,7 @@ function Logout() {
   };
 
   return (
-    <Button danger onClick={handleLogout}>
+    <Button type="text" onClick={handleLogout} style={{ color: "#F3722C" }}>
       Logout
       <LogoutOutlined />
     </Button>

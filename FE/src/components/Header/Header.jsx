@@ -11,7 +11,7 @@ import "./Header.css";
 const items = [
   {
     label: (
-      <Button type="link">
+      <Button type="link" style={{ color: "#4D908E" }}>
         <Link to="/profile">
           Profile <EyeOutlined />
         </Link>

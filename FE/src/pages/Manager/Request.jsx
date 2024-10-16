@@ -10,7 +10,7 @@ import {
   Tag,
   Modal,
 } from "antd";
-import { DownOutlined } from "@ant-design/icons";
+import { DownOutlined, EyeOutlined } from "@ant-design/icons";
 import NavBar_Manager from "../../components/NavBar/NavBar_Manager";
 import Header from "../../components/Header/Header.jsx";
 import { useSemester } from "../../components/Context/SemesterContext.jsx";
@@ -144,11 +144,12 @@ const Request = () => {
       render: (text, record) => (
         <Space size="large">
           <Button
+            type="text"
             onClick={() => handleDetailClick(record)}
-            style={{ ...detailButtonStyle, width: "90px" }}
+            style={{ ...detailButtonStyle, width: "50px" }}
             loading={detailLoading[record.requestId] || false} // Use loading state for the specific row
           >
-            Detail
+            <EyeOutlined style={{ fontSize: "20px", color: "#43AA8B" }} />
           </Button>
           <Button style={buttonStyle}>Approve</Button>
           <Button danger>Reject</Button>
