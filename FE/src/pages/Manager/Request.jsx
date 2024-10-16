@@ -9,7 +9,6 @@ import {
   Spin,
   Tag,
   Modal,
-  Select,
 } from "antd";
 import { DownOutlined } from "@ant-design/icons";
 import NavBar_Manager from "../../components/NavBar/NavBar_Manager";
@@ -25,28 +24,26 @@ import {
   selectButtonStyle,
 } from "../../design-systems/CSS/Button.js";
 import { titleStyle } from "../../design-systems/CSS/Title.js";
+import userApi from "../../services/User.js";
 
 const { Content, Sider } = Layout;
 
 const Request = () => {
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(false);
-  const { selectedSemester, setSelectedSemester, semesters } = useSemester(); // Access shared semester state
+  const { selectedSemester, setSelectedSemester, semesters } = useSemester();
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 8;
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [selectedRequest, setSelectedRequest] = useState(null); // Store selected request details
+  const [selectedRequest, setSelectedRequest] = useState(null);
+  const [detailLoading, setDetailLoading] = useState({}); // Change to an object to track loading by row
 
   const fetchData = async (semesterId) => {
     setLoading(true);
     try {
       const response = await requestApi.getAllRequestsBySemesterId(semesterId);
-      const result = managerMapperUtil.mapRequest(response); // Map response data to table data
-      // sort request by createdAt
-      result.sort((a, b) => {
-        return new Date(b.requestId) - new Date(a.requestId);
-      });
-
+      const result = managerMapperUtil.mapRequest(response);
+      result.sort((a, b) => new Date(b.requestId) - new Date(a.requestId));
       setRequests(result || []);
     } catch (error) {
       message.error("Failed to fetch requests");
@@ -76,14 +73,26 @@ const Request = () => {
     }
   };
 
-  const handleDetailClick = (record) => {
-    setSelectedRequest(record); // Set the selected request data
-    setIsModalVisible(true); // Show modal
+  const handleDetailClick = async (record) => {
+    setDetailLoading((prev) => ({ ...prev, [record.requestId]: true })); // Set loading for the specific row
+    try {
+      const requestUser = await userApi.getUserByFuId(record.fuId);
+      const response = {
+        ...record,
+        ...requestUser,
+      };
+      setSelectedRequest(response);
+      setIsModalVisible(true);
+    } catch (error) {
+      message.error("Failed to fetch user info");
+    } finally {
+      setDetailLoading((prev) => ({ ...prev, [record.requestId]: false })); // Reset loading for the specific row
+    }
   };
 
   const handleModalClose = () => {
-    setIsModalVisible(false); // Hide modal
-    setSelectedRequest(null); // Clear selected request data
+    setIsModalVisible(false);
+    setSelectedRequest(null);
   };
 
   const columns = [
@@ -102,9 +111,7 @@ const Request = () => {
       title: "Subject",
       dataIndex: "subject",
       key: "studentId",
-      render: (text, record) => {
-        return `${record.subjectCode} `;
-      },
+      render: (text, record) => `${record.subjectCode} `,
     },
     {
       title: "Exam Type",
@@ -115,27 +122,20 @@ const Request = () => {
       title: "Date",
       dataIndex: "date",
       key: "date",
-      render: (text, record) => {
-        return moment(record.startAt).format("DD/MM/YYYY");
-      },
+      render: (text, record) => moment(record.startAt).format("DD/MM/YYYY"),
     },
     {
       title: "Time",
       dataIndex: "time",
       key: "time",
-      render: (text, record) => {
-        return `${moment(record.startAt).format("HH:mm")} - ${moment(
-          record.endAt
-        ).format("HH:mm")}`;
-      },
+      render: (text, record) =>
+        `${moment(record.startAt).format("HH:mm")} - ${moment(record.endAt).format("HH:mm")}`,
     },
     {
       title: "Status",
       dataIndex: "status",
       key: "status",
-      render: (text, record) => {
-        requestTag(record.status);
-      },
+      render: (text, record) => requestTag(record.status),
     },
     {
       title: "Action",
@@ -145,7 +145,8 @@ const Request = () => {
         <Space size="large">
           <Button
             onClick={() => handleDetailClick(record)}
-            style={detailButtonStyle}
+            style={{ ...detailButtonStyle, width: "90px" }}
+            loading={detailLoading[record.requestId] || false} // Use loading state for the specific row
           >
             Detail
           </Button>
@@ -198,7 +199,6 @@ const Request = () => {
             />
           </Spin>
 
-          {/* Modal for displaying request details */}
           {selectedRequest && (
             <Modal
               title="Request Details"
@@ -211,9 +211,15 @@ const Request = () => {
               ]}
             >
               <p>
-                <strong>FU ID:</strong> {selectedRequest.fuId}
+                <strong>FuID:</strong> {selectedRequest.fuId}
               </p>
-
+              <p>
+                <strong>Fullname:</strong> {selectedRequest.lastName}{" "}
+                {selectedRequest.firstName}
+              </p>
+              <p>
+                <strong>Phone: </strong> {selectedRequest.phoneNumber}
+              </p>
               <p>
                 <strong>Email:</strong> {selectedRequest.email}
               </p>

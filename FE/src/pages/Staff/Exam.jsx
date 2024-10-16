@@ -43,6 +43,7 @@ const Exam = () => {
     setLoading(true);
     try {
       const result = await examApi.getExamBySemesterId(semesterId);
+      console.log(result);
       setData(result);
     } catch (error) {
       message.error("Failed to fetch exams");
@@ -152,10 +153,7 @@ const Exam = () => {
       title: "Type",
       dataIndex: "examType",
       key: "examType",
-      // using tag of ant to display
-      render: (text) => {
-        examTypeTag(text);
-      },
+      render: (examType) => examTypeTag(examType),
     },
     {
       title: "Duration (minutes)",

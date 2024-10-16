@@ -79,11 +79,7 @@ const examTypeTag = (type) => {
       color = "red";
   }
 
-  return (
-    <Tag color={color}>
-      <strong>{type}</strong>
-    </Tag>
-  );
+  return <Tag color={color}>{type}</Tag>;
 };
 
 const requestTag = (status) => {

@@ -19,9 +19,7 @@ const examScheduleTable = (handleRoomClick, handleEdit, handleDelete) => [
     title: "Exam Type",
     dataIndex: "examType",
     key: "examType",
-    render: (text) => {
-      examTypeTag(text);
-    },
+    render: (text) => examTypeTag(text),
   },
   {
     title: "Date (DD-MM-YYYY)",
@@ -54,9 +52,7 @@ const examScheduleTable = (handleRoomClick, handleEdit, handleDelete) => [
     title: "Status",
     dataIndex: "status",
     key: "status",
-    render: (status) => {
-      examScheduleTag(status);
-    },
+    render: (status) => examScheduleTag(status),
   },
   {
     title: "Action",
