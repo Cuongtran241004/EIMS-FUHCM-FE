@@ -5,6 +5,16 @@ import examSlotApi from "../../services/ExamSlot";
 import { Button, Row, Col, Layout, Spin, message } from "antd";
 import moment from "moment";
 import examSlotHallApi from "../../services/ExamSlotHall";
+import {
+  BackwardFilled,
+  BackwardOutlined,
+  CloseOutlined,
+  CloudOutlined,
+  CompressOutlined,
+  PlusOutlined,
+  ReloadOutlined,
+} from "@ant-design/icons";
+import { titleRoomStyle } from "../../design-systems/CSS/Title";
 
 const { Content } = Layout;
 
@@ -160,6 +170,10 @@ const RoomSelectionPage = () => {
     event.preventDefault();
   };
 
+  const handleCancel = () => {
+    setSelectedRooms([]);
+    setGroupedRooms([]);
+  };
   // Define groupedRoomsByFloor to use in the render
   const groupedRoomsByFloor = rooms.reduce((acc, room) => {
     if (!acc[room.floor]) {
@@ -177,12 +191,12 @@ const RoomSelectionPage = () => {
             span={12}
             style={{ borderRight: "1px solid #f0f0f0", padding: "12px" }}
           >
-            <h1 style={{ textAlign: "center" }}>
+            <h1 style={titleRoomStyle}>
               {examSlot?.subjectExamDTO?.subjectCode}-
               {examSlot?.subjectExamDTO?.examType}
             </h1>
             <h2 style={{ textAlign: "center" }}>
-              {moment(examSlot?.startAt).format("DD-MM-YYYY")}(
+              {moment(examSlot?.startAt).format("DD-MM-YYYY")} (
               {moment(examSlot?.startAt).format("HH:mm")} -{" "}
               {moment(examSlot?.endAt).format("HH:mm")})
             </h2>
@@ -210,12 +224,12 @@ const RoomSelectionPage = () => {
                             backgroundColor: selectedRooms.some(
                               (selectedRoom) => selectedRoom.id === room.id
                             )
-                              ? "#f0f0f0"
+                              ? "green"
                               : "",
                             color: selectedRooms.some(
                               (selectedRoom) => selectedRoom.id === room.id
                             )
-                              ? "gray"
+                              ? "white"
                               : "",
                           }}
                         >
@@ -230,8 +244,8 @@ const RoomSelectionPage = () => {
             </Spin>
           </Col>
 
-          <Col span={12} style={{ padding: "24px" }}>
-            <h1 style={{ textAlign: "center" }}>Selected Rooms</h1>
+          <Col span={12} style={{ padding: "12px" }}>
+            <h1 style={titleRoomStyle}>SELECTED ROOMS</h1>
             {selectedRooms.length === 0 ? (
               <p>No rooms selected</p>
             ) : (
@@ -265,8 +279,8 @@ const RoomSelectionPage = () => {
                           );
                         }}
                         style={{
-                          backgroundColor: "#f0f0f0",
-                          color: "gray",
+                          backgroundColor: "green",
+                          color: "white",
                         }}
                       >
                         {room.roomName}
@@ -275,37 +289,55 @@ const RoomSelectionPage = () => {
                   </div>
                 ))}
                 <Button type="link" onClick={addGroup}>
+                  <PlusOutlined />
                   Add group
                 </Button>
               </div>
             )}
-            <Button onClick={groupRooms} style={{ marginTop: "20px" }}>
+
+            <Button
+              danger
+              type="dashed"
+              onClick={handleCancel}
+              style={{ marginTop: "20px" }}
+            >
+              <CloseOutlined />
+              Cancel
+            </Button>
+            <Button
+              onClick={groupRooms}
+              style={{ marginTop: "20px", marginLeft: "10px" }}
+              type="default"
+            >
               Group Rooms
+              <CompressOutlined />
             </Button>
 
             <Button
+              type="default"
               onClick={handleSave}
               style={{
                 marginTop: "20px",
                 marginLeft: "10px",
-                backgroundColor: "green",
-                color: "white",
+
                 float: "right",
               }}
               loading={loadingSubmit}
             >
               Save
+              <ReloadOutlined />
             </Button>
             <Button
+              danger
+              type="dashed"
               onClick={() => window.history.back()}
               style={{
                 marginTop: "20px",
                 marginLeft: "10px",
                 float: "right",
-                backgroundColor: "orange",
-                color: "white",
               }}
             >
+              <BackwardFilled />
               Return
             </Button>
           </Col>
