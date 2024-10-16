@@ -25,7 +25,15 @@ import {
   FETCH_SEMESTERS_FAILED,
 } from "../../configs/messages.js";
 import Header from "../../components/Header/Header.jsx";
-import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
+import {
+  CloseCircleFilled,
+  CloseOutlined,
+  EditOutlined,
+  PlusOutlined,
+  SendOutlined,
+} from "@ant-design/icons";
+import { selectButtonStyle } from "../../design-systems/CSS/Button.js";
+import { titleStyle } from "../../design-systems/CSS/Title.js";
 
 const { Content, Sider } = Layout;
 const { RangePicker } = DatePicker;
@@ -71,35 +79,37 @@ const Semester = ({ isLogin }) => {
   };
 
   const handleOk = async () => {
-    setLoadingSubmit(true);
-    try {
-      const values = await form.validateFields();
-      const { dateRange } = values;
-      const [startAt, endAt] = dateRange;
+    await form.validateFields().then(async () => {
+      try {
+        setLoadingSubmit(true);
+        const values = form.getFieldsValue();
+        const { dateRange } = values;
+        const [startAt, endAt] = dateRange;
 
-      if (isEditing) {
-        await semesterApi.updateSemester({
-          ...editingSemester,
-          startAt: startAt.format("YYYY-MM-DD"),
-          endAt: endAt.format("YYYY-MM-DD"),
-          ...values,
-        });
-        message.success(EDIT_SEMESTER_SUCCESS);
-      } else {
-        await semesterApi.addSemester({
-          ...values,
-          startAt: startAt.format("YYYY-MM-DD"),
-          endAt: endAt.format("YYYY-MM-DD"),
-        });
-        message.success(ADD_SEMESTER_SUCCESS);
+        if (isEditing) {
+          await semesterApi.updateSemester({
+            ...editingSemester,
+            startAt: startAt.format("YYYY-MM-DD"),
+            endAt: endAt.format("YYYY-MM-DD"),
+            ...values,
+          });
+          message.success(EDIT_SEMESTER_SUCCESS);
+        } else {
+          await semesterApi.addSemester({
+            ...values,
+            startAt: startAt.format("YYYY-MM-DD"),
+            endAt: endAt.format("YYYY-MM-DD"),
+          });
+          message.success(ADD_SEMESTER_SUCCESS);
+        }
+        fetchData();
+        handleCancel();
+      } catch (error) {
+        message.error(isEditing ? EDIT_SEMESTER_FAILED : ADD_SEMESTER_FAILED);
+      } finally {
+        setLoadingSubmit(false);
       }
-      fetchData();
-      handleCancel();
-    } catch (error) {
-      message.error(isEditing ? EDIT_SEMESTER_FAILED : ADD_SEMESTER_FAILED);
-    } finally {
-      setLoadingSubmit(false);
-    }
+    });
   };
 
   const handleEdit = (semester) => {
@@ -170,20 +180,25 @@ const Semester = ({ isLogin }) => {
         <Layout style={{ padding: "16px" }}>
           <Content
             style={{
-              padding: 24,
+              padding: 12,
               margin: 0,
               background: "#fff",
               minHeight: 280,
             }}
           >
+            <div style={{ marginBottom: "20px", textAlign: "center" }}>
+              <h2 style={titleStyle}>Semester Management</h2>
+            </div>
             <div style={{ display: "flex", alignItems: "center" }}>
               {" "}
-              <Button type="primary" onClick={showModal}>
+              <Button
+                type="primary"
+                onClick={showModal}
+                icon={<PlusOutlined />}
+                style={selectButtonStyle}
+              >
                 Add New Semester
               </Button>
-              <span style={{ margin: "0 25%", fontSize: "20px" }}>
-                <h2>Semester Management</h2>
-              </span>
             </div>
 
             <Spin spinning={loading}>
@@ -205,8 +220,17 @@ const Semester = ({ isLogin }) => {
         onOk={handleOk}
         onCancel={handleCancel}
         loading={loadingSubmit}
-        okText="Submit"
-        cancelText="Cancel"
+        closeIcon={<CloseCircleFilled />}
+        footer={[
+          <Button key="cancel" onClick={handleCancel}>
+            Cancel
+            <CloseOutlined />
+          </Button>,
+          <Button key="submit" type="primary" onClick={handleOk}>
+            Submit
+            <SendOutlined />
+          </Button>,
+        ]}
       >
         <Form form={form} layout="vertical" name="add_semester_form">
           <Row gutter={16}>
@@ -214,9 +238,7 @@ const Semester = ({ isLogin }) => {
               <Form.Item
                 name="name"
                 label="Name"
-                rules={[
-                  { required: true, message: "Please input semester name!" },
-                ]}
+                rules={[{ required: true, message: "Required" }]}
               >
                 <Input placeholder="Semester name" />
               </Form.Item>

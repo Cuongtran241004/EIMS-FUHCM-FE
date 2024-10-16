@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { Menu } from "antd";
 import {
-  MailOutlined,
-  AppstoreOutlined,
   SettingOutlined,
+  ReadOutlined,
+  MonitorOutlined,
 } from "@ant-design/icons";
 import { Link, useLocation } from "react-router-dom";
 import {
@@ -17,7 +17,7 @@ const items = [
   {
     key: "sub1",
     label: <h3 style={{ color: "#fff" }}>Exam Management</h3>,
-    icon: <MailOutlined style={{ color: "#fff" }} />,
+    icon: <ReadOutlined style={{ color: "#fff" }} />,
     children: [
       {
         key: "1",
@@ -40,7 +40,7 @@ const items = [
   {
     key: "sub2",
     label: <h3 style={{ color: "#fff" }}>Invigilation</h3>,
-    icon: <AppstoreOutlined style={{ color: "#fff" }} />,
+    icon: <MonitorOutlined style={{ color: "#fff" }} />,
     children: [
       {
         key: "3",

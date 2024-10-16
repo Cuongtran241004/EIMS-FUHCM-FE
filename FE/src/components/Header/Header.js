@@ -9,7 +9,10 @@ import {
 
 const headerConfig = {
   manager: [
-    { name: "Dashboard", path: MANAGER_DASHBOARD_URL },
+    {
+      name: "Dashboard",
+      path: MANAGER_DASHBOARD_URL,
+    },
     { name: "Request", path: MANAGER_REQUESTS_URL },
   ],
   staff: [

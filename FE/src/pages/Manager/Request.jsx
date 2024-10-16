@@ -19,9 +19,14 @@ import requestApi from "../../services/Request.js";
 import moment from "moment";
 import { requestTag } from "../../design-systems/CustomTag.jsx";
 import { managerMapperUtil } from "../../utils/Mapper/ManagerMapperUtil.jsx";
+import {
+  buttonStyle,
+  detailButtonStyle,
+  selectButtonStyle,
+} from "../../design-systems/CSS/Button.js";
+import { titleStyle } from "../../design-systems/CSS/Title.js";
 
 const { Content, Sider } = Layout;
-const { Option } = Select;
 
 const Request = () => {
   const [requests, setRequests] = useState([]);
@@ -128,8 +133,8 @@ const Request = () => {
       title: "Status",
       dataIndex: "status",
       key: "status",
-      render: (status) => {
-        requestTag(status);
+      render: (text, record) => {
+        requestTag(record.status);
       },
     },
     {
@@ -138,36 +143,18 @@ const Request = () => {
       key: "action",
       render: (text, record) => (
         <Space size="large">
-          <Button type="primary" onClick={() => handleDetailClick(record)}>
+          <Button
+            onClick={() => handleDetailClick(record)}
+            style={detailButtonStyle}
+          >
             Detail
           </Button>
-          <Button type="primary" style={buttonStyle}>
-            Approve
-          </Button>
+          <Button style={buttonStyle}>Approve</Button>
           <Button danger>Reject</Button>
         </Space>
       ),
     },
   ];
-
-  const buttonStyle = {
-    backgroundColor: "#43AA8B",
-    borderColor: "#43AA8B",
-    color: "#fff",
-    borderRadius: "5px",
-  };
-
-  const titleStyle = {
-    color: "#333",
-    fontSize: "24px",
-    fontWeight: "bold",
-    margin: "20px 0",
-  };
-
-  const contentStyle = {
-    padding: "20px",
-    background: "#f9f9f9",
-  };
 
   return (
     <Layout style={{ minHeight: "100vh" }}>
@@ -194,7 +181,7 @@ const Request = () => {
               menu={{ items, onClick: handleMenuClick }}
               style={{ marginRight: "auto" }}
             >
-              <Button style={{ width: "200px", ...buttonStyle }}>
+              <Button style={{ width: "200px", ...selectButtonStyle }}>
                 <Space>
                   {selectedSemester.name} <DownOutlined />
                 </Space>

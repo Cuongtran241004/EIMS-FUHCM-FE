@@ -6,6 +6,8 @@ import { Dropdown, Button, Space, Table, Spin } from "antd";
 import { DownOutlined } from "@ant-design/icons";
 import { useSemester } from "../../components/Context/SemesterContext.jsx";
 import moment from "moment";
+import { titleStyle } from "../../design-systems/CSS/Title.js";
+import { selectButtonStyle } from "../../design-systems/CSS/Button.js";
 
 const { Content, Sider } = Layout;
 const AttendanceCheck = () => {
@@ -98,6 +100,9 @@ const AttendanceCheck = () => {
           <NavBar_Manager />
         </Sider>
         <Content style={{ padding: 12, margin: 0, background: "#fff" }}>
+          <div style={{ marginBottom: "20px", textAlign: "center" }}>
+            <h2 style={titleStyle}> Attendance Check</h2>
+          </div>
           <div style={{ display: "flex", alignItems: "center" }}>
             <Dropdown
               menu={{
@@ -105,16 +110,13 @@ const AttendanceCheck = () => {
                 onClick: handleMenuClick,
               }}
             >
-              <Button style={{ width: "150px" }}>
+              <Button style={{ width: "150px", ...selectButtonStyle }}>
                 <Space>
                   {selectedSemester.name}
                   <DownOutlined />
                 </Space>
               </Button>
             </Dropdown>
-            <span style={{ margin: "0 25%", fontSize: "20px" }}>
-              <h2>Attendance Management</h2>
-            </span>
           </div>
 
           <Spin spinning={loading}>

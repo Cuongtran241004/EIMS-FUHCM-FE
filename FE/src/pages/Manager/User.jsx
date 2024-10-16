@@ -19,10 +19,12 @@ import {
   Tag,
 } from "antd";
 import {
-  EditOutlined,
-  DeleteOutlined,
   UploadOutlined,
   DownloadOutlined,
+  CloseOutlined,
+  PlusOutlined,
+  SendOutlined,
+  CloseCircleFilled,
 } from "@ant-design/icons";
 import {
   ADD_USER_SUCCESS,
@@ -40,8 +42,9 @@ import { User_Excel_Template } from "../../utils/Import-Excel/User_Excel_Templat
 import NavBar_Manager from "../../components/NavBar/NavBar_Manager.jsx";
 import Header from "../../components/Header/Header.jsx";
 import { departments, roleOptions } from "../../configs/data.js";
-import { userRoleTag } from "../../design-systems/CustomTag.jsx";
 import { userTable } from "../../design-systems/CustomTable.jsx";
+import { selectButtonStyle } from "../../design-systems/CSS/Button.js";
+import { titleStyle } from "../../design-systems/CSS/Title.js";
 
 const { Content, Sider } = Layout;
 
@@ -87,24 +90,26 @@ const Users = ({ isLogin }) => {
   };
 
   const handleOk = async () => {
-    setLoadingSubmit(true);
-    try {
-      const values = await form.validateFields();
-      console.log("Received values of form: ", values);
-      if (isEditing) {
-        await userApi.updateUser({ ...editingUser, ...values });
-        message.success(EDIT_USER_SUCCESS);
-      } else {
-        await userApi.addUser(values);
-        message.success(ADD_USER_SUCCESS);
+    await form.validateFields().then(async () => {
+      try {
+        setLoadingSubmit(true);
+        // Gather form values
+        const values = form.getFieldsValue();
+        if (isEditing) {
+          await userApi.updateUser({ ...editingUser, ...values });
+          message.success(EDIT_USER_SUCCESS);
+        } else {
+          await userApi.addUser(values);
+          message.success(ADD_USER_SUCCESS);
+        }
+        fetchData();
+        handleCancel();
+      } catch (error) {
+        message.error(isEditing ? EDIT_USER_FAILED : ADD_USER_FAILED);
+      } finally {
+        setLoadingSubmit(false);
       }
-      fetchData();
-      handleCancel();
-    } catch (error) {
-      message.error(isEditing ? EDIT_USER_FAILED : ADD_USER_FAILED);
-    } finally {
-      setLoadingSubmit(false);
-    }
+    });
   };
 
   const handleEdit = (user) => {
@@ -199,48 +204,55 @@ const Users = ({ isLogin }) => {
         <Layout style={{ padding: "16px" }}>
           <Content
             style={{
-              padding: 24,
+              padding: 12,
               margin: 0,
               background: "#fff",
               minHeight: 280,
             }}
           >
-            <div style={{ display: "flex", alignItems: "center" }}>
-              <Button type="primary" onClick={showModal}>
+            <div style={{ marginBottom: "20px", textAlign: "center" }}>
+              <h2 style={titleStyle}>User Management</h2>
+            </div>
+            <div style={{ margin: "5px" }}>
+              <Button
+                type="primary"
+                onClick={showModal}
+                style={selectButtonStyle}
+                icon={<PlusOutlined />}
+              >
                 Add New User
               </Button>
 
-              <span style={{ margin: "0 20%", fontSize: "20px" }}>
-                <h2>User Management</h2>
-              </span>
-              <Upload
-                beforeUpload={(file) => {
-                  const isValid = beforeUpload(file);
-                  if (isValid) {
-                    handleFileUpload({ file }); // Trigger file upload only if valid
-                  }
-                  return false; // Prevent default upload behavior
-                }}
-                showUploadList={false}
-                maxCount={1}
-                method="POST"
-              >
-                <Button
-                  icon={<UploadOutlined />}
-                  loading={fileLoading}
-                  style={{ marginRight: "15px" }}
+              <div style={{ float: "right" }}>
+                <Upload
+                  beforeUpload={(file) => {
+                    const isValid = beforeUpload(file);
+                    if (isValid) {
+                      handleFileUpload({ file }); // Trigger file upload only if valid
+                    }
+                    return false; // Prevent default upload behavior
+                  }}
+                  showUploadList={false}
+                  maxCount={1}
+                  method="POST"
                 >
-                  Import Users
-                </Button>
-              </Upload>
+                  <Button
+                    icon={<UploadOutlined />}
+                    loading={fileLoading}
+                    style={{ marginRight: "15px" }}
+                  >
+                    Import Users
+                  </Button>
+                </Upload>
 
-              <Button
-                icon={<DownloadOutlined />}
-                onClick={() => User_Excel_Template()}
-                type="default"
-              >
-                Download Template
-              </Button>
+                <Button
+                  icon={<DownloadOutlined />}
+                  onClick={() => User_Excel_Template()}
+                  type="default"
+                >
+                  Download Template
+                </Button>
+              </div>
             </div>
 
             <Spin spinning={loading}>
@@ -264,9 +276,18 @@ const Users = ({ isLogin }) => {
         open={isModalVisible}
         onOk={handleOk}
         onCancel={handleCancel}
-        okText="Submit"
         loading={loadingSubmit}
-        cancelText="Cancel"
+        closeIcon={<CloseCircleFilled />}
+        footer={[
+          <Button key="cancel" onClick={handleCancel}>
+            Cancel
+            <CloseOutlined />
+          </Button>,
+          <Button key="submit" type="primary" onClick={handleOk}>
+            Submit
+            <SendOutlined />
+          </Button>,
+        ]}
       >
         <Form
           form={form}

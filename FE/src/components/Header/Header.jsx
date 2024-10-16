@@ -93,11 +93,32 @@ const Header = () => {
             );
           })}
 
-          <Dropdown menu={menuProps} trigger={["click"]}>
-            <Button size="large" style={{ borderRadius: "100%" }}>
-              <UserOutlined />
-            </Button>
-          </Dropdown>
+          <div
+            style={{
+              width: "150px",
+              borderLeft: "2px solid black",
+              textAlign: "center",
+              paddingLeft: "10px",
+            }}
+          >
+            <div style={{}}>
+              <Dropdown menu={menuProps} trigger={["click"]}>
+                <Button
+                  size="middle"
+                  style={{
+                    borderRadius: "100%",
+                  }}
+                >
+                  <UserOutlined />
+                </Button>
+              </Dropdown>
+            </div>
+            <span>
+              <strong style={{ color: "#577590" }}>
+                {user.lastName} {user.firstName}
+              </strong>
+            </span>
+          </div>
         </Space>
       </div>
     </div>
