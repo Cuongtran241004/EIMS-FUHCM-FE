@@ -1,20 +1,12 @@
 import React, { useState, useEffect, useContext } from "react";
 import Header from "../../components/Header/Header.jsx";
-import {
-  Table,
-  Spin,
-  message,
-  Select,
-  Layout,
-  Space,
-  Dropdown,
-  Button,
-} from "antd";
+import { Table, Spin, message, Layout, Space, Dropdown, Button } from "antd";
 import examSlotApi from "../../services/ExamSlot.js";
 import { useSemester } from "../../components/Context/SemesterContext.jsx";
 import { DownOutlined } from "@ant-design/icons";
 const { Content, Sider } = Layout;
-const { Option } = Select;
+import { selectButtonStyle } from "../../design-systems/CSS/Button.js";
+import { titleStyle } from "../../design-systems/CSS/Title.js";
 
 const Attendance = () => {
   const [data, setData] = useState([]);
@@ -92,11 +84,14 @@ const Attendance = () => {
         {/* Sider for Form */}
         <Sider
           width={300}
-          style={{ background: "#f1f1f1", padding: "24px" }}
+          style={{ background: "#4D908E", padding: "24px" }}
         ></Sider>
 
         {/* Content for Table */}
         <Content style={{ padding: 12, margin: 0, background: "#fff" }}>
+          <div style={{ marginBottom: "20px", textAlign: "center" }}>
+            <h2 style={titleStyle}>Attendance Management</h2>
+          </div>
           <div style={{ display: "flex", alignItems: "center" }}>
             <Dropdown
               menu={{
@@ -107,16 +102,13 @@ const Attendance = () => {
                 onClick: handleMenuClick,
               }}
             >
-              <Button style={{ width: "150px" }}>
+              <Button style={{ ...selectButtonStyle, width: "150px" }}>
                 <Space>
                   {selectedSemester?.name || "Select Semester"}
                   <DownOutlined />
                 </Space>
               </Button>
             </Dropdown>
-            <span style={{ margin: "0 25%", fontSize: "20px" }}>
-              <h2>Attendance Management</h2>
-            </span>
           </div>
 
           <Spin spinning={loading}>

@@ -9,11 +9,9 @@ import {
   Row,
   Col,
   message,
-  Popconfirm,
   Space,
   Dropdown,
   Spin,
-  Tag,
 } from "antd";
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
@@ -21,15 +19,13 @@ import Sider from "antd/es/layout/Sider";
 import Header from "../../components/Header/Header.jsx";
 import examApi from "../../services/Exam.js";
 import examSlotApi from "../../services/ExamSlot.js";
-import { DeleteOutlined, EditOutlined, DownOutlined } from "@ant-design/icons";
+import { DownOutlined } from "@ant-design/icons";
 import moment from "moment";
 import { useSemester } from "../../components/Context/SemesterContext.jsx";
-import {
-  examScheduleTag,
-  examTypeTag,
-} from "../../design-systems/CustomTag.jsx";
+import { selectButtonStyle } from "../../design-systems/CSS/Button.js";
 import { staffMapperUtil } from "../../utils/Mapper/StaffMapperUtil.jsx";
 import { examScheduleTable } from "../../design-systems/CustomTable.jsx";
+import { titleStyle } from "../../design-systems/CSS/Title.js";
 const { Option } = Select;
 const { Content } = Layout;
 const PAGE_SIZE = 6;
@@ -203,7 +199,7 @@ const Exam_Schedule = () => {
     <Layout style={{ height: "100vh" }}>
       <Header />
       <Layout>
-        <Sider width={300} style={{ background: "#f1f1f1", padding: "24px" }}>
+        <Sider width={300} style={{ background: "#4D908E", padding: "24px" }}>
           <Form form={form} layout="vertical" name="add_exam_slot_form">
             <Form.Item
               name="exam"
@@ -282,6 +278,9 @@ const Exam_Schedule = () => {
         </Sider>
 
         <Content style={{ padding: "24px", background: "#fff" }}>
+          <div style={{ marginBottom: "20px", textAlign: "center" }}>
+            <h2 style={titleStyle}>Exam Schedule Management</h2>
+          </div>
           <div style={{ display: "flex", alignItems: "center" }}>
             <Dropdown
               menu={{
@@ -292,16 +291,13 @@ const Exam_Schedule = () => {
                 onClick: handleMenuClick,
               }}
             >
-              <Button style={{ width: "150px" }}>
+              <Button style={{ ...selectButtonStyle, width: "150px" }}>
                 <Space>
                   {selectedSemester?.name || "Select Semester"}
                   <DownOutlined />
                 </Space>
               </Button>
             </Dropdown>
-            <span style={{ margin: "0 25%", fontSize: "20px" }}>
-              <h2>Exam Schedule Management</h2>
-            </span>
           </div>
           <Spin spinning={loading}>
             <Table

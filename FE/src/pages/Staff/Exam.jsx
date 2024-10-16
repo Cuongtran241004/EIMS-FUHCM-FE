@@ -22,6 +22,8 @@ import Header from "../../components/Header/Header.jsx";
 import { useSemester } from "../../components/Context/SemesterContext.jsx";
 import { examType } from "../../configs/data.js";
 import { examTypeTag } from "../../design-systems/CustomTag.jsx";
+import { selectButtonStyle } from "../../design-systems/CSS/Button.js";
+import { titleStyle } from "../../design-systems/CSS/Title.js";
 const { Content, Sider } = Layout;
 const { Option } = Select;
 
@@ -191,7 +193,7 @@ const Exam = () => {
       <Header />
       <Layout>
         {/* Sider for Form */}
-        <Sider width={300} style={{ background: "#f1f1f1", padding: "24px" }}>
+        <Sider width={300} style={{ background: "#4D908E", padding: "24px" }}>
           <Form form={form} layout="vertical" name="add_exam_form">
             {/* Subject Field */}
             <Form.Item
@@ -268,6 +270,9 @@ const Exam = () => {
 
         {/* Content for Table and Dropdown */}
         <Content style={{ padding: 12, margin: 0, background: "#fff" }}>
+          <div style={{ marginBottom: "20px", textAlign: "center" }}>
+            <h2 style={titleStyle}>Exam Management</h2>
+          </div>
           <div style={{ display: "flex", alignItems: "center" }}>
             <Dropdown
               menu={{
@@ -278,16 +283,13 @@ const Exam = () => {
                 onClick: handleMenuClick,
               }}
             >
-              <Button style={{ width: "150px" }}>
+              <Button style={{ ...selectButtonStyle, width: "150px" }}>
                 <Space>
                   {selectedSemester?.name || "Select Semester"}
                   <DownOutlined />
                 </Space>
               </Button>
             </Dropdown>
-            <span style={{ margin: "0 25%", fontSize: "20px" }}>
-              <h2>Exam Management</h2>
-            </span>
           </div>
 
           <Spin spinning={loading}>

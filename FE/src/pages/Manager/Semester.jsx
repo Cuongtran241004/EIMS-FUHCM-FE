@@ -258,6 +258,9 @@ const Semester = ({ isLogin }) => {
                 >
                   <RangePicker
                     style={{ width: "100%" }}
+                    disabledDate={(current) => {
+                      return current && current < moment().startOf("day");
+                    }}
                     onChange={(dates) => {
                       if (dates) {
                         form.setFieldsValue({

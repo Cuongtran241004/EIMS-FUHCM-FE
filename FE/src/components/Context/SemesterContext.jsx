@@ -12,6 +12,8 @@ export const SemesterProvider = ({ children }) => {
     id: null,
     name: "Select semester",
   });
+  const [availableSemesters, setAvailableSemesters] = useState([]);
+
   const [loading, setLoading] = useState(true); // Loading state
 
   const fetchSemesters = async () => {
@@ -32,6 +34,13 @@ export const SemesterProvider = ({ children }) => {
           name: sortedSemesters[0].name,
         });
       }
+
+      // Set available semesters: today <= endAt
+      const today = new Date();
+      const availableSemester = sortedSemesters.filter(
+        (semester) => new Date(semester.endAt) >= today
+      );
+      setAvailableSemesters(availableSemester);
     } catch (error) {
       message.error("Failed to fetch semesters");
     } finally {
@@ -46,7 +55,13 @@ export const SemesterProvider = ({ children }) => {
 
   return (
     <SemesterContext.Provider
-      value={{ selectedSemester, setSelectedSemester, semesters, loading }} // Expose loading state
+      value={{
+        selectedSemester,
+        setSelectedSemester,
+        semesters,
+        availableSemesters,
+        loading,
+      }} // Expose loading state
     >
       {children}
     </SemesterContext.Provider>

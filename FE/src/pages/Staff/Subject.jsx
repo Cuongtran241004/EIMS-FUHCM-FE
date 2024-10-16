@@ -17,16 +17,18 @@ import {
   Table,
   Input,
   message,
-  Popconfirm,
   Dropdown,
   Col,
   Row,
+  Select,
 } from "antd";
 import subjectApi from "../../services/Subject.js";
-import { DeleteOutlined, DownOutlined, EditOutlined } from "@ant-design/icons";
+import { DownOutlined } from "@ant-design/icons";
 import Header from "../../components/Header/Header.jsx";
 import { useSemester } from "../../components/Context/SemesterContext.jsx";
 import { subjectTable } from "../../design-systems/CustomTable.jsx";
+import { titleStyle } from "../../design-systems/CSS/Title.js";
+import { selectButtonStyle } from "../../design-systems/CSS/Button.js";
 const { Content, Sider } = Layout;
 
 const Subject = () => {
@@ -34,7 +36,12 @@ const Subject = () => {
   const [loading, setLoading] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [editingSubject, setEditingSubject] = useState(null);
-  const { selectedSemester, setSelectedSemester, semesters } = useSemester(); // Access shared semester state
+  const {
+    selectedSemester,
+    setSelectedSemester,
+    semesters,
+    availableSemesters,
+  } = useSemester(); // Access shared semester state
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [loadingSubmit, setLoadingSubmit] = useState(false);
   const [form] = Form.useForm();
@@ -99,38 +106,54 @@ const Subject = () => {
   };
 
   const handleOk = async () => {
-    setLoadingSubmit(true);
-    try {
-      const values = await form.validateFields();
+    await form.validateFields().then(async () => {
+      setLoadingSubmit(true);
+      try {
+        const values = await form.validateFields();
+        const subjectData = {
+          ...values,
+          semesterId: selectedSemester.id,
+        };
 
-      const subjectData = {
-        ...values,
-        semesterId: selectedSemester.id,
-      };
-
-      if (isEditing) {
-        await subjectApi.updateSubject({ ...editingSubject, ...subjectData });
-        message.success(EDIT_SUBJECT_SUCCESS);
-      } else {
-        await subjectApi.addSubject(subjectData);
-        message.success(ADD_SUBJECT_SUCCESS);
+        if (isEditing) {
+          await subjectApi.updateSubject({ ...editingSubject, ...subjectData });
+          message.success(EDIT_SUBJECT_SUCCESS);
+        } else {
+          await subjectApi.addSubject(subjectData);
+          message.success(ADD_SUBJECT_SUCCESS);
+        }
+        fetchData(subjectData.semesterId);
+        handleCancel();
+      } catch (error) {
+        message.error(isEditing ? EDIT_SUBJECT_FAILED : ADD_SUBJECT_FAILED);
+      } finally {
+        setLoadingSubmit(false);
       }
-
-      fetchData(subjectData.semesterId);
-      handleCancel();
-    } catch (error) {
-      message.error(isEditing ? EDIT_SUBJECT_FAILED : ADD_SUBJECT_FAILED);
-    } finally {
-      setLoadingSubmit(false);
-    }
+    });
   };
 
   return (
     <Layout style={{ height: "100vh" }}>
       <Header />
       <Layout>
-        <Sider width={300} style={{ background: "#f1f1f1", padding: "24px" }}>
+        <Sider width={300} style={{ background: "#4D908E", padding: "24px" }}>
           <Form form={form} layout="vertical" name="add_subject_form">
+            <Form.Item
+              name="semester"
+              label="Semester"
+              rules={[
+                {
+                  required: true,
+                  message: "Please select semester!",
+                },
+              ]}
+            >
+              <Select
+                placeholder="Select semester"
+                onChange={(value) => setSelectedSemester(value)}
+              />
+            </Form.Item>
+
             <Form.Item
               name="code"
               label="Code"
@@ -181,6 +204,9 @@ const Subject = () => {
           </Form>
         </Sider>
         <Content style={{ padding: 12, margin: 0, background: "#fff" }}>
+          <div style={{ marginBottom: "20px", textAlign: "center" }}>
+            <h2 style={titleStyle}>Subject Management</h2>
+          </div>
           <div style={{ display: "flex", alignItems: "center" }}>
             <Dropdown
               menu={{
@@ -188,16 +214,13 @@ const Subject = () => {
                 onClick: handleMenuClick,
               }}
             >
-              <Button style={{ width: "150px" }}>
+              <Button style={{ ...selectButtonStyle, width: "150px" }}>
                 <Space>
                   {selectedSemester.name}
                   <DownOutlined />
                 </Space>
               </Button>
             </Dropdown>
-            <span style={{ margin: "0 25%", fontSize: "20px" }}>
-              <h2>Subject Management</h2>
-            </span>
           </div>
           <Spin spinning={loading}>
             <Table
