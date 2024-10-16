@@ -12,7 +12,7 @@ import {
   MANAGER_SEMESTER_URL,
   MANAGER_USERS_URL,
 } from "../../configs/urlWeb";
-
+import "./NavBar_Manager.css";
 const items = [
   {
     key: "sub1",

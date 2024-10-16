@@ -1,0 +1,25 @@
+/* Selected Menu Item */
+.ant-menu-item-selected {
+  background-color: #f3722c !important; /* Custom background color */
+  color: #fff !important; /* Custom text color */
+}
+
+/* For submenu titles */
+.ant-menu-submenu-title:hover {
+  color: #fff !important; /* Hover color for submenu */
+}
+/* Custom arrow color for Ant Design submenu when an item is selected */
+.ant-menu-submenu-selected .ant-menu-submenu-arrow::before,
+.ant-menu-submenu-selected .ant-menu-submenu-arrow::after {
+  color: #fff; /* Change arrow color when an item inside the submenu is selected */
+}
+
+/* Custom icon color when an item inside submenu is selected */
+.ant-menu-submenu-selected .menu-icon {
+  color: #fff; /* Change icon color when an item inside submenu is selected */
+}
+
+/* Regular link styles */
+.ant-menu-item a {
+  color: #fff !important; /* Default text color */
+}
