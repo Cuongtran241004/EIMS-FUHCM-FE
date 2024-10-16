@@ -1,6 +1,7 @@
 import React from "react";
 import { Button, message } from "antd";
 import axios from "axios";
+import { LogoutOutlined } from "@ant-design/icons";
 
 function Logout() {
   const handleLogout = async () => {
@@ -31,6 +32,7 @@ function Logout() {
   return (
     <Button danger onClick={handleLogout}>
       Logout
+      <LogoutOutlined />
     </Button>
   );
 }

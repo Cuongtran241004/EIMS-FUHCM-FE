@@ -19,10 +19,17 @@ import Sider from "antd/es/layout/Sider";
 import Header from "../../components/Header/Header.jsx";
 import examApi from "../../services/Exam.js";
 import examSlotApi from "../../services/ExamSlot.js";
-import { CloseOutlined, DownOutlined } from "@ant-design/icons";
+import {
+  CaretRightFilled,
+  CloseOutlined,
+  DownOutlined,
+} from "@ant-design/icons";
 import moment from "moment";
 import { useSemester } from "../../components/Context/SemesterContext.jsx";
-import { selectButtonStyle } from "../../design-systems/CSS/Button.js";
+import {
+  addButtonStyle,
+  selectButtonStyle,
+} from "../../design-systems/CSS/Button.js";
 import { staffMapperUtil } from "../../utils/Mapper/StaffMapperUtil.jsx";
 import { examScheduleTable } from "../../design-systems/CustomTable.jsx";
 import { titleStyle } from "../../design-systems/CSS/Title.js";
@@ -301,8 +308,10 @@ const Exam_Schedule = () => {
                   type="primary"
                   onClick={handleOK}
                   loading={loadingSubmit}
+                  style={addButtonStyle}
                 >
                   {isEditing ? "Update" : "Add"}
+                  <CaretRightFilled />
                 </Button>
               </Col>
             </Row>

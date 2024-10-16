@@ -15,6 +15,8 @@ import {
   PlusOutlined,
   EyeInvisibleOutlined,
   EyeOutlined,
+  BackwardOutlined,
+  ReloadOutlined,
 } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom"; // For navigation
 import { MANAGER_DASHBOARD_URL } from "../../configs/urlWeb";
@@ -183,6 +185,7 @@ const ProfilePage = ({ user }) => {
             onClick={() => navigate(MANAGER_DASHBOARD_URL)}
             style={{ marginRight: 10, borderRadius: "4px" }}
           >
+            <BackwardOutlined />
             Return to Dashboard
           </Button>
           <Button
@@ -196,6 +199,7 @@ const ProfilePage = ({ user }) => {
             }}
           >
             Update
+            <ReloadOutlined />
           </Button>
         </Form.Item>
       </Form>

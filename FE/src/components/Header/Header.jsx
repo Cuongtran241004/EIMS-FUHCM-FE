@@ -3,16 +3,21 @@ import { UserContext } from "../UserContext.jsx";
 import { Link, useLocation } from "react-router-dom";
 import headerConfig from "./Header";
 import { Button, Space, Dropdown } from "antd";
-import { DownOutlined, UserOutlined } from "@ant-design/icons";
+import { DownOutlined, EyeOutlined, UserOutlined } from "@ant-design/icons";
 import logo from "../../assets/fpt-university-logo.png";
 import Logout from "../Logout";
 import "./Header.css";
 
 const items = [
   {
-    label: <Link to="/profile">Profile</Link>,
+    label: (
+      <Button type="link">
+        <Link to="/profile">
+          Profile <EyeOutlined />
+        </Link>
+      </Button>
+    ),
     key: "1",
-    icon: <UserOutlined />,
   },
   {
     label: "",
@@ -79,7 +84,10 @@ const Header = () => {
               <Button
                 key={index}
                 size="large"
-                style={{ backgroundColor: isActive ? "#4D908E" : "" }}
+                style={{
+                  backgroundColor: isActive ? "#4D908E" : "",
+                  width: "150px",
+                }}
               >
                 <Link
                   to={item.path}
@@ -101,7 +109,7 @@ const Header = () => {
               paddingLeft: "10px",
             }}
           >
-            <div style={{}}>
+            <div>
               <Dropdown menu={menuProps} trigger={["click"]}>
                 <Button
                   size="middle"

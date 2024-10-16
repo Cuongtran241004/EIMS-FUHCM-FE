@@ -18,4 +18,12 @@ const detailButtonStyle = {
   color: "#fff",
   borderRadius: "5px",
 };
-export { buttonStyle, detailButtonStyle, selectButtonStyle };
+
+const addButtonStyle = {
+  backgroundColor: "#90BE6D",
+  borderColor: "#43AA8B",
+  color: "#fff",
+  borderRadius: "5px",
+};
+
+export { buttonStyle, detailButtonStyle, selectButtonStyle, addButtonStyle };

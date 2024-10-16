@@ -23,12 +23,20 @@ import {
   Select,
 } from "antd";
 import subjectApi from "../../services/Subject.js";
-import { CloseOutlined, DownOutlined } from "@ant-design/icons";
+import {
+  CaretRightFilled,
+  CloseOutlined,
+  DownOutlined,
+} from "@ant-design/icons";
 import Header from "../../components/Header/Header.jsx";
 import { useSemester } from "../../components/Context/SemesterContext.jsx";
 import { subjectTable } from "../../design-systems/CustomTable.jsx";
 import { titleStyle } from "../../design-systems/CSS/Title.js";
-import { selectButtonStyle } from "../../design-systems/CSS/Button.js";
+import {
+  addButtonStyle,
+  selectButtonStyle,
+} from "../../design-systems/CSS/Button.js";
+import "./CustomForm.css";
 const { Content, Sider } = Layout;
 
 const Subject = () => {
@@ -159,7 +167,7 @@ const Subject = () => {
           <Form form={form} layout="vertical" name="add_subject_form">
             <Form.Item
               name="semesterId"
-              label="Semester"
+              label={<span className="custom-label">Semester</span>}
               rules={[
                 {
                   required: true,
@@ -178,7 +186,7 @@ const Subject = () => {
 
             <Form.Item
               name="code"
-              label="Code"
+              label={<span className="custom-label">Code</span>}
               rules={[
                 {
                   required: true,
@@ -191,7 +199,7 @@ const Subject = () => {
 
             <Form.Item
               name="name"
-              label="Name"
+              label={<span className="custom-label">Name</span>}
               rules={[
                 {
                   required: true,
@@ -219,8 +227,10 @@ const Subject = () => {
                   type="primary"
                   onClick={handleOk}
                   loading={loadingSubmit}
+                  style={addButtonStyle}
                 >
                   {isEditing ? "Update" : "Add"}
+                  <CaretRightFilled />
                 </Button>
               </Col>
             </Row>

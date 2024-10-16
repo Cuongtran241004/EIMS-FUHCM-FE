@@ -17,13 +17,23 @@ import {
 } from "antd";
 import subjectApi from "../../services/Subject.js";
 import examApi from "../../services/Exam.js";
-import { DeleteOutlined, DownOutlined, EditOutlined } from "@ant-design/icons";
+import {
+  CaretRightFilled,
+  CloseOutlined,
+  DeleteOutlined,
+  DownOutlined,
+  EditOutlined,
+} from "@ant-design/icons";
 import Header from "../../components/Header/Header.jsx";
 import { useSemester } from "../../components/Context/SemesterContext.jsx";
 import { examType } from "../../configs/data.js";
 import { examTypeTag } from "../../design-systems/CustomTag.jsx";
-import { selectButtonStyle } from "../../design-systems/CSS/Button.js";
+import {
+  addButtonStyle,
+  selectButtonStyle,
+} from "../../design-systems/CSS/Button.js";
 import { titleStyle } from "../../design-systems/CSS/Title.js";
+import "./CustomForm.css";
 const { Content, Sider } = Layout;
 const { Option } = Select;
 
@@ -216,7 +226,7 @@ const Exam = () => {
           <Form form={form} layout="vertical" name="add_exam_form">
             <Form.Item
               name="semesterId"
-              label="Semester"
+              label={<span className="custom-label">Semester</span>}
               rules={[
                 {
                   required: true,
@@ -235,7 +245,7 @@ const Exam = () => {
             {/* Subject Field */}
             <Form.Item
               name="subjectName"
-              label="Subject"
+              label={<span className="custom-label">Subject</span>}
               rules={[{ required: true, message: "Please select a subject!" }]}
             >
               <Select
@@ -257,7 +267,7 @@ const Exam = () => {
               <Col span={12}>
                 <Form.Item
                   name="examType"
-                  label="Type"
+                  label={<span className="custom-label">Type</span>}
                   rules={[{ required: true, message: "Required" }]}
                 >
                   <Select placeholder="Exam type">
@@ -274,7 +284,7 @@ const Exam = () => {
               <Col span={12}>
                 <Form.Item
                   name="duration"
-                  label="Duration"
+                  label={<span className="custom-label">Duration</span>}
                   rules={[{ required: true, message: "Required" }]}
                 >
                   <Input type="number" placeholder="Duration" />
@@ -290,6 +300,7 @@ const Exam = () => {
                   style={{ borderColor: "orange", color: "orange" }}
                 >
                   Clear
+                  <CloseOutlined />
                 </Button>
               </Col>
               <Col>
@@ -297,8 +308,10 @@ const Exam = () => {
                   type="primary"
                   onClick={handleOk}
                   loading={loadingSubmit}
+                  style={addButtonStyle}
                 >
                   {isEditing ? "Update" : "Add"}
+                  <CaretRightFilled />
                 </Button>
               </Col>
             </Row>

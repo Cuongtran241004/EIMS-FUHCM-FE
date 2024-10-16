@@ -7,12 +7,13 @@ import { DownOutlined } from "@ant-design/icons";
 const { Content, Sider } = Layout;
 import { selectButtonStyle } from "../../design-systems/CSS/Button.js";
 import { titleStyle } from "../../design-systems/CSS/Title.js";
+import { Form } from "react-router-dom";
 
 const Attendance = () => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
   const { selectedSemester, setSelectedSemester, semesters } = useSemester(); // Access shared semester state
-
+  const [form] = Form.useForm();
   // Fetch attendance data
   const fetchExams = async (term) => {
     setLoading(true);
@@ -82,10 +83,10 @@ const Attendance = () => {
       <Header />
       <Layout>
         {/* Sider for Form */}
-        <Sider
-          width={300}
-          style={{ background: "#4D908E", padding: "24px" }}
-        ></Sider>
+        <Sider width={300} style={{ background: "#4D908E", padding: "24px" }}>
+          {/* Add form components here */}
+          <Form form={form} layout="vertical" name="add_exam_slot_form"></Form>
+        </Sider>
 
         {/* Content for Table */}
         <Content style={{ padding: 12, margin: 0, background: "#fff" }}>
