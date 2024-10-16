@@ -224,7 +224,7 @@ const RoomSelectionPage = () => {
                             backgroundColor: selectedRooms.some(
                               (selectedRoom) => selectedRoom.id === room.id
                             )
-                              ? "green"
+                              ? "#4D908E"
                               : "",
                             color: selectedRooms.some(
                               (selectedRoom) => selectedRoom.id === room.id
@@ -279,7 +279,7 @@ const RoomSelectionPage = () => {
                           );
                         }}
                         style={{
-                          backgroundColor: "green",
+                          backgroundColor: "#4D908E",
                           color: "white",
                         }}
                       >
