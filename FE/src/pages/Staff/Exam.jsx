@@ -13,7 +13,7 @@ import {
   Col,
   Row,
   Select,
-  Tag,
+  notification,
 } from "antd";
 import subjectApi from "../../services/Subject.js";
 import examApi from "../../services/Exam.js";
@@ -34,6 +34,10 @@ import {
 } from "../../design-systems/CSS/Button.js";
 import { titleStyle } from "../../design-systems/CSS/Title.js";
 import "./CustomForm.css";
+import {
+  deleteNotification,
+  editNotification,
+} from "../../design-systems/CustomNotification.jsx";
 const { Content, Sider } = Layout;
 const { Option } = Select;
 
@@ -122,7 +126,7 @@ const Exam = () => {
       setEditingExam(record);
       form.setFieldsValue(record);
     } else {
-      message.error("You cannot edit this exam!");
+      editNotification();
     }
   };
 
@@ -138,7 +142,7 @@ const Exam = () => {
         message.error("Failed to delete exam");
       }
     } else {
-      message.error("You cannot delete this exam!");
+      deleteNotification();
     }
   };
 

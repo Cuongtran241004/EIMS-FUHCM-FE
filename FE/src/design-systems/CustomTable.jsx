@@ -102,6 +102,7 @@ const subjectTable = (currentPage, pageSize, handleEdit, handleDelete) => [
     title: "Code",
     dataIndex: "code",
     key: "code",
+    align: "center",
   },
   {
     title: "Name",
@@ -111,6 +112,7 @@ const subjectTable = (currentPage, pageSize, handleEdit, handleDelete) => [
   {
     title: "Action",
     key: "action",
+    align: "center",
     render: (text, record) => (
       <Space size="middle">
         <EditOutlined

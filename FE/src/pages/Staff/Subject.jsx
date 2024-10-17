@@ -21,6 +21,7 @@ import {
   Col,
   Row,
   Select,
+  notification,
 } from "antd";
 import subjectApi from "../../services/Subject.js";
 import {
@@ -38,6 +39,11 @@ import {
 } from "../../design-systems/CSS/Button.js";
 import "./CustomForm.css";
 import { staffMapperUtil } from "../../utils/Mapper/StaffMapperUtil.jsx";
+import {
+  deleteNotification,
+  editNotification,
+} from "../../design-systems/CustomNotification.jsx";
+
 const { Content, Sider } = Layout;
 
 const Subject = () => {
@@ -112,7 +118,7 @@ const Subject = () => {
         message.error(DELETE_SUBJECT_FAILED);
       }
     } else {
-      message.error("You cannot delete this subject!");
+      deleteNotification();
     }
   };
 
@@ -126,11 +132,11 @@ const Subject = () => {
       form.setFieldsValue({
         code: record.code,
         name: record.name,
-        semesterId: record.semesterName,
+        semesterId: record.semesterId,
       });
       setIsModalVisible(true);
     } else {
-      message.error("You cannot edit this subject!");
+      editNotification();
     }
   };
 
@@ -140,16 +146,16 @@ const Subject = () => {
       try {
         const values = await form.validateFields();
 
-        console.log(subjectData);
         if (isEditing) {
-          await subjectApi.updateSubject({ ...editingSubject, ...subjectData });
+          await subjectApi.updateSubject({ ...editingSubject, ...values });
           message.success(EDIT_SUBJECT_SUCCESS);
         } else {
           await subjectApi.addSubject(values);
           message.success(ADD_SUBJECT_SUCCESS);
         }
-        if (selectedSemester.id === values.semesterId) {
-          fetchData(subjectData.semesterId);
+
+        if (selectedSemester.id == values.semesterId) {
+          fetchData(values.semesterId);
         }
 
         handleCancel();

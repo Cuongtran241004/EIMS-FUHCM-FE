@@ -34,6 +34,10 @@ import { staffMapperUtil } from "../../utils/Mapper/StaffMapperUtil.jsx";
 import { examScheduleTable } from "../../design-systems/CustomTable.jsx";
 import { titleStyle } from "../../design-systems/CSS/Title.js";
 import "./CustomForm.css";
+import {
+  deleteNotification,
+  editNotification,
+} from "../../design-systems/CustomNotification.jsx";
 const { Option } = Select;
 const { Content } = Layout;
 const PAGE_SIZE = 6;
@@ -117,7 +121,7 @@ const Exam_Schedule = () => {
         message.error("Failed to delete exam");
       }
     } else {
-      message.error("You cannot delete this exam slot!");
+      deleteNotification();
     }
   };
 
@@ -135,7 +139,7 @@ const Exam_Schedule = () => {
         endTime: moment(record.endAt),
       });
     } else {
-      message.error("You cannot edit this exam slot!");
+      editNotification();
     }
   };
 
