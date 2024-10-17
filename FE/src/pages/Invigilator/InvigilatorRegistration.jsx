@@ -63,17 +63,23 @@ function InvigilatorRegistration() {
   // };
 
   const handleSelectEvent = (event) => {
-    const { examSlotId, status } = event;
-
+    const { examSlotId, status, startAt } = event;
+    const currentDate = moment();
+    const openAt = moment(startAt).subtract(7, 'days');
+    const closeAt = moment(startAt).subtract(3, 'days');
+    if(currentDate.isBefore(openAt) || currentDate.isAfter(closeAt)) {
+      message.warning('Not open for registration');
+      return;
+    }
+//=======================================================================================================
     // if (!selectedSemester) {
     //   message.warning('Please select a semester first.');
     //   return;
     // }
-
+//=======================================================================================================
     if (status === 'REGISTERED' || status === 'FULL') {
       return;
     }
-
     if (selectedSlots.includes(examSlotId)) {
       const updatedSelectedSlots = selectedSlots.filter((slotId) => slotId !== examSlotId);
       setSelectedSlots(updatedSelectedSlots);
@@ -194,9 +200,18 @@ function InvigilatorRegistration() {
             components={{ event: EventComponent }}
             onSelectEvent={handleSelectEvent}
             eventPropGetter={(event) => {
+              const { startAt } = event;
+              const currentDate = moment();
+              const openAt = moment(startAt).subtract(7, 'days');
+              const closeAt = moment(startAt).subtract(3, 'days');
               const isSelected = selectedSlots.includes(event.examSlotId);
               let backgroundColor;
               let isSelectable = true;
+              if(currentDate.isBefore(openAt) || currentDate.isAfter(closeAt)) {
+                backgroundColor = '#f0f0f0';
+                isSelectable = false;
+              }
+              else {
               switch (event.status) {
                 case 'REGISTERED':
                   backgroundColor = '#52c41a';
@@ -211,6 +226,7 @@ function InvigilatorRegistration() {
                   isSelectable = true;
                   break;
               }
+            }
 
               return {
                 style: {

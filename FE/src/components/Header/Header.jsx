@@ -52,7 +52,7 @@ const Header = () => {
               const subMenuItems = item.subMenu.map((subItem, subIndex) => ({
                 key: subItem.path,
                 label: (
-                  <Link
+                  <Link 
                     to={subItem.path}
                     className={
                       location.pathname === subItem.path ? "active" : ""
@@ -69,7 +69,7 @@ const Header = () => {
                   menu={{ items: subMenuItems }}
                   trigger={["click"]}
                 >
-                  <Button size="large" type={isActive ? "primary" : "default"}>
+                  <Button size="large" style={{backgroundColor: isActive ? "#4D908E" : "", color: isActive? 'white' : ''}}>
                     <Space>
                       {item.name}
                       <DownOutlined />
@@ -92,8 +92,9 @@ const Header = () => {
                 <Link
                   to={item.path}
                   className={`header-right-item ${isActive ? "active" : ""}`}
+                  style={{width: '100%'}}
                 >
-                  <span className={`button-name ${isActive ? "active" : ""}`}>
+                  <span style={{width: '100%'}} className={`button-name ${isActive ? "active" : ""}`}>
                     {item.name}
                   </span>
                 </Link>
