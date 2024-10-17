@@ -68,6 +68,7 @@ function InvigilatorDashboard() {
       </h2>
       <div style={{ display: "flex", alignItems: "flex-start" }}>
         <BigCalendar
+          views={{ day: true, week: true, month: true }}
           localizer={localizer}
           events={examSlotDetail}
           onSelectEvent={handleSelectEvent}
@@ -102,7 +103,7 @@ function InvigilatorDashboard() {
             </div>
           )}
         </Modal>
-        <div style={{marginLeft: 30, marginTop: 40, display: 'grid', width: '15%' }}>
+        <div style={{ marginLeft: 30, marginTop: 40, display: 'grid', width: '15%' }}>
           <Dropdown menu={menu} trigger={["click"]}>
             <Button size="large">
               <Space>

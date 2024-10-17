@@ -10,6 +10,7 @@ export const useSemester = () => useContext(SemesterContext);
 export const SemesterProviderInvigilator = ({ children }) => {
   const { semesters, loading: loadingSemesters } = useFetchSemesters();
   const [selectedSemester, setSelectedSemester] = useState(null);
+  const [lastestSemester, setLasestSemester] = useState(null);
   const [reloadSlots, setReloadSlots] = useState(0);
   const { availableSlotsData, loading: loadingAvailableSlots } =
     useFetchAvailableSlots(selectedSemester?.id, reloadSlots);
@@ -19,13 +20,24 @@ export const SemesterProviderInvigilator = ({ children }) => {
 
   useEffect(() => {
     if (semesters.length > 0) {
-      const latestSemester = semesters.reduce(
+      const select = semesters.reduce(
         (latest, current) => (current.id > latest.id ? current : latest),
         semesters[0]
       );
-      setSelectedSemester(latestSemester);
+      setSelectedSemester(select);
     }
-  }, [semesters, availableSlotsData]);
+  }, [semesters]);
+
+  useEffect(() => {
+    if (semesters.length > 0) {
+      const select = semesters.reduce(
+        (latest, current) => (current.id != latest.id ? latest : latest),
+        semesters[0]
+      );
+      setLasestSemester(select);
+      
+    }
+  },[semesters])
 
   const reloadAvailableSlots = () => {
     setReloadSlots(reloadSlots + 1);
@@ -43,6 +55,7 @@ export const SemesterProviderInvigilator = ({ children }) => {
         loadingAvailableSlots,
         loadingSchedules,
         reloadAvailableSlots,
+        lastestSemester,
       }}
     >
       {children}

@@ -15,8 +15,8 @@ const localizer = momentLocalizer(moment);
 
 function InvigilatorRegistration() {
   const { user } = useContext(UserContext);
-  const { semesters = [], selectedSemester, setSelectedSemester, examSlotDetail, availableSlotsData, reloadAvailableSlots } = useSemester();
-  const [events, setEvents] = useState([]); 
+  const { semesters = [], selectedSemester, setSelectedSemester, examSlotDetail, availableSlotsData, reloadAvailableSlots, lastestSemester } = useSemester();
+  const [events, setEvents] = useState([]);
   const [selectedSlots, setSelectedSlots] = useState([]);
   const [slots, setSlots] = useState({ fuId: user.id, examSlotId: [] });
   const [cancelModalVisible, setCancelModalVisible] = useState(false);
@@ -41,26 +41,26 @@ function InvigilatorRegistration() {
   useEffect(() => {
     if (selectedSemester && availableSlotsData) {
       setSlots({ ...slots, examSlotId: [] });
-      setEvents(availableSlotsData); 
-      fetchAndSetData(); 
+      setEvents(availableSlotsData);
+      fetchAndSetData();
     }
   }, [selectedSemester, availableSlotsData]);
 
-  const handleMenuClick = (e) => {
-    const selected = semesters.find((semester) => semester.id === parseInt(e.key));
-    setSelectedSemester(selected);
-    fetchAndSetData();
-  };
+  // const handleMenuClick = (e) => {
+  //   const selected = semesters.find((semester) => semester.id === parseInt(e.key));
+  //   setSelectedSemester(selected);
+  //   fetchAndSetData();
+  // };
 
-  const menuItems = semesters.map((semester) => ({
-    key: semester.id,
-    label: semester.name,
-  }));
+  // const menuItems = semesters.map((semester) => ({
+  //   key: semester.id,
+  //   label: semester.name,
+  // }));
 
-  const menu = {
-    items: menuItems,
-    onClick: handleMenuClick,
-  };
+  // const menu = {
+  //   items: menuItems,
+  //   onClick: handleMenuClick,
+  // };
 
   const handleSelectEvent = (event) => {
     const { examSlotId, status } = event;
@@ -92,10 +92,10 @@ function InvigilatorRegistration() {
 
   const handleRegister = async () => {
 
-    if (!selectedSemester) {
-      message.warning('Please select a semester first.');
-      return;
-    }
+    // if (!selectedSemester) {
+    //   message.warning('Please select a semester first.');
+    //   return;
+    // }
 
     if (selectedSlots.length === 0) {
       message.warning('Please select at least one slot to register.');
@@ -108,7 +108,7 @@ function InvigilatorRegistration() {
         message.success('Registered for slots successfully');
         setSelectedSlots([]);
         setSlots({ ...slots, examSlotId: [] });
-        reloadAvailableSlots(); 
+        reloadAvailableSlots();
       } else {
         message.error('Error registering for slots');
       }
@@ -163,7 +163,7 @@ function InvigilatorRegistration() {
           console.error(error);
         }
       },
-      
+
     });
   };
 
@@ -172,6 +172,7 @@ function InvigilatorRegistration() {
       <p style={{ margin: 0, fontWeight: 500, fontSize: 13.33333 }}>
         {new Date(event.startAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}-
         {new Date(event.endAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+        <br/><span style={{fontSize: '0.625rem'}}>(Registed: 10/Total: 15)</span>
       </p>
     </div>
   );
@@ -184,8 +185,9 @@ function InvigilatorRegistration() {
         <h2 style={{ marginTop: 10, marginBottom: 0, marginLeft: 50 }}>Invigilator Register</h2>
         <div style={{ display: 'flex', alignItems: 'flex-start' }}>
           <Calendar
+            views={{ day: true, week: true, month: true }}
             localizer={localizer}
-            events={events} 
+            events={events}
             startAccessor={(event) => new Date(event.startAt)}
             endAccessor={(event) => new Date(event.endAt)}
             style={{ height: 500, margin: '50px', width: '70%', fontWeight: 'lighter' }}
@@ -221,14 +223,14 @@ function InvigilatorRegistration() {
             }}
           />
           <div style={{ marginLeft: 30, marginTop: 40, display: 'grid', width: '15%' }}>
-            <Dropdown menu={menu} trigger={['click']}>
+            {/* <Dropdown menu={menu} trigger={['click']}>
               <Button size="large" style={{ width: '100%' }}>
                 <Space>
                   {selectedSemester ? selectedSemester.name : 'No Semesters Available'}
                   <DownOutlined />
                 </Space>
               </Button>
-            </Dropdown>
+            </Dropdown> */}
 
             <Button
               type="primary"
@@ -240,15 +242,15 @@ function InvigilatorRegistration() {
             <Button onClick={showCancelModal} style={{ marginTop: 10, width: '100%', height: 40 }}>
               Cancel Slots
             </Button>
-            <p>Registered Slots: {examSlotDetail.length} / <span style={{color: 'red'}}>{allowedSlots}</span></p>
+            <p>Registered Slots: {examSlotDetail.length} / <span style={{ color: 'red' }}>{allowedSlots}</span></p>
             <p>Selected Slots: {selectedSlots.length}</p>
-            <p style={{fontWeight: 'bold'}}>
-              <span style={{marginRight: 20, color: '#52c41a'}}>Registered</span>
-              <span style={{marginRight: 20, color: '#d9363e'}}>Full</span>
-              <span style={{marginRight: 20, color: 'rgb(221, 221, 221)'}}>Not full</span>
+            <p style={{ fontWeight: 'bold' }}>
+              <span style={{ marginRight: 20, color: '#52c41a' }}>Registered</span>
+              <span style={{ marginRight: 20, color: '#d9363e' }}>Full</span>
+              <span style={{ marginRight: 20, color: 'rgb(221, 221, 221)' }}>Not full</span>
             </p>
-            <p style={{fontStyle: 'italic'}}>*Note: Gather 30 minutes before exam time in the room <span style={{fontWeight: 'bolder'}}>301.</span></p>
-           
+            <p style={{ fontStyle: 'italic' }}>*Note: Gather 30 minutes before exam time in the room <span style={{ fontWeight: 'bolder' }}>301.</span></p>
+
           </div>
         </div>
 
