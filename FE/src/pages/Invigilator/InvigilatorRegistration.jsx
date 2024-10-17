@@ -220,7 +220,7 @@ function InvigilatorRegistration() {
               };
             }}
           />
-          <div style={{ marginTop: 40 }}>
+          <div style={{ marginLeft: 30, marginTop: 40, display: 'grid', width: '15%' }}>
             <Dropdown menu={menu} trigger={['click']}>
               <Button size="large" style={{ width: '100%' }}>
                 <Space>
@@ -240,8 +240,15 @@ function InvigilatorRegistration() {
             <Button onClick={showCancelModal} style={{ marginTop: 10, width: '100%', height: 40 }}>
               Cancel Slots
             </Button>
-            <p>Registered Slots: {examSlotDetail.length} / {allowedSlots}</p>
+            <p>Registered Slots: {examSlotDetail.length} / <span style={{color: 'red'}}>{allowedSlots}</span></p>
             <p>Selected Slots: {selectedSlots.length}</p>
+            <p style={{fontWeight: 'bold'}}>
+              <span style={{marginRight: 20, color: '#52c41a'}}>Registered</span>
+              <span style={{marginRight: 20, color: '#d9363e'}}>Full</span>
+              <span style={{marginRight: 20, color: 'rgb(221, 221, 221)'}}>Not full</span>
+            </p>
+            <p style={{fontStyle: 'italic'}}>*Note: Gather 30 minutes before exam time in the room <span style={{fontWeight: 'bolder'}}>301.</span></p>
+           
           </div>
         </div>
 
