@@ -24,7 +24,7 @@ function InvigilatorRegistration() {
   const [isAllSelected, setIsAllSelected] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  const allowedSlots = selectedSemester?.allowedSlotConfig;
+  const allowedSlots = lastestSemester?.allowedSlotConfig;
 
   const fetchAndSetData = async () => {
     try {
@@ -39,12 +39,12 @@ function InvigilatorRegistration() {
   };
 
   useEffect(() => {
-    if (selectedSemester && availableSlotsData) {
+    if (lastestSemester && availableSlotsData) {
       setSlots({ ...slots, examSlotId: [] });
       setEvents(availableSlotsData);
       fetchAndSetData();
     }
-  }, [selectedSemester, availableSlotsData]);
+  }, [lastestSemester, availableSlotsData]);
 
   // const handleMenuClick = (e) => {
   //   const selected = semesters.find((semester) => semester.id === parseInt(e.key));
@@ -65,10 +65,10 @@ function InvigilatorRegistration() {
   const handleSelectEvent = (event) => {
     const { examSlotId, status } = event;
 
-    if (!selectedSemester) {
-      message.warning('Please select a semester first.');
-      return;
-    }
+    // if (!selectedSemester) {
+    //   message.warning('Please select a semester first.');
+    //   return;
+    // }
 
     if (status === 'REGISTERED' || status === 'FULL') {
       return;
@@ -231,6 +231,7 @@ function InvigilatorRegistration() {
                 </Space>
               </Button>
             </Dropdown> */}
+            <Button size="large" style={{ width: '100%' }}>{lastestSemester.name}</Button>
 
             <Button
               type="primary"
