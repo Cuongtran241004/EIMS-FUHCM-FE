@@ -6,11 +6,12 @@ const buttonStyle = {
 };
 
 const selectButtonStyle = {
-  backgroundColor: "#F8961E",
-  borderColor: "#F8961E",
+  backgroundColor: "#F9C74F",
+  borderColor: "#F9C74F",
   color: "#fff",
   borderRadius: "5px",
-  marginBottom: "5px",
+  boxShadow: "0 0 5px rgba(0, 0, 0, 0.5)",
+  marginBottom: "10px",
 };
 
 const detailButtonStyle = {
