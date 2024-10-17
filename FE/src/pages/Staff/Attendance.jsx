@@ -97,7 +97,14 @@ const Attendance = () => {
       <Header />
       <Layout>
         {/* Sider for Form */}
-        <Sider width={300} style={{ background: "#4D908E", padding: "24px" }}>
+        <Sider
+          width={300}
+          style={{
+            background: "#4D908E",
+            padding: "24px",
+            boxShadow: "3px 0 5px rgba(0, 0, 0, 0.5)",
+          }}
+        >
           {/* Add form components here */}
           <Form form={form} layout="vertical" name="add_exam_slot_form">
             <Form.Item

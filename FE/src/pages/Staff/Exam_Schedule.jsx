@@ -219,7 +219,14 @@ const Exam_Schedule = () => {
     <Layout style={{ height: "100vh" }}>
       <Header />
       <Layout>
-        <Sider width={300} style={{ background: "#4D908E", padding: "24px" }}>
+        <Sider
+          width={300}
+          style={{
+            background: "#4D908E",
+            padding: "24px",
+            boxShadow: "3px 0 5px rgba(0, 0, 0, 0.5)",
+          }}
+        >
           <Form form={form} layout="vertical" name="add_exam_slot_form">
             <Form.Item
               name="semesterId"
@@ -322,7 +329,12 @@ const Exam_Schedule = () => {
           <div style={{ marginBottom: "20px", textAlign: "center" }}>
             <h2 style={titleStyle}>Exam Schedule Management</h2>
           </div>
-          <div style={{ display: "flex", alignItems: "center" }}>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+            }}
+          >
             <Dropdown
               menu={{
                 items: semesters.map((sem) => ({
