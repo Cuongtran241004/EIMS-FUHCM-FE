@@ -21,6 +21,7 @@ import {
   Col,
   Row,
   Select,
+  notification,
 } from "antd";
 import subjectApi from "../../services/Subject.js";
 import {
@@ -37,6 +38,12 @@ import {
   selectButtonStyle,
 } from "../../design-systems/CSS/Button.js";
 import "./CustomForm.css";
+import { staffMapperUtil } from "../../utils/Mapper/StaffMapperUtil.jsx";
+import {
+  deleteNotification,
+  editNotification,
+} from "../../design-systems/CustomNotification.jsx";
+
 const { Content, Sider } = Layout;
 
 const Subject = () => {
@@ -54,14 +61,15 @@ const Subject = () => {
   const [loadingSubmit, setLoadingSubmit] = useState(false);
   const [form] = Form.useForm();
   const [currentPage, setCurrentPage] = useState(1);
-  const pageSize = 8;
+  const pageSize = 7;
 
   const fetchData = async (semesterId) => {
     setLoading(true);
     try {
       const response = await subjectApi.getSubjectBySemester(semesterId);
+      const mapResponse = await staffMapperUtil.mapSubject(response);
       // sort by id
-      const result = response.sort((a, b) => b.id - a.id);
+      const result = mapResponse.sort((a, b) => b.id - a.id);
       setData(result || []);
     } catch (error) {
       message.error(FETCH_SUBJECTS_FAILED);
@@ -110,7 +118,7 @@ const Subject = () => {
         message.error(DELETE_SUBJECT_FAILED);
       }
     } else {
-      message.error("You cannot delete this subject!");
+      deleteNotification();
     }
   };
 
@@ -124,11 +132,11 @@ const Subject = () => {
       form.setFieldsValue({
         code: record.code,
         name: record.name,
-        semesterId: record.semesterName,
+        semesterId: record.semesterId,
       });
       setIsModalVisible(true);
     } else {
-      message.error("You cannot edit this subject!");
+      editNotification();
     }
   };
 
@@ -138,16 +146,16 @@ const Subject = () => {
       try {
         const values = await form.validateFields();
 
-        console.log(subjectData);
         if (isEditing) {
-          await subjectApi.updateSubject({ ...editingSubject, ...subjectData });
+          await subjectApi.updateSubject({ ...editingSubject, ...values });
           message.success(EDIT_SUBJECT_SUCCESS);
         } else {
           await subjectApi.addSubject(values);
           message.success(ADD_SUBJECT_SUCCESS);
         }
-        if (selectedSemester.id === values.semesterId) {
-          fetchData(subjectData.semesterId);
+
+        if (selectedSemester.id == values.semesterId) {
+          fetchData(values.semesterId);
         }
 
         handleCancel();
@@ -163,7 +171,14 @@ const Subject = () => {
     <Layout style={{ height: "100vh" }}>
       <Header />
       <Layout>
-        <Sider width={300} style={{ background: "#4D908E", padding: "24px" }}>
+        <Sider
+          width={300}
+          style={{
+            background: "#4D908E",
+            padding: "24px",
+            boxShadow: "3px 0 5px rgba(0, 0, 0, 0.5)",
+          }}
+        >
           <Form form={form} layout="vertical" name="add_subject_form">
             <Form.Item
               name="semesterId"
@@ -257,7 +272,7 @@ const Subject = () => {
           </div>
           <Spin spinning={loading}>
             <Table
-              dataSource={data.map((item) => ({ ...item, key: item.id }))}
+              dataSource={data}
               columns={subjectTable(
                 currentPage,
                 pageSize,

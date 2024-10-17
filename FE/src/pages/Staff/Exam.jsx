@@ -13,7 +13,7 @@ import {
   Col,
   Row,
   Select,
-  Tag,
+  notification,
 } from "antd";
 import subjectApi from "../../services/Subject.js";
 import examApi from "../../services/Exam.js";
@@ -34,6 +34,10 @@ import {
 } from "../../design-systems/CSS/Button.js";
 import { titleStyle } from "../../design-systems/CSS/Title.js";
 import "./CustomForm.css";
+import {
+  deleteNotification,
+  editNotification,
+} from "../../design-systems/CustomNotification.jsx";
 const { Content, Sider } = Layout;
 const { Option } = Select;
 
@@ -53,7 +57,7 @@ const Exam = () => {
   const [filteredSubjects, setFilteredSubjects] = useState([]);
   const [form] = Form.useForm();
   const [currentPage, setCurrentPage] = useState(1);
-  const pageSize = 8;
+  const pageSize = 7;
 
   // Fetch exam data based on selected semester
   const fetchExams = async (semesterId) => {
@@ -122,7 +126,7 @@ const Exam = () => {
       setEditingExam(record);
       form.setFieldsValue(record);
     } else {
-      message.error("You cannot edit this exam!");
+      editNotification();
     }
   };
 
@@ -138,7 +142,7 @@ const Exam = () => {
         message.error("Failed to delete exam");
       }
     } else {
-      message.error("You cannot delete this exam!");
+      deleteNotification();
     }
   };
 
@@ -172,6 +176,7 @@ const Exam = () => {
       title: "No",
       dataIndex: "no",
       key: "no",
+      align: "center",
       render: (_, __, index) => (currentPage - 1) * pageSize + index + 1,
     },
     {
@@ -184,20 +189,25 @@ const Exam = () => {
       dataIndex: "subjectName",
       key: "subjectName",
     },
+
     {
       title: "Type",
       dataIndex: "examType",
       key: "examType",
+      align: "center",
       render: (examType) => examTypeTag(examType),
     },
     {
       title: "Duration (minutes)",
       dataIndex: "duration",
       key: "duration",
+      align: "center",
     },
+
     {
       title: "Action",
       key: "action",
+      align: "center",
       render: (text, record) => (
         <Space size="middle">
           <EditOutlined
@@ -222,7 +232,14 @@ const Exam = () => {
       <Header />
       <Layout>
         {/* Sider for Form */}
-        <Sider width={300} style={{ background: "#4D908E", padding: "24px" }}>
+        <Sider
+          width={300}
+          style={{
+            background: "#4D908E",
+            padding: "24px",
+            boxShadow: "3px 0 5px rgba(0, 0, 0, 0.5)",
+          }}
+        >
           <Form form={form} layout="vertical" name="add_exam_form">
             <Form.Item
               name="semesterId"

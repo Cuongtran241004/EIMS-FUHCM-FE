@@ -34,6 +34,10 @@ import { staffMapperUtil } from "../../utils/Mapper/StaffMapperUtil.jsx";
 import { examScheduleTable } from "../../design-systems/CustomTable.jsx";
 import { titleStyle } from "../../design-systems/CSS/Title.js";
 import "./CustomForm.css";
+import {
+  deleteNotification,
+  editNotification,
+} from "../../design-systems/CustomNotification.jsx";
 const { Option } = Select;
 const { Content } = Layout;
 const PAGE_SIZE = 6;
@@ -117,7 +121,7 @@ const Exam_Schedule = () => {
         message.error("Failed to delete exam");
       }
     } else {
-      message.error("You cannot delete this exam slot!");
+      deleteNotification();
     }
   };
 
@@ -135,7 +139,7 @@ const Exam_Schedule = () => {
         endTime: moment(record.endAt),
       });
     } else {
-      message.error("You cannot edit this exam slot!");
+      editNotification();
     }
   };
 
@@ -219,7 +223,14 @@ const Exam_Schedule = () => {
     <Layout style={{ height: "100vh" }}>
       <Header />
       <Layout>
-        <Sider width={300} style={{ background: "#4D908E", padding: "24px" }}>
+        <Sider
+          width={300}
+          style={{
+            background: "#4D908E",
+            padding: "24px",
+            boxShadow: "3px 0 5px rgba(0, 0, 0, 0.5)",
+          }}
+        >
           <Form form={form} layout="vertical" name="add_exam_slot_form">
             <Form.Item
               name="semesterId"
@@ -322,7 +333,12 @@ const Exam_Schedule = () => {
           <div style={{ marginBottom: "20px", textAlign: "center" }}>
             <h2 style={titleStyle}>Exam Schedule Management</h2>
           </div>
-          <div style={{ display: "flex", alignItems: "center" }}>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+            }}
+          >
             <Dropdown
               menu={{
                 items: semesters.map((sem) => ({

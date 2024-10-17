@@ -14,6 +14,7 @@ const examScheduleTable = (handleRoomClick, handleEdit, handleDelete) => [
     title: "Code",
     dataIndex: "subjectCode",
     key: "subjectCode",
+    align: "center",
   },
   {
     title: "Subject",
@@ -24,17 +25,20 @@ const examScheduleTable = (handleRoomClick, handleEdit, handleDelete) => [
     title: "Exam Type",
     dataIndex: "examType",
     key: "examType",
+    align: "center",
     render: (text) => examTypeTag(text),
   },
   {
     title: "Date (DD-MM-YYYY)",
     dataIndex: "startAt", // Use startAt to extract date
     key: "date",
+    align: "center",
     render: (text) => moment(text).format("DD-MM-YYYY"), // Format as DD-MM-YYYY
   },
   {
     title: "Time",
     key: "time",
+    align: "center",
     render: (text, record) => {
       const startTime = new Date(record.startAt).toLocaleTimeString([], {
         hour: "2-digit",
@@ -49,6 +53,8 @@ const examScheduleTable = (handleRoomClick, handleEdit, handleDelete) => [
   },
   {
     title: "Room",
+    key: "room",
+    align: "center",
     render: (text, record) => (
       <Button type="text" onClick={() => handleRoomClick(record.id)}>
         <PlusSquareOutlined style={{ fontSize: "20px", color: "#43AA8B" }} />
@@ -64,6 +70,7 @@ const examScheduleTable = (handleRoomClick, handleEdit, handleDelete) => [
   {
     title: "Action",
     key: "action",
+    align: "center",
     render: (text, record) => (
       <Space size="middle">
         <EditOutlined
@@ -88,12 +95,14 @@ const subjectTable = (currentPage, pageSize, handleEdit, handleDelete) => [
     title: "No",
     dataIndex: "no",
     key: "no",
+    align: "center",
     render: (_, __, index) => (currentPage - 1) * pageSize + index + 1,
   },
   {
     title: "Code",
     dataIndex: "code",
     key: "code",
+    align: "center",
   },
   {
     title: "Name",
@@ -103,6 +112,7 @@ const subjectTable = (currentPage, pageSize, handleEdit, handleDelete) => [
   {
     title: "Action",
     key: "action",
+    align: "center",
     render: (text, record) => (
       <Space size="middle">
         <EditOutlined

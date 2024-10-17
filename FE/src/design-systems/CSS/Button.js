@@ -10,6 +10,7 @@ const selectButtonStyle = {
   borderColor: "#F8961E",
   color: "#fff",
   borderRadius: "5px",
+  marginBottom: "5px",
 };
 
 const detailButtonStyle = {
