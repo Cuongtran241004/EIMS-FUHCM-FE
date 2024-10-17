@@ -102,7 +102,7 @@ function InvigilatorDashboard() {
             </div>
           )}
         </Modal>
-        <div style={{ marginTop: 50 }}>
+        <div style={{marginLeft: 30, marginTop: 40, display: 'grid', width: '15%' }}>
           <Dropdown menu={menu} trigger={["click"]}>
             <Button size="large">
               <Space>
