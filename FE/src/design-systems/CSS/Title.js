@@ -8,7 +8,7 @@ const titleStyle = {
 const titleRoomStyle = {
   textAlign: "center",
   color: "#F94144",
-  fontSize: "30px",
+  fontSize: "24px",
   fontWeight: "bold",
 };
 
