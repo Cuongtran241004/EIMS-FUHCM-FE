@@ -145,7 +145,7 @@ function App() {
 
   return (
     <div className="container">
-      {role === 1 || role === 2 ? (
+      {role === 1 || role === 2? (
         <SemesterProvider>{renderRoutes()}</SemesterProvider>
       ) : (
         <>

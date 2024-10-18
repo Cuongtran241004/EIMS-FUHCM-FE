@@ -1,6 +1,7 @@
 import React, { createContext, useState, useContext, useEffect } from "react";
 import { message } from "antd"; // Ensure to import message
 import semesterApi from "../../services/Semester.js";
+import examSlotApi from "../../services/ExamSlot.js";
 
 // Create a context for the semester
 const SemesterContext = createContext();
@@ -13,6 +14,7 @@ export const SemesterProvider = ({ children }) => {
     name: "Select semester",
   });
   const [availableSemesters, setAvailableSemesters] = useState([]);
+  const [examSlotBySemester, setExamSlotBySemester] = useState([]);
 
   const [loading, setLoading] = useState(true); // Loading state
 
@@ -48,6 +50,23 @@ export const SemesterProvider = ({ children }) => {
     }
   };
 
+  useEffect(() => {
+    const fetchExamSlotBySemester = async () => {
+      if (selectedSemester.id) {
+        try {
+          const result = await examSlotApi.getExamSlotBySemesterId(
+            selectedSemester.id
+          );
+          setExamSlotBySemester(result);
+          console.log(result);
+        } catch (error) {
+          message.error("Failed to fetch exam slots");
+        }
+      }
+    }   
+    fetchExamSlotBySemester();
+  }, [selectedSemester]);
+
   // Fetch semesters and set the default selected semester
   useEffect(() => {
     fetchSemesters();
@@ -61,6 +80,7 @@ export const SemesterProvider = ({ children }) => {
         semesters,
         availableSemesters,
         loading,
+        examSlotBySemester,
       }} // Expose loading state
     >
       {children}
