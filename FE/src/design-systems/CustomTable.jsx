@@ -10,7 +10,12 @@ import moment from "moment";
 import { examScheduleTag, examTypeTag, userRoleTag } from "./CustomTag.jsx";
 import { roleOptions } from "../configs/data.js";
 
-const examScheduleTable = (handleRoomClick, handleEdit, handleDelete) => [
+const examScheduleTable = (
+  handleRoomClick,
+  handleAssignmentClick,
+  handleEdit,
+  handleDelete
+) => [
   {
     title: "Code",
     dataIndex: "subjectCode",
@@ -34,12 +39,14 @@ const examScheduleTable = (handleRoomClick, handleEdit, handleDelete) => [
     dataIndex: "startAt", // Use startAt to extract date
     key: "date",
     align: "center",
+    width: "15%",
     render: (text) => moment(text).format("DD-MM-YYYY"), // Format as DD-MM-YYYY
   },
   {
     title: "Time",
     key: "time",
     align: "center",
+    width: "15%",
     render: (text, record) => {
       const startTime = new Date(record.startAt).toLocaleTimeString([], {
         hour: "2-digit",
@@ -67,7 +74,7 @@ const examScheduleTable = (handleRoomClick, handleEdit, handleDelete) => [
     key: "invigilator",
     align: "center",
     render: (text, record) => (
-      <Button type="text">
+      <Button type="text" onClick={() => handleAssignmentClick(record.id)}>
         <PlusCircleOutlined style={{ fontSize: "20px", color: "#43AA8B" }} />
       </Button>
     ),
@@ -83,7 +90,7 @@ const examScheduleTable = (handleRoomClick, handleEdit, handleDelete) => [
     key: "action",
     align: "center",
     render: (text, record) => (
-      <Space size="middle">
+      <Space size="large">
         <EditOutlined
           style={{ color: "blue", cursor: "pointer" }}
           onClick={() => handleEdit(record)}
@@ -125,7 +132,7 @@ const subjectTable = (currentPage, pageSize, handleEdit, handleDelete) => [
     key: "action",
     align: "center",
     render: (text, record) => (
-      <Space size="middle">
+      <Space size="large">
         <EditOutlined
           style={{ color: "blue", cursor: "pointer" }}
           onClick={() => handleEdit(record)}
@@ -183,7 +190,7 @@ const userTable = (handleEdit, handleDelete) => [
     title: "Action",
     key: "action",
     render: (text, record) => (
-      <Space size="middle">
+      <Space size="large">
         <EditOutlined
           onClick={() => handleEdit(record)}
           style={{ color: "blue", cursor: "pointer" }}

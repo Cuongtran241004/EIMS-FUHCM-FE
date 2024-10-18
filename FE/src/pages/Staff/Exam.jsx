@@ -148,27 +148,31 @@ const Exam = () => {
   };
 
   const handleOk = async () => {
-    setLoadingSubmit(true);
-    try {
-      const values = await form.validateFields();
-      const subject = subjects.find((sub) => sub.name === values.subjectName);
-      values.subjectId = subject.id;
+    await form.validateFields().then(async () => {
+      setLoadingSubmit(true);
+      try {
+        const values = await form.validateFields();
+        const subject = subjects.find((sub) => sub.name === values.subjectName);
+        values.subjectId = subject.id;
 
-      if (isEditing) {
-        values.id = editingExam.id;
-        await examApi.updateExam(values);
-        message.success("Exam updated successfully");
-      } else {
-        await examApi.addExam(values);
-        message.success("Exam added successfully");
+        if (isEditing) {
+          values.id = editingExam.id;
+          await examApi.updateExam(values);
+          message.success("Exam updated successfully");
+        } else {
+          await examApi.addExam(values);
+          message.success("Exam added successfully");
+        }
+        if (selectedSemester.id === values.semesterId) {
+          fetchExams(selectedSemester.id);
+        }
+        handleCancel();
+      } catch (error) {
+        message.error("Failed to submit exam");
+      } finally {
+        setLoadingSubmit(false);
       }
-      fetchExams(selectedSemester.id); // Reload exams after adding/updating
-      handleCancel();
-    } catch (error) {
-      message.error("Failed to submit exam");
-    } finally {
-      setLoadingSubmit(false);
-    }
+    });
   };
 
   // Handle semester selection in the form
@@ -215,6 +219,7 @@ const Exam = () => {
       dataIndex: "duration",
       key: "duration",
       align: "center",
+      width: "15%",
     },
 
     {

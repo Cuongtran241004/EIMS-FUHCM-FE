@@ -18,6 +18,9 @@ const { Content, Sider } = Layout;
 import { selectButtonStyle } from "../../design-systems/CSS/Button.js";
 import { titleStyle } from "../../design-systems/CSS/Title.js";
 import "./CustomForm.css";
+import { staffMapperUtil } from "../../utils/Mapper/StaffMapperUtil.jsx";
+import moment from "moment";
+
 const Attendance = () => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -28,14 +31,39 @@ const Attendance = () => {
     availableSemesters,
   } = useSemester(); // Access shared semester state
   const [form] = Form.useForm();
-  // Fetch attendance data
-  const fetchExams = async (term) => {
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 6;
+
+  // // Fetch attendance data
+  // const fetchExams = async (term) => {
+  //   setLoading(true);
+  //   try {
+  //     const result = await examSlotApi.getExamSlotBySemesterId(term);
+  //     setData(result);
+  //   } catch (error) {
+  //     message.error("Failed to fetch attendance");
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
+
+  // Fetch exam schedule data
+  const fetchExamSchedule = async (term) => {
     setLoading(true);
     try {
-      const result = await examSlotApi.getExamSlotBySemesterId(term);
+      const response = await examSlotApi.getExamSlotBySemesterId(term);
+      const result = staffMapperUtil.mapExamSchedule(response);
+      // sort by startAt, format: DD/MM/YYYY HH:mm
+      result.sort((a, b) => {
+        return (
+          moment(a.startAt).format("YYYYMMDDHHmm") -
+          moment(b.startAt).format("YYYYMMDDHHmm")
+        );
+      });
+
       setData(result);
     } catch (error) {
-      message.error("Failed to fetch attendance");
+      message.error("Failed to fetch exam schedule");
     } finally {
       setLoading(false);
     }
@@ -43,8 +71,8 @@ const Attendance = () => {
 
   useEffect(() => {
     if (selectedSemester?.id) {
-      fetchExams(selectedSemester.id);
-      // fetchExamSchedule(selectedSemester.id);
+      //  fetchExams(selectedSemester.id);
+      fetchExamSchedule(selectedSemester.id);
     }
   }, [selectedSemester]);
 
@@ -65,29 +93,55 @@ const Attendance = () => {
   const columns = [
     {
       title: "No",
+      dataIndex: "no",
+      key: "no",
+      align: "center",
+      render: (_, __, index) => (currentPage - 1) * pageSize + index + 1,
     },
-    {
-      title: "Subject",
-      dataIndex: "subject",
-      key: "subject",
-    },
+
     {
       title: "Date",
       dataIndex: "date",
       key: "date",
+      align: "center",
+      render: (text, record) => moment(record.startAt).format("DD/MM/YYYY"),
     },
     {
-      title: "Start Time",
-      dataIndex: "startTime",
-      key: "startTime",
+      title: "Time",
+      dataIndex: "time",
+      key: "time",
+      align: "center",
+      render: (text, record) => {
+        const startTime = moment(record.startAt).format("HH:mm");
+        const endTime = moment(record.endAt).format("HH:mm");
+        return `${startTime} - ${endTime}`;
+      },
     },
-    {
-      title: "End Time",
-      dataIndex: "endTime",
-      key: "endTime",
-    },
+
     {
       title: "Action",
+      dataIndex: "action",
+      key: "action",
+      align: "center",
+      width: "20%",
+      render: (text, record) => (
+        <Space size="small">
+          <Button
+            type="text"
+            style={{ backgroundColor: "#43AA8B", color: "#fff" }}
+            size="middle"
+          >
+            Check-in
+          </Button>
+          <Button
+            type="link"
+            size="middle"
+            style={{ backgroundColor: "#F9844A", color: "#fff" }}
+          >
+            Check-out
+          </Button>
+        </Space>
+      ),
     },
     // Add more columns as necessary
   ];
@@ -157,7 +211,11 @@ const Attendance = () => {
               dataSource={data}
               columns={columns}
               rowKey={(record) => record.id}
-              pagination={{ pageSize: 8 }}
+              pagination={{
+                pageSize,
+                current: currentPage,
+                onChange: (page) => setCurrentPage(page),
+              }}
             />
           </Spin>
         </Content>

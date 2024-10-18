@@ -2,7 +2,17 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import roomApi from "../../services/Room";
 import examSlotApi from "../../services/ExamSlot";
-import { Button, Row, Col, Layout, Spin, message, Empty } from "antd";
+import {
+  Button,
+  Row,
+  Col,
+  Layout,
+  Spin,
+  message,
+  Empty,
+  Tag,
+  Divider,
+} from "antd";
 import moment from "moment";
 import examSlotHallApi from "../../services/ExamSlotHall";
 import {
@@ -30,6 +40,7 @@ const RoomSelectionPage = () => {
   const fetchExamSlot = async () => {
     try {
       const response = await examSlotApi.getExamSlotById(examSlotId);
+
       setExamSlot(response);
     } catch (error) {
       message.error("Failed to fetch exam slot");
@@ -199,6 +210,11 @@ const RoomSelectionPage = () => {
     setSelectedRooms([]);
     setGroupedRooms([]);
   };
+
+  const isAvailable = () => {
+    // if startAt < today, disable save button
+    return moment(examSlot?.startAt).isBefore(moment());
+  };
   // Define groupedRoomsByFloor to use in the render
   const groupedRoomsByFloor = rooms.reduce((acc, room) => {
     if (!acc[room.floor]) {
@@ -220,11 +236,16 @@ const RoomSelectionPage = () => {
               {examSlot?.subjectExamDTO?.subjectCode}-
               {examSlot?.subjectExamDTO?.examType}
             </h1>
-            <h2 style={{ textAlign: "center" }}>
-              {moment(examSlot?.startAt).format("DD-MM-YYYY")} (
-              {moment(examSlot?.startAt).format("HH:mm")} -{" "}
-              {moment(examSlot?.endAt).format("HH:mm")})
+
+            <h2 style={{ textAlign: "center", margin: "0", padding: "0" }}>
+              <Tag color="#F9C74F" style={{ fontSize: "14px" }}>
+                {" "}
+                {moment(examSlot?.startAt).format("DD-MM-YYYY")} (
+                {moment(examSlot?.startAt).format("HH:mm")} -{" "}
+                {moment(examSlot?.endAt).format("HH:mm")})
+              </Tag>
             </h2>
+
             <Spin spinning={loading}>
               {Object.keys(groupedRoomsByFloor).length === 0 ? (
                 <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
@@ -236,9 +257,16 @@ const RoomSelectionPage = () => {
                         display: "flex",
                         flexWrap: "wrap",
                         gap: "8px",
-                        margin: "20px",
+                        margin: "5px",
                       }}
                     >
+                      <Divider
+                        variant="dashed"
+                        style={{
+                          borderColor: "#F9844A",
+                          margin: "10px",
+                        }}
+                      ></Divider>
                       {groupedRoomsByFloor[floor].map((room) => (
                         <Button
                           key={room.id}
@@ -266,7 +294,6 @@ const RoomSelectionPage = () => {
                         </Button>
                       ))}
                     </div>
-                    <hr />
                   </div>
                 ))
               )}
@@ -274,15 +301,19 @@ const RoomSelectionPage = () => {
           </Col>
 
           <Col span={12} style={{ padding: "12px" }}>
-            <h1 style={titleRoomStyle}>SELECTED ROOMS</h1>
+            <h1 style={{ ...titleRoomStyle, marginBottom: "55px" }}>
+              SELECTED ROOMS
+            </h1>
+
             {selectedRooms.length === 0 ? (
               <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
             ) : (
               <div
                 style={{
                   display: "flex",
-                  flexDirection: "column",
+                  flexDirection: "row",
                   gap: "10px",
+                  flexWrap: "wrap",
                 }}
               >
                 {groupedRooms.map((group, groupIndex) => (
@@ -293,6 +324,7 @@ const RoomSelectionPage = () => {
                       gap: "8px",
                       border: "1px dashed #ccc",
                       padding: "5px",
+                      width: "49%",
                     }}
                     onDragOver={handleDragOver}
                     onDrop={(event) => handleDrop(event, groupIndex)}
@@ -352,6 +384,7 @@ const RoomSelectionPage = () => {
                 float: "right",
               }}
               loading={loadingSubmit}
+              disabled={isAvailable()}
             >
               Save
               <ReloadOutlined />
