@@ -134,18 +134,21 @@ const Semester = ({ isLogin }) => {
       title: "Start Date",
       dataIndex: "startAt",
       key: "startAt",
+      align: "center",
       render: (text) => moment(text).format("YYYY-MM-DD"),
     },
     {
       title: "End Date",
       dataIndex: "endAt",
       key: "endAt",
+      align: "center",
       render: (text) => moment(text).format("YYYY-MM-DD"),
     },
     {
       title: "Hour Rate",
       dataIndex: "hourlyConfig",
       key: "hourlyConfig",
+      align: "center",
       render: (text) => {
         // Format the value as Vietnamese currency
         return `${text.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")} ₫`;
