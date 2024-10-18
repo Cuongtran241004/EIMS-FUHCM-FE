@@ -10,7 +10,12 @@ import moment from "moment";
 import { examScheduleTag, examTypeTag, userRoleTag } from "./CustomTag.jsx";
 import { roleOptions } from "../configs/data.js";
 
-const examScheduleTable = (handleRoomClick, handleEdit, handleDelete) => [
+const examScheduleTable = (
+  handleRoomClick,
+  handleAssignmentClick,
+  handleEdit,
+  handleDelete
+) => [
   {
     title: "Code",
     dataIndex: "subjectCode",
@@ -67,7 +72,7 @@ const examScheduleTable = (handleRoomClick, handleEdit, handleDelete) => [
     key: "invigilator",
     align: "center",
     render: (text, record) => (
-      <Button type="text">
+      <Button type="text" onClick={() => handleAssignmentClick(record.id)}>
         <PlusCircleOutlined style={{ fontSize: "20px", color: "#43AA8B" }} />
       </Button>
     ),

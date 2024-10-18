@@ -53,7 +53,6 @@ const Exam_Schedule = () => {
     setSelectedSemester,
     semesters,
     availableSemesters,
-    loading: semesterLoading,
   } = useSemester(); // Access shared semester state
   const [isEditing, setIsEditing] = useState(false);
   const [editingExamSlot, setEditingExamSlot] = useState(null);
@@ -71,6 +70,8 @@ const Exam_Schedule = () => {
         page
       );
       const result = staffMapperUtil.mapExamSchedule(response);
+      // sort by id
+      result.sort((a, b) => b.id - a.id);
       setExamSchedule(result || []);
       setTotalItems(result.length || 0);
     } catch (error) {
@@ -219,6 +220,9 @@ const Exam_Schedule = () => {
     navigate(`/exam-schedule/${examSlotId}/room`);
   };
 
+  const handleAssignmentClick = (examSlotId) => {
+    navigate(`/exam-schedule/${examSlotId}/assignment`);
+  };
   // Handle semester selection in the form
   const handleSemesterChange = async (value) => {
     console.log("Selected semester:", value);
@@ -241,9 +245,7 @@ const Exam_Schedule = () => {
   };
   const handleChooseTime = async (value) => {
     const exam = await examApi.getExamById(examId);
-    console.log(exam);
     const duration = exam?.duration;
-    console.log(duration);
     if (duration) {
       const endTime = value.clone().add(duration, "minutes");
       form.setFieldsValue({ endTime });
@@ -415,6 +417,7 @@ const Exam_Schedule = () => {
               dataSource={examSchedule}
               columns={examScheduleTable(
                 handleRoomClick,
+                handleAssignmentClick,
                 handleEdit,
                 handleDelete
               )}

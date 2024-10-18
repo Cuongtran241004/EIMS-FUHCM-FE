@@ -31,10 +31,12 @@ import {
   STAFF_EXAM_URL,
   STAFF_ROOM_SELECTION_URL,
   STAFF_SUBJECT_URL,
+  STAFF_ASSIGNMENT_URL,
 } from "./configs/urlWeb.js";
 import "./App.css";
 import ProfilePage from "./pages/Home/Profile.jsx";
 import Header from "./components/Header/Header.jsx";
+import AssignmentInvigilator from "./pages/Staff/Assignment.jsx";
 
 function App() {
   const [isLogin, setIsLogin] = useState(false);
@@ -102,6 +104,10 @@ function App() {
             <Route
               path={STAFF_ROOM_SELECTION_URL}
               element={<RoomSelectionPage />}
+            />
+            <Route
+              path={STAFF_ASSIGNMENT_URL}
+              element={<AssignmentInvigilator />}
             />
             <Route
               path="*"
