@@ -7,11 +7,14 @@ const handleError = (error) => {
   throw error;
 };
 const invigilatorAssignmentApi = {
-  getAllAssignmentByExamSlotId: async (id) => {
+  getAllAssignmentByExamSlotId: async (examSlotId) => {
     try {
       const response = await axios.get(
-        `${INVIGILATOR_ASSIGNMENT_API_BASE_URL}/invigilatorid=${id}`,
+        `${INVIGILATOR_ASSIGNMENT_API_BASE_URL}`,
         {
+          params: {
+            examSlotId,
+          },
           headers: {
             "Content-Type": "application/json",
             Accept: "application/json",

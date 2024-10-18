@@ -219,6 +219,7 @@ const Exam = () => {
       dataIndex: "duration",
       key: "duration",
       align: "center",
+      width: "15%",
     },
 
     {

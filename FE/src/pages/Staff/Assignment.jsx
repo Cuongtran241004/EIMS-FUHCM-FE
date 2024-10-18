@@ -3,8 +3,10 @@ import { Layout, Button, message, Table, Spin } from "antd";
 import { titleStyle } from "../../design-systems/CSS/Title";
 import { EditOutlined } from "@ant-design/icons";
 import invigilatorAssignmentApi from "../../services/InvigilatorAssignment";
+import { useParams } from "react-router-dom";
 const { Content } = Layout;
 const AssignmentInvigilator = () => {
+  const examSlotId = useParams();
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
@@ -13,7 +15,8 @@ const AssignmentInvigilator = () => {
   const fetchInvigilatorAssignment = async () => {
     setLoading(true);
     try {
-      const response = invigilatorAssignmentApi.getAllAssignmentByExamSlotId();
+      const response =
+        invigilatorAssignmentApi.getAllAssignmentByExamSlotId(examSlotId);
       setData(response || []);
     } catch (error) {
       message.error(error.message);
@@ -21,9 +24,9 @@ const AssignmentInvigilator = () => {
     setLoading(false);
   };
 
-  //   useEffect(() => {
-  //     fetchInvigilatorAssignment();
-  //   }, []);
+  useEffect(() => {
+    fetchInvigilatorAssignment();
+  }, []);
 
   const columns = [
     {

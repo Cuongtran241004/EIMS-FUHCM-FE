@@ -40,6 +40,7 @@ const RoomSelectionPage = () => {
   const fetchExamSlot = async () => {
     try {
       const response = await examSlotApi.getExamSlotById(examSlotId);
+
       setExamSlot(response);
     } catch (error) {
       message.error("Failed to fetch exam slot");
@@ -208,6 +209,11 @@ const RoomSelectionPage = () => {
   const handleCancel = () => {
     setSelectedRooms([]);
     setGroupedRooms([]);
+  };
+
+  const isAvailable = () => {
+    // if startAt < today, disable save button
+    return moment(examSlot?.startAt).isBefore(moment());
   };
   // Define groupedRoomsByFloor to use in the render
   const groupedRoomsByFloor = rooms.reduce((acc, room) => {
@@ -378,6 +384,7 @@ const RoomSelectionPage = () => {
                 float: "right",
               }}
               loading={loadingSubmit}
+              disabled={isAvailable()}
             >
               Save
               <ReloadOutlined />
