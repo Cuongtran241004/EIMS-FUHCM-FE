@@ -408,7 +408,7 @@ const RoomSelectionPage = () => {
                 float: "right",
               }}
               loading={loadingSubmit}
-              disabled={isAvailable()}
+              disabled={isAvailable() || groupedRooms.length == 0}
             >
               Save
               <ReloadOutlined />

@@ -10,6 +10,9 @@ import {
   Button,
   Form,
   Select,
+  DatePicker,
+  Calendar,
+  theme,
 } from "antd";
 import examSlotApi from "../../services/ExamSlot.js";
 import { useSemester } from "../../components/Context/SemesterContext.jsx";
@@ -162,7 +165,12 @@ const Attendance = () => {
     },
     // Add more columns as necessary
   ];
-
+  const { token } = theme.useToken();
+  const wrapperStyle = {
+    width: 300,
+    border: `1px solid ${token.colorBorderSecondary}`,
+    borderRadius: token.borderRadiusLG,
+  };
   return (
     <Layout style={{ height: "100vh" }}>
       <Header />
@@ -183,7 +191,7 @@ const Attendance = () => {
           <Form form={form} layout="vertical" name="add_exam_slot_form">
             <Form.Item
               name="semesterId"
-              label={<span className="custom-label">Semester</span>}
+              label={<span className="custom-label">Date</span>}
               rules={[
                 {
                   required: true,
@@ -191,13 +199,10 @@ const Attendance = () => {
                 },
               ]}
             >
-              <Select placeholder="Select semester">
-                {availableSemesters.map((semester) => (
-                  <Select.Option key={semester.id} value={semester.id}>
-                    {semester.name}
-                  </Select.Option>
-                ))}
-              </Select>
+              {" "}
+              <div style={wrapperStyle}>
+                <Calendar fullscreen={false} />
+              </div>
             </Form.Item>
           </Form>
         </Sider>

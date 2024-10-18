@@ -35,5 +35,29 @@ const staffMapperUtil = {
       };
     });
   },
+
+  mapAssignment: (assignments) => {
+    // check if assignments is an array
+    if (!Array.isArray(assignments)) {
+      return [];
+    }
+    return assignments.map((item) => {
+      return {
+        key: item.examSlotRoomId,
+        id: item.examSlotRoomId,
+        examSlotId: item.examSlotId,
+        startAt: item.startAt,
+        endAt: item.endAt,
+        invigilatorFuId: item.roomInvigilatorFuId,
+        invigilatorFirstName: item.roomInvigilatorFirstName,
+        invigilatorLastName: item.roomInvigilatorLastName,
+        hallFuId: item.hallInvigilatorFuId,
+        hallFirstName: item.hallInvigilatorFirstName,
+        hallLastName: item.hallInvigilatorLastName,
+        roomId: item.roomId,
+        roomName: item.roomName,
+      };
+    });
+  },
 };
 export { staffMapperUtil };

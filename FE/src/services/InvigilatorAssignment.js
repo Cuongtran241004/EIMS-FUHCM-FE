@@ -22,6 +22,7 @@ const invigilatorAssignmentApi = {
           withCredentials: true,
         }
       );
+
       return response.data;
     } catch (error) {
       handleError(error);
