@@ -2,19 +2,18 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import roomApi from "../../services/Room";
 import examSlotApi from "../../services/ExamSlot";
-import { Button, Row, Col, Layout, Spin, message } from "antd";
+import { Button, Row, Col, Layout, Spin, message, Empty } from "antd";
 import moment from "moment";
 import examSlotHallApi from "../../services/ExamSlotHall";
 import {
   BackwardFilled,
-  BackwardOutlined,
   CloseOutlined,
-  CloudOutlined,
   CompressOutlined,
   PlusOutlined,
   ReloadOutlined,
 } from "@ant-design/icons";
 import { titleRoomStyle } from "../../design-systems/CSS/Title";
+import examSlotRoomApi from "../../services/ExamSlotRoom";
 
 const { Content } = Layout;
 
@@ -25,32 +24,58 @@ const RoomSelectionPage = () => {
   const [loading, setLoading] = useState(true);
   const [examSlot, setExamSlot] = useState(null);
   const [groupedRooms, setGroupedRooms] = useState([]);
+  const [unvailableRooms, setUnvailableRooms] = useState([]);
   const [loadingSubmit, setLoadingSubmit] = useState(false);
 
+  const fetchExamSlot = async () => {
+    try {
+      const response = await examSlotApi.getExamSlotById(examSlotId);
+      setExamSlot(response);
+    } catch (error) {
+      message.error("Failed to fetch exam slot");
+    }
+  };
+
+  const fetchRooms = async () => {
+    try {
+      const response = await roomApi.getAllRooms();
+      console.log("Rooms:", response);
+      setRooms(response || []);
+    } catch (error) {
+      message.error("Failed to fetch rooms");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchUnavailableRooms = async () => {
+    console.log(examSlot);
+    if (!examSlot?.startAt || !examSlot?.endAt) return; // Ensure startAt and endAt are available
+
+    try {
+      const resUnRooms = await examSlotRoomApi.getUnavailableRooms(
+        examSlot.startAt,
+        examSlot.endAt
+      );
+
+      console.log("Unavailable Rooms:", resUnRooms);
+      setUnvailableRooms(resUnRooms || []);
+    } catch (error) {
+      console.log("Error fetching unavailable rooms:", error);
+      message.error("Failed to fetch unavailable rooms");
+    }
+  };
+
   useEffect(() => {
-    const fetchRooms = async () => {
-      try {
-        const response = await roomApi.getAllRooms();
-        setRooms(response);
-      } catch (error) {
-        // Handle error (optional)
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    const fetchExamSlot = async () => {
-      try {
-        const response = await examSlotApi.getExamSlotById(examSlotId);
-        setExamSlot(response);
-      } catch (error) {
-        // Handle error (optional)
-      }
-    };
-
-    fetchRooms();
     fetchExamSlot();
+    fetchRooms();
   }, [examSlotId]);
+
+  useEffect(() => {
+    if (examSlot) {
+      fetchUnavailableRooms();
+    }
+  }, [examSlot]);
 
   const handleRoomSelect = (room) => {
     if (selectedRooms.find((selectedRoom) => selectedRoom.id === room.id)) {
@@ -202,7 +227,7 @@ const RoomSelectionPage = () => {
             </h2>
             <Spin spinning={loading}>
               {Object.keys(groupedRoomsByFloor).length === 0 ? (
-                <p>No rooms available</p>
+                <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
               ) : (
                 Object.keys(groupedRoomsByFloor).map((floor) => (
                   <div key={floor}>
@@ -219,6 +244,10 @@ const RoomSelectionPage = () => {
                           key={room.id}
                           size="small"
                           onClick={() => handleRoomSelect(room)}
+                          disabled={unvailableRooms.some(
+                            // Disable if room is unavailable
+                            (unavailableRoom) => unavailableRoom == room.id
+                          )}
                           style={{
                             width: "calc(10% - 8px)",
                             backgroundColor: selectedRooms.some(
@@ -247,7 +276,7 @@ const RoomSelectionPage = () => {
           <Col span={12} style={{ padding: "12px" }}>
             <h1 style={titleRoomStyle}>SELECTED ROOMS</h1>
             {selectedRooms.length === 0 ? (
-              <p>No rooms selected</p>
+              <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
             ) : (
               <div
                 style={{

@@ -36,11 +36,15 @@ const examSlotRoomApi = {
       handleError(error);
     }
   },
-  getUnavailableRooms: async (id) => {
+  getUnavailableRooms: async (startAt, endAt) => {
     try {
       const response = await axios.get(
-        `${EXAM_SLOT_ROOM_API_BASE_URL}/unavailable/${id}`,
+        `${EXAM_SLOT_ROOM_API_BASE_URL}/unavailable-rooms`,
         {
+          params: {
+            startAt, // Should be a string in correct date-time format
+            endAt, // Should be a string in correct date-time format
+          },
           headers: {
             "Content-Type": "application/json",
             Accept: "application/json",
@@ -50,9 +54,12 @@ const examSlotRoomApi = {
       );
       return response.data;
     } catch (error) {
+      console.error("Error fetching unavailable rooms:", error);
+      // Optional: Handle specific error cases based on the response
       handleError(error);
     }
   },
+
   addExamSlotRoom: async (examSlotRoom) => {
     try {
       const response = await axios.post(
@@ -72,3 +79,5 @@ const examSlotRoomApi = {
     }
   },
 };
+
+export default examSlotRoomApi;

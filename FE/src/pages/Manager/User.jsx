@@ -64,7 +64,8 @@ const Users = ({ isLogin }) => {
       const result = await userApi.getAllUsers();
 
       result.sort((a, b) => {
-        return b.fuId.localeCompare(a.fuId);
+        // sort by createAt
+        return new Date(b.createdAt) - new Date(a.createdAt);
       });
 
       setData(result);

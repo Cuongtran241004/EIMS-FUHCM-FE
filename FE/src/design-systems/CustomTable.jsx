@@ -3,6 +3,7 @@ import {
   DeleteOutlined,
   EditOutlined,
   EyeOutlined,
+  PlusCircleOutlined,
   PlusSquareOutlined,
 } from "@ant-design/icons";
 import moment from "moment";
@@ -16,11 +17,11 @@ const examScheduleTable = (handleRoomClick, handleEdit, handleDelete) => [
     key: "subjectCode",
     align: "center",
   },
-  {
-    title: "Subject",
-    dataIndex: "subjectName",
-    key: "subjectName",
-  },
+  // {
+  //   title: "Subject",
+  //   dataIndex: "subjectName",
+  //   key: "subjectName",
+  // },
   {
     title: "Exam Type",
     dataIndex: "examType",
@@ -58,6 +59,16 @@ const examScheduleTable = (handleRoomClick, handleEdit, handleDelete) => [
     render: (text, record) => (
       <Button type="text" onClick={() => handleRoomClick(record.id)}>
         <PlusSquareOutlined style={{ fontSize: "20px", color: "#43AA8B" }} />
+      </Button>
+    ),
+  },
+  {
+    title: "Invigilator",
+    key: "invigilator",
+    align: "center",
+    render: (text, record) => (
+      <Button type="text">
+        <PlusCircleOutlined style={{ fontSize: "20px", color: "#43AA8B" }} />
       </Button>
     ),
   },

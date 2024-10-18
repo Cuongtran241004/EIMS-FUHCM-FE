@@ -1,5 +1,10 @@
 const staffMapperUtil = {
   mapSubject: (subjects) => {
+    // check if subjects is an array
+    if (!Array.isArray(subjects)) {
+      return [];
+    }
+
     return subjects.map((subject) => {
       return {
         key: subject.id,
@@ -12,6 +17,10 @@ const staffMapperUtil = {
     });
   },
   mapExamSchedule: (examSchedule) => {
+    // check if examSchedule is an array
+    if (!Array.isArray(examSchedule)) {
+      return [];
+    }
     return examSchedule.map((item) => {
       return {
         key: item.id,
