@@ -59,6 +59,7 @@ const Exam_Schedule = () => {
   const [editingExamSlot, setEditingExamSlot] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalItems, setTotalItems] = useState(1);
+  const [examId, setExamId] = useState(null);
   const [loadingSubmit, setLoadingSubmit] = useState(false);
   const navigate = useNavigate();
 
@@ -83,7 +84,7 @@ const Exam_Schedule = () => {
   const fetchExams = async (semesterId) => {
     try {
       const result = await examApi.getExamBySemesterId(semesterId);
-      setExams(result);
+      setExams(result || []);
       setFilteredExams(result);
     } catch (error) {
       message.error("Failed to load subjects. Please try again.");
@@ -94,7 +95,6 @@ const Exam_Schedule = () => {
     const semesterId = selectedSemester?.id;
     if (semesterId) {
       fetchExamSchedule(semesterId, currentPage);
-      fetchExams(semesterId);
     }
   }, [selectedSemester, currentPage]);
 
@@ -125,64 +125,72 @@ const Exam_Schedule = () => {
     }
   };
 
-  const handleEdit = (record) => {
+  const handleEdit = async (record) => {
+    console.log("Editing exam slot:", record);
     if (
       availableSemesters.find((semester) => semester.id === selectedSemester.id)
     ) {
       setIsEditing(true);
       setEditingExamSlot(record);
+      setExamId(record.examId);
       form.setFieldsValue({
         id: record.id,
-        exam: record.examId,
+        semesterId: selectedSemester.id,
+        exam: record.subjectCode + " - " + record.examType,
         date: moment(record.startAt),
         startTime: moment(record.startAt),
         endTime: moment(record.endAt),
       });
+      await fetchExams(selectedSemester.id);
     } else {
       editNotification();
     }
   };
 
   const handleOK = async () => {
-    const values = await form.validateFields();
-    const selectedExam = exams.find((exam) => exam.id === values.exam);
-    const selectedDate = values.date.format("YYYY-MM-DD");
-    const startTime = values.startTime.format("HH:mm");
-    const endTime = values.endTime.format("HH:mm");
+    await form.validateFields().then(async () => {
+      const values = await form.validateFields();
+      const selectedExam = exams.find((exam) => exam.id === values.exam);
+      const selectedDate = values.date.format("YYYY-MM-DD");
+      const startTime = values.startTime.format("HH:mm");
+      const endTime = values.endTime.format("HH:mm");
 
-    const examSlotDataUpdate = {
-      examSlotId: isEditing ? editingExamSlot.id : null,
-      subjectExamId: selectedExam.id,
-      startAt: `${selectedDate}T${startTime}:00+07:00`,
-      endAt: `${selectedDate}T${endTime}:00+07:00`,
-      id: isEditing ? editingExamSlot.id : null,
-    };
+      const examSlotDataUpdate = {
+        examSlotId: isEditing ? editingExamSlot.id : null,
+        subjectExamId: examId,
+        startAt: `${selectedDate}T${startTime}:00+07:00`,
+        endAt: `${selectedDate}T${endTime}:00+07:00`,
+        id: isEditing ? editingExamSlot.id : null,
+      };
 
-    const examSlotDataAdd = {
-      examSlotId: isEditing ? editingExamSlot.id : null,
-      subjectExamId: selectedExam.id,
-      startAt: `${selectedDate}T${startTime}:00+07:00`,
-      endAt: `${selectedDate}T${endTime}:00+07:00`,
-      requiredInvigilators: 15,
-    };
-    setLoadingSubmit(true); // Start loading
-    try {
-      if (isEditing) {
-        await examSlotApi.updateExamSlot(examSlotDataUpdate);
-        message.success("Exam slot updated successfully.");
-        fetchExamSchedule(selectedSemester.id);
-      } else {
-        await examSlotApi.addExamSlot(examSlotDataAdd); // Assuming API returns the new slot
-        message.success("Exam slot added successfully.");
-        fetchExamSchedule(selectedSemester.id);
+      const examSlotDataAdd = {
+        examSlotId: isEditing ? editingExamSlot.id : null,
+        subjectExamId: examId,
+        startAt: `${selectedDate}T${startTime}:00+07:00`,
+        endAt: `${selectedDate}T${endTime}:00+07:00`,
+        requiredInvigilators: 15,
+      };
+      setLoadingSubmit(true); // Start loading
+      try {
+        if (isEditing) {
+          await examSlotApi.updateExamSlot(examSlotDataUpdate);
+          message.success("Exam slot updated successfully.");
+        } else {
+          await examSlotApi.addExamSlot(examSlotDataAdd); // Assuming API returns the new slot
+          message.success("Exam slot added successfully.");
+        }
+
+        if (values.semesterId === selectedSemester.id) {
+          fetchExamSchedule(selectedSemester.id); // Refresh schedule
+        }
+      } catch (error) {
+        console.error("Error saving exam slot:", error);
+        message.error("Failed to save exam slot.");
+      } finally {
+        setLoadingSubmit(false); // Stop loading
+        handleCancel(); // Reset form
       }
-    } catch (error) {
-      console.error("Error saving exam slot:", error);
-      message.error("Failed to save exam slot.");
-    } finally {
-      setLoadingSubmit(false); // Stop loading
-      handleCancel(); // Reset form
-    }
+    });
   };
 
   const handleCancel = () => {
@@ -213,6 +221,7 @@ const Exam_Schedule = () => {
 
   // Handle semester selection in the form
   const handleSemesterChange = async (value) => {
+    console.log("Selected semester:", value);
     const selectedSemesterForm = availableSemesters.find(
       (sem) => sem.id === value
     );
@@ -230,7 +239,24 @@ const Exam_Schedule = () => {
     }
     return Promise.resolve();
   };
+  const handleChooseTime = async (value) => {
+    const exam = await examApi.getExamById(examId);
+    console.log(exam);
+    const duration = exam?.duration;
+    console.log(duration);
+    if (duration) {
+      const endTime = value.clone().add(duration, "minutes");
+      form.setFieldsValue({ endTime });
+    }
+  };
 
+  const handleChooseExam = (value) => {
+    setExamId(value);
+    console.log("Selected exam:", value);
+    // Reset time fields when a new exam is selected
+    setStartTime(null);
+    setEndTime(null);
+  };
   return (
     <Layout style={{ height: "100vh" }}>
       <Header />
@@ -256,7 +282,7 @@ const Exam_Schedule = () => {
             >
               <Select
                 placeholder="Select semester"
-                onClick={handleSemesterChange}
+                onChange={handleSemesterChange}
               >
                 {availableSemesters.map((semester) => (
                   <Select.Option key={semester.id} value={semester.id}>
@@ -277,6 +303,7 @@ const Exam_Schedule = () => {
                 onSearch={handleExamSearch}
                 optionFilterProp="children"
                 filterOption={false}
+                onChange={handleChooseExam}
               >
                 {filteredExams.map((exam) => (
                   <Option key={exam.id} value={exam.id}>
@@ -299,7 +326,15 @@ const Exam_Schedule = () => {
                   label={<span className="custom-label">Start Time</span>}
                   rules={[{ required: true, message: "Required" }]}
                 >
-                  <TimePicker format="HH:mm" style={{ width: "100%" }} />
+                  <TimePicker
+                    format="HH:mm"
+                    style={{
+                      width: "100%",
+                      backgroundColor: "#FFF",
+                    }}
+                    onChange={handleChooseTime}
+                    disabled={!examId}
+                  />
                 </Form.Item>
               </Col>
 
@@ -312,7 +347,11 @@ const Exam_Schedule = () => {
                     { validator: validateTime },
                   ]}
                 >
-                  <TimePicker format="HH:mm" style={{ width: "100%" }} />
+                  <TimePicker
+                    format="HH:mm"
+                    style={{ width: "100%", backgroundColor: "#FFF" }}
+                    disabled
+                  />
                 </Form.Item>
               </Col>
             </Row>
