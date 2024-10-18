@@ -211,6 +211,18 @@ const Exam_Schedule = () => {
     navigate(`/exam-schedule/${examSlotId}/room`);
   };
 
+  // Handle semester selection in the form
+  const handleSemesterChange = async (value) => {
+    const selectedSemesterForm = availableSemesters.find(
+      (sem) => sem.id === value
+    );
+
+    if (selectedSemesterForm) {
+      form.setFieldsValue({ semesterId: selectedSemesterForm.id }); // Update semesterId in the form
+      fetchExams(selectedSemesterForm.id); // Fetch subjects for the selected semester
+    }
+  };
+
   const validateTime = (rule, value) => {
     const startTime = form.getFieldValue("startTime");
     if (startTime && value && value.isBefore(startTime)) {
@@ -242,7 +254,10 @@ const Exam_Schedule = () => {
                 },
               ]}
             >
-              <Select placeholder="Select semester">
+              <Select
+                placeholder="Select semester"
+                onClick={handleSemesterChange}
+              >
                 {availableSemesters.map((semester) => (
                   <Select.Option key={semester.id} value={semester.id}>
                     {semester.name}

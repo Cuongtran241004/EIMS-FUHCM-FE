@@ -76,8 +76,9 @@ const Exam = () => {
   // Fetch subjects based on selected semester
   const fetchSubjects = async (semesterId) => {
     try {
-      const result = await subjectApi.getSubjectBySemester(semesterId);
-      setSubjects(result);
+      const response = await subjectApi.getSubjectBySemester(semesterId);
+      const result = response.sort((a, b) => b.id - a.id);
+      setSubjects(result || []);
       setFilteredSubjects(result);
     } catch (error) {
       message.error("Failed to fetch subjects");
@@ -170,6 +171,18 @@ const Exam = () => {
     }
   };
 
+  // Handle semester selection in the form
+  const handleSemesterChange = async (value) => {
+    const selectedSemesterForm = availableSemesters.find(
+      (sem) => sem.id === value
+    );
+
+    if (selectedSemesterForm) {
+      form.setFieldsValue({ semesterId: selectedSemesterForm.id }); // Update semesterId in the form
+      fetchSubjects(selectedSemesterForm.id); // Fetch subjects for the selected semester
+    }
+  };
+
   // Table columns
   const columns = [
     {
@@ -251,7 +264,10 @@ const Exam = () => {
                 },
               ]}
             >
-              <Select placeholder="Select semester">
+              <Select
+                placeholder="Select semester"
+                onChange={handleSemesterChange}
+              >
                 {availableSemesters.map((semester) => (
                   <Select.Option key={semester.id} value={semester.id}>
                     {semester.name}
