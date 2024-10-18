@@ -1,12 +1,15 @@
 import React, { useState, useEffect } from "react";
-import { Layout, Button, message, Table, Spin, Space } from "antd";
-import { titleStyle } from "../../design-systems/CSS/Title";
+import { Layout, Button, message, Table, Spin, Space, Tag } from "antd";
+import {
+  titleAssignmentStyle,
+  titleStyle,
+} from "../../design-systems/CSS/Title";
 import { EditOutlined } from "@ant-design/icons";
 import invigilatorAssignmentApi from "../../services/InvigilatorAssignment";
 import examSlotApi from "../../services/ExamSlot";
 import { useParams } from "react-router-dom";
 import { staffMapperUtil } from "../../utils/Mapper/StaffMapperUtil";
-
+import moment from "moment";
 const { Content } = Layout;
 
 const AssignmentInvigilator = () => {
@@ -20,8 +23,9 @@ const AssignmentInvigilator = () => {
   const fetchExamSlot = async () => {
     try {
       const response = await examSlotApi.getExamSlotById(examSlotId);
-      const result = staffMapperUtil.mapExamSchedule(response);
-      console.log(result);
+
+      const result = staffMapperUtil.mapExamSlot(response);
+
       setExamSlot(result || {});
     } catch (error) {
       message.error("Failed to fetch exam slot data.");
@@ -37,9 +41,7 @@ const AssignmentInvigilator = () => {
       const result = staffMapperUtil.mapAssignment(response);
       setData(result || []);
     } catch (error) {
-      message.error(
-        error.message || "Failed to fetch invigilator assignments."
-      );
+      message.error("Failed to fetch invigilator assignments.");
     } finally {
       setLoading(false);
     }
@@ -59,22 +61,32 @@ const AssignmentInvigilator = () => {
     },
     {
       title: "FuID",
-      dataIndex: "invigilatorFuId",
-      key: "invigilatorFuId",
+      dataIndex: "roomFuId",
+      key: "roomFuId",
+      align: "center",
     },
     {
-      title: "Full Name",
-      dataIndex: "fullName",
-      key: "fullName",
+      title: "Room Invigilator",
+      dataIndex: "roomFullName",
+      key: "roomFullName",
       render: (text, record) => {
-        return `${record.invigilatorFirstName} ${record.invigilatorLastName}`;
+        return `${record.roomLastName} ${record.roomFirstName}`;
       },
     },
     {
       title: "Room Name",
       dataIndex: "roomName",
       key: "roomName",
+      align: "center",
       width: "10%",
+    },
+    {
+      title: "Hall Invigilator",
+      dataIndex: "hallFullName",
+      key: "hallFullName",
+      render: (text, record) => {
+        return `${record.hallLastName} ${record.hallFirstName}`;
+      },
     },
     {
       title: "Action",
@@ -92,24 +104,36 @@ const AssignmentInvigilator = () => {
   ];
 
   return (
-    <Layout style={{ maxWidth: "80%", margin: "0 auto" }}>
-      <div style={{ marginBottom: "20px", textAlign: "center" }}>
-        <h2 style={titleStyle}>INVIGILATOR ASSIGNMENT</h2>
-        <div
+    <Layout
+      style={{ maxWidth: "80%", margin: "0 auto", backgroundColor: "#fff" }}
+    >
+      <div
+        style={{
+          margin: "5px",
+          textAlign: "center",
+          backgroundColor: "#4D908E",
+        }}
+      >
+        <h2 style={titleAssignmentStyle}>INVIGILATOR ASSIGNMENT</h2>
+
+        <Tag
+          color="green"
           style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
+            fontSize: "18px",
+            marginBottom: "10px",
+            textAlign: "center",
+            boxShadow: "0 4px 4px 0 rgba(0,0,0,0.4)",
           }}
         >
-          <p>Exam Slot: </p>
-          <p>Subject: </p>
-        </div>
-        <div>
-          <p>Start Time: {examSlot.startAt}</p>
-          <p>End Time: {examSlot.endAt}</p>{" "}
-          {/* Assuming endAt is a valid field */}
-        </div>
+          <strong>
+            {" "}
+            {examSlot.subjectCode} - {examSlot.examType}
+          </strong>
+          <br></br>
+          {moment(examSlot.startAt).format("DD-MM-YYYY")} ({" "}
+          {moment(examSlot.endAt).format("HH:MM")} -{" "}
+          {moment(examSlot.startAt).format("HH:MM")})
+        </Tag>
       </div>
       <Content style={{ padding: "24px", background: "#fff" }}>
         <Spin spinning={loading}>

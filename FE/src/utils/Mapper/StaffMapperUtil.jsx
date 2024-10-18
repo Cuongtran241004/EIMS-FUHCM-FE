@@ -35,7 +35,19 @@ const staffMapperUtil = {
       };
     });
   },
-
+  mapExamSlot: (item) => {
+    return {
+      key: item.id,
+      id: item.id,
+      examId: item.subjectExamDTO?.subjectExamId,
+      subjectCode: item.subjectExamDTO?.subjectCode || "Loading",
+      subjectName: item.subjectExamDTO?.subjectName || "Loading",
+      examType: item.subjectExamDTO?.examType || "Loading",
+      startAt: item.startAt,
+      endAt: item.endAt,
+      status: item.status,
+    };
+  },
   mapAssignment: (assignments) => {
     // check if assignments is an array
     if (!Array.isArray(assignments)) {
@@ -48,9 +60,9 @@ const staffMapperUtil = {
         examSlotId: item.examSlotId,
         startAt: item.startAt,
         endAt: item.endAt,
-        invigilatorFuId: item.roomInvigilatorFuId,
-        invigilatorFirstName: item.roomInvigilatorFirstName,
-        invigilatorLastName: item.roomInvigilatorLastName,
+        roomFuId: item.roomInvigilatorFuId,
+        roomFirstName: item.roomInvigilatorFirstName,
+        roomLastName: item.roomInvigilatorLastName,
         hallFuId: item.hallInvigilatorFuId,
         hallFirstName: item.hallInvigilatorFirstName,
         hallLastName: item.hallInvigilatorLastName,

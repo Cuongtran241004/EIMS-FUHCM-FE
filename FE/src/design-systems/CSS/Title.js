@@ -12,4 +12,11 @@ const titleRoomStyle = {
   fontWeight: "bold",
 };
 
-export { titleStyle, titleRoomStyle };
+const titleAssignmentStyle = {
+  color: "#F9C74F",
+  fontSize: "30px",
+  margin: "0",
+  padding: "10px",
+};
+
+export { titleStyle, titleRoomStyle, titleAssignmentStyle };
