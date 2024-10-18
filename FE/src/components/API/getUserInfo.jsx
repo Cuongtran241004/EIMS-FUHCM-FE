@@ -10,7 +10,7 @@ export const getUserInfo = async () => {
         "Content-Type": "application/json",
         Accept: "application/json",
       },
-      withCredentials: true, // Important to include credentials
+      withCredentials: true, 
     });
 
     return response.data;

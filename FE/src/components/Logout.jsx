@@ -19,6 +19,7 @@ function Logout() {
 
       if (response.status === 200) {
         message.success("Logout successful!");
+        localStorage.clear();
 
         // Optionally redirect the user to a login or home page after logout
         window.location.href = "/login";

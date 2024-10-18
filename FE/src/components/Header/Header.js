@@ -9,20 +9,20 @@ import {
 } from "../../configs/urlWeb";
 
 const headerConfig = {
-  manager: [
+  1: [
     {
       name: "Dashboard",
       path: MANAGER_DASHBOARD_URL,
     },
     { name: "Request", path: MANAGER_REQUESTS_URL },
   ],
-  staff: [
+  2: [
     { name: "Subject", path: STAFF_SUBJECT_URL },
     { name: "Exam", path: STAFF_EXAM_URL },
     { name: "Exam Schedule", path: STAFF_EXAM_SCHEDULE_URL },
     { name: "Attendance", path: STAFF_ATTENDANCE_URL },
   ],
-  invigilator: [
+  3: [
     { name: "Dashboard", path: "/" },
     { name: "Register", path: "/register" },
     {

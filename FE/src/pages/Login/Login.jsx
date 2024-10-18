@@ -1,7 +1,8 @@
 import React, { useContext, useState } from "react";
 import { UserContext } from "../../components/UserContext";
 import GoogleLogin from "../../components/API/GoogleLogin";
-import { postLoginToken } from "../../components/api/postLoginToken";
+import { postLoginToken } from "../../components/API/postLoginToken";
+import { postEmail } from "../../components/API/postEmail";
 import "./Login.css";
 import LoginForm from "./LoginForm";
 import { getUserInfo } from "../../components/API/getUserInfo";
@@ -9,6 +10,30 @@ import { getUserInfo } from "../../components/API/getUserInfo";
 export default function Login({ setIsLogin }) {
   const { setUser } = useContext(UserContext);
   const [errorMessage, setErrorMessage] = useState("");
+  const [errorMessage1, setErrorMessage1] = useState("");
+
+  const onLoginForm = async (values) => {
+    const result = await postEmail(values);
+    if (result) {
+      const initInfo = await getUserInfo();
+      if (initInfo) {
+        const userInfo = {
+          role: initInfo.role,
+          firstName: initInfo.firstName,
+          lastName: initInfo.lastName,
+        };
+        localStorage.setItem("role", userInfo.role);
+        localStorage.setItem("firstName", userInfo.firstName);
+        localStorage.setItem("lastName", userInfo.lastName);
+
+        setUser(userInfo);
+        setIsLogin(true);
+        window.location.reload();
+      }
+    } else {
+      setErrorMessage1("Wrong email or password.");
+    }
+  };
 
   const onGoogleSignIn = async (res) => {
     const { credential } = res;
@@ -17,16 +42,15 @@ export default function Login({ setIsLogin }) {
       const initInfo = await getUserInfo();
       if (initInfo) {
         const userInfo = {
-          role: initInfo.role.name,
+          role: initInfo.role,
           firstName: initInfo.firstName,
           lastName: initInfo.lastName,
         };
-        // Save user information to localStorage
+
         localStorage.setItem("role", userInfo.role);
         localStorage.setItem("firstName", userInfo.firstName);
         localStorage.setItem("lastName", userInfo.lastName);
 
-        // Set user information in context
         setUser(userInfo);
         setIsLogin(true);
         window.location.reload();
@@ -43,7 +67,8 @@ export default function Login({ setIsLogin }) {
         <h1 className="login-h1">Login</h1>
         <div className="login-form-section">
           <div className="form-section">
-            <LoginForm />
+            <LoginForm onLoginForm={onLoginForm} />
+            {errorMessage1 && <p style={{ color: 'red', marginLeft: 50 }} className="error-message">{errorMessage1}</p>}
           </div>
           <div className="divider"></div>
           <div className="form-section">
@@ -51,7 +76,7 @@ export default function Login({ setIsLogin }) {
               onGoogleSignIn={onGoogleSignIn}
               text="Login with Google"
             />
-         {errorMessage && <p style={{color: 'red'}} className="error-message">{errorMessage}</p>}
+            {errorMessage && <p style={{ color: 'red' }} className="error-message">{errorMessage}</p>}
           </div>
         </div>
       </div>
