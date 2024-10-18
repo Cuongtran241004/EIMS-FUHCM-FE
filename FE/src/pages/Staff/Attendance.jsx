@@ -31,21 +31,10 @@ const Attendance = () => {
     availableSemesters,
   } = useSemester(); // Access shared semester state
   const [form] = Form.useForm();
+  const [availableAttendance, setAvailableAttendance] = useState([]);
+  const [allAttendance, setAllAttendance] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 6;
-
-  // // Fetch attendance data
-  // const fetchExams = async (term) => {
-  //   setLoading(true);
-  //   try {
-  //     const result = await examSlotApi.getExamSlotBySemesterId(term);
-  //     setData(result);
-  //   } catch (error) {
-  //     message.error("Failed to fetch attendance");
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
 
   // Fetch exam schedule data
   const fetchExamSchedule = async (term) => {
@@ -53,15 +42,23 @@ const Attendance = () => {
     try {
       const response = await examSlotApi.getExamSlotBySemesterId(term);
       const result = staffMapperUtil.mapExamSchedule(response);
-      // sort by startAt, format: DD/MM/YYYY HH:mm
-      result.sort((a, b) => {
-        return (
-          moment(a.startAt).format("YYYYMMDDHHmm") -
-          moment(b.startAt).format("YYYYMMDDHHmm")
-        );
+      setAllAttendance(result || []);
+
+      // Define today's date at the start of the day (without time)
+      const today = moment().startOf("day");
+
+      // Filter for available exam slots where startAt is today or in the future
+      const available = result.filter((item) => {
+        return moment(item.startAt).isSameOrAfter(today);
       });
 
-      setData(result);
+      // Sort available exam slots by startAt in ascending order
+      available.sort((a, b) => {
+        return moment(a.startAt).diff(moment(b.startAt));
+      });
+
+      setAvailableAttendance(available || []);
+      setData(available || []);
     } catch (error) {
       message.error("Failed to fetch exam schedule");
     } finally {
@@ -71,21 +68,41 @@ const Attendance = () => {
 
   useEffect(() => {
     if (selectedSemester?.id) {
-      //  fetchExams(selectedSemester.id);
       fetchExamSchedule(selectedSemester.id);
     }
   }, [selectedSemester]);
 
   // Handle semester selection change
   const handleMenuClick = (e) => {
-    console.log(semesters);
     const selected = semesters.find((semester) => semester.id == e.key);
-    console.log(selected);
+
     if (selected) {
       setSelectedSemester({
         id: selected.id,
         name: selected.name,
       });
+    }
+  };
+  const getHistoryAttendance = async () => {
+    setLoading(true);
+    try {
+      const today = moment().startOf("day"); // Get today's date without time
+
+      // Filter attendance for dates before today
+      const history = allAttendance.filter((item) => {
+        return moment(item.startAt).isBefore(today);
+      });
+
+      // Sort by `startAt` in descending order (most recent first)
+      history.sort((a, b) => {
+        return moment(b.startAt).diff(moment(a.startAt));
+      });
+
+      setData(history || []);
+    } catch (error) {
+      message.error("Failed to fetch history attendance");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -159,6 +176,9 @@ const Attendance = () => {
             boxShadow: "3px 0 5px rgba(0, 0, 0, 0.5)",
           }}
         >
+          <Button onClick={getHistoryAttendance}>
+            View History Attendance
+          </Button>
           {/* Add form components here */}
           <Form form={form} layout="vertical" name="add_exam_slot_form">
             <Form.Item
@@ -187,7 +207,7 @@ const Attendance = () => {
           <div style={{ marginBottom: "20px", textAlign: "center" }}>
             <h2 style={titleStyle}>Attendance Management</h2>
           </div>
-          <div style={{ display: "flex", alignItems: "center" }}>
+          <div>
             <Dropdown
               menu={{
                 items: semesters.map((sem) => ({

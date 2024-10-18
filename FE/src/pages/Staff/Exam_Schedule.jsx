@@ -70,8 +70,13 @@ const Exam_Schedule = () => {
         page
       );
       const result = staffMapperUtil.mapExamSchedule(response);
-      // sort by id
-      result.sort((a, b) => b.id - a.id);
+      // sort by startAt, format: DD/MM/YYYY HH:mm
+      result.sort((a, b) => {
+        return (
+          moment(b.startAt).format("YYYYMMDDHHmm") -
+          moment(a.startAt).format("YYYYMMDDHHmm")
+        );
+      });
       setExamSchedule(result || []);
       setTotalItems(result.length || 0);
     } catch (error) {
