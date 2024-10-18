@@ -1,43 +1,47 @@
 .header {
   overflow: hidden;
   background-color: #f1f1f1;
-  padding: 5px 10px;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  padding: 0;
   width: 100%;
+  overflow-x: hidden;
 }
 
 /* Style the header links */
 .header-left a {
   float: left;
-  color: black;
   text-align: center;
-  padding: 12px;
   text-decoration: none;
   font-size: s18px;
   line-height: 25px;
   border-radius: 4px;
+  padding: 14px 35px;
 }
 
 .header a img {
-  height: 55px;
+  height: 60px;
   aspect-ratio: 3.5 /1;
 }
 
 .header-right {
   float: right;
   background-color: #f1f1f1;
+  padding-right: 1.875rem;
 }
 
 .header-right .header-right-item {
   display: inline-block;
-  padding: 10px 15px;
   text-align: center;
   text-decoration: none;
-  color: black;
+  color: inherit;
 }
 
 .header-right button {
   font-size: 16px;
+}
+
+.button-name.active {
+  color: white;
 }

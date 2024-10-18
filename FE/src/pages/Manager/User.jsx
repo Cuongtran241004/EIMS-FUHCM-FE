@@ -16,11 +16,15 @@ import {
   Col,
   Row,
   Select,
+  Tag,
 } from "antd";
 import {
-  EditOutlined,
-  DeleteOutlined,
   UploadOutlined,
+  DownloadOutlined,
+  CloseOutlined,
+  PlusOutlined,
+  SendOutlined,
+  CloseCircleFilled,
 } from "@ant-design/icons";
 import {
   ADD_USER_SUCCESS,
@@ -32,21 +36,17 @@ import {
   FETCH_USERS_FAILED,
   IMPORT_USERS_SUCCESS,
   IMPORT_USERS_FAILED,
-} from "../../configs/messages.jsx";
-import { User_Import_Excel } from "../../utils/User_Import_Excel.js";
-import { User_Excel_Template } from "../../utils/User_Excel_Template.js";
-
-import Header_Manager from "../../components/Header/Header_Manager.jsx";
+} from "../../configs/messages.js";
+import { User_Import_Excel } from "../../utils/Import-Excel/User_Import_Excel.js";
+import { User_Excel_Template } from "../../utils/Import-Excel/User_Excel_Template.js";
 import NavBar_Manager from "../../components/NavBar/NavBar_Manager.jsx";
+import Header from "../../components/Header/Header.jsx";
+import { departments, roleOptions } from "../../configs/data.js";
+import { userTable } from "../../design-systems/CustomTable.jsx";
+import { selectButtonStyle } from "../../design-systems/CSS/Button.js";
+import { titleStyle } from "../../design-systems/CSS/Title.js";
 
 const { Content, Sider } = Layout;
-
-const roleOptions = [
-  { label: "Admin", value: 0 },
-  { label: "Manager", value: 1 },
-  { label: "Staff", value: 2 },
-  { label: "Invigilator", value: 3 },
-];
 
 const Users = ({ isLogin }) => {
   const [data, setData] = useState([]);
@@ -55,15 +55,19 @@ const Users = ({ isLogin }) => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [editingUser, setEditingUser] = useState(null);
+  const [loadingSubmit, setLoadingSubmit] = useState(false);
   const [form] = Form.useForm();
 
   const fetchData = async () => {
     setLoading(true);
     try {
-      // Fetch the data
       const result = await userApi.getAllUsers();
 
-      // Ensure that we replace the current data with the new data
+      result.sort((a, b) => {
+        // sort by createAt
+        return new Date(b.createdAt) - new Date(a.createdAt);
+      });
+
       setData(result);
     } catch (error) {
       message.error(FETCH_USERS_FAILED);
@@ -87,20 +91,26 @@ const Users = ({ isLogin }) => {
   };
 
   const handleOk = async () => {
-    try {
-      const values = await form.validateFields();
-      if (isEditing) {
-        await userApi.updateUser({ ...editingUser, ...values });
-        message.success(EDIT_USER_SUCCESS);
-      } else {
-        await userApi.addUser(values);
-        message.success(ADD_USER_SUCCESS);
+    await form.validateFields().then(async () => {
+      try {
+        setLoadingSubmit(true);
+        // Gather form values
+        const values = form.getFieldsValue();
+        if (isEditing) {
+          await userApi.updateUser({ ...editingUser, ...values });
+          message.success(EDIT_USER_SUCCESS);
+        } else {
+          await userApi.addUser(values);
+          message.success(ADD_USER_SUCCESS);
+        }
+        fetchData();
+        handleCancel();
+      } catch (error) {
+        message.error(isEditing ? EDIT_USER_FAILED : ADD_USER_FAILED);
+      } finally {
+        setLoadingSubmit(false);
       }
-      fetchData();
-      handleCancel();
-    } catch (error) {
-      message.error(isEditing ? EDIT_USER_FAILED : ADD_USER_FAILED);
-    }
+    });
   };
 
   const handleEdit = (user) => {
@@ -123,127 +133,136 @@ const Users = ({ isLogin }) => {
     try {
       await userApi.deleteUser(fuId);
       message.success(DELETE_USER_SUCCESS);
-
       fetchData();
     } catch (error) {
       message.error(DELETE_USER_FAILED);
     }
+  };
+  // Validate file type and size before upload
+  const beforeUpload = (file) => {
+    const isXlsx =
+      file.type ===
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+    const isLt4M = file.size / 1024 / 1024 < 4;
+
+    if (!isXlsx) {
+      message.error("You can only upload .xlsx files!");
+      return false; // Prevent upload if file type is not .xlsx
+    }
+
+    if (!isLt4M) {
+      message.error("File must be smaller than 4MB!");
+      return false; // Prevent upload if file is larger than 4MB
+    }
+
+    return true; // Accept file if both conditions are met
   };
 
   const handleFileUpload = async ({ file }) => {
     setFileLoading(true);
     try {
       const data = await User_Import_Excel(file);
-      await Promise.all(data.map((user) => userApi.addUser(user)));
-      message.success(IMPORT_USERS_SUCCESS);
-      fetchData();
+
+      // Mapping definitions
+      const roleMapping = {
+        manager: 1,
+        staff: 2,
+        invigilator: 3,
+      };
+
+      const genderMapping = {
+        male: true,
+        female: false,
+      };
+
+      // Transform the user data
+      const transformedData = data.map((user) => ({
+        ...user,
+        role: roleMapping[user.role] || null, // Map role to backend value
+        gender: genderMapping[user.gender] || null, // Map gender to backend value
+      }));
+
+      // Send transformed data to backend
+      await userApi.addMultipleUsers(transformedData);
+
+      message.success("Users imported successfully!");
+      fetchData(); // Refresh data after import
     } catch (error) {
+      console.error("Import error:", error);
       message.error(IMPORT_USERS_FAILED);
     } finally {
       setFileLoading(false);
     }
   };
 
-  const columns = [
-    {
-      title: "FUID",
-      dataIndex: "fuId",
-      key: "fuId",
-    },
-    {
-      title: "Full Name",
-      key: "fullName",
-      render: (text, record) => `${record.firstName} ${record.lastName}`,
-    },
-    {
-      title: "Email",
-      dataIndex: "email",
-      key: "email",
-    },
-    {
-      title: "Phone Number",
-      dataIndex: "phoneNumber",
-      key: "phoneNumber",
-    },
-    {
-      title: "Department",
-      dataIndex: "department",
-      key: "department",
-    },
-    {
-      title: "Role",
-      dataIndex: "role",
-      key: "role",
-      render: (role) =>
-        roleOptions.find((option) => option.value === role)?.label || "Unknown",
-    },
-    {
-      title: "Action",
-      key: "action",
-      render: (text, record) => (
-        <Space size="middle">
-          <EditOutlined
-            onClick={() => handleEdit(record)}
-            style={{ color: "blue", cursor: "pointer" }}
-          />
-          <Popconfirm
-            title="Are you sure to delete this user?"
-            onConfirm={() => handleDelete(record.fuId)}
-            okText="Yes"
-            cancelText="No"
-          >
-            <DeleteOutlined style={{ color: "red", cursor: "pointer" }} />
-          </Popconfirm>
-        </Space>
-      ),
-    },
-  ];
-
   return (
     <Layout style={{ height: "100vh" }}>
-      <Header_Manager isLogin={isLogin} />
+      <Header />
       <Layout>
-        <Sider width={256} style={{ backgroundColor: "#fff" }}>
+        <Sider width={256} style={{ backgroundColor: "#4D908E" }}>
           <NavBar_Manager isLogin={isLogin} />
         </Sider>
         <Layout style={{ padding: "16px" }}>
           <Content
             style={{
-              padding: 24,
+              padding: 12,
               margin: 0,
               background: "#fff",
               minHeight: 280,
             }}
           >
-            <Space>
-              <Button type="primary" onClick={showModal}>
+            <div style={{ marginBottom: "20px", textAlign: "center" }}>
+              <h2 style={titleStyle}>User Management</h2>
+            </div>
+            <div style={{ margin: "5px" }}>
+              <Button
+                type="primary"
+                onClick={showModal}
+                style={selectButtonStyle}
+                icon={<PlusOutlined />}
+              >
                 Add New User
               </Button>
 
-              <Upload
-                beforeUpload={() => false}
-                showUploadList={false}
-                onChange={handleFileUpload}
-                maxCount={1}
-                method="POST"
-              >
-                <Button icon={<UploadOutlined />} loading={fileLoading}>
-                  Import Users
-                </Button>
-              </Upload>
+              <div style={{ float: "right" }}>
+                <Upload
+                  beforeUpload={(file) => {
+                    const isValid = beforeUpload(file);
+                    if (isValid) {
+                      handleFileUpload({ file }); // Trigger file upload only if valid
+                    }
+                    return false; // Prevent default upload behavior
+                  }}
+                  showUploadList={false}
+                  maxCount={1}
+                  method="POST"
+                >
+                  <Button
+                    icon={<UploadOutlined />}
+                    loading={fileLoading}
+                    style={{ marginRight: "15px" }}
+                  >
+                    Import Users
+                  </Button>
+                </Upload>
 
-              <Button onClick={() => User_Excel_Template()} type="default">
-                Download Import Template
-              </Button>
-            </Space>
+                <Button
+                  icon={<DownloadOutlined />}
+                  onClick={() => User_Excel_Template()}
+                  type="default"
+                >
+                  Download Template
+                </Button>
+              </div>
+            </div>
 
             <Spin spinning={loading}>
               <Table
                 dataSource={data}
-                columns={columns}
-                rowKey={Math.random()}
+                columns={userTable(handleEdit, handleDelete)}
+                rowKey={(record) => record.fuId}
                 pagination={{
-                  pageSize: 8,
+                  pageSize: 7,
                   showSizeChanger: true,
                   pageSizeOptions: ["8", "16", "24"],
                 }}
@@ -258,10 +277,27 @@ const Users = ({ isLogin }) => {
         open={isModalVisible}
         onOk={handleOk}
         onCancel={handleCancel}
-        okText="Submit"
-        cancelText="Cancel"
+        loading={loadingSubmit}
+        closeIcon={<CloseCircleFilled />}
+        footer={[
+          <Button key="cancel" onClick={handleCancel}>
+            Cancel
+            <CloseOutlined />
+          </Button>,
+          <Button key="submit" type="primary" onClick={handleOk}>
+            Submit
+            <SendOutlined />
+          </Button>,
+        ]}
       >
-        <Form form={form} layout="vertical" name="add_user_form">
+        <Form
+          form={form}
+          layout="vertical"
+          name="add_user_form"
+          initialValues={{
+            gender: true, // Male selected by default
+          }}
+        >
           <Row gutter={16}>
             <Col span={6}>
               <Form.Item
@@ -272,7 +308,7 @@ const Users = ({ isLogin }) => {
                 <Input placeholder="Enter FUID" />
               </Form.Item>
             </Col>
-            <Col span={9}>
+            <Col span={8}>
               <Form.Item
                 name="firstName"
                 label="First Name"
@@ -283,7 +319,7 @@ const Users = ({ isLogin }) => {
                 <Input placeholder="Enter first name" />
               </Form.Item>
             </Col>
-            <Col span={9}>
+            <Col span={10}>
               <Form.Item
                 name="lastName"
                 label="Last Name"
@@ -295,7 +331,7 @@ const Users = ({ isLogin }) => {
           </Row>
 
           <Row gutter={16}>
-            <Col span={14}>
+            <Col span={16}>
               <Form.Item
                 name="email"
                 label="Email"
@@ -307,7 +343,7 @@ const Users = ({ isLogin }) => {
                 <Input placeholder="Enter email" />
               </Form.Item>
             </Col>
-            <Col span={10}>
+            <Col span={8}>
               <Form.Item
                 name="phoneNumber"
                 label="Phone"
@@ -315,21 +351,34 @@ const Users = ({ isLogin }) => {
                   { required: true, message: "Please input phone number!" },
                 ]}
               >
-                <Input placeholder="Enter phone number" />
+                <Input placeholder="Phone number" />
               </Form.Item>
             </Col>
           </Row>
 
           <Row gutter={16}>
-            <Col span={8}>
+            <Col span={16}>
               <Form.Item
                 name="department"
                 label="Department"
                 rules={[
-                  { required: true, message: "Please input department!" },
+                  { required: true, message: "Please select department!" },
                 ]}
               >
-                <Input placeholder="Enter department" />
+                <Select
+                  placeholder="Select department"
+                  showSearch
+                  optionFilterProp="children" // Allows searching based on option text
+                  filterOption={(input, option) =>
+                    option.children.toLowerCase().includes(input.toLowerCase())
+                  } // Filters options based on input
+                >
+                  {departments.map((department) => (
+                    <Select.Option key={department} value={department}>
+                      {department}
+                    </Select.Option>
+                  ))}
+                </Select>
               </Form.Item>
             </Col>
 
@@ -348,19 +397,17 @@ const Users = ({ isLogin }) => {
                 </Select>
               </Form.Item>
             </Col>
-            <Col span={8}>
-              <Form.Item
-                name="gender"
-                label="Gender"
-                rules={[{ required: true, message: "Please select gender!" }]}
-              >
-                <Radio.Group>
-                  <Radio value={true}>Male</Radio>
-                  <Radio value={false}>Female</Radio>
-                </Radio.Group>
-              </Form.Item>
-            </Col>
           </Row>
+          <Form.Item
+            name="gender"
+            label="Gender"
+            rules={[{ required: true, message: "Please select gender!" }]}
+          >
+            <Radio.Group>
+              <Radio value={true}>Male</Radio>
+              <Radio value={false}>Female</Radio>
+            </Radio.Group>
+          </Form.Item>
         </Form>
       </Modal>
     </Layout>

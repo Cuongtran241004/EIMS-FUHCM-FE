@@ -7,55 +7,70 @@ import {
   DELETE_SUBJECT_SUCCESS,
   DELETE_SUBJECT_FAILED,
   FETCH_SUBJECTS_FAILED,
-} from "../../configs/messages.jsx";
+} from "../../configs/messages.js";
 import {
   Layout,
   Button,
   Space,
-  Modal,
   Form,
   Spin,
   Table,
   Input,
   message,
-  Popconfirm,
   Dropdown,
   Col,
   Row,
+  Select,
+  notification,
 } from "antd";
 import subjectApi from "../../services/Subject.js";
-import Header_Staff from "../../components/Header/Header_Staff.jsx";
-import { DeleteOutlined, DownOutlined } from "@ant-design/icons";
+import {
+  CaretRightFilled,
+  CloseOutlined,
+  DownOutlined,
+} from "@ant-design/icons";
+import Header from "../../components/Header/Header.jsx";
+import { useSemester } from "../../components/Context/SemesterContext.jsx";
+import { subjectTable } from "../../design-systems/CustomTable.jsx";
+import { titleStyle } from "../../design-systems/CSS/Title.js";
+import {
+  addButtonStyle,
+  selectButtonStyle,
+} from "../../design-systems/CSS/Button.js";
+import "./CustomForm.css";
+import { staffMapperUtil } from "../../utils/Mapper/StaffMapperUtil.jsx";
+import {
+  deleteNotification,
+  editNotification,
+} from "../../design-systems/CustomNotification.jsx";
 
-const items = [
-  {
-    key: "1",
-    label: "Fall24",
-  },
-  {
-    key: "2",
-    label: "Summer24",
-  },
-  {
-    key: "3",
-    label: "Spring24",
-  },
-];
-// Ant Design Layout Components
 const { Content, Sider } = Layout;
-const Subject = ({ isLogin }) => {
+
+const Subject = () => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [editingSubject, setEditingSubject] = useState(null);
-  const [selectedItem, setSelectedItem] = useState("Fall24");
+  const {
+    selectedSemester,
+    setSelectedSemester,
+    semesters,
+    availableSemesters,
+  } = useSemester(); // Access shared semester state
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [loadingSubmit, setLoadingSubmit] = useState(false);
   const [form] = Form.useForm();
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 7;
 
-  const fetchData = async (term) => {
+  const fetchData = async (semesterId) => {
     setLoading(true);
     try {
-      const result = await subjectApi.getAllSubjects(term);
-      setData(result);
+      const response = await subjectApi.getSubjectBySemester(semesterId);
+      const mapResponse = await staffMapperUtil.mapSubject(response);
+      // sort by id
+      const result = mapResponse.sort((a, b) => b.id - a.id);
+      setData(result || []);
     } catch (error) {
       message.error(FETCH_SUBJECTS_FAILED);
     } finally {
@@ -63,13 +78,26 @@ const Subject = ({ isLogin }) => {
     }
   };
 
+  // Fetch subjects whenever the selected semester changes
   useEffect(() => {
-    // Fetch data when the component mounts and when selectedItem changes
-    fetchData(selectedItem);
-  }, [selectedItem]); // Add selectedItem as a dependency
+    if (selectedSemester.id) {
+      fetchData(selectedSemester.id);
+    }
+  }, [selectedSemester.id]); // This will run whenever selectedSemester.id changes
 
-  const showModal = () => {
-    setIsModalVisible(true);
+  const items = semesters.map((semester) => ({
+    key: semester.id,
+    label: semester.name,
+  }));
+
+  const handleMenuClick = (e) => {
+    const selected = items.find((item) => item.key == e.key);
+    if (selected) {
+      setSelectedSemester({
+        id: selected.key,
+        name: selected.label,
+      });
+    }
   };
 
   const handleCancel = () => {
@@ -79,92 +107,101 @@ const Subject = ({ isLogin }) => {
   };
 
   const handleDelete = async (id) => {
-    try {
-      await subjectApi.deleteSubject(id);
-      message.success(DELETE_SUBJECT_SUCCESS);
-      fetchData();
-    } catch (error) {
-      message.error(DELETE_SUBJECT_FAILED);
-    }
-  };
-
-  const handleMenuClick = (e) => {
-    const newTerm = items.find((item) => item.key === e.key).label;
-    setSelectedItem(newTerm); // Update selectedItem
-    fetchData(newTerm); // Fetch data for the new selected term
-  };
-
-  const columns = [
-    {
-      title: "No",
-      dataIndex: "no",
-      key: "no",
-    },
-    {
-      title: "Code",
-      dataIndex: "code",
-      key: "code",
-    },
-    {
-      title: "Name",
-      dataIndex: "name",
-      key: "Name",
-    },
-    {
-      title: "Action",
-      key: "action",
-      render: (text, record) => (
-        <Space size="middle">
-          <Button
-            type="primary"
-            onClick={() => {
-              setIsEditing(true);
-              setEditingSubject(record);
-              form.setFieldsValue(record);
-              showModal();
-            }}
-          >
-            Edit
-          </Button>
-          <Popconfirm
-            title="Are you sure to delete this staff?"
-            onConfirm={() => handleDelete(record.fuId)}
-            okText="Yes"
-            cancelText="No"
-          >
-            <DeleteOutlined style={{ color: "red", cursor: "pointer" }} />
-          </Popconfirm>
-        </Space>
-      ),
-    },
-  ];
-  const handleOk = async () => {
-    try {
-      const values = await form.validateFields();
-      if (isEditing) {
-        await subjectApi.updateSubject({ ...editingSubject, ...values });
-        message.success(EDIT_SUBJECT_SUCCESS);
-      } else {
-        await subjectApi.addSubject(values);
-        message.success(ADD_SUBJECT_SUCCESS);
+    if (
+      availableSemesters.find((semester) => semester.id === selectedSemester.id)
+    ) {
+      try {
+        await subjectApi.deleteSubject(id);
+        message.success(DELETE_SUBJECT_SUCCESS);
+        fetchData(selectedSemester.id);
+      } catch (error) {
+        message.error(DELETE_SUBJECT_FAILED);
       }
-
-      fetchData();
-      handleCancel();
-    } catch (error) {
-      message.error(isEditing ? EDIT_SUBJECT_FAILED : ADD_SUBJECT_FAILED);
+    } else {
+      deleteNotification();
     }
+  };
+
+  const handleEdit = (record) => {
+    // only allow when availableSemesters contains selectedSemester
+    if (
+      availableSemesters.find((semester) => semester.id === selectedSemester.id)
+    ) {
+      setIsEditing(true);
+      setEditingSubject(record);
+      form.setFieldsValue({
+        code: record.code,
+        name: record.name,
+        semesterId: record.semesterId,
+      });
+      setIsModalVisible(true);
+    } else {
+      editNotification();
+    }
+  };
+
+  const handleOk = async () => {
+    await form.validateFields().then(async () => {
+      setLoadingSubmit(true);
+      try {
+        const values = await form.validateFields();
+
+        if (isEditing) {
+          await subjectApi.updateSubject({ ...editingSubject, ...values });
+          message.success(EDIT_SUBJECT_SUCCESS);
+        } else {
+          await subjectApi.addSubject(values);
+          message.success(ADD_SUBJECT_SUCCESS);
+        }
+
+        if (selectedSemester.id == values.semesterId) {
+          fetchData(values.semesterId);
+        }
+
+        handleCancel();
+      } catch (error) {
+        message.error(isEditing ? EDIT_SUBJECT_FAILED : ADD_SUBJECT_FAILED);
+      } finally {
+        setLoadingSubmit(false);
+      }
+    });
   };
 
   return (
     <Layout style={{ height: "100vh" }}>
-      <Header_Staff isLogin={isLogin} />
+      <Header />
       <Layout>
-        <Sider width={300} style={{ background: "#f1f1f1", padding: "24px" }}>
+        <Sider
+          width={300}
+          style={{
+            background: "#4D908E",
+            padding: "24px",
+            boxShadow: "3px 0 5px rgba(0, 0, 0, 0.5)",
+          }}
+        >
           <Form form={form} layout="vertical" name="add_subject_form">
             <Form.Item
+              name="semesterId"
+              label={<span className="custom-label">Semester</span>}
+              rules={[
+                {
+                  required: true,
+                  message: "Please select semester!",
+                },
+              ]}
+            >
+              <Select placeholder="Select semester">
+                {availableSemesters.map((semester) => (
+                  <Select.Option key={semester.id} value={semester.id}>
+                    {semester.name}
+                  </Select.Option>
+                ))}
+              </Select>
+            </Form.Item>
+
+            <Form.Item
               name="code"
-              label="Code"
+              label={<span className="custom-label">Code</span>}
               rules={[
                 {
                   required: true,
@@ -177,7 +214,7 @@ const Subject = ({ isLogin }) => {
 
             <Form.Item
               name="name"
-              label="Name"
+              label={<span className="custom-label">Name</span>}
               rules={[
                 {
                   required: true,
@@ -187,7 +224,6 @@ const Subject = ({ isLogin }) => {
             >
               <Input placeholder="Enter subject name" />
             </Form.Item>
-            {/* Add buttons for Clear and Add */}
             <Row justify="space-between">
               <Col>
                 <Button
@@ -198,36 +234,56 @@ const Subject = ({ isLogin }) => {
                   }}
                 >
                   Clear
+                  <CloseOutlined />
                 </Button>
               </Col>
               <Col>
-                <Button type="primary" onClick={handleOk}>
-                  Add
+                <Button
+                  type="primary"
+                  onClick={handleOk}
+                  loading={loadingSubmit}
+                  style={addButtonStyle}
+                >
+                  {isEditing ? "Update" : "Add"}
+                  <CaretRightFilled />
                 </Button>
               </Col>
             </Row>
           </Form>
         </Sider>
-        <Content>
-          <Dropdown
-            menu={{
-              items,
-              onClick: handleMenuClick,
-            }}
-          >
-            <Button style={{ width: "100px" }}>
-              <Space>
-                {selectedItem}
-                <DownOutlined />
-              </Space>
-            </Button>
-          </Dropdown>
+        <Content style={{ padding: 12, margin: 0, background: "#fff" }}>
+          <div style={{ marginBottom: "20px", textAlign: "center" }}>
+            <h2 style={titleStyle}>Subject Management</h2>
+          </div>
+          <div style={{ display: "flex", alignItems: "center" }}>
+            <Dropdown
+              menu={{
+                items,
+                onClick: handleMenuClick,
+              }}
+            >
+              <Button style={{ ...selectButtonStyle, width: "150px" }}>
+                <Space>
+                  {selectedSemester.name}
+                  <DownOutlined />
+                </Space>
+              </Button>
+            </Dropdown>
+          </div>
           <Spin spinning={loading}>
             <Table
               dataSource={data}
-              columns={columns}
-              rowKey={Math.random}
-              pagination={{ pageSize: 8 }}
+              columns={subjectTable(
+                currentPage,
+                pageSize,
+                handleEdit,
+                handleDelete
+              )}
+              pagination={{
+                pageSize,
+                current: currentPage,
+                onChange: (page) => setCurrentPage(page),
+              }}
             />
           </Spin>
         </Content>

@@ -1,61 +1,86 @@
 import React, { useState, useEffect } from "react";
 import { Menu } from "antd";
 import {
-  MailOutlined,
-  AppstoreOutlined,
   SettingOutlined,
+  ReadOutlined,
+  MonitorOutlined,
 } from "@ant-design/icons";
 import { Link, useLocation } from "react-router-dom";
-import { MANAGER_SEMESTER_URL, MANAGER_USERS_URL } from "../../configs/urlWeb";
-
+import {
+  MANAGER_ATTENDENCE_CHECK_URL,
+  MANAGER_EXAM_SCHEDULE_URL,
+  MANAGER_SEMESTER_URL,
+  MANAGER_USERS_URL,
+} from "../../configs/urlWeb";
+import "./NavBar_Manager.css";
 const items = [
   {
     key: "sub1",
-    label: "Exam Management",
-    icon: <MailOutlined />,
+    label: <h3 style={{ color: "#fff" }}>Exam Management</h3>,
+    icon: <ReadOutlined style={{ color: "#fff" }} />,
     children: [
       {
         key: "1",
-        label: <Link to="/exam-schedule">Exam Schedule</Link>,
+        label: (
+          <Link to={MANAGER_EXAM_SCHEDULE_URL} style={{ color: "#fff" }}>
+            Exam Schedule
+          </Link>
+        ),
       },
       {
         key: "2",
-        label: <Link to="/attendance-check">Attendance Check</Link>,
+        label: (
+          <Link to={MANAGER_ATTENDENCE_CHECK_URL} style={{ color: "#fff" }}>
+            Attendance Check
+          </Link>
+        ),
       },
     ],
   },
   {
     key: "sub2",
-    label: "Invigilation Management",
-    icon: <AppstoreOutlined />,
+    label: <h3 style={{ color: "#fff" }}>Invigilation</h3>,
+    icon: <MonitorOutlined style={{ color: "#fff" }} />,
     children: [
       {
         key: "3",
-        label: <Link to="/invigilator-attendance">Invigilator Attendance</Link>,
+        label: (
+          <Link to="/invigilator-attendance" style={{ color: "#fff" }}>
+            Invigilator Attendance
+          </Link>
+        ),
       },
       {
         key: "4",
-        label: <Link to="/invigilation-fees">Invigilation Fees</Link>,
+        label: (
+          <Link to="/invigilation-fees" style={{ color: "#fff" }}>
+            Invigilation Fees
+          </Link>
+        ),
       },
     ],
   },
   {
     key: "sub3",
-    label: "Settings",
-    icon: <SettingOutlined />,
+    label: <h3 style={{ color: "#fff" }}>Settings</h3>,
+    icon: <SettingOutlined style={{ color: "#fff" }} />,
     children: [
       {
         key: "5",
-        label: <Link to={MANAGER_SEMESTER_URL}>Semester</Link>,
+        label: (
+          <Link to={MANAGER_SEMESTER_URL} style={{ color: "#fff" }}>
+            Semester
+          </Link>
+        ),
       },
 
       {
-        key: "6",
-        label: <Link to="/exam-slot">Exam Slot</Link>,
-      },
-      {
         key: "7",
-        label: <Link to={MANAGER_USERS_URL}>Users</Link>,
+        label: (
+          <Link to={MANAGER_USERS_URL} style={{ color: "#fff" }}>
+            Users
+          </Link>
+        ),
       },
     ],
   },
@@ -74,7 +99,7 @@ const NavBar_Manager = () => {
     "/invigilation-fees": { key: "4", openKey: "sub2" },
     "/semester": { key: "5", openKey: "sub3" },
     "/exam-slot": { key: "6", openKey: "sub3" },
-    "/staffs": { key: "7", openKey: "sub3" },
+    "/users": { key: "7", openKey: "sub3" },
   };
 
   // Set selected key and open key when location changes
@@ -101,7 +126,7 @@ const NavBar_Manager = () => {
   };
   return (
     <Menu
-      style={{ width: 256 }}
+      style={{ width: 256, backgroundColor: "#4D908E" }}
       mode="inline"
       selectedKeys={selectedKeys}
       openKeys={openKeys} // Control open keys

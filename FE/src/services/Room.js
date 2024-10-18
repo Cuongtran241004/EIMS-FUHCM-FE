@@ -1,5 +1,5 @@
 import axios from "axios";
-import { API_BASE_URL } from "../configs/urlApi.jsx";
+import { API_BASE_URL } from "../configs/urlApi.js";
 const ROOM_API_BASE_URL = `${API_BASE_URL}/rooms`;
 
 const handleError = (error) => {
@@ -7,19 +7,29 @@ const handleError = (error) => {
   throw error;
 };
 const roomApi = {
-  getAllRooms: async ({ filters = {} }) => {
+  getAllRooms: async () => {
     try {
       const response = await axios.get(`${ROOM_API_BASE_URL}`, {
-        params: filters,
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        withCredentials: true,
       });
       return response.data;
     } catch (error) {
       handleError(error);
     }
   },
-  getRoomByName: async (name) => {
+  getRoomById: async (id) => {
     try {
-      const response = await axios.get(`${ROOM_API_BASE_URL}/${name}`);
+      const response = await axios.get(`${ROOM_API_BASE_URL}/${id}`, {
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        withCredentials: true,
+      });
       return response.data;
     } catch (error) {
       handleError(error);
@@ -27,7 +37,13 @@ const roomApi = {
   },
   addRoom: async (room) => {
     try {
-      const response = await axios.post(`${ROOM_API_BASE_URL}`, room);
+      const response = await axios.post(`${ROOM_API_BASE_URL}`, room, {
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        withCredentials: true,
+      });
       return response.data;
     } catch (error) {
       handleError(error);
@@ -35,21 +51,22 @@ const roomApi = {
   },
   updateRoom: async (room) => {
     try {
-      const response = await axios.put(`${ROOM_API_BASE_URL}/${room.id}`, room);
+      const response = await axios.put(
+        `${ROOM_API_BASE_URL}/${room.id}`,
+        room,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+          withCredentials: true,
+        }
+      );
       return response.data;
     } catch (error) {
       handleError(error);
     }
   },
-  //   deleteRoom: async (code) => {
-  //     try {
-  //       const response = await axios.delete(`${ROOM_API_BASE_URL}/${code}`);
-  //       return response.data;
-  //     } catch (error) {
-  //       console.error("Error fetching data:", error);
-  //       throw error;
-  //     }
-  //   },
 };
 
 export default roomApi;

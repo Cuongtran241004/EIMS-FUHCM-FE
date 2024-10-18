@@ -1,165 +1,367 @@
 import {
   Layout,
-  Divider,
   Select,
   DatePicker,
   TimePicker,
   Button,
   Form,
-  Space,
   Table,
+  Row,
+  Col,
+  message,
+  Space,
+  Dropdown,
+  Spin,
 } from "antd";
-import Header_Staff from "../../components/Header/Header_Staff";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import Sider from "antd/es/layout/Sider";
-import { Row, Col } from "antd";
-
+import Header from "../../components/Header/Header.jsx";
+import examApi from "../../services/Exam.js";
+import examSlotApi from "../../services/ExamSlot.js";
+import {
+  CaretRightFilled,
+  CloseOutlined,
+  DownOutlined,
+} from "@ant-design/icons";
+import moment from "moment";
+import { useSemester } from "../../components/Context/SemesterContext.jsx";
+import {
+  addButtonStyle,
+  selectButtonStyle,
+} from "../../design-systems/CSS/Button.js";
+import { staffMapperUtil } from "../../utils/Mapper/StaffMapperUtil.jsx";
+import { examScheduleTable } from "../../design-systems/CustomTable.jsx";
+import { titleStyle } from "../../design-systems/CSS/Title.js";
+import "./CustomForm.css";
+import {
+  deleteNotification,
+  editNotification,
+} from "../../design-systems/CustomNotification.jsx";
 const { Option } = Select;
 const { Content } = Layout;
+const PAGE_SIZE = 6;
 
-const Exam_Schedule = ({ isLogin }) => {
+const Exam_Schedule = () => {
   const [form] = Form.useForm();
   const [examSchedule, setExamSchedule] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [exams, setExams] = useState([]);
+  const [filteredExams, setFilteredExams] = useState([]);
+  const {
+    selectedSemester,
+    setSelectedSemester,
+    semesters,
+    availableSemesters,
+  } = useSemester(); // Access shared semester state
+  const [isEditing, setIsEditing] = useState(false);
+  const [editingExamSlot, setEditingExamSlot] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalItems, setTotalItems] = useState(1);
+  const [examId, setExamId] = useState(null);
+  const [loadingSubmit, setLoadingSubmit] = useState(false);
+  const navigate = useNavigate();
 
-  // Mock data for dropdowns
-  const semesters = ["Fall24", "Summer24", "Spring24"];
-  const subjects = ["Math", "Physics", "Chemistry"];
-  const rooms = ["Room A", "Room B", "Room C"];
-
-  const columns = [
-    {
-      title: "Semester",
-      dataIndex: "semester",
-      key: "semester",
-    },
-    {
-      title: "Subject",
-      dataIndex: "subject",
-      key: "subject",
-    },
-    {
-      title: "Date",
-      dataIndex: "date",
-      key: "date",
-    },
-    {
-      title: "Start Time",
-      dataIndex: "startTime",
-      key: "startTime",
-    },
-    {
-      title: "End Time",
-      dataIndex: "endTime",
-      key: "endTime",
-    },
-    {
-      title: "Room",
-      dataIndex: "room",
-      key: "room",
-    },
-  ];
-
-  const handleSubmit = (values) => {
-    // Save the new exam schedule
-    const newSchedule = {
-      ...values,
-      date: values.date.format("YYYY-MM-DD"),
-      startTime: values.startTime.format("HH:mm"),
-      endTime: values.endTime.format("HH:mm"),
-    };
-    setExamSchedule([...examSchedule, newSchedule]);
-    form.resetFields(); // Reset form after submission
+  const fetchExamSchedule = async (semesterId, page) => {
+    setLoading(true);
+    try {
+      const response = await examSlotApi.getExamSlotBySemesterId(
+        semesterId,
+        page
+      );
+      const result = staffMapperUtil.mapExamSchedule(response);
+      // sort by startAt, format: DD/MM/YYYY HH:mm
+      result.sort((a, b) => {
+        return (
+          moment(b.startAt).format("YYYYMMDDHHmm") -
+          moment(a.startAt).format("YYYYMMDDHHmm")
+        );
+      });
+      setExamSchedule(result || []);
+      setTotalItems(result.length || 0);
+    } catch (error) {
+      console.error("Error fetching exam schedule:", error); // Log the error
+      message.error("Failed to load exam schedule. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
+  const fetchExams = async (semesterId) => {
+    try {
+      const result = await examApi.getExamBySemesterId(semesterId);
+      setExams(result || []);
+      setFilteredExams(result);
+    } catch (error) {
+      message.error("Failed to load subjects. Please try again.");
+    }
+  };
+
+  useEffect(() => {
+    const semesterId = selectedSemester?.id;
+    if (semesterId) {
+      fetchExamSchedule(semesterId, currentPage);
+    }
+  }, [selectedSemester, currentPage]);
+
+  const handleExamSearch = (value) => {
+    if (value) {
+      const filtered = exams.filter((exam) =>
+        exam.subjectName.toLowerCase().includes(value.toLowerCase())
+      );
+      setFilteredExams(filtered);
+    } else {
+      setFilteredExams(exams);
+    }
+  };
+
+  const handleDelete = async (id) => {
+    if (
+      availableSemesters.find((semester) => semester.id === selectedSemester.id)
+    ) {
+      try {
+        await examSlotApi.deleteExamSlot(id);
+        message.success("Exam slot deleted successfully");
+        fetchExamSchedule(selectedSemester.id); // Refresh schedule
+      } catch (error) {
+        message.error("Failed to delete exam");
+      }
+    } else {
+      deleteNotification();
+    }
+  };
+
+  const handleEdit = async (record) => {
+    console.log("Editing exam slot:", record);
+    if (
+      availableSemesters.find((semester) => semester.id === selectedSemester.id)
+    ) {
+      setIsEditing(true);
+      setEditingExamSlot(record);
+      setExamId(record.examId);
+      form.setFieldsValue({
+        id: record.id,
+        semesterId: selectedSemester.id,
+        exam: record.subjectCode + " - " + record.examType,
+        date: moment(record.startAt),
+        startTime: moment(record.startAt),
+        endTime: moment(record.endAt),
+      });
+      await fetchExams(selectedSemester.id);
+    } else {
+      editNotification();
+    }
+  };
+
+  const handleOK = async () => {
+    await form.validateFields().then(async () => {
+      const values = await form.validateFields();
+      const selectedExam = exams.find((exam) => exam.id === values.exam);
+      const selectedDate = values.date.format("YYYY-MM-DD");
+      const startTime = values.startTime.format("HH:mm");
+      const endTime = values.endTime.format("HH:mm");
+
+      const examSlotDataUpdate = {
+        examSlotId: isEditing ? editingExamSlot.id : null,
+        subjectExamId: examId,
+        startAt: `${selectedDate}T${startTime}:00+07:00`,
+        endAt: `${selectedDate}T${endTime}:00+07:00`,
+        id: isEditing ? editingExamSlot.id : null,
+      };
+
+      const examSlotDataAdd = {
+        examSlotId: isEditing ? editingExamSlot.id : null,
+        subjectExamId: examId,
+        startAt: `${selectedDate}T${startTime}:00+07:00`,
+        endAt: `${selectedDate}T${endTime}:00+07:00`,
+        requiredInvigilators: 15,
+      };
+      setLoadingSubmit(true); // Start loading
+      try {
+        if (isEditing) {
+          await examSlotApi.updateExamSlot(examSlotDataUpdate);
+          message.success("Exam slot updated successfully.");
+        } else {
+          await examSlotApi.addExamSlot(examSlotDataAdd); // Assuming API returns the new slot
+          message.success("Exam slot added successfully.");
+        }
+
+        if (values.semesterId === selectedSemester.id) {
+          fetchExamSchedule(selectedSemester.id); // Refresh schedule
+        }
+      } catch (error) {
+        console.error("Error saving exam slot:", error);
+        message.error("Failed to save exam slot.");
+      } finally {
+        setLoadingSubmit(false); // Stop loading
+        handleCancel(); // Reset form
+      }
+    });
+  };
+
+  const handleCancel = () => {
+    setIsEditing(false);
+    form.resetFields();
+  };
+
+  const handleTableChange = (pagination) => {
+    setCurrentPage(pagination.current);
+    //fetchExamSchedule(selectedSemester.id, pagination.current); // Re-fetch when page changes
+  };
+
+  // Handle semester selection change
+  const handleMenuClick = (e) => {
+    const selected = semesters.find((semester) => semester.id == e.key);
+    if (selected) {
+      setSelectedSemester({
+        id: selected.id,
+        name: selected.name,
+      });
+    }
+  };
+
+  const handleRoomClick = (examSlotId) => {
+    // Navigate to RoomSelectionPage with the exam slot ID in the URL
+    navigate(`/exam-schedule/${examSlotId}/room`);
+  };
+
+  const handleAssignmentClick = (examSlotId) => {
+    navigate(`/exam-schedule/${examSlotId}/assignment`);
+  };
+  // Handle semester selection in the form
+  const handleSemesterChange = async (value) => {
+    console.log("Selected semester:", value);
+    const selectedSemesterForm = availableSemesters.find(
+      (sem) => sem.id === value
+    );
+
+    if (selectedSemesterForm) {
+      form.setFieldsValue({ semesterId: selectedSemesterForm.id }); // Update semesterId in the form
+      fetchExams(selectedSemesterForm.id); // Fetch subjects for the selected semester
+    }
+  };
+
+  const validateTime = (rule, value) => {
+    const startTime = form.getFieldValue("startTime");
+    if (startTime && value && value.isBefore(startTime)) {
+      return Promise.reject("End time must be after start time");
+    }
+    return Promise.resolve();
+  };
+  const handleChooseTime = async (value) => {
+    const exam = await examApi.getExamById(examId);
+    const duration = exam?.duration;
+    if (duration) {
+      const endTime = value.clone().add(duration, "minutes");
+      form.setFieldsValue({ endTime });
+    }
+  };
+
+  const handleChooseExam = (value) => {
+    setExamId(value);
+    console.log("Selected exam:", value);
+    // Reset time fields when a new exam is selected
+    setStartTime(null);
+    setEndTime(null);
+  };
   return (
     <Layout style={{ height: "100vh" }}>
-      <Header_Staff isLogin={isLogin} />
+      <Header />
       <Layout>
-        <Sider width={300} style={{ background: "#f1f1f1", padding: "24px" }}>
-          <Form form={form} layout="vertical" onFinish={handleSubmit}>
-            <Row gutter={16}>
-              {/* Semester Dropdown */}
-              <Col span={12}>
-                <Form.Item
-                  name="semester"
-                  label="Semester"
-                  rules={[{ required: true, message: "Required" }]}
-                >
-                  <Select placeholder="Semester" style={{ width: "100%" }}>
-                    {semesters.map((semester) => (
-                      <Option key={semester} value={semester}>
-                        {semester}
-                      </Option>
-                    ))}
-                  </Select>
-                </Form.Item>
-              </Col>
-
-              {/* Subject Dropdown */}
-              <Col span={12}>
-                <Form.Item
-                  name="subject"
-                  label="Subject"
-                  rules={[{ required: true, message: "Required" }]}
-                >
-                  <Select placeholder="Subject" style={{ width: "100%" }}>
-                    {subjects.map((subject) => (
-                      <Option key={subject} value={subject}>
-                        {subject}
-                      </Option>
-                    ))}
-                  </Select>
-                </Form.Item>
-              </Col>
-            </Row>
-
-            {/* Date Picker */}
+        <Sider
+          width={300}
+          style={{
+            background: "#4D908E",
+            padding: "24px",
+            boxShadow: "3px 0 5px rgba(0, 0, 0, 0.5)",
+          }}
+        >
+          <Form form={form} layout="vertical" name="add_exam_slot_form">
             <Form.Item
-              name="date"
-              label="Date"
+              name="semesterId"
+              label={<span className="custom-label">Semester</span>}
+              rules={[
+                {
+                  required: true,
+                  message: "Please select semester!",
+                },
+              ]}
+            >
+              <Select
+                placeholder="Select semester"
+                onChange={handleSemesterChange}
+              >
+                {availableSemesters.map((semester) => (
+                  <Select.Option key={semester.id} value={semester.id}>
+                    {semester.name}
+                  </Select.Option>
+                ))}
+              </Select>
+            </Form.Item>
+            <Form.Item
+              name="exam"
+              label={<span className="custom-label">Exam</span>}
               rules={[{ required: true, message: "Required" }]}
             >
-              <DatePicker style={{ width: "100%" }} />
+              <Select
+                placeholder="Select Exam"
+                style={{ width: "100%" }}
+                showSearch
+                onSearch={handleExamSearch}
+                optionFilterProp="children"
+                filterOption={false}
+                onChange={handleChooseExam}
+              >
+                {filteredExams.map((exam) => (
+                  <Option key={exam.id} value={exam.id}>
+                    {exam.subjectCode} - {exam.examType}
+                  </Option>
+                ))}
+              </Select>
             </Form.Item>
-
-            {/* Time Pickers: Start Time and End Time */}
+            <Form.Item
+              name="date"
+              label={<span className="custom-label">Date</span>}
+              rules={[{ required: true, message: "Required" }]}
+            >
+              <DatePicker format="DD-MM-YYYY" style={{ width: "100%" }} />
+            </Form.Item>
             <Row gutter={16}>
               <Col span={12}>
                 <Form.Item
                   name="startTime"
-                  label="Start Time"
+                  label={<span className="custom-label">Start Time</span>}
                   rules={[{ required: true, message: "Required" }]}
                 >
-                  <TimePicker format="HH:mm" style={{ width: "100%" }} />
+                  <TimePicker
+                    format="HH:mm"
+                    style={{
+                      width: "100%",
+                      backgroundColor: "#FFF",
+                    }}
+                    onChange={handleChooseTime}
+                    disabled={!examId}
+                  />
                 </Form.Item>
               </Col>
 
               <Col span={12}>
                 <Form.Item
                   name="endTime"
-                  label="End Time"
-                  rules={[{ required: true, message: "Required" }]}
+                  label={<span className="custom-label">End Time</span>}
+                  rules={[
+                    { required: true, message: "Required" },
+                    { validator: validateTime },
+                  ]}
                 >
-                  <TimePicker format="HH:mm" style={{ width: "100%" }} />
+                  <TimePicker
+                    format="HH:mm"
+                    style={{ width: "100%", backgroundColor: "#FFF" }}
+                    disabled
+                  />
                 </Form.Item>
               </Col>
             </Row>
-
-            {/* Room Selection */}
-            <Form.Item
-              name="room"
-              label="Room"
-              rules={[{ required: true, message: "Please select a room!" }]}
-            >
-              <Select placeholder="Select Room" style={{ width: "100%" }}>
-                {rooms.map((room) => (
-                  <Option key={room} value={room}>
-                    {room}
-                  </Option>
-                ))}
-              </Select>
-            </Form.Item>
-
             <Row justify="space-between">
               <Col>
                 <Button
@@ -167,14 +369,21 @@ const Exam_Schedule = ({ isLogin }) => {
                     borderColor: "orange",
                     color: "orange",
                   }}
-                  onClick={() => form.resetFields()}
+                  onClick={handleCancel}
                 >
                   Clear
+                  <CloseOutlined />
                 </Button>
               </Col>
               <Col>
-                <Button type="primary" htmlType="submit">
-                  Add
+                <Button
+                  type="primary"
+                  onClick={handleOK}
+                  loading={loadingSubmit}
+                  style={addButtonStyle}
+                >
+                  {isEditing ? "Update" : "Add"}
+                  <CaretRightFilled />
                 </Button>
               </Col>
             </Row>
@@ -182,12 +391,49 @@ const Exam_Schedule = ({ isLogin }) => {
         </Sider>
 
         <Content style={{ padding: "24px", background: "#fff" }}>
-          <Table
-            dataSource={examSchedule}
-            columns={columns}
-            rowKey={(record, index) => index}
-            pagination={{ pageSize: 5 }}
-          />
+          <div style={{ marginBottom: "20px", textAlign: "center" }}>
+            <h2 style={titleStyle}>Exam Schedule Management</h2>
+          </div>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+            }}
+          >
+            <Dropdown
+              menu={{
+                items: semesters.map((sem) => ({
+                  key: sem.id,
+                  label: sem.name,
+                })),
+                onClick: handleMenuClick,
+              }}
+            >
+              <Button style={{ ...selectButtonStyle, width: "150px" }}>
+                <Space>
+                  {selectedSemester?.name || "Select Semester"}
+                  <DownOutlined />
+                </Space>
+              </Button>
+            </Dropdown>
+          </div>
+          <Spin spinning={loading}>
+            <Table
+              dataSource={examSchedule}
+              columns={examScheduleTable(
+                handleRoomClick,
+                handleAssignmentClick,
+                handleEdit,
+                handleDelete
+              )}
+              pagination={{
+                pageSize: PAGE_SIZE,
+                total: totalItems,
+                current: currentPage,
+                onChange: handleTableChange,
+              }}
+            />
+          </Spin>
         </Content>
       </Layout>
     </Layout>

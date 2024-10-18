@@ -2,7 +2,7 @@ import axios from "axios";
 
 export const postLoginToken = async (idToken) => {
   const API_URL = import.meta.env.VITE_APP_API_URL;
-  const path = "/v1/oauth/login";
+  const path = "/v1/oauth/google/login";
 
   try {
     const response = await axios.post(
@@ -19,7 +19,6 @@ export const postLoginToken = async (idToken) => {
 
     // Login successful, cookie should be set automatically by the browser
     if (response.status === 200) {
-      console.log("Login successful. Cookie set by backend.");
       return true;
     }
   } catch (error) {

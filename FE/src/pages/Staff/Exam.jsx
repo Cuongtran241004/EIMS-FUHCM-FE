@@ -1,14 +1,5 @@
 import React, { useState, useEffect } from "react";
 import {
-  ADD_EXAM_SUCCESS,
-  ADD_EXAM_FAILED,
-  EDIT_EXAM_SUCCESS,
-  EDIT_EXAM_FAILED,
-  DELETE_EXAM_SUCCESS,
-  DELETE_EXAM_FAILED,
-  FETCH_EXAM_FAILED,
-} from "../../configs/messages.jsx";
-import {
   Layout,
   Button,
   Space,
@@ -21,135 +12,229 @@ import {
   Dropdown,
   Col,
   Row,
+  Select,
+  notification,
 } from "antd";
 import subjectApi from "../../services/Subject.js";
-import Header_Staff from "../../components/Header/Header_Staff.jsx";
-import { DeleteOutlined, DownOutlined } from "@ant-design/icons";
-
-const items = [
-  {
-    key: "1",
-    label: "Fall24",
-  },
-  {
-    key: "2",
-    label: "Summer24",
-  },
-  {
-    key: "3",
-    label: "Spring24",
-  },
-];
-
-// Ant Design Layout Components
+import examApi from "../../services/Exam.js";
+import {
+  CaretRightFilled,
+  CloseOutlined,
+  DeleteOutlined,
+  DownOutlined,
+  EditOutlined,
+} from "@ant-design/icons";
+import Header from "../../components/Header/Header.jsx";
+import { useSemester } from "../../components/Context/SemesterContext.jsx";
+import { examType } from "../../configs/data.js";
+import { examTypeTag } from "../../design-systems/CustomTag.jsx";
+import {
+  addButtonStyle,
+  selectButtonStyle,
+} from "../../design-systems/CSS/Button.js";
+import { titleStyle } from "../../design-systems/CSS/Title.js";
+import "./CustomForm.css";
+import {
+  deleteNotification,
+  editNotification,
+} from "../../design-systems/CustomNotification.jsx";
 const { Content, Sider } = Layout;
+const { Option } = Select;
 
-const Exam = ({ isLogin }) => {
-  const [data, setData] = useState([]);
+const Exam = () => {
+  const [data, setData] = useState([]); // For exam data
   const [loading, setLoading] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
-  const [editingSubject, setEditingSubject] = useState(null);
-  const [selectedItem, setSelectedItem] = useState("Fall24");
+  const [loadingSubmit, setLoadingSubmit] = useState(false);
+  const [editingExam, setEditingExam] = useState(null);
+  const {
+    selectedSemester,
+    setSelectedSemester,
+    semesters,
+    availableSemesters,
+  } = useSemester(); // Access shared semester state
+  const [subjects, setSubjects] = useState([]);
+  const [filteredSubjects, setFilteredSubjects] = useState([]);
   const [form] = Form.useForm();
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 7;
 
-  const fetchData = async (term) => {
+  // Fetch exam data based on selected semester
+  const fetchExams = async (semesterId) => {
     setLoading(true);
     try {
-      const result = await subjectApi.getAllSubjects(term);
+      const result = await examApi.getExamBySemesterId(semesterId);
+      console.log(result);
       setData(result);
     } catch (error) {
-      message.error(FETCH_EXAM_FAILED);
+      message.error("Failed to fetch exams");
     } finally {
       setLoading(false);
     }
   };
 
+  // Fetch subjects based on selected semester
+  const fetchSubjects = async (semesterId) => {
+    try {
+      const response = await subjectApi.getSubjectBySemester(semesterId);
+      const result = response.sort((a, b) => b.id - a.id);
+      setSubjects(result || []);
+      setFilteredSubjects(result);
+    } catch (error) {
+      message.error("Failed to fetch subjects");
+    }
+  };
+
+  // When selectedSemester changes, fetch both exams and subjects
   useEffect(() => {
-    fetchData(selectedItem);
-  }, [selectedItem]);
+    if (selectedSemester?.id) {
+      fetchExams(selectedSemester.id); // Fetch exams for the selected semester
+      fetchSubjects(selectedSemester.id); // Fetch subjects for the selected semester
+    }
+  }, [selectedSemester]);
+
+  // Handle subject search in dropdown
+  const handleSearch = (value) => {
+    const filtered = subjects.filter((subject) =>
+      subject.name.toLowerCase().includes(value.toLowerCase())
+    );
+    setFilteredSubjects(filtered);
+  };
+
+  // Handle semester selection change
+  const handleMenuClick = (e) => {
+    console.log(semesters);
+    const selected = semesters.find((semester) => semester.id == e.key);
+    console.log(selected);
+    if (selected) {
+      setSelectedSemester({
+        id: selected.id,
+        name: selected.name,
+      });
+    }
+  };
 
   const handleCancel = () => {
     setIsEditing(false);
     form.resetFields();
   };
 
-  const handleDelete = async (id) => {
-    try {
-      await subjectApi.deleteSubject(id);
-      message.success(DELETE_EXAM_SUCCESS);
-      fetchData(selectedItem);
-    } catch (error) {
-      message.error(DELETE_EXAM_FAILED);
+  const handleEdit = (record) => {
+    if (
+      availableSemesters.find((semester) => semester.id === selectedSemester.id)
+    ) {
+      setIsEditing(true);
+      setEditingExam(record);
+      form.setFieldsValue(record);
+    } else {
+      editNotification();
     }
   };
 
-  const handleMenuClick = (e) => {
-    const newTerm = items.find((item) => item.key === e.key).label;
-    setSelectedItem(newTerm);
-    fetchData(newTerm);
+  const handleDelete = async (id) => {
+    if (
+      availableSemesters.find((semester) => semester.id === selectedSemester.id)
+    ) {
+      try {
+        await examApi.deleteExam(id);
+        message.success("Exam deleted successfully");
+        fetchExams(selectedSemester.id); // Reload exams after deletion
+      } catch (error) {
+        message.error("Failed to delete exam");
+      }
+    } else {
+      deleteNotification();
+    }
   };
 
   const handleOk = async () => {
-    try {
-      const values = await form.validateFields();
-      if (isEditing) {
-        await subjectApi.updateSubject({ ...editingSubject, ...values });
-        message.success(EDIT_EXAM_SUCCESS);
-      } else {
-        await subjectApi.addSubject(values);
-        message.success(ADD_EXAM_SUCCESS);
+    await form.validateFields().then(async () => {
+      setLoadingSubmit(true);
+      try {
+        const values = await form.validateFields();
+        const subject = subjects.find((sub) => sub.name === values.subjectName);
+        values.subjectId = subject.id;
+
+        if (isEditing) {
+          values.id = editingExam.id;
+          await examApi.updateExam(values);
+          message.success("Exam updated successfully");
+        } else {
+          await examApi.addExam(values);
+          message.success("Exam added successfully");
+        }
+        if (selectedSemester.id === values.semesterId) {
+          fetchExams(selectedSemester.id);
+        }
+        handleCancel();
+      } catch (error) {
+        message.error("Failed to submit exam");
+      } finally {
+        setLoadingSubmit(false);
       }
-      fetchData(selectedItem);
-      handleCancel();
-    } catch (error) {
-      message.error(isEditing ? EDIT_EXAM_FAILED : ADD_EXAM_FAILED);
+    });
+  };
+
+  // Handle semester selection in the form
+  const handleSemesterChange = async (value) => {
+    const selectedSemesterForm = availableSemesters.find(
+      (sem) => sem.id === value
+    );
+
+    if (selectedSemesterForm) {
+      form.setFieldsValue({ semesterId: selectedSemesterForm.id }); // Update semesterId in the form
+      fetchSubjects(selectedSemesterForm.id); // Fetch subjects for the selected semester
     }
   };
 
+  // Table columns
   const columns = [
     {
       title: "No",
       dataIndex: "no",
       key: "no",
+      align: "center",
+      render: (_, __, index) => (currentPage - 1) * pageSize + index + 1,
     },
     {
-      title: "Code",
-      dataIndex: "code",
-      key: "code",
+      title: "Subject Code",
+      dataIndex: "subjectCode",
+      key: "subjectCode",
     },
     {
-      title: "Name",
-      dataIndex: "name",
-      key: "name",
+      title: "Subject Name",
+      dataIndex: "subjectName",
+      key: "subjectName",
     },
+
     {
       title: "Type",
-      dataIndex: "type",
-      key: "type",
+      dataIndex: "examType",
+      key: "examType",
+      align: "center",
+      render: (examType) => examTypeTag(examType),
     },
     {
-      title: "Duration",
+      title: "Duration (minutes)",
       dataIndex: "duration",
       key: "duration",
+      align: "center",
+      width: "15%",
     },
+
     {
       title: "Action",
       key: "action",
+      align: "center",
       render: (text, record) => (
         <Space size="middle">
-          <Button
-            type="primary"
-            onClick={() => {
-              setIsEditing(true);
-              setEditingSubject(record);
-              form.setFieldsValue(record);
-            }}
-          >
-            Edit
-          </Button>
+          <EditOutlined
+            style={{ color: "blue", cursor: "pointer" }}
+            onClick={() => handleEdit(record)}
+          />
           <Popconfirm
             title="Are you sure to delete this exam?"
-            onConfirm={() => handleDelete(record.fuId)}
+            onConfirm={() => handleDelete(record.id)}
             okText="Yes"
             cancelText="No"
           >
@@ -162,73 +247,109 @@ const Exam = ({ isLogin }) => {
 
   return (
     <Layout style={{ height: "100vh" }}>
-      <Header_Staff isLogin={isLogin} />
+      <Header />
       <Layout>
         {/* Sider for Form */}
-        <Sider width={300} style={{ background: "#f1f1f1", padding: "24px" }}>
+        <Sider
+          width={300}
+          style={{
+            background: "#4D908E",
+            padding: "24px",
+            boxShadow: "3px 0 5px rgba(0, 0, 0, 0.5)",
+          }}
+        >
           <Form form={form} layout="vertical" name="add_exam_form">
             <Form.Item
-              name="code"
-              label="Code"
+              name="semesterId"
+              label={<span className="custom-label">Semester</span>}
               rules={[
-                { required: true, message: "Please input the exam code!" },
+                {
+                  required: true,
+                  message: "Please select semester!",
+                },
               ]}
             >
-              <Input placeholder="Enter exam code" />
+              <Select
+                placeholder="Select semester"
+                onChange={handleSemesterChange}
+              >
+                {availableSemesters.map((semester) => (
+                  <Select.Option key={semester.id} value={semester.id}>
+                    {semester.name}
+                  </Select.Option>
+                ))}
+              </Select>
             </Form.Item>
-
+            {/* Subject Field */}
             <Form.Item
-              name="name"
-              label="Name"
-              rules={[
-                { required: true, message: "Please input the exam name!" },
-              ]}
+              name="subjectName"
+              label={<span className="custom-label">Subject</span>}
+              rules={[{ required: true, message: "Please select a subject!" }]}
             >
-              <Input placeholder="Enter exam name" />
+              <Select
+                showSearch
+                placeholder="Select subject"
+                onSearch={handleSearch}
+                filterOption={false} // Use custom search logic
+              >
+                {filteredSubjects.map((subject) => (
+                  <Option key={subject.id} value={subject.name}>
+                    {subject.name}
+                  </Option>
+                ))}
+              </Select>
             </Form.Item>
 
+            {/* Type Field */}
             <Row gutter={16}>
               <Col span={12}>
                 <Form.Item
-                  name="type"
-                  label="Type"
+                  name="examType"
+                  label={<span className="custom-label">Type</span>}
                   rules={[{ required: true, message: "Required" }]}
                 >
-                  <Input placeholder="Exam type" />
+                  <Select placeholder="Exam type">
+                    {examType.map((type) => (
+                      <Option key={type} value={type}>
+                        {type}
+                      </Option>
+                    ))}
+                  </Select>
                 </Form.Item>
               </Col>
+
+              {/* Duration Field */}
               <Col span={12}>
                 <Form.Item
                   name="duration"
-                  label="Duration"
-                  rules={[
-                    {
-                      required: true,
-                      message: "Required",
-                    },
-                  ]}
+                  label={<span className="custom-label">Duration</span>}
+                  rules={[{ required: true, message: "Required" }]}
                 >
-                  <Input placeholder="duration" />
+                  <Input type="number" placeholder="Duration" />
                 </Form.Item>
               </Col>
             </Row>
 
-            {/* Clear and Add buttons */}
+            {/* Clear and Add/Submit buttons */}
             <Row justify="space-between">
               <Col>
                 <Button
                   onClick={handleCancel}
-                  style={{
-                    borderColor: "orange",
-                    color: "orange",
-                  }}
+                  style={{ borderColor: "orange", color: "orange" }}
                 >
                   Clear
+                  <CloseOutlined />
                 </Button>
               </Col>
               <Col>
-                <Button type="primary" onClick={handleOk}>
-                  Add
+                <Button
+                  type="primary"
+                  onClick={handleOk}
+                  loading={loadingSubmit}
+                  style={addButtonStyle}
+                >
+                  {isEditing ? "Update" : "Add"}
+                  <CaretRightFilled />
                 </Button>
               </Col>
             </Row>
@@ -236,29 +357,38 @@ const Exam = ({ isLogin }) => {
         </Sider>
 
         {/* Content for Table and Dropdown */}
-        <Content style={{ padding: 24, margin: 0, background: "#fff" }}>
-          <Space>
+        <Content style={{ padding: 12, margin: 0, background: "#fff" }}>
+          <div style={{ marginBottom: "20px", textAlign: "center" }}>
+            <h2 style={titleStyle}>Exam Management</h2>
+          </div>
+          <div style={{ display: "flex", alignItems: "center" }}>
             <Dropdown
               menu={{
-                items,
+                items: semesters.map((sem) => ({
+                  key: sem.id,
+                  label: sem.name,
+                })),
                 onClick: handleMenuClick,
               }}
             >
-              <Button style={{ width: "100px" }}>
+              <Button style={{ ...selectButtonStyle, width: "150px" }}>
                 <Space>
-                  {selectedItem}
+                  {selectedSemester?.name || "Select Semester"}
                   <DownOutlined />
                 </Space>
               </Button>
             </Dropdown>
-          </Space>
+          </div>
 
           <Spin spinning={loading}>
             <Table
-              dataSource={data}
+              dataSource={data.map((item) => ({ ...item, key: item.id }))}
               columns={columns}
-              rowKey={Math.random}
-              pagination={{ pageSize: 8 }}
+              pagination={{
+                pageSize,
+                current: currentPage,
+                onChange: (page) => setCurrentPage(page),
+              }}
             />
           </Spin>
         </Content>
