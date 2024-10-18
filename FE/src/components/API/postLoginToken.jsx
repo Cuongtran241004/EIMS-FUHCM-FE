@@ -2,7 +2,7 @@ import axios from "axios";
 
 export const postLoginToken = async (idToken) => {
   const API_URL = import.meta.env.VITE_APP_API_URL;
-  const path = "/v1/oauth/login";
+  const path = "/v1/oauth/google/login";
 
   try {
     const response = await axios.post(

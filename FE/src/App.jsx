@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Route, Routes, Navigate } from "react-router-dom";
+import { Route, Routes, useNavigate, Navigate } from "react-router-dom";
 import Login from "./pages/Login/Login";
 import User from "./pages/Manager/User";
 import Dashboard from "./pages/Manager/Dashboard";
@@ -36,6 +36,7 @@ import {
 import "./App.css";
 import ProfilePage from "./pages/Home/Profile.jsx";
 import Header from "./components/Header/Header.jsx";
+import HandlePassword from "./pages/Login/HandlePassword.jsx";
 import AssignmentInvigilator from "./pages/Staff/Assignment.jsx";
 
 function App() {
@@ -43,15 +44,18 @@ function App() {
   const [isLoading, setIsLoading] = useState(true);
   const [user, setUser] = useState(null);
   const [role, setRole] = useState(null);
+  const [passwordSet, setPasswordSet] = useState(null);
+  const navigate = useNavigate();
 
   const initLogin = async () => {
     try {
       const user = await getUserInfo();
       if (user) {
-        const userRole = user.role.name || null;
+        const userRole = user.role || null;
         setRole(userRole);
         setUser(user);
         setIsLogin(true);
+        setPasswordSet(user.passwordSet);
       }
     } catch (error) {
       console.error("Failed to get user info:", error);
@@ -62,6 +66,13 @@ function App() {
   useEffect(() => {
     initLogin();
   }, []);
+
+  useEffect(() => {
+    // Kiểm tra nếu passwordSet === false thì chuyển đến /add
+    if (isLogin && passwordSet === false) {
+      navigate("/add");
+    }
+  }, [isLogin, passwordSet, navigate]);
 
   const renderRoutes = () => {
     if (!isLogin) {
@@ -76,7 +87,7 @@ function App() {
     return (
       <Routes>
         {/* Manager Routes */}
-        {role === "manager" && (
+        {role === 1 && (
           <>
             <Route path={MANAGER_DASHBOARD_URL} element={<Dashboard />} />
             <Route path={MANAGER_SEMESTER_URL} element={<Semester />} />
@@ -95,7 +106,7 @@ function App() {
         )}
 
         {/* Staff Routes */}
-        {role === "staff" && (
+        {role === 2 && (
           <>
             <Route path={STAFF_SUBJECT_URL} element={<Subject />} />
             <Route path={STAFF_EXAM_URL} element={<Exam />} />
@@ -117,7 +128,7 @@ function App() {
         )}
 
         {/* Invigilator Routes */}
-        {role === "invigilator" && (
+        {role === 3 && (
           <>
             <Route path="/" element={<InvigilatorDashboard />} />
             <Route path="/register" element={<InvigilatorRegistration />} />
@@ -126,18 +137,19 @@ function App() {
           </>
         )}
         <Route path="profile" element={<ProfilePage user={user} />} />
-        <Route path="*" element={<Navigate to="/" replace />} />
+        <Route path="add" element={<HandlePassword />} />
+        <Route path="*" element={<Navigate to="/add" replace />} />
       </Routes>
     );
   };
 
   return (
     <div className="container">
-      {role === "staff" || role === "manager" ? (
+      {role === 1 || role === 2 ? (
         <SemesterProvider>{renderRoutes()}</SemesterProvider>
       ) : (
         <>
-          {role === "invigilator" && <Header />}
+          {role === 3 && <Header />}
           <SemesterProviderInvigilator>
             {renderRoutes()}
           </SemesterProviderInvigilator>
