@@ -16,14 +16,20 @@ import {
 } from "antd";
 import examSlotApi from "../../services/ExamSlot.js";
 import { useSemester } from "../../components/Context/SemesterContext.jsx";
-import { DownOutlined } from "@ant-design/icons";
+import {
+  BackwardOutlined,
+  CloseOutlined,
+  DownOutlined,
+  EyeOutlined,
+  ForwardOutlined,
+} from "@ant-design/icons";
 const { Content, Sider } = Layout;
 import { selectButtonStyle } from "../../design-systems/CSS/Button.js";
 import { titleStyle } from "../../design-systems/CSS/Title.js";
 import "./CustomForm.css";
 import { staffMapperUtil } from "../../utils/Mapper/StaffMapperUtil.jsx";
 import moment from "moment";
-
+import dayjs from "dayjs"; // Import dayjs
 const Attendance = () => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -167,10 +173,57 @@ const Attendance = () => {
   ];
   const { token } = theme.useToken();
   const wrapperStyle = {
-    width: 300,
+    width: 280,
     border: `1px solid ${token.colorBorderSecondary}`,
     borderRadius: token.borderRadiusLG,
+    marginTop: "20px",
   };
+  const handleClear = () => {
+    setSelectedDate(currentDate); // Clear the selected date
+    // view available attendance
+    setData(availableAttendance);
+  };
+  const [currentDate, setCurrentDate] = useState(dayjs()); // Use dayjs instead of Date
+  const [selectedDate, setSelectedDate] = useState(dayjs());
+
+  const onNextMonth = () => {
+    setSelectedDate(selectedDate.add(1, "month")); // Use dayjs to add a month
+  };
+
+  const onPrevMonth = () => {
+    setSelectedDate(selectedDate.subtract(1, "month")); // Use dayjs to subtract a month
+  };
+  // Function to handle date selection
+  const onDateSelect = (date) => {
+    setSelectedDate(date); // Set the selected date
+    console.log(date);
+  };
+  const onPanelChange = () => {
+    setSelectedDate(null); // Update the selected date
+  };
+  // Custom header rendering
+  const headerRender = () => {
+    return (
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          padding: "8px",
+        }}
+      >
+        <Button onClick={onPrevMonth}>
+          <BackwardOutlined />
+        </Button>
+        <span style={{ alignSelf: "center", fontWeight: "bold" }}>
+          {selectedDate.format("MMMM YYYY")} {/* Format the date using dayjs */}
+        </span>
+        <Button onClick={onNextMonth}>
+          <ForwardOutlined />
+        </Button>
+      </div>
+    );
+  };
+
   return (
     <Layout style={{ height: "100vh" }}>
       <Header />
@@ -180,31 +233,41 @@ const Attendance = () => {
           width={300}
           style={{
             background: "#4D908E",
-            padding: "24px",
+            padding: "10px",
             boxShadow: "3px 0 5px rgba(0, 0, 0, 0.5)",
           }}
         >
-          <Button onClick={getHistoryAttendance}>
-            View History Attendance
+          <Button
+            onClick={getHistoryAttendance}
+            style={{
+              width: "100%",
+              backgroundColor: "#90BE6D",
+              color: "#fff",
+              borderColor: "#90BE6D",
+            }}
+          >
+            History Attendance
+            <EyeOutlined />
           </Button>
-          {/* Add form components here */}
-          <Form form={form} layout="vertical" name="add_exam_slot_form">
-            <Form.Item
-              name="semesterId"
-              label={<span className="custom-label">Date</span>}
-              rules={[
-                {
-                  required: true,
-                  message: "Please select semester!",
-                },
-              ]}
-            >
-              {" "}
-              <div style={wrapperStyle}>
-                <Calendar fullscreen={false} />
-              </div>
-            </Form.Item>
-          </Form>
+          <div style={wrapperStyle}>
+            <Calendar
+              value={selectedDate || currentDate} // Use selected date or current date
+              headerRender={headerRender} // Use custom header
+              onPanelChange={onPanelChange} // Update the current date if needed
+              fullscreen={false} // Render the calendar without fullscreen
+              onSelect={onDateSelect} // Handle date selection
+            />
+          </div>
+
+          <Button
+            style={{ float: "right", marginTop: "10px" }}
+            danger
+            type="dashed"
+            onClick={handleClear}
+          >
+            Clear
+            <CloseOutlined />
+          </Button>
         </Sider>
 
         {/* Content for Table */}
