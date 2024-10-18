@@ -26,6 +26,10 @@ function InvigilatorRegistration() {
 
   const allowedSlots = lastestSemester?.allowedSlotConfig;
 
+  if(selectedSemester != lastestSemester) {
+    setSelectedSemester(lastestSemester);
+  }
+
   const fetchAndSetData = async () => {
     try {
       setLoading(true);
@@ -176,9 +180,8 @@ function InvigilatorRegistration() {
   const EventComponent = ({ event }) => (
     <div>
       <p style={{ margin: 0, fontWeight: 500, fontSize: 13.33333 }}>
-        {new Date(event.startAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}-
-        {new Date(event.endAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-        <br/><span style={{fontSize: '0.625rem'}}>(Registed: 10/Total: 15)</span>
+       {moment(event.startAt).format('HH:mm')} - {moment(event.endAt).format('HH:mm')}
+        <br/><span style={{fontSize: '0.625rem'}}>(Registed: {event.numberOfRegistered}/Total: {event.requiredInvigilators})</span>
       </p>
     </div>
   );
@@ -197,7 +200,7 @@ function InvigilatorRegistration() {
             startAccessor={(event) => new Date(event.startAt)}
             endAccessor={(event) => new Date(event.endAt)}
             style={{ height: 500, margin: '50px', width: '70%', fontWeight: 'lighter' }}
-            components={{ event: EventComponent }}
+            components={{ event: EventComponent}}
             onSelectEvent={handleSelectEvent}
             eventPropGetter={(event) => {
               const { startAt } = event;
@@ -208,8 +211,20 @@ function InvigilatorRegistration() {
               let backgroundColor;
               let isSelectable = true;
               if(currentDate.isBefore(openAt) || currentDate.isAfter(closeAt)) {
-                backgroundColor = '#f0f0f0';
-                isSelectable = false;
+                switch (event.status) {
+                  case 'REGISTERED':
+                    backgroundColor = '#52c41a';
+                    isSelectable = false;
+                    break;
+                  case 'FULL':
+                    backgroundColor = '#d9363e';
+                    isSelectable = false;
+                    break;
+                  default:
+                    backgroundColor = isSelected ? '#1890ff' : '#ddd';
+                    isSelectable = true;
+                    break;
+                }
               }
               else {
               switch (event.status) {
@@ -266,7 +281,7 @@ function InvigilatorRegistration() {
               <span style={{ marginRight: 20, color: '#d9363e' }}>Full</span>
               <span style={{ marginRight: 20, color: 'rgb(221, 221, 221)' }}>Not full</span>
             </p>
-            <p style={{ fontStyle: 'italic' }}>*Note: Gather 30 minutes before exam time in the room <span style={{ fontWeight: 'bolder' }}>301.</span></p>
+            <p style={{ fontStyle: 'italic' }}>*Note: Arrive 30 minutes before exam time in room <span style={{ fontWeight: 'bolder' }}>301</span>.</p>
 
           </div>
         </div>
@@ -290,7 +305,12 @@ function InvigilatorRegistration() {
             <p>No registered slots available to cancel.</p>
           ) : (
             <div>
-              {examSlotDetail.map(slot => (
+              {examSlotDetail.map(slot => {
+                const currentDate = moment();
+                const openAt = moment(slot.startAt).subtract(7, 'days');
+                const closeAt = moment(slot.startAt).subtract(3, 'days');
+                const isCancelable = currentDate.isBetween(openAt, closeAt);
+                return isCancelable ? (
                 <div
                   key={slot.examSlotId}
                   style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px', width: '100%' }}
@@ -305,7 +325,8 @@ function InvigilatorRegistration() {
                     onChange={(e) => handleCancelSlotChange(slot.examSlotId, e.target.checked)}
                   />
                 </div>
-              ))}
+                ) : <p>No registered slots available to cancel.</p>;
+              })}
             </div>
           )}
         </Modal>
