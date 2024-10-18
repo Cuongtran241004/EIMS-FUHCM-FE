@@ -35,12 +35,12 @@ const RoomSelectionPage = () => {
   const [examSlot, setExamSlot] = useState(null);
   const [groupedRooms, setGroupedRooms] = useState([]);
   const [unvailableRooms, setUnvailableRooms] = useState([]);
+  const [usingRoom, setUsingRoom] = useState([]);
   const [loadingSubmit, setLoadingSubmit] = useState(false);
 
   const fetchExamSlot = async () => {
     try {
       const response = await examSlotApi.getExamSlotById(examSlotId);
-
       setExamSlot(response);
     } catch (error) {
       message.error("Failed to fetch exam slot");
@@ -83,10 +83,31 @@ const RoomSelectionPage = () => {
   }, [examSlotId]);
 
   useEffect(() => {
+    const fetchUsingRoom = async () => {
+      try {
+        const response = await examSlotApi.getUsingRoom(examSlotId);
+        setUsingRoom(response || []);
+
+        // Check if usingRoom is empty
+        if (response.length > 0) {
+          // User is updating, so populate selectedRooms and groupedRooms
+          setSelectedRooms(response.flat()); // Flatten the response into a single array
+
+          // Directly set groupedRooms from response
+          setGroupedRooms(response);
+        }
+      } catch (error) {
+        message.error("Failed to fetch using room");
+      }
+    };
+
     if (examSlot) {
+      fetchUsingRoom();
       fetchUnavailableRooms();
     }
   }, [examSlot]);
+
+  // Additional logic for visualizing the groups
 
   const handleRoomSelect = (room) => {
     if (selectedRooms.find((selectedRoom) => selectedRoom.id === room.id)) {
@@ -152,6 +173,8 @@ const RoomSelectionPage = () => {
   };
 
   const handleSave = async () => {
+    console.log("Selected Rooms:", selectedRooms);
+    console.log("Grouped Rooms:", groupedRooms);
     setLoadingSubmit(true);
     try {
       // only return roomName
@@ -163,6 +186,7 @@ const RoomSelectionPage = () => {
         examSlotId: examSlotId,
         roomIds: roomIds,
       };
+
       await examSlotHallApi.addExamSlotHall(data);
 
       message.success("Rooms grouped successfully");
@@ -324,7 +348,7 @@ const RoomSelectionPage = () => {
                       gap: "8px",
                       border: "1px dashed #ccc",
                       padding: "5px",
-                      width: "49%",
+                      width: "calc(50% - 10px)",
                     }}
                     onDragOver={handleDragOver}
                     onDrop={(event) => handleDrop(event, groupIndex)}
