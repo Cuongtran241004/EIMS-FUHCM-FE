@@ -20,6 +20,7 @@ const ExamSlots = () => {
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [pendingSlots, setPendingSlots] = useState([]);
   const [showPending, setShowPending] = useState(false);
+  const [showRejected, setShowRejected] = useState(false);
   const [checkedSlots, setCheckedSlots] = useState([]);
 
   const handleMenuClick = (e) => {
@@ -56,6 +57,13 @@ const ExamSlots = () => {
     setShowPending(true);
   };
 
+  const handleReject = () => {
+    const pending = examSlotBySemester.filter(slot => slot.status === "PENDING");
+    setPendingSlots(pending);
+    setShowRejected(true);
+  };
+
+
   const handleCheckboxChange = (slotId) => {
     setCheckedSlots((prev) =>
       prev.includes(slotId) ? prev.filter(id => id !== slotId) : [...prev, slotId]
@@ -67,19 +75,17 @@ const ExamSlots = () => {
       title: 'Do you want to approve these slots?',
       icon: <ExclamationCircleOutlined />,
       onOk: async () => {
-        
+
         const updatedSlots = checkedSlots.map((slot) => ({
           subjectExamId: slot.id,
           startAt: slot.startAt,
-          endAt: slot.endAt, 
+          endAt: slot.endAt,
           requiredInvigilators: slot.requiredInvigilators,
-          status: "APPROVED" 
+          status: "APPROVED"
         }));
-        
-        // console.log(updatedSlots);
+
         try {
           const success = await examSlotApi.updateExamSlot(updatedSlots);
-          // const success = true;
           if (success) {
             message.success('Approved successfully!');
             setCheckedSlots([]);
@@ -87,6 +93,34 @@ const ExamSlots = () => {
           }
         } catch (error) {
           message.error('There was an error approving the slots!');
+          console.error(error);
+        }
+      },
+    });
+  };
+
+  const handleConfirmReject = async () => {
+    confirm({
+      title: 'Do you want to reject these slots?',
+      icon: <ExclamationCircleOutlined />,
+      onOk: async () => {
+        const updatedSlots = checkedSlots.map((slot) => ({
+          subjectExamId: slot.id,
+          startAt: slot.startAt,
+          endAt: slot.endAt,
+          requiredInvigilators: slot.requiredInvigilators,
+          status: "REJECTED"
+        }));
+
+        try {
+          const success = await examSlotApi.updateExamSlot(updatedSlots);
+          if (success) {
+            message.success('Rejected successfully!');
+            setCheckedSlots([]);
+            setShowRejected(false);
+          }
+        } catch (error) {
+          message.error('There was an error rejecting the slots!');
           console.error(error);
         }
       },
@@ -146,7 +180,7 @@ const ExamSlots = () => {
   ];
 
   return (
-    <Layout style={{ height: "100vh" }}>
+    <Layout style={{ height: "100vh", overflowY: 'hidden' }}>
       <Header />
       <Layout>
         <Sider width={256} style={{ backgroundColor: "#4D908E" }}>
@@ -168,6 +202,29 @@ const ExamSlots = () => {
                   style={{ height: 500, margin: "50px", width: "70%" }}
                   components={{
                     event: EventComponent,
+                  }}
+
+                  eventPropGetter={(event) => {
+                    let backgroundColor;
+                    switch (event.status) {
+                      case 'APPROVED':
+                        backgroundColor = '#52c41a';
+                        break;
+                      case 'REJECTED':
+                        backgroundColor = '#d9363e';
+                        break;
+                      default:
+                        backgroundColor = '#1890ff';
+                        break;
+                    }
+                    return {
+                      style: {
+                        backgroundColor,
+                        border: '1px solid #ddd',
+                        color: backgroundColor === '#ddd' ? 'black' : 'white',
+
+                      },
+                    };
                   }}
                 />
                 <Modal
@@ -191,7 +248,7 @@ const ExamSlots = () => {
                     </div>
                   )}
                 </Modal>
-                <div style={{ marginLeft: 30, marginTop: 40, display: 'grid', width: '15%' }}>
+                <div style={{ marginRight: 30, marginTop: 40, display: 'grid', width: '15%' }}>
                   <Dropdown menu={menu} trigger={["click"]}>
                     <Button size="large">
                       <Space>
@@ -200,9 +257,14 @@ const ExamSlots = () => {
                       </Space>
                     </Button>
                   </Dropdown>
-                  <div>
-                    <Button onClick={handleApprove}>Approve</Button>
-                    <Button>Reject</Button>
+                  <div style={{marginTop: 10}}>
+                    <Button style={{width: 100, marginLeft: 20}} onClick={handleApprove}>Approve</Button>
+                    <Button style={{width: 100, marginLeft: 20}} onClick={handleReject}>Reject</Button>
+                    <p style={{ fontWeight: 'bold' }}>
+                      <span style={{ marginRight: 20, color: '#52c41a' }}>APPROVED</span>
+                      <span style={{ marginRight: 20, color: '#d9363e' }}>REJECTED</span>
+                      <span style={{ marginRight: 20, color: '#1890ff' }}>PENDING</span>
+                    </p>
                   </div>
                 </div>
               </div>
@@ -223,6 +285,34 @@ const ExamSlots = () => {
             </Button>,
             <Button key="submit" type="primary" onClick={handleConfirm}>
               Approve
+            </Button>
+          ]}
+        >
+          <Table
+            columns={columns}
+            dataSource={pendingSlots}
+            rowKey="id"
+            pagination={{
+              pageSize: 4,
+              showSizeChanger: false,
+              showQuickJumper: false,
+              position: ["bottomCenter"],
+            }}
+          />
+        </Modal>
+      )}
+      {showRejected && (
+        <Modal
+          title="Pending Slots"
+          open={showRejected}
+          onOk={handleConfirmReject}
+          onCancel={() => setShowRejected(false)}
+          footer={[
+            <Button key="back" onClick={() => setShowRejected(false)}>
+              Cancel
+            </Button>,
+            <Button key="submit" type="primary" onClick={handleConfirmReject}>
+              Reject
             </Button>
           ]}
         >
