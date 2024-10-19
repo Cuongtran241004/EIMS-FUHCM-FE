@@ -39,5 +39,23 @@ const examSlotHallApi = {
       handleError(error);
     }
   },
+  updateExamSlotHall: async (examSlotHall) => {
+    try {
+      const response = await axios.put(
+        `${EXAM_SLOT_HALL_API_BASE_URL}`,
+        examSlotHall,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+          withCredentials: true,
+        }
+      );
+      return response.data;
+    } catch (error) {
+      handleError(error);
+    }
+  },
 };
 export default examSlotHallApi;
