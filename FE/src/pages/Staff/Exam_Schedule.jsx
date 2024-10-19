@@ -12,6 +12,7 @@ import {
   Space,
   Dropdown,
   Spin,
+  notification,
 } from "antd";
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
@@ -38,6 +39,15 @@ import {
   deleteNotification,
   editNotification,
 } from "../../design-systems/CustomNotification.jsx";
+import {
+  ADD_EXAM_SCHEDULE_FAILED,
+  ADD_EXAM_SCHEDULE_SUCCESS,
+  DELETE_EXAM_SCHEDULE_FAILED,
+  DELETE_EXAM_SCHEDULE_SUCCESS,
+  EDIT_EXAM_SCHEDULE_FAILED,
+  EDIT_EXAM_SCHEDULE_SUCCESS,
+  FETCH_EXAM_SCHEDULE_FAILED,
+} from "../../configs/messages.js";
 const { Option } = Select;
 const { Content } = Layout;
 const PAGE_SIZE = 6;
@@ -81,7 +91,7 @@ const Exam_Schedule = () => {
       setTotalItems(result.length || 0);
     } catch (error) {
       console.error("Error fetching exam schedule:", error); // Log the error
-      message.error("Failed to load exam schedule. Please try again.");
+      message.error(FETCH_EXAM_SCHEDULE_FAILED);
     } finally {
       setLoading(false);
     }
@@ -121,10 +131,10 @@ const Exam_Schedule = () => {
     ) {
       try {
         await examSlotApi.deleteExamSlot(id);
-        message.success("Exam slot deleted successfully");
+        message.success(DELETE_EXAM_SCHEDULE_SUCCESS);
         fetchExamSchedule(selectedSemester.id); // Refresh schedule
       } catch (error) {
-        message.error("Failed to delete exam");
+        notification.error({ message: DELETE_EXAM_SCHEDULE_FAILED });
       }
     } else {
       deleteNotification();
@@ -180,10 +190,10 @@ const Exam_Schedule = () => {
       try {
         if (isEditing) {
           await examSlotApi.updateExamSlot(examSlotDataUpdate);
-          message.success("Exam slot updated successfully.");
+          message.success(EDIT_EXAM_SCHEDULE_SUCCESS);
         } else {
           await examSlotApi.addExamSlot(examSlotDataAdd); // Assuming API returns the new slot
-          message.success("Exam slot added successfully.");
+          message.success(ADD_EXAM_SCHEDULE_SUCCESS);
         }
 
         if (values.semesterId === selectedSemester.id) {
@@ -191,7 +201,9 @@ const Exam_Schedule = () => {
         }
       } catch (error) {
         console.error("Error saving exam slot:", error);
-        message.error("Failed to save exam slot.");
+        message.error(
+          isEditing ? EDIT_EXAM_SCHEDULE_FAILED : ADD_EXAM_SCHEDULE_FAILED
+        );
       } finally {
         setLoadingSubmit(false); // Stop loading
         handleCancel(); // Reset form

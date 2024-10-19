@@ -115,7 +115,7 @@ const Subject = () => {
         message.success(DELETE_SUBJECT_SUCCESS);
         fetchData(selectedSemester.id);
       } catch (error) {
-        message.error(DELETE_SUBJECT_FAILED);
+        notification.error({ message: DELETE_SUBJECT_FAILED });
       }
     } else {
       deleteNotification();

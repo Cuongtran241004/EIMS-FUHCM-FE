@@ -16,6 +16,7 @@ import InvigilatorDashboard from "./pages/Invigilator/InvigilatorDashboard";
 import InvigilatorRegistration from "./pages/Invigilator/InvigilatorRegistration";
 import InvigilatorRequest from "./pages/Invigilator/InvigilatorRequest";
 import InvigilatorRequestsList from "./pages/Invigilator/InvigilatorRequestList";
+import NotFound from "./pages/Home/NotFound";
 import { getUserInfo } from "./components/API/getUserInfo";
 import { SemesterProvider } from "./components/Context/SemesterContext.jsx";
 import { SemesterProviderInvigilator } from "./components/SemesterContext.jsx";
@@ -89,6 +90,7 @@ function App() {
         {/* Manager Routes */}
         {role === 1 && (
           <>
+            <Route path="/" element={<Dashboard />} />
             <Route path={MANAGER_DASHBOARD_URL} element={<Dashboard />} />
             <Route path={MANAGER_SEMESTER_URL} element={<Semester />} />
             <Route path={MANAGER_USERS_URL} element={<User />} />
@@ -98,16 +100,14 @@ function App() {
               path={MANAGER_ATTENDENCE_CHECK_URL}
               element={<AttendanceCheck />}
             />
-            <Route
-              path="*"
-              element={<Navigate to={MANAGER_DASHBOARD_URL} replace />}
-            />
+            <Route path="*" element={<NotFound />} />
           </>
         )}
 
         {/* Staff Routes */}
         {role === 2 && (
           <>
+            <Route path="/" element={<Subject />} />
             <Route path={STAFF_SUBJECT_URL} element={<Subject />} />
             <Route path={STAFF_EXAM_URL} element={<Exam />} />
             <Route path={STAFF_EXAM_SCHEDULE_URL} element={<Exam_Schedule />} />
@@ -120,10 +120,7 @@ function App() {
               path={STAFF_ASSIGNMENT_URL}
               element={<AssignmentInvigilator />}
             />
-            <Route
-              path="*"
-              element={<Navigate to={STAFF_SUBJECT_URL} replace />}
-            />
+            <Route path="*" element={<NotFound />} />
           </>
         )}
 
@@ -134,6 +131,7 @@ function App() {
             <Route path="/register" element={<InvigilatorRegistration />} />
             <Route path="/request/send" element={<InvigilatorRequest />} />
             <Route path="/request/view" element={<InvigilatorRequestsList />} />
+            <Route path="*" element={<NotFound />} />
           </>
         )}
         <Route path="profile" element={<ProfilePage user={user} />} />
@@ -145,7 +143,7 @@ function App() {
 
   return (
     <div className="container">
-      {role === 1 || role === 2? (
+      {role === 1 || role === 2 ? (
         <SemesterProvider>{renderRoutes()}</SemesterProvider>
       ) : (
         <>

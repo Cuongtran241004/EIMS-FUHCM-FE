@@ -38,6 +38,7 @@ import {
   deleteNotification,
   editNotification,
 } from "../../design-systems/CustomNotification.jsx";
+import { DELETE_EXAM_FAILED } from "../../configs/messages.js";
 const { Content, Sider } = Layout;
 const { Option } = Select;
 
@@ -140,7 +141,7 @@ const Exam = () => {
         message.success("Exam deleted successfully");
         fetchExams(selectedSemester.id); // Reload exams after deletion
       } catch (error) {
-        message.error("Failed to delete exam");
+        notification.error({ message: DELETE_EXAM_FAILED });
       }
     } else {
       deleteNotification();

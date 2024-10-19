@@ -11,9 +11,9 @@ import "./Header.css";
 const items = [
   {
     label: (
-      <Button type="link" style={{ color: "#4D908E" }}>
+      <Button type="link">
         <Link to="/profile">
-          Profile <EyeOutlined />
+          Profile &nbsp; <EyeOutlined />
         </Link>
       </Button>
     ),
@@ -52,7 +52,7 @@ const Header = () => {
               const subMenuItems = item.subMenu.map((subItem, subIndex) => ({
                 key: subItem.path,
                 label: (
-                  <Link 
+                  <Link
                     to={subItem.path}
                     className={
                       location.pathname === subItem.path ? "active" : ""
@@ -69,7 +69,13 @@ const Header = () => {
                   menu={{ items: subMenuItems }}
                   trigger={["click"]}
                 >
-                  <Button size="large" style={{backgroundColor: isActive ? "#4D908E" : "", color: isActive? 'white' : ''}}>
+                  <Button
+                    size="large"
+                    style={{
+                      backgroundColor: isActive ? "#4D908E" : "",
+                      color: isActive ? "white" : "",
+                    }}
+                  >
                     <Space>
                       {item.name}
                       <DownOutlined />
@@ -92,9 +98,12 @@ const Header = () => {
                 <Link
                   to={item.path}
                   className={`header-right-item ${isActive ? "active" : ""}`}
-                  style={{width: '100%'}}
+                  style={{ width: "100%" }}
                 >
-                  <span style={{width: '100%'}} className={`button-name ${isActive ? "active" : ""}`}>
+                  <span
+                    style={{ width: "100%" }}
+                    className={`button-name ${isActive ? "active" : ""}`}
+                  >
                     {item.name}
                   </span>
                 </Link>
