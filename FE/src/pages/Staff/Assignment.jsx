@@ -211,14 +211,12 @@ const AssignmentInvigilator = () => {
               onCancel={() => setModalVisible(false)}
               footer={null}
             >
-              <div style={{ overflowY: "auto", maxHeight: "400px" }}>
-                <Table
-                  columns={assignmentColumns}
-                  dataSource={selectedAssignment} // Use the selected assignment data
-                  pagination={false} // Disable pagination for simplicity
-                  rowKey="id" // Ensure each row has a unique key
-                />
-              </div>
+              <Table
+                columns={assignmentColumns}
+                dataSource={selectedAssignment} // Use the selected assignment data
+                pagination={false} // Disable pagination for simplicity
+                rowKey="id" // Ensure each row has a unique key
+              />
             </Modal>
           </Content>
         </Spin>

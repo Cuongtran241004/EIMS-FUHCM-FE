@@ -9,8 +9,7 @@ import {
   Dropdown,
   Button,
   Form,
-  Select,
-  DatePicker,
+  Checkbox,
   Calendar,
   theme,
   Modal,
@@ -23,7 +22,9 @@ import {
   DownOutlined,
   EyeOutlined,
   ForwardOutlined,
+  ReloadOutlined,
 } from "@ant-design/icons";
+import "./CustomModal.css";
 const { Content, Sider } = Layout;
 import { selectButtonStyle } from "../../design-systems/CSS/Button.js";
 import { titleStyle } from "../../design-systems/CSS/Title.js";
@@ -32,10 +33,7 @@ import { staffMapperUtil } from "../../utils/Mapper/StaffMapperUtil.jsx";
 import moment from "moment";
 import dayjs from "dayjs"; // Import dayjs
 import attendanceApi from "../../services/InvigilatorAttendance.js";
-import {
-  examScheduleTag,
-  examTypeTag,
-} from "../../design-systems/CustomTag.jsx";
+import { examTypeTag } from "../../design-systems/CustomTag.jsx";
 const Attendance = () => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -142,6 +140,25 @@ const Attendance = () => {
   const handleCheckOut = () => {
     // Handle check-out action
   };
+
+  const [selectedRowKeys, setSelectedRowKeys] = useState([]);
+  const [checkAll, setCheckAll] = useState(false);
+
+  const handleCheckAll = (e) => {
+    const checked = e.target.checked;
+    setCheckAll(checked);
+    setSelectedRowKeys(checked ? attendance.map((item) => item.id) : []);
+  };
+
+  const handleCheckboxChange = (id) => {
+    setSelectedRowKeys((prevSelected) => {
+      const newSelected = prevSelected.includes(id)
+        ? prevSelected.filter((id) => id !== id)
+        : [...prevSelected, id];
+      setCheckAll(newSelected.length === attendance.length);
+      return newSelected;
+    });
+  };
   // Define columns for the Table
   const columns = [
     {
@@ -232,15 +249,20 @@ const Attendance = () => {
       render: (text, record) => `${record.lastName} ${record.firstName} `,
     },
     {
-      title: "Action",
-      dataIndex: "action",
-      key: "action",
+      title: (
+        <Checkbox checked={checkAll} onChange={handleCheckAll}>
+          Check All
+        </Checkbox>
+      ),
+      dataIndex: "check",
+      key: "check",
       align: "center",
-      // checkbox to mark attendance
       render: (text, record) => (
-        <Form.Item name="attendance" valuePropName="checked">
-          <input type="checkbox" />
-        </Form.Item>
+        <Checkbox
+          value={record.fuId}
+          checked={selectedRowKeys.includes(record.id)}
+          onChange={() => handleCheckboxChange(record.id)}
+        />
       ),
     },
   ];
@@ -296,7 +318,23 @@ const Attendance = () => {
       </div>
     );
   };
-
+  const handleSave = async () => {
+    setLoading(true);
+    try {
+      // Call the API to save the attendance
+      const response = await attendanceApi.updateCheckinList(selectedRowKeys);
+      if (response) {
+        message.success("Checkin saved successfully");
+        setModalVisible(false);
+      } else {
+        message.error("Failed to save attendance");
+      }
+    } catch (error) {
+      message.error("Failed to save attendance");
+    } finally {
+      setLoading(false);
+    }
+  };
   return (
     <Layout style={{ height: "100vh" }}>
       <Header />
@@ -388,16 +426,25 @@ const Attendance = () => {
               open={modalVisible}
               onCancel={() => setModalVisible(false)}
               footer={null}
+              className="scrollable-modal"
             >
               <Table
+                className="modal-content-container"
                 columns={attendanceColumns}
                 dataSource={attendance} // Use the selected assignment data
                 pagination={false} // Disable pagination for simplicity
                 rowKey="id" // Ensure each row has a unique key
               />
-              <Space>
-                <Button danger>Return</Button>
-                <Button>Save</Button>
+              <Space
+                style={{ display: "flex", justifyContent: "space-between" }}
+              >
+                <Button danger onClick={() => setModalVisible(false)}>
+                  <BackwardOutlined />
+                  Return
+                </Button>
+                <Button onClick={handleSave}>
+                  Save <ReloadOutlined />
+                </Button>
               </Space>
             </Modal>
           </Spin>

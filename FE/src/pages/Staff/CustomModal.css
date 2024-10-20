@@ -1,0 +1,8 @@
+.scrollable-modal .modal-content-container {
+  max-height: 500px; /* Adjust the max height as needed */
+  overflow-y: auto; /* Enable vertical scrolling if the content is too long */
+  padding: 16px; /* Optional: Add padding inside the content area */
+}
+.modal-content-container .ant-table-cell {
+  padding: 16px !important; /* Remove padding inside table cells */
+}

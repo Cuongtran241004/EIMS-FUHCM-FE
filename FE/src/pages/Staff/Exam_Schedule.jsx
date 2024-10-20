@@ -431,7 +431,6 @@ const Exam_Schedule = () => {
               dataSource={examSchedule}
               columns={examScheduleTable(
                 handleRoomClick,
-                handleAssignmentClick,
                 handleEdit,
                 handleDelete
               )}
