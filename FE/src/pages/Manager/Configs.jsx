@@ -10,6 +10,7 @@ import {
   Popconfirm,
   InputNumber,
   Typography,
+  Spin,
 } from "antd";
 import configApi from "../../services/Config.js";
 
@@ -54,6 +55,7 @@ const EditableCell = ({
 };
 
 const Configs = ({ isLogin }) => {
+  const [loading, setLoading] = useState(false);
   const [configs, setConfigs] = useState([]);
   const [form] = Form.useForm();
   const [editingKey, setEditingKey] = useState("");
@@ -61,6 +63,7 @@ const Configs = ({ isLogin }) => {
   const isEditing = (record) => record.key === editingKey;
 
   const fetchConfigs = async () => {
+    setLoading(true);
     try {
       const hourly_rate = await configApi.getHourlyRate();
       console.log(hourly_rate);
@@ -126,6 +129,8 @@ const Configs = ({ isLogin }) => {
       setConfigs(result);
     } catch (error) {
       message.error("Failed to fetch configs");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -264,22 +269,24 @@ const Configs = ({ isLogin }) => {
             <div style={{ marginBottom: "20px", textAlign: "center" }}>
               <h2 style={titleStyle}>Configs System</h2>
             </div>
-            <div style={{ width: "60%", margin: "0 auto" }}>
-              <Form form={form} component={false}>
-                <Table
-                  bordered
-                  components={{
-                    body: {
-                      cell: EditableCell,
-                    },
-                  }}
-                  dataSource={configs}
-                  columns={mergedColumns}
-                  rowClassName="editable-row"
-                  pagination={false}
-                />
-              </Form>
-            </div>
+            <Spin spinning={loading}>
+              <div style={{ width: "60%", margin: "0 auto" }}>
+                <Form form={form} component={false}>
+                  <Table
+                    bordered
+                    components={{
+                      body: {
+                        cell: EditableCell,
+                      },
+                    }}
+                    dataSource={configs}
+                    columns={mergedColumns}
+                    rowClassName="editable-row"
+                    pagination={false}
+                  />
+                </Form>
+              </div>
+            </Spin>
           </Content>
         </Layout>
       </Layout>
