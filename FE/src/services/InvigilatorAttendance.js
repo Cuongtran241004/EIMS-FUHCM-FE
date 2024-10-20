@@ -150,3 +150,5 @@ const attendanceApi = {
     }
   },
 };
+
+export default attendanceApi;

@@ -12,7 +12,7 @@ const STAFF_EXAM_URL = "/exams";
 const STAFF_EXAM_SCHEDULE_URL = "/exam-schedule";
 const STAFF_ATTENDANCE_URL = "/attendance";
 const STAFF_ROOM_SELECTION_URL = "/exam-schedule/:examSlotId/room";
-const STAFF_ASSIGNMENT_URL = "/exam-schedule/:examSlotId/assignment";
+const STAFF_ASSIGNMENT_URL = "/assignment";
 
 // INVIGILATOR
 

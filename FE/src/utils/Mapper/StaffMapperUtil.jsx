@@ -71,5 +71,21 @@ const staffMapperUtil = {
       };
     });
   },
+  mapAllAttendanceByDate: (attendances) => {
+    // check if attendance is an array
+    if (!Array.isArray(attendances)) {
+      return [];
+    }
+    return attendances.map((item) => {
+      return {
+        key: item.id,
+        id: item.id,
+        startAt: item.startAt,
+        endAt: item.endAt,
+        examSlotId: item.examSlotId,
+        status: item.status,
+      };
+    });
+  },
 };
 export { staffMapperUtil };

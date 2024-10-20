@@ -10,6 +10,7 @@ import examSlotApi from "../../services/ExamSlot";
 import { useParams } from "react-router-dom";
 import { staffMapperUtil } from "../../utils/Mapper/StaffMapperUtil";
 import moment from "moment";
+import Header from "../../components/Header/Header.jsx";
 const { Content } = Layout;
 
 const AssignmentInvigilator = () => {
@@ -104,50 +105,34 @@ const AssignmentInvigilator = () => {
   ];
 
   return (
-    <Layout
-      style={{ maxWidth: "80%", margin: "0 auto", backgroundColor: "#fff" }}
-    >
-      <div
-        style={{
-          margin: "5px",
-          textAlign: "center",
-          backgroundColor: "#4D908E",
-        }}
-      >
-        <h2 style={titleAssignmentStyle}>INVIGILATOR ASSIGNMENT</h2>
-
-        <Tag
-          color="green"
-          style={{
-            fontSize: "18px",
-            marginBottom: "10px",
-            textAlign: "center",
-            boxShadow: "0 4px 4px 0 rgba(0,0,0,0.4)",
-          }}
-        >
-          <strong>
-            {" "}
-            {examSlot.subjectCode} - {examSlot.examType}
-          </strong>
-          <br></br>
-          {moment(examSlot.startAt).format("DD-MM-YYYY")} ({" "}
-          {moment(examSlot.endAt).format("HH:MM")} -{" "}
-          {moment(examSlot.startAt).format("HH:MM")})
-        </Tag>
-      </div>
-      <Content style={{ padding: "24px", background: "#fff" }}>
+    <Layout style={{ height: "100vh" }}>
+      <Header />
+      <Layout>
         <Spin spinning={loading}>
-          <Table
-            dataSource={data}
-            columns={columns}
-            pagination={{
-              pageSize,
-              current: currentPage,
-              onChange: (page) => setCurrentPage(page),
-            }}
-          />
+          <Content style={{ padding: "0 50px" }}>
+            <div style={titleAssignmentStyle}>
+              <h1 style={titleStyle}>Assignment</h1>
+              <h2>{examSlot.subjectName}</h2>
+              <h3>
+                {examSlot.subjectCode} - {examSlot.examType}
+              </h3>
+              <h3>
+                {moment(examSlot.startAt).format("DD/MM/YYYY")} -{" "}
+                {moment(examSlot.endAt).format("DD/MM/YYYY")}
+              </h3>
+            </div>
+            <Table
+              columns={columns}
+              dataSource={data}
+              pagination={{
+                pageSize: pageSize,
+                current: currentPage,
+                onChange: (page) => setCurrentPage(page),
+              }}
+            />
+          </Content>
         </Spin>
-      </Content>
+      </Layout>
     </Layout>
   );
 };
