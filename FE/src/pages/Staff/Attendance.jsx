@@ -36,7 +36,9 @@ import attendanceApi from "../../services/InvigilatorAttendance.js";
 import { examTypeTag } from "../../design-systems/CustomTag.jsx";
 const Attendance = () => {
   const [data, setData] = useState([]);
+  const [loadingData, setLoadingData] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [saveLoading, setSaveLoading] = useState(false);
   const {
     selectedSemester,
     setSelectedSemester,
@@ -47,16 +49,19 @@ const Attendance = () => {
   const [availableAttendance, setAvailableAttendance] = useState([]);
   const [attendance, setAttendance] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
+  const [isCheckIn, setIsCheckIn] = useState(false);
   const [today, setToday] = useState(dayjs()); // Use dayjs instead of Date
   const [selectedDate, setSelectedDate] = useState(
     dayjs(selectedSemester.startAt)
   );
   const [currentPage, setCurrentPage] = useState(1);
+  const [selectedRowKeys, setSelectedRowKeys] = useState([]);
+  const [checkAll, setCheckAll] = useState(false);
   const pageSize = 6;
 
   // Fetch exam schedule data
   const fetchExamSlot = async () => {
-    setLoading(true);
+    setLoadingData(true);
     try {
       // Define today's date at the start of the day (using currentDate)
       const date = selectedDate.format("YYYY-MM-DD");
@@ -68,7 +73,7 @@ const Attendance = () => {
     } catch (error) {
       message.error("Failed to fetch exam schedule");
     } finally {
-      setLoading(false);
+      setLoadingData(false);
     }
   };
 
@@ -98,6 +103,7 @@ const Attendance = () => {
       setSelectedDate(dayjs(selected.startAt));
     }
   };
+
   const getHistoryAttendance = async () => {
     setLoading(true);
     try {
@@ -123,22 +129,25 @@ const Attendance = () => {
 
   const handleCheckIn = async (examSlotId) => {
     setLoading(true);
+    setIsCheckIn(true);
     try {
       // Assign invigilators
       const response =
         await attendanceApi.getAttendanceByExamSlotId(examSlotId);
 
       const result = staffMapperUtil.mapAttendance(response);
-      console.log(result);
+
       // loop all object of result, if checkIn not null, setSelectedRowKeys
       // if checkIn is null, setSelectedRowKeys to empty array
       const checkedbox = result.map((item) => {
         return item.checkIn != null ? item.id : null;
       });
-      // disabled checkbox if checkIn is not null
 
-      setSelectedRowKeys(checkedbox);
+      const check = checkedbox.filter((item) => item != null);
+
+      setSelectedRowKeys(check);
       setAttendance(result || []);
+
       setModalVisible(true);
     } catch (error) {
       message.error("Failed to assign invigilators.");
@@ -146,13 +155,60 @@ const Attendance = () => {
       setLoading(false);
     }
   };
-  const handleCheckOut = () => {
-    // Handle check-out action
+
+  const handleCheckOut = async (examSlotId) => {
+    setLoading(true);
+    setIsCheckIn(false);
+    try {
+      // Assign invigilators
+      const response =
+        await attendanceApi.getAttendanceByExamSlotId(examSlotId);
+
+      const result = staffMapperUtil.mapAttendance(response);
+
+      const checkedbox = result.map((item) => {
+        return item.checkOut != null ? item.id : null;
+      });
+
+      const check = checkedbox.filter((item) => item != null);
+
+      setSelectedRowKeys(check);
+      setAttendance(result || []);
+
+      setModalVisible(true);
+    } catch (error) {
+      message.error("Failed to assign invigilators.");
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const [selectedRowKeys, setSelectedRowKeys] = useState([]);
-  const [checkAll, setCheckAll] = useState(false);
+  const handleSave = async () => {
+    setSaveLoading(true);
+    try {
+      // Call the API to save the attendance
+      const response = isCheckIn
+        ? await attendanceApi.updateCheckinList(selectedRowKeys)
+        : await attendanceApi.updateCheckoutList(selectedRowKeys);
 
+      if (response) {
+        message.success("Check attendance saved successfully");
+        setModalVisible(false);
+      } else {
+        message.error("Failed to save attendance");
+      }
+    } catch (error) {
+      message.error("Failed to save attendance");
+    } finally {
+      setSaveLoading(false);
+      setIsCheckIn(!isCheckIn);
+    }
+  };
+
+  const handleReturn = () => {
+    setModalVisible(false);
+    setIsCheckIn(!isCheckIn);
+  };
   const handleCheckAll = (e) => {
     const checked = e.target.checked;
     setCheckAll(checked);
@@ -220,6 +276,7 @@ const Attendance = () => {
             type="text"
             style={{ backgroundColor: "#43AA8B", color: "#fff" }}
             size="middle"
+            loading={loading && isCheckIn}
             onClick={() => handleCheckIn(record.id)}
           >
             Check-in
@@ -228,6 +285,7 @@ const Attendance = () => {
             type="link"
             size="middle"
             style={{ backgroundColor: "#F9844A", color: "#fff" }}
+            loading={loading && !isCheckIn}
             onClick={() => handleCheckOut(record.id)}
           >
             Check-out
@@ -237,6 +295,7 @@ const Attendance = () => {
     },
     // Add more columns as necessary
   ];
+
   const attendanceColumns = [
     {
       title: "No",
@@ -275,6 +334,7 @@ const Attendance = () => {
       ),
     },
   ];
+
   const { token } = theme.useToken();
   const wrapperStyle = {
     width: 280,
@@ -327,23 +387,7 @@ const Attendance = () => {
       </div>
     );
   };
-  const handleSave = async () => {
-    setLoading(true);
-    try {
-      // Call the API to save the attendance
-      const response = await attendanceApi.updateCheckinList(selectedRowKeys);
-      if (response) {
-        message.success("Checkin saved successfully");
-        setModalVisible(false);
-      } else {
-        message.error("Failed to save attendance");
-      }
-    } catch (error) {
-      message.error("Failed to save attendance");
-    } finally {
-      setLoading(false);
-    }
-  };
+
   return (
     <Layout style={{ height: "100vh" }}>
       <Header />
@@ -419,7 +463,7 @@ const Attendance = () => {
             </Dropdown>
           </div>
 
-          <Spin spinning={loading}>
+          <Spin spinning={loadingData}>
             <Table
               dataSource={data}
               columns={columns}
@@ -430,33 +474,31 @@ const Attendance = () => {
                 onChange: (page) => setCurrentPage(page),
               }}
             />
-            <Modal
-              title="Check Attendance"
-              open={modalVisible}
-              onCancel={() => setModalVisible(false)}
-              footer={null}
-              className="scrollable-modal"
-            >
-              <Table
-                className="modal-content-container"
-                columns={attendanceColumns}
-                dataSource={attendance} // Use the selected assignment data
-                pagination={false} // Disable pagination for simplicity
-                rowKey="id" // Ensure each row has a unique key
-              />
-              <Space
-                style={{ display: "flex", justifyContent: "space-between" }}
-              >
-                <Button danger onClick={() => setModalVisible(false)}>
-                  <BackwardOutlined />
-                  Return
-                </Button>
-                <Button onClick={handleSave} loading={loading}>
-                  Save <ReloadOutlined />
-                </Button>
-              </Space>
-            </Modal>
           </Spin>
+          <Modal
+            title="Check Attendance"
+            open={modalVisible}
+            onCancel={() => setModalVisible(false)}
+            footer={null}
+            className="scrollable-modal"
+          >
+            <Table
+              className="modal-content-container"
+              columns={attendanceColumns}
+              dataSource={attendance} // Use the selected assignment data
+              pagination={false} // Disable pagination for simplicity
+              rowKey="id" // Ensure each row has a unique key
+            />
+            <Space style={{ display: "flex", justifyContent: "space-between" }}>
+              <Button danger onClick={handleReturn}>
+                <BackwardOutlined />
+                Return
+              </Button>
+              <Button onClick={handleSave} loading={saveLoading}>
+                Save <ReloadOutlined />
+              </Button>
+            </Space>
+          </Modal>
         </Content>
       </Layout>
     </Layout>
