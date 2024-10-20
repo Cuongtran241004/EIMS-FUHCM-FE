@@ -87,5 +87,21 @@ const staffMapperUtil = {
       };
     });
   },
+  mapAttendance: (attendances) => {
+    // check if attendance is an array
+    if (!Array.isArray(attendances)) {
+      return [];
+    }
+    return attendances.map((item) => {
+      return {
+        key: item.id,
+        id: item.id,
+        firstName: item.invigilatorFirstName,
+        lastName: item.invigilatorLastName,
+        fuId: item.invigilatorFuId,
+        status: item.status,
+      };
+    });
+  },
 };
 export { staffMapperUtil };

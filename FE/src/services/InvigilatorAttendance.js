@@ -70,6 +70,23 @@ const attendanceApi = {
       handleError(error);
     }
   },
+  getAttendanceByExamSlotId: async (examSlotId) => {
+    try {
+      const response = await axios.get(
+        `${ATTENDANCE_API_BASE_URL}/exam-slot/${examSlotId}`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+          withCredentials: true,
+        }
+      );
+      return response.data;
+    } catch (error) {
+      handleError(error);
+    }
+  },
   addAllAttendanceByDate: async (date) => {
     try {
       const response = await axios.post(

@@ -13,6 +13,7 @@ import {
   DatePicker,
   Calendar,
   theme,
+  Modal,
 } from "antd";
 import examSlotApi from "../../services/ExamSlot.js";
 import { useSemester } from "../../components/Context/SemesterContext.jsx";
@@ -46,7 +47,8 @@ const Attendance = () => {
   } = useSemester(); // Access shared semester state
   const [form] = Form.useForm();
   const [availableAttendance, setAvailableAttendance] = useState([]);
-  const [allAttendance, setAllAttendance] = useState([]);
+  const [attendance, setAttendance] = useState([]);
+  const [modalVisible, setModalVisible] = useState(false);
   const [today, setToday] = useState(dayjs()); // Use dayjs instead of Date
   const [selectedDate, setSelectedDate] = useState(
     dayjs(selectedSemester.startAt)
@@ -121,6 +123,25 @@ const Attendance = () => {
     }
   };
 
+  const handleCheckIn = async (examSlotId) => {
+    setLoading(true);
+    try {
+      // Assign invigilators
+      const response =
+        await attendanceApi.getAttendanceByExamSlotId(examSlotId);
+      console.log(response);
+      const result = staffMapperUtil.mapAttendance(response);
+      setAttendance(result || []);
+      setModalVisible(true);
+    } catch (error) {
+      message.error("Failed to assign invigilators.");
+    } finally {
+      setLoading(false);
+    }
+  };
+  const handleCheckOut = () => {
+    // Handle check-out action
+  };
   // Define columns for the Table
   const columns = [
     {
@@ -173,6 +194,7 @@ const Attendance = () => {
             type="text"
             style={{ backgroundColor: "#43AA8B", color: "#fff" }}
             size="middle"
+            onClick={() => handleCheckIn(record.id)}
           >
             Check-in
           </Button>
@@ -180,6 +202,7 @@ const Attendance = () => {
             type="link"
             size="middle"
             style={{ backgroundColor: "#F9844A", color: "#fff" }}
+            onClick={() => handleCheckOut(record.id)}
           >
             Check-out
           </Button>
@@ -188,7 +211,39 @@ const Attendance = () => {
     },
     // Add more columns as necessary
   ];
-
+  const attendanceColumns = [
+    {
+      title: "No",
+      dataIndex: "no",
+      key: "no",
+      align: "center",
+      render: (_, __, index) => index + 1,
+    },
+    {
+      title: "FuId",
+      dataIndex: "fuId",
+      key: "fuId",
+      align: "center",
+    },
+    {
+      title: "Full Name",
+      dataIndex: "fullName",
+      key: "fullName",
+      render: (text, record) => `${record.lastName} ${record.firstName} `,
+    },
+    {
+      title: "Action",
+      dataIndex: "action",
+      key: "action",
+      align: "center",
+      // checkbox to mark attendance
+      render: (text, record) => (
+        <Form.Item name="attendance" valuePropName="checked">
+          <input type="checkbox" />
+        </Form.Item>
+      ),
+    },
+  ];
   const { token } = theme.useToken();
   const wrapperStyle = {
     width: 280,
@@ -328,6 +383,23 @@ const Attendance = () => {
                 onChange: (page) => setCurrentPage(page),
               }}
             />
+            <Modal
+              title="Check Attendance"
+              open={modalVisible}
+              onCancel={() => setModalVisible(false)}
+              footer={null}
+            >
+              <Table
+                columns={attendanceColumns}
+                dataSource={attendance} // Use the selected assignment data
+                pagination={false} // Disable pagination for simplicity
+                rowKey="id" // Ensure each row has a unique key
+              />
+              <Space>
+                <Button danger>Return</Button>
+                <Button>Save</Button>
+              </Space>
+            </Modal>
           </Spin>
         </Content>
       </Layout>
