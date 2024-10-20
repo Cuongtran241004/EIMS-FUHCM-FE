@@ -31,7 +31,10 @@ import { staffMapperUtil } from "../../utils/Mapper/StaffMapperUtil.jsx";
 import moment from "moment";
 import dayjs from "dayjs"; // Import dayjs
 import attendanceApi from "../../services/InvigilatorAttendance.js";
-import { examScheduleTag } from "../../design-systems/CustomTag.jsx";
+import {
+  examScheduleTag,
+  examTypeTag,
+} from "../../design-systems/CustomTag.jsx";
 const Attendance = () => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -44,8 +47,10 @@ const Attendance = () => {
   const [form] = Form.useForm();
   const [availableAttendance, setAvailableAttendance] = useState([]);
   const [allAttendance, setAllAttendance] = useState([]);
-  const [currentDate, setCurrentDate] = useState(dayjs()); // Use dayjs instead of Date
-  const [selectedDate, setSelectedDate] = useState(dayjs());
+  const [today, setToday] = useState(dayjs()); // Use dayjs instead of Date
+  const [selectedDate, setSelectedDate] = useState(
+    dayjs(selectedSemester.startAt)
+  );
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 6;
 
@@ -55,10 +60,10 @@ const Attendance = () => {
     try {
       // Define today's date at the start of the day (using currentDate)
       const date = selectedDate.format("YYYY-MM-DD");
-      console.log("date", date);
+
       const response = await attendanceApi.getExamSlotByDate(date);
       const result = staffMapperUtil.mapExamSchedule(response);
-      console.log("result", result);
+
       setData(result || []);
     } catch (error) {
       message.error("Failed to fetch exam schedule");
@@ -83,6 +88,14 @@ const Attendance = () => {
         startAt: selected.startAt,
         endAt: selected.endAt,
       });
+    }
+    if (
+      dayjs(selected.startAt).isBefore(today) &&
+      dayjs(today).isBefore(selected.endAt)
+    ) {
+      setSelectedDate(dayjs(today));
+    } else {
+      setSelectedDate(dayjs(selected.startAt));
     }
   };
   const getHistoryAttendance = async () => {
@@ -128,7 +141,7 @@ const Attendance = () => {
       dataIndex: "examType",
       key: "examType",
       align: "center",
-      render: (text) => examScheduleTag(text),
+      render: (text) => examTypeTag(text),
     },
     {
       title: "Date",
@@ -184,7 +197,7 @@ const Attendance = () => {
     marginTop: "20px",
   };
   const handleClear = () => {
-    setSelectedDate(currentDate); // Clear the selected date
+    setSelectedDate(today); // Clear the selected date
     // view available attendance
     setData(availableAttendance);
   };
@@ -204,7 +217,7 @@ const Attendance = () => {
   };
   const onPanelChange = () => {
     setSelectedDate(null); // Update the selected date
-    setCurrentDate(dayjs()); // Update the current date
+    setToday(dayjs()); // Update the current date
   };
   // Custom header rendering
   const headerRender = () => {
