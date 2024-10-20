@@ -7,6 +7,9 @@ import Request from "./pages/Manager/Request";
 import Semester from "./pages/Manager/Semester";
 import ExamSlots from "./pages/Manager/ExamSlots";
 import AttendanceCheck from "./pages/Manager/AttendanceCheck";
+import Configs from "./pages/Manager/Configs";
+import InvigilatorAttendance from "./pages/Manager/InvigilatorAttendance";
+import InvigilatorFees from "./pages/Manager/InvigilatorFees";
 import Subject from "./pages/Staff/Subject";
 import Exam from "./pages/Staff/Exam";
 import RoomSelectionPage from "./pages/Staff/Room";
@@ -16,7 +19,6 @@ import InvigilatorDashboard from "./pages/Invigilator/InvigilatorDashboard";
 import InvigilatorRegistration from "./pages/Invigilator/InvigilatorRegistration";
 import InvigilatorRequest from "./pages/Invigilator/InvigilatorRequest";
 import InvigilatorRequestsList from "./pages/Invigilator/InvigilatorRequestList";
-import NotFound from "./pages/Home/NotFound.jsx";
 import { getUserInfo } from "./components/API/getUserInfo";
 import { SemesterProvider } from "./components/Context/SemesterContext.jsx";
 import { SemesterProviderInvigilator } from "./components/SemesterContext.jsx";
@@ -104,6 +106,15 @@ function App() {
             <Route
               path={MANAGER_ATTENDENCE_CHECK_URL}
               element={<AttendanceCheck />}
+            />
+            <Route path={MANAGER_CONFIGS_URL} element={<Configs />} />
+            <Route
+              path={MANAGER_INVIGILATOR_ATTENDANCE_URL}
+              element={<InvigilatorAttendance />}
+            />
+            <Route
+              path={MANAGER_INVIGILATOR_FEES_URL}
+              element={<InvigilatorFees />}
             />
           </>
         )}
