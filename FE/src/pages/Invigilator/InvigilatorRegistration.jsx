@@ -182,7 +182,7 @@ function InvigilatorRegistration() {
     <div>
       <p style={{ margin: 0, fontWeight: 500, fontSize: 13.33333 }}>
         {moment(event.startAt).format('HH:mm')} - {moment(event.endAt).format('HH:mm')}
-        <br /><span style={{ fontSize: '0.625rem' }}>(Registed: {event.numberOfRegistered}/Total: {event.requiredInvigilators})</span>
+        <span style={{ fontSize: '0.625rem' }}> (R: {event.numberOfRegistered}/T: {event.requiredInvigilators})</span>
       </p>
     </div>
   );
@@ -283,6 +283,8 @@ function InvigilatorRegistration() {
               <span style={{ marginRight: 10, fontSize: 13, color: 'rgb(221, 221, 221)' }}>Not full</span>
               <span style={{ marginRight: 10, fontSize: 13, color: 'rgb(83, 41, 236)' }}>Not open</span>
             </p>
+            <p><span style={{ marginRight: 10, fontSize: 13 }}>R: Registered</span>
+              <span style={{ marginRight: 10, fontSize: 13 }}>T: Total</span></p>
             <p style={{ fontStyle: 'italic' }}>*Note: Arrive {getConfigValue(ConfigType.TIME_BEFORE_EXAM)} minutes before exam time in room <span style={{ fontWeight: 'bolder' }}>{getConfigValue(ConfigType.INVIGILATOR_ROOM)}</span>.</p>
 
           </div>
@@ -334,7 +336,7 @@ function InvigilatorRegistration() {
                 const openAt = moment(slot.startAt).subtract(getConfigValue(ConfigType.TIME_BEFORE_OPEN_REGISTRATION), 'days');
                 const closeAt = moment(slot.startAt).subtract(getConfigValue(ConfigType.TIME_BEFORE_CLOSE_REGISTRATION), 'days');
                 const isCancelable = currentDate.isBetween(openAt, closeAt);
-                return !isCancelable; 
+                return !isCancelable;
               }) && <p>No registered slots available to cancel.</p>}
 
             </div>
