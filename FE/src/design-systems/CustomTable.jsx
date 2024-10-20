@@ -69,20 +69,21 @@ const examScheduleTable = (
       </Button>
     ),
   },
-  {
-    title: "Invigilator",
-    key: "invigilator",
-    align: "center",
-    render: (text, record) => (
-      <Button type="text" onClick={() => handleAssignmentClick(record.id)}>
-        <PlusCircleOutlined style={{ fontSize: "20px", color: "#43AA8B" }} />
-      </Button>
-    ),
-  },
+  // {
+  //   title: "Invigilator",
+  //   key: "invigilator",
+  //   align: "center",
+  //   render: (text, record) => (
+  //     <Button type="text" onClick={() => handleAssignmentClick(record.id)}>
+  //       <PlusCircleOutlined style={{ fontSize: "20px", color: "#43AA8B" }} />
+  //     </Button>
+  //   ),
+  // },
   {
     title: "Status",
     dataIndex: "status",
     key: "status",
+    width: "10%",
     render: (status) => examScheduleTag(status),
   },
   {

@@ -237,9 +237,6 @@ const Exam_Schedule = () => {
     navigate(`/exam-schedule/${examSlotId}/room`);
   };
 
-  const handleAssignmentClick = (examSlotId) => {
-    navigate(`/exam-schedule/${examSlotId}/assignment`);
-  };
   // Handle semester selection in the form
   const handleSemesterChange = async (value) => {
     console.log("Selected semester:", value);
