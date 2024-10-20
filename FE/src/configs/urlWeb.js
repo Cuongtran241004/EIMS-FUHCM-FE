@@ -5,6 +5,8 @@ const MANAGER_ATTENDENCE_CHECK_URL = "/attendance-check";
 const MANAGER_USERS_URL = "/users";
 const MANAGER_SEMESTER_URL = "/semester";
 const MANAGER_REQUESTS_URL = "/requests";
+const MANAGER_INVIGILATOR_ATTENDANCE_URL = "/invigilator-attendance";
+const MANAGER_INVIGILATOR_FEES_URL = "/invigilation-fees";
 
 // STAFF
 const STAFF_SUBJECT_URL = "/subjects";
@@ -29,4 +31,6 @@ export {
   STAFF_ATTENDANCE_URL,
   STAFF_ROOM_SELECTION_URL,
   STAFF_ASSIGNMENT_URL,
+  MANAGER_INVIGILATOR_ATTENDANCE_URL,
+  MANAGER_INVIGILATOR_FEES_URL,
 };
