@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Table, message, Tag } from "antd";
 import { getRequests } from "../../components/API/getRequests";
+import moment from "moment";
 
 function InvigilatorRequestsList() {
   const [requests, setRequests] = useState([]);
@@ -38,9 +39,9 @@ function InvigilatorRequestsList() {
       title: "Slot Details",
       key: "slotDetails",
       render: (record) => {
-        const date = new Date(record.startAt).toLocaleDateString();
-        const startTime = new Date(record.startAt).toLocaleTimeString();
-        const endTime = new Date(record.endAt).toLocaleTimeString();
+        const date = moment(record.startAt).format("DD/MM/YYYY");
+        const startTime = moment(record.startAt).format("HH:mm");
+        const endTime = moment(record.endAt).format("HH:mm");
         return (
           <div>
             <div>
@@ -60,8 +61,8 @@ function InvigilatorRequestsList() {
       title: "Created At",
       dataIndex: "createdAt",
       key: "createdAt",
-      render: (text) => new Date(text).toLocaleString(),
-      sorter: (a, b) => new Date(b.createdAt) - new Date(a.createdAt),
+      render: (text) => moment(text).format("DD/MM/YYYY HH:mm"),
+      sorter: (a, b) => moment(b.createdAt) - moment(a.createdAt),
     },
     {
       title: "Reason",
@@ -103,7 +104,7 @@ function InvigilatorRequestsList() {
       key: "updatedAt",
       render: (text, record) => {
         if (record.status === "APPROVED" || record.status === "REJECTED") {
-          return new Date(text).toLocaleString();
+          return moment(text).format("DD/MM/YYYY HH:mm");
         }
         return null;
       },
