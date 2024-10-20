@@ -4,6 +4,7 @@ import semesterApi from "../../services/Semester.js";
 import examSlotApi from "../../services/ExamSlot.js";
 import attendanceApi from "../../services/InvigilatorAttendance.js";
 import moment from "moment";
+import configApi from "../../services/Config.js";
 // Create a context for the semester
 const SemesterContext = createContext();
 
@@ -14,6 +15,7 @@ export const SemesterProvider = ({ children }) => {
     id: null,
     name: "Select semester",
   });
+
   const [availableSemesters, setAvailableSemesters] = useState([]);
   const [examSlotBySemester, setExamSlotBySemester] = useState([]);
 
@@ -62,6 +64,7 @@ export const SemesterProvider = ({ children }) => {
       message.error("Failed to fetch today attendance");
     }
   };
+
   useEffect(() => {
     const fetchExamSlotBySemester = async () => {
       if (selectedSemester.id) {
@@ -70,7 +73,6 @@ export const SemesterProvider = ({ children }) => {
             selectedSemester.id
           );
           setExamSlotBySemester(result);
-          console.log(result);
         } catch (error) {
           message.error("Failed to fetch exam slots");
         }

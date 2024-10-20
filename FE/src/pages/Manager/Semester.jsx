@@ -118,8 +118,8 @@ const Semester = ({ isLogin }) => {
     form.setFieldsValue({
       name: semester.name,
       dateRange: [moment(semester.startAt), moment(semester.endAt)],
-      hourlyConfig: semester.hourlyConfig,
-      allowedSlotConfig: semester.allowedSlotConfig,
+      // hourlyConfig: semester.hourlyConfig,
+      // allowedSlotConfig: semester.allowedSlotConfig,
     });
     setIsModalVisible(true);
   };
@@ -144,21 +144,21 @@ const Semester = ({ isLogin }) => {
       align: "center",
       render: (text) => moment(text).format("YYYY-MM-DD"),
     },
-    {
-      title: "Hour Rate",
-      dataIndex: "hourlyConfig",
-      key: "hourlyConfig",
-      align: "center",
-      render: (text) => {
-        // Format the value as Vietnamese currency
-        return `${text.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")} ₫`;
-      },
-    },
-    {
-      title: "Max Slot",
-      dataIndex: "allowedSlotConfig",
-      key: "allowedSlotConfig",
-    },
+    // {
+    //   title: "Hour Rate",
+    //   dataIndex: "hourlyConfig",
+    //   key: "hourlyConfig",
+    //   align: "center",
+    //   render: (text) => {
+    //     // Format the value as Vietnamese currency
+    //     return `${text.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")} ₫`;
+    //   },
+    // },
+    // {
+    //   title: "Max Slot",
+    //   dataIndex: "allowedSlotConfig",
+    //   key: "allowedSlotConfig",
+    // },
     {
       title: "Action",
       key: "action",

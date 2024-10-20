@@ -8,6 +8,7 @@ import {
 import { Link, useLocation } from "react-router-dom";
 import {
   MANAGER_ATTENDENCE_CHECK_URL,
+  MANAGER_CONFIGS_URL,
   MANAGER_EXAM_SCHEDULE_URL,
   MANAGER_SEMESTER_URL,
   MANAGER_USERS_URL,
@@ -82,6 +83,14 @@ const items = [
           </Link>
         ),
       },
+      {
+        key: "8",
+        label: (
+          <Link to={MANAGER_CONFIGS_URL} style={{ color: "#fff" }}>
+            Configs
+          </Link>
+        ),
+      },
     ],
   },
 ];
@@ -100,6 +109,7 @@ const NavBar_Manager = () => {
     "/semester": { key: "5", openKey: "sub3" },
     "/exam-slot": { key: "6", openKey: "sub3" },
     "/users": { key: "7", openKey: "sub3" },
+    "/configs": { key: "8", openKey: "sub3" },
   };
 
   // Set selected key and open key when location changes

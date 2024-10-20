@@ -442,7 +442,7 @@ const Attendance = () => {
                   <BackwardOutlined />
                   Return
                 </Button>
-                <Button onClick={handleSave}>
+                <Button onClick={handleSave} loading={loading}>
                   Save <ReloadOutlined />
                 </Button>
               </Space>

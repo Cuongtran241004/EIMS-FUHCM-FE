@@ -12,9 +12,27 @@ const configApi = {
       const response = await axios.get(`${CONFIG_API_BASE_URL}`, {
         headers: {
           "Content-Type": "application/json",
+          Accept: "application/json",
         },
         withCredentials: true,
       });
+      return response.data;
+    } catch (error) {
+      handleError(error);
+    }
+  },
+  getAllConfigsBySemesterId: async (semesterId) => {
+    try {
+      const response = await axios.get(
+        `${CONFIG_API_BASE_URL}/semester/${semesterId}`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+          withCredentials: true,
+        }
+      );
       return response.data;
     } catch (error) {
       handleError(error);
@@ -27,6 +45,7 @@ const configApi = {
         {
           headers: {
             "Content-Type": "application/json",
+            Accept: "application/json",
           },
           withCredentials: true,
         }
@@ -43,6 +62,7 @@ const configApi = {
         {
           headers: {
             "Content-Type": "application/json",
+            Accept: "application/json",
           },
           withCredentials: true,
         }
@@ -57,6 +77,7 @@ const configApi = {
       const response = await axios.get(`${CONFIG_API_BASE_URL}/hourly-rate`, {
         headers: {
           "Content-Type": "application/json",
+          Accept: "application/json",
         },
         withCredentials: true,
       });
@@ -70,6 +91,7 @@ const configApi = {
       const response = await axios.get(`${CONFIG_API_BASE_URL}/allowed-slot`, {
         headers: {
           "Content-Type": "application/json",
+          Accept: "application/json",
         },
         withCredentials: true,
       });
@@ -85,6 +107,7 @@ const configApi = {
         {
           headers: {
             "Content-Type": "application/json",
+            Accept: "application/json",
           },
           withCredentials: true,
         }
@@ -101,6 +124,7 @@ const configApi = {
         {
           headers: {
             "Content-Type": "application/json",
+            Accept: "application/json",
           },
           withCredentials: true,
         }
@@ -117,6 +141,7 @@ const configApi = {
         {
           headers: {
             "Content-Type": "application/json",
+            Accept: "application/json",
           },
           withCredentials: true,
         }
@@ -126,6 +151,7 @@ const configApi = {
       handleError(error);
     }
   },
+
   getAllConfigsBySemester: async (semesterId) => {
     try {
       const response = await axios.get(
@@ -133,6 +159,7 @@ const configApi = {
         {
           headers: {
             "Content-Type": "application/json",
+            Accept: "application/json",
           },
           withCredentials: true,
         }
@@ -150,6 +177,7 @@ const configApi = {
         {
           headers: {
             "Content-Type": "application/json",
+            Accept: "application/json",
           },
           withCredentials: true,
         }
@@ -167,6 +195,7 @@ const configApi = {
         {
           headers: {
             "Content-Type": "application/json",
+            Accept: "application/json",
           },
           withCredentials: true,
         }
@@ -184,6 +213,7 @@ const configApi = {
         {
           headers: {
             "Content-Type": "application/json",
+            Accept: "application/json",
           },
           withCredentials: true,
         }
@@ -201,6 +231,7 @@ const configApi = {
         {
           headers: {
             "Content-Type": "application/json",
+            Accept: "application/json",
           },
           withCredentials: true,
         }
@@ -218,6 +249,7 @@ const configApi = {
         {
           headers: {
             "Content-Type": "application/json",
+            Accept: "application/json",
           },
           withCredentials: true,
         }
@@ -235,6 +267,7 @@ const configApi = {
         {
           headers: {
             "Content-Type": "application/json",
+            Accept: "application/json",
           },
           withCredentials: true,
         }
@@ -252,6 +285,7 @@ const configApi = {
         {
           headers: {
             "Content-Type": "application/json",
+            Accept: "application/json",
           },
           withCredentials: true,
         }
@@ -269,6 +303,7 @@ const configApi = {
         {
           headers: {
             "Content-Type": "application/json",
+            Accept: "application/json",
           },
           withCredentials: true,
         }
@@ -286,6 +321,7 @@ const configApi = {
         {
           headers: {
             "Content-Type": "application/json",
+            Accept: "application/json",
           },
           withCredentials: true,
         }

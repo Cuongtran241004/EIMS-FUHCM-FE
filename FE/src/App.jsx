@@ -33,12 +33,14 @@ import {
   STAFF_ROOM_SELECTION_URL,
   STAFF_SUBJECT_URL,
   STAFF_ASSIGNMENT_URL,
+  MANAGER_CONFIGS_URL,
 } from "./configs/urlWeb.js";
 import "./App.css";
 import ProfilePage from "./pages/Home/Profile.jsx";
 import Header from "./components/Header/Header.jsx";
 import HandlePassword from "./pages/Login/HandlePassword.jsx";
 import AssignmentInvigilator from "./pages/Staff/Assignment.jsx";
+import Configs from "./pages/Manager/Configs.jsx";
 
 function App() {
   const [isLogin, setIsLogin] = useState(false);
@@ -102,6 +104,7 @@ function App() {
               path={MANAGER_ATTENDENCE_CHECK_URL}
               element={<AttendanceCheck />}
             />
+            <Route path={MANAGER_CONFIGS_URL} element={<Configs />} />
           </>
         )}
         {/* Staff Routes */}
