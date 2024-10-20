@@ -96,6 +96,8 @@ const staffMapperUtil = {
       return {
         key: item.id,
         id: item.id,
+        checkIn: item.checkIn,
+        checkOut: item.checkOut,
         firstName: item.invigilatorFirstName,
         lastName: item.invigilatorLastName,
         fuId: item.invigilatorFuId,

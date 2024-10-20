@@ -127,8 +127,17 @@ const Attendance = () => {
       // Assign invigilators
       const response =
         await attendanceApi.getAttendanceByExamSlotId(examSlotId);
-      console.log(response);
+
       const result = staffMapperUtil.mapAttendance(response);
+      console.log(result);
+      // loop all object of result, if checkIn not null, setSelectedRowKeys
+      // if checkIn is null, setSelectedRowKeys to empty array
+      const checkedbox = result.map((item) => {
+        return item.checkIn != null ? item.id : null;
+      });
+      // disabled checkbox if checkIn is not null
+
+      setSelectedRowKeys(checkedbox);
       setAttendance(result || []);
       setModalVisible(true);
     } catch (error) {
