@@ -2,7 +2,8 @@ import React, { createContext, useState, useContext, useEffect } from "react";
 import { message } from "antd"; // Ensure to import message
 import semesterApi from "../../services/Semester.js";
 import examSlotApi from "../../services/ExamSlot.js";
-
+import attendanceApi from "../../services/InvigilatorAttendance.js";
+import moment from "moment";
 // Create a context for the semester
 const SemesterContext = createContext();
 
@@ -34,6 +35,8 @@ export const SemesterProvider = ({ children }) => {
         setSelectedSemester({
           id: sortedSemesters[0].id,
           name: sortedSemesters[0].name,
+          startAt: sortedSemesters[0].startAt.split("T")[0],
+          endAt: sortedSemesters[0].endAt.split("T")[0],
         });
       }
 
@@ -50,6 +53,15 @@ export const SemesterProvider = ({ children }) => {
     }
   };
 
+  const addTodayAttendance = async () => {
+    try {
+      // Add today attendance, params is today (YYYY-MM-DD)
+      const today = moment().format("YYYY-MM-DD");
+      const result = await attendanceApi.addAllAttendanceByDate(today);
+    } catch (error) {
+      message.error("Failed to fetch today attendance");
+    }
+  };
   useEffect(() => {
     const fetchExamSlotBySemester = async () => {
       if (selectedSemester.id) {
@@ -63,13 +75,14 @@ export const SemesterProvider = ({ children }) => {
           message.error("Failed to fetch exam slots");
         }
       }
-    }   
+    };
     fetchExamSlotBySemester();
   }, [selectedSemester]);
 
   // Fetch semesters and set the default selected semester
   useEffect(() => {
     fetchSemesters();
+    addTodayAttendance();
   }, []);
 
   return (

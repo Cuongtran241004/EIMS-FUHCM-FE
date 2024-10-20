@@ -13,6 +13,7 @@ const attendanceApi = {
       const response = await axios.get(`${ATTENDANCE_API_BASE_URL}`, {
         headers: {
           "Content-Type": "application/json",
+          Accept: "application/json",
         },
         withCredentials: true,
       });
@@ -26,6 +27,7 @@ const attendanceApi = {
       const response = await axios.get(`${ATTENDANCE_API_BASE_URL}/today`, {
         headers: {
           "Content-Type": "application/json",
+          Accept: "application/json",
         },
         withCredentials: true,
       });
@@ -39,9 +41,51 @@ const attendanceApi = {
       const response = await axios.get(`${ATTENDANCE_API_BASE_URL}/day`, {
         headers: {
           "Content-Type": "application/json",
+          Accept: "application/json",
         },
         withCredentials: true,
       });
+      return response.data;
+    } catch (error) {
+      handleError(error);
+    }
+  },
+  getExamSlotByDate: async (date) => {
+    try {
+      const response = await axios.get(
+        `${ATTENDANCE_API_BASE_URL}/exam-slots-by-day`,
+        {
+          params: {
+            date,
+          },
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+          withCredentials: true,
+        }
+      );
+      return response.data;
+    } catch (error) {
+      handleError(error);
+    }
+  },
+  addAllAttendanceByDate: async (date) => {
+    try {
+      const response = await axios.post(
+        `${ATTENDANCE_API_BASE_URL}/add-by-day`,
+        {},
+        {
+          params: {
+            date,
+          },
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+          withCredentials: true,
+        }
+      );
       return response.data;
     } catch (error) {
       handleError(error);
@@ -55,6 +99,7 @@ const attendanceApi = {
         {
           headers: {
             "Content-Type": "application/json",
+            Accept: "application/json",
           },
           withCredentials: true,
         }
@@ -72,6 +117,7 @@ const attendanceApi = {
         {
           headers: {
             "Content-Type": "application/json",
+            Accept: "application/json",
           },
           withCredentials: true,
         }
@@ -89,6 +135,7 @@ const attendanceApi = {
         {
           headers: {
             "Content-Type": "application/json",
+            Accept: "application/json",
           },
           withCredentials: true,
         }
@@ -106,6 +153,7 @@ const attendanceApi = {
         {
           headers: {
             "Content-Type": "application/json",
+            Accept: "application/json",
           },
           withCredentials: true,
         }
@@ -123,6 +171,7 @@ const attendanceApi = {
         {
           headers: {
             "Content-Type": "application/json",
+            Accept: "application/json",
           },
           withCredentials: true,
         }
@@ -140,6 +189,7 @@ const attendanceApi = {
         {
           headers: {
             "Content-Type": "application/json",
+            Accept: "application/json",
           },
           withCredentials: true,
         }

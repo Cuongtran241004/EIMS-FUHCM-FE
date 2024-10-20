@@ -31,6 +31,7 @@ import { staffMapperUtil } from "../../utils/Mapper/StaffMapperUtil.jsx";
 import moment from "moment";
 import dayjs from "dayjs"; // Import dayjs
 import attendanceApi from "../../services/InvigilatorAttendance.js";
+import { examScheduleTag } from "../../design-systems/CustomTag.jsx";
 const Attendance = () => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -43,32 +44,22 @@ const Attendance = () => {
   const [form] = Form.useForm();
   const [availableAttendance, setAvailableAttendance] = useState([]);
   const [allAttendance, setAllAttendance] = useState([]);
+  const [currentDate, setCurrentDate] = useState(dayjs()); // Use dayjs instead of Date
+  const [selectedDate, setSelectedDate] = useState(dayjs());
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 6;
 
   // Fetch exam schedule data
-  const fetchExamSchedule = async (term) => {
+  const fetchExamSlot = async () => {
     setLoading(true);
     try {
-      const response = await examSlotApi.getExamSlotBySemesterId(term);
+      // Define today's date at the start of the day (using currentDate)
+      const date = selectedDate.format("YYYY-MM-DD");
+      console.log("date", date);
+      const response = await attendanceApi.getExamSlotByDate(date);
       const result = staffMapperUtil.mapExamSchedule(response);
-      setAllAttendance(result || []);
-
-      // Define today's date at the start of the day (without time)
-      const today = moment().startOf("day");
-
-      // Filter for available exam slots where startAt is today or in the future
-      const available = result.filter((item) => {
-        return moment(item.startAt).isSameOrAfter(today);
-      });
-
-      // Sort available exam slots by startAt in ascending order
-      available.sort((a, b) => {
-        return moment(a.startAt).diff(moment(b.startAt));
-      });
-
-      setAvailableAttendance(available || []);
-      setData(available || []);
+      console.log("result", result);
+      setData(result || []);
     } catch (error) {
       message.error("Failed to fetch exam schedule");
     } finally {
@@ -78,18 +69,19 @@ const Attendance = () => {
 
   useEffect(() => {
     if (selectedSemester?.id) {
-      fetchExamSchedule(selectedSemester.id);
+      fetchExamSlot();
     }
-  }, [selectedSemester]);
+  }, [selectedSemester, selectedDate]);
 
   // Handle semester selection change
   const handleMenuClick = (e) => {
     const selected = semesters.find((semester) => semester.id == e.key);
-
     if (selected) {
       setSelectedSemester({
         id: selected.id,
         name: selected.name,
+        startAt: selected.startAt,
+        endAt: selected.endAt,
       });
     }
   };
@@ -125,7 +117,19 @@ const Attendance = () => {
       align: "center",
       render: (_, __, index) => (currentPage - 1) * pageSize + index + 1,
     },
-
+    {
+      title: "Code",
+      dataIndex: "subjectCode",
+      key: "subjectCode",
+      align: "center",
+    },
+    {
+      title: "Exam Type",
+      dataIndex: "examType",
+      key: "examType",
+      align: "center",
+      render: (text) => examScheduleTag(text),
+    },
     {
       title: "Date",
       dataIndex: "date",
@@ -144,7 +148,6 @@ const Attendance = () => {
         return `${startTime} - ${endTime}`;
       },
     },
-
     {
       title: "Action",
       dataIndex: "action",
@@ -172,6 +175,7 @@ const Attendance = () => {
     },
     // Add more columns as necessary
   ];
+
   const { token } = theme.useToken();
   const wrapperStyle = {
     width: 280,
@@ -184,23 +188,23 @@ const Attendance = () => {
     // view available attendance
     setData(availableAttendance);
   };
-  const [currentDate, setCurrentDate] = useState(dayjs()); // Use dayjs instead of Date
-  const [selectedDate, setSelectedDate] = useState(dayjs());
 
   const onNextMonth = () => {
+    setSelectedDate(null); // Set selectedDate to null
     setSelectedDate(selectedDate.add(1, "month")); // Use dayjs to add a month
   };
 
   const onPrevMonth = () => {
+    setSelectedDate(null); // Set selectedDate to null
     setSelectedDate(selectedDate.subtract(1, "month")); // Use dayjs to subtract a month
   };
   // Function to handle date selection
   const onDateSelect = (date) => {
     setSelectedDate(date); // Set the selected date
-    console.log(date);
   };
   const onPanelChange = () => {
     setSelectedDate(null); // Update the selected date
+    setCurrentDate(dayjs()); // Update the current date
   };
   // Custom header rendering
   const headerRender = () => {
@@ -252,11 +256,16 @@ const Attendance = () => {
           </Button>
           <div style={wrapperStyle}>
             <Calendar
-              value={selectedDate || currentDate} // Use selected date or current date
+              value={selectedDate} // Use selected date or current date
               headerRender={headerRender} // Use custom header
               onPanelChange={onPanelChange} // Update the current date if needed
               fullscreen={false} // Render the calendar without fullscreen
               onSelect={onDateSelect} // Handle date selection
+              // change startAt to dayjs
+              validRange={[
+                dayjs(selectedSemester.startAt),
+                dayjs(selectedSemester.endAt),
+              ]} // Set the valid date
             />
           </div>
 
