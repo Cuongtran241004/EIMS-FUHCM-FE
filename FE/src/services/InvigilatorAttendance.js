@@ -47,12 +47,96 @@ const attendanceApi = {
       handleError(error);
     }
   },
-
-  updateCheckinAll: async (checkin) => {
+  updateCheckinAllByExamSlotId: async (checkin) => {
     try {
       const response = await axios.put(
-        `${ATTENDANCE_API_BASE_URL}/checkin-all/${checkin.id}`,
+        `${ATTENDANCE_API_BASE_URL}/checkin-all/${checkin.examSlotId}`,
         checkin,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+          withCredentials: true,
+        }
+      );
+      return response.data;
+    } catch (error) {
+      handleError(error);
+    }
+  },
+  updateCheckinList: async (checkin) => {
+    try {
+      const response = await axios.put(
+        `${ATTENDANCE_API_BASE_URL}/checkin-all`,
+        checkin,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+          withCredentials: true,
+        }
+      );
+      return response.data;
+    } catch (error) {
+      handleError(error);
+    }
+  },
+  updateCheckinById: async (checkin) => {
+    try {
+      const response = await axios.put(
+        `${ATTENDANCE_API_BASE_URL}/checkin/${checkin.id}`,
+        checkin,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+          withCredentials: true,
+        }
+      );
+      return response.data;
+    } catch (error) {
+      handleError(error);
+    }
+  },
+  updateCheckoutByExamSlotId: async (checkout) => {
+    try {
+      const response = await axios.put(
+        `${ATTENDANCE_API_BASE_URL}/checkout/${checkout.examSlotId}`,
+        checkout,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+          withCredentials: true,
+        }
+      );
+      return response.data;
+    } catch (error) {
+      handleError(error);
+    }
+  },
+  updateCheckoutById: async (checkout) => {
+    try {
+      const response = await axios.put(
+        `${ATTENDANCE_API_BASE_URL}/checkout/${checkout.id}`,
+        checkout,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+          withCredentials: true,
+        }
+      );
+      return response.data;
+    } catch (error) {
+      handleError(error);
+    }
+  },
+  updateCheckoutList: async (checkout) => {
+    try {
+      const response = await axios.put(
+        `${ATTENDANCE_API_BASE_URL}/checkout-all`,
+        checkout,
         {
           headers: {
             "Content-Type": "application/json",
