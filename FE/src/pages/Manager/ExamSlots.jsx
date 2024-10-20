@@ -130,14 +130,7 @@ const ExamSlots = () => {
   const EventComponent = ({ event }) => (
     <span>
       <p style={{ margin: 0, fontWeight: 500, fontSize: 13.33333 }}>
-        {new Date(event.startAt).toLocaleTimeString([], {
-          hour: "2-digit",
-          minute: "2-digit",
-        })} -
-        {new Date(event.endAt).toLocaleTimeString([], {
-          hour: "2-digit",
-          minute: "2-digit",
-        })}
+        {moment(event.startAt).format('HH:mm')} - {moment(event.endAt).format('HH:mm')}
       </p>
     </span>
   );
@@ -161,16 +154,22 @@ const ExamSlots = () => {
       render: (text, record) => `${record.subjectExamDTO.subjectName} (${record.subjectExamDTO.subjectCode})`,
     },
     {
+      title: 'Date',
+      dataIndex: 'startAt',
+      key: 'startAt',
+      render: (text) => moment(text).format('DD/MM/YYYY'),
+    },
+    {
       title: 'Start Time',
       dataIndex: 'startAt',
       key: 'startAt',
-      render: (text) => new Date(text).toLocaleString(),
+      render: (text) => moment(text).format('HH:mm'),
     },
     {
       title: 'End Time',
       dataIndex: 'endAt',
       key: 'endAt',
-      render: (text) => new Date(text).toLocaleString(),
+      render: (text) => moment(text).format('HH:mm'),
     },
     {
       title: 'Status',
@@ -235,10 +234,10 @@ const ExamSlots = () => {
                 >
                   {selectedEvent && (
                     <div>
-                      <p><strong>Date:</strong> {new Date(selectedEvent.startAt).toLocaleDateString()}</p>
-                      <p><strong>Start Time:</strong> {new Date(selectedEvent.startAt).toLocaleTimeString()}</p>
-                      <p><strong>End Time:</strong> {new Date(selectedEvent.endAt).toLocaleTimeString()}</p>
-                      <p><strong>Created At:</strong> {new Date(selectedEvent.createdAt).toLocaleString()}</p>
+                      <p><strong>Date:</strong> {moment(selectedEvent.startAt).format('DD/MM/YYYY')}</p>
+                      <p><strong>Start Time:</strong> {moment(selectedEvent.startAt).format('HH:MM')}</p>
+                      <p><strong>End Time:</strong> {moment(selectedEvent.endAt).format('HH:MM')}</p>
+                      <p><strong>Created At:</strong> {moment(selectedEvent.createdAt).format('DD/MM/YYYY HH:MM')}</p>
                       <p><strong>Created By:</strong> {selectedEvent.createdBy}</p>
                       <p><strong>Required Invigilators:</strong> {selectedEvent.requiredInvigilators}</p>
                       <p><strong>Status:</strong> {selectedEvent.status}</p>
@@ -257,9 +256,9 @@ const ExamSlots = () => {
                       </Space>
                     </Button>
                   </Dropdown>
-                  <div style={{marginTop: 10}}>
-                    <Button style={{width: 100, marginLeft: 20}} onClick={handleApprove}>Approve</Button>
-                    <Button style={{width: 100, marginLeft: 20}} onClick={handleReject}>Reject</Button>
+                  <div style={{ marginTop: 10 }}>
+                    <Button style={{ width: 100, marginLeft: 20 }} onClick={handleApprove}>Approve</Button>
+                    <Button style={{ width: 100, marginLeft: 20 }} onClick={handleReject}>Reject</Button>
                     <p style={{ fontWeight: 'bold' }}>
                       <span style={{ marginRight: 20, color: '#52c41a' }}>APPROVED</span>
                       <span style={{ marginRight: 20, color: '#d9363e' }}>REJECTED</span>

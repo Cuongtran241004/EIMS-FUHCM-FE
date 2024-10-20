@@ -48,15 +48,7 @@ function InvigilatorDashboard() {
   const EventComponent = ({ event }) => (
     <span>
       <p style={{ margin: 0, fontWeight: 500, fontSize: 13.33333 }}>
-        {new Date(event.startAt).toLocaleTimeString([], {
-          hour: "2-digit",
-          minute: "2-digit",
-        })}
-        -
-        {new Date(event.endAt).toLocaleTimeString([], {
-          hour: "2-digit",
-          minute: "2-digit",
-        })}
+        {new moment(event.startAt).format("HH:mm")} - {new moment(event.endAt).format("HH:mm")}
       </p>
     </span>
   );
@@ -90,15 +82,15 @@ function InvigilatorDashboard() {
             <div>
               <p>
                 <strong>Date:</strong>{" "}
-                {new Date(selectedEvent.startAt).toLocaleDateString()}
+                {new moment(selectedEvent.startAt).format("DD/MM/YYYY")}
               </p>
               <p>
                 <strong>Start Time:</strong>{" "}
-                {new Date(selectedEvent.startAt).toLocaleTimeString()}
+                {new moment(selectedEvent.startAt).format("HH:mm")}
               </p>
               <p>
                 <strong>End Time:</strong>{" "}
-                {new Date(selectedEvent.endAt).toLocaleTimeString()}
+                {new moment(selectedEvent.endAt).format("HH:mm")}
               </p>
             </div>
           )}

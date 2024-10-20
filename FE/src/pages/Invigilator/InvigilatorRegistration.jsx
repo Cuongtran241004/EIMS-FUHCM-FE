@@ -9,13 +9,14 @@ import { Calendar, momentLocalizer } from 'react-big-calendar';
 import moment from 'moment';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import './invigilatorRegistration.css';
+import { ConfigType } from '../../configs/enum';
 
 const { confirm } = Modal;
 const localizer = momentLocalizer(moment);
 
 function InvigilatorRegistration() {
   const { user } = useContext(UserContext);
-  const { semesters = [], selectedSemester, setSelectedSemester, examSlotDetail, availableSlotsData, reloadAvailableSlots, lastestSemester } = useSemester();
+  const { semesters = [], selectedSemester, setSelectedSemester, examSlotDetail, availableSlotsData, reloadAvailableSlots, lastestSemester, getConfigValue } = useSemester();
   const [events, setEvents] = useState([]);
   const [selectedSlots, setSelectedSlots] = useState([]);
   const [slots, setSlots] = useState({ fuId: user.id, examSlotId: [] });
@@ -24,9 +25,9 @@ function InvigilatorRegistration() {
   const [isAllSelected, setIsAllSelected] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  const allowedSlots = lastestSemester?.allowedSlotConfig;
+  const allowedSlots = getConfigValue(ConfigType.ALLOWED_SLOT) || 0;
 
-  if(selectedSemester != lastestSemester) {
+  if (selectedSemester != lastestSemester) {
     setSelectedSemester(lastestSemester);
   }
 
@@ -69,18 +70,18 @@ function InvigilatorRegistration() {
   const handleSelectEvent = (event) => {
     const { examSlotId, status, startAt } = event;
     const currentDate = moment();
-    const openAt = moment(startAt).subtract(7, 'days');
-    const closeAt = moment(startAt).subtract(3, 'days');
-    if(currentDate.isBefore(openAt) || currentDate.isAfter(closeAt)) {
+    const openAt = moment(startAt).subtract(getConfigValue(ConfigType.TIME_BEFORE_OPEN_REGISTRATION), 'days');
+    const closeAt = moment(startAt).subtract(getConfigValue(ConfigType.TIME_BEFORE_CLOSE_REGISTRATION), 'days');
+    if (currentDate.isBefore(openAt) || currentDate.isAfter(closeAt)) {
       message.warning('Not open for registration');
       return;
     }
-//=======================================================================================================
+    //=======================================================================================================
     // if (!selectedSemester) {
     //   message.warning('Please select a semester first.');
     //   return;
     // }
-//=======================================================================================================
+    //=======================================================================================================
     if (status === 'REGISTERED' || status === 'FULL') {
       return;
     }
@@ -180,8 +181,8 @@ function InvigilatorRegistration() {
   const EventComponent = ({ event }) => (
     <div>
       <p style={{ margin: 0, fontWeight: 500, fontSize: 13.33333 }}>
-       {moment(event.startAt).format('HH:mm')} - {moment(event.endAt).format('HH:mm')}
-        <br/><span style={{fontSize: '0.625rem'}}>(Registed: {event.numberOfRegistered}/Total: {event.requiredInvigilators})</span>
+        {moment(event.startAt).format('HH:mm')} - {moment(event.endAt).format('HH:mm')}
+        <span style={{ fontSize: '0.625rem' }}> (R: {event.numberOfRegistered}/T: {event.requiredInvigilators})</span>
       </p>
     </div>
   );
@@ -197,20 +198,36 @@ function InvigilatorRegistration() {
             views={{ day: true, week: true, month: true }}
             localizer={localizer}
             events={events}
-            startAccessor={(event) => new Date(event.startAt)}
-            endAccessor={(event) => new Date(event.endAt)}
+            startAccessor={(event) => { return new Date(event.startAt) }}
+            endAccessor={(event) => { return new Date(event.endAt) }}
             style={{ height: 500, margin: '50px', width: '70%', fontWeight: 'lighter' }}
-            components={{ event: EventComponent}}
+            components={{ event: EventComponent }}
             onSelectEvent={handleSelectEvent}
             eventPropGetter={(event) => {
               const { startAt } = event;
               const currentDate = moment();
-              const openAt = moment(startAt).subtract(7, 'days');
-              const closeAt = moment(startAt).subtract(3, 'days');
+              const openAt = moment(startAt).subtract(getConfigValue(ConfigType.TIME_BEFORE_OPEN_REGISTRATION), 'days');
+              const closeAt = moment(startAt).subtract(getConfigValue(ConfigType.TIME_BEFORE_CLOSE_REGISTRATION), 'days');
               const isSelected = selectedSlots.includes(event.examSlotId);
               let backgroundColor;
               let isSelectable = true;
-              if(currentDate.isBefore(openAt) || currentDate.isAfter(closeAt)) {
+              if (currentDate.isBefore(openAt) || currentDate.isAfter(closeAt)) {
+                switch (event.status) {
+                  case 'REGISTERED':
+                    backgroundColor = 'rgba(82, 196, 26, 0.5)';
+                    isSelectable = false;
+                    break;
+                  case 'FULL':
+                    backgroundColor = 'rgba(217,54,62,0.5)';
+                    isSelectable = false;
+                    break;
+                  default:
+                    backgroundColor = isSelected ? '#1890ff' : 'rgba(83, 41, 236, 0.2)';
+                    isSelectable = false;
+                    break;
+                }
+              }
+              else {
                 switch (event.status) {
                   case 'REGISTERED':
                     backgroundColor = '#52c41a';
@@ -226,22 +243,6 @@ function InvigilatorRegistration() {
                     break;
                 }
               }
-              else {
-              switch (event.status) {
-                case 'REGISTERED':
-                  backgroundColor = '#52c41a';
-                  isSelectable = false;
-                  break;
-                case 'FULL':
-                  backgroundColor = '#d9363e';
-                  isSelectable = false;
-                  break;
-                default:
-                  backgroundColor = isSelected ? '#1890ff' : '#ddd';
-                  isSelectable = true;
-                  break;
-              }
-            }
 
               return {
                 style: {
@@ -277,11 +278,14 @@ function InvigilatorRegistration() {
             <p>Registered Slots: {examSlotDetail.length} / <span style={{ color: 'red' }}>{allowedSlots}</span></p>
             <p>Selected Slots: {selectedSlots.length}</p>
             <p style={{ fontWeight: 'bold' }}>
-              <span style={{ marginRight: 20, color: '#52c41a' }}>Registered</span>
-              <span style={{ marginRight: 20, color: '#d9363e' }}>Full</span>
-              <span style={{ marginRight: 20, color: 'rgb(221, 221, 221)' }}>Not full</span>
+              <span style={{ marginRight: 10, fontSize: 13, color: '#52c41a' }}>Registered</span>
+              <span style={{ marginRight: 10, fontSize: 13, color: '#d9363e' }}>Full</span>
+              <span style={{ marginRight: 10, fontSize: 13, color: 'rgb(221, 221, 221)' }}>Not full</span>
+              <span style={{ marginRight: 10, fontSize: 13, color: 'rgb(83, 41, 236)' }}>Not open</span>
             </p>
-            <p style={{ fontStyle: 'italic' }}>*Note: Arrive 30 minutes before exam time in room <span style={{ fontWeight: 'bolder' }}>301</span>.</p>
+            <p><span style={{ marginRight: 10, fontSize: 13 }}>R: Registered</span>
+              <span style={{ marginRight: 10, fontSize: 13 }}>T: Total</span></p>
+            <p style={{ fontStyle: 'italic' }}>*Note: Arrive {getConfigValue(ConfigType.TIME_BEFORE_EXAM)} minutes before exam time in room <span style={{ fontWeight: 'bolder' }}>{getConfigValue(ConfigType.INVIGILATOR_ROOM)}</span>.</p>
 
           </div>
         </div>
@@ -307,26 +311,34 @@ function InvigilatorRegistration() {
             <div>
               {examSlotDetail.map(slot => {
                 const currentDate = moment();
-                const openAt = moment(slot.startAt).subtract(7, 'days');
-                const closeAt = moment(slot.startAt).subtract(3, 'days');
+                const openAt = moment(slot.startAt).subtract(getConfigValue(ConfigType.TIME_BEFORE_OPEN_REGISTRATION), 'days');
+                const closeAt = moment(slot.startAt).subtract(getConfigValue(ConfigType.TIME_BEFORE_CLOSE_REGISTRATION), 'days');
                 const isCancelable = currentDate.isBetween(openAt, closeAt);
                 return isCancelable ? (
-                <div
-                  key={slot.examSlotId}
-                  style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px', width: '100%' }}
-                >
-                  <span>
-                    {new Date(slot.startAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} - {new Date(slot.endAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })},
-                    {new Date(slot.startAt).toLocaleDateString()}
-                  </span>
+                  <div
+                    key={slot.examSlotId}
+                    style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px', width: '100%' }}
+                  >
+                    <span>
+                      {moment(slot.startAt).format('HH:mm')} - {moment(slot.endAt).format('HH:mm')},
+                      {moment(slot.startAt).format('DD/MM/YYYY')}
+                    </span>
 
-                  <Checkbox
-                    checked={selectedCancelSlots.includes(slot.examSlotId)}
-                    onChange={(e) => handleCancelSlotChange(slot.examSlotId, e.target.checked)}
-                  />
-                </div>
-                ) : <p>No registered slots available to cancel.</p>;
+                    <Checkbox
+                      checked={selectedCancelSlots.includes(slot.examSlotId)}
+                      onChange={(e) => handleCancelSlotChange(slot.examSlotId, e.target.checked)}
+                    />
+                  </div>
+                ) : null;
               })}
+              {examSlotDetail.every(slot => {
+                const currentDate = moment();
+                const openAt = moment(slot.startAt).subtract(getConfigValue(ConfigType.TIME_BEFORE_OPEN_REGISTRATION), 'days');
+                const closeAt = moment(slot.startAt).subtract(getConfigValue(ConfigType.TIME_BEFORE_CLOSE_REGISTRATION), 'days');
+                const isCancelable = currentDate.isBetween(openAt, closeAt);
+                return !isCancelable;
+              }) && <p>No registered slots available to cancel.</p>}
+
             </div>
           )}
         </Modal>

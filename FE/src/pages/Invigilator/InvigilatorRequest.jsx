@@ -2,6 +2,8 @@ import React from 'react';
 import { Form, Input, Button, Select, message } from 'antd';
 import { useSemester } from '../../components/SemesterContext';
 import { postRequest } from '../../components/API/postRequest';
+import moment from 'moment';
+import { ConfigType } from '../../configs/enum';
 
 const { Option } = Select;
 
@@ -10,6 +12,7 @@ function InvigilatorRequest() {
     examSlotDetail: examSlots = [],
     loadingSemesters,
     loadingSchedules,
+    getConfigValue,
   } = useSemester();
 
   const [form] = Form.useForm();
@@ -48,7 +51,7 @@ function InvigilatorRequest() {
   return (
     <div>
       <div style={{ paddingLeft: 100, paddingRight: 100, paddingTop: 10 }}>
-      <h2 >Invigilator Requests </h2>
+        <h2 >Invigilator Requests </h2>
         {loadingSemesters || loadingSchedules ? (
           <div>Loading...</div>
         ) : (
@@ -60,11 +63,18 @@ function InvigilatorRequest() {
               rules={[{ required: true, message: 'Please select an exam slot' }]}
             >
               <Select placeholder="Select Exam Slot">
-                {examSlots.map((slot) => (
-                  <Option key={slot.examSlotId} value={slot.examSlotId}>
-                    {new Date(slot.startAt).toLocaleString()} - {new Date(slot.endAt).toLocaleString()}
-                  </Option>
-                ))}
+                {examSlots.map((slot) => {
+                  const currentDate = moment();
+                  const openAt = moment(slot.startAt).subtract(getConfigValue(ConfigType.TIME_BEFORE_CLOSE_REQUEST), 'days');
+                  const closeAt = moment(slot.startAt);
+                  if (currentDate.isBetween(openAt, closeAt)) {
+                    return (
+                      <Option key={slot.examSlotId} value={slot.examSlotId}>
+                        {moment(slot.startAt).format('DD/MM/YYYY')} | {moment(slot.startAt).format('HH:mm')} - {moment(slot.endAt).format('HH:mm')}
+                      </Option>
+                    );
+                  }
+                })}
               </Select>
             </Form.Item>
 

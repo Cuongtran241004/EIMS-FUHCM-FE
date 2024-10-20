@@ -2,6 +2,7 @@ import React, { createContext, useState, useEffect, useContext } from "react";
 import { useFetchSemesters } from "./Hook/useFetchSemesters";
 import { useFetchAvailableSlots } from "./Hook/useFetchAvailableSlots";
 import { useFetchSchedules } from "./Hook/useFetchSchedules";
+import { useSemesterConfig } from "./Hook/useSemesterConfig";
 import moment from "moment";
 
 const SemesterContext = createContext();
@@ -17,12 +18,13 @@ export const SemesterProviderInvigilator = ({ children }) => {
     useFetchAvailableSlots(lastestSemester?.id, reloadSlots);
   const { examSlotDetail, loading: loadingSchedules } = useFetchSchedules(
     selectedSemester?.id, reloadSlots);
+  const { semesterConfig, getConfigValue } = useSemesterConfig(lastestSemester?.id);
 
   useEffect(() => {
     if (semesters.length > 0) {
       const currentDate = moment();
       const currentSemester = semesters.find((semester) => moment(currentDate).isBetween(moment(semester.startAt), moment(semester.endAt)));
-      if(currentSemester) {
+      if (currentSemester) {
         setSelectedSemester(currentSemester);
       } else {
         const select = semesters.reduce(
@@ -31,22 +33,22 @@ export const SemesterProviderInvigilator = ({ children }) => {
         );
         setSelectedSemester(select);
       }
-      }
+    }
   }, [semesters]);
 
   useEffect(() => {
     if (semesters.length > 0) {
       const currentDate = moment();
       const validSemesters = semesters.filter(semesters => moment(semesters.startAt).isSameOrBefore(currentDate));
-      if(validSemesters.length > 0) {
+      if (validSemesters.length > 0) {
         const lastestSemester = validSemesters.reduce((last, current) => {
           return moment(current.startAt).isAfter(last.startAt) ? current : last;
         }, validSemesters[0]);
-      
-      setLasestSemester(lastestSemester);
+
+        setLasestSemester(lastestSemester);
       }
     }
-  },[semesters])
+  }, [semesters])
 
   const reloadAvailableSlots = () => {
     setReloadSlots(reloadSlots + 1);
@@ -66,6 +68,8 @@ export const SemesterProviderInvigilator = ({ children }) => {
         reloadAvailableSlots,
         lastestSemester,
         setLasestSemester,
+        semesterConfig,
+        getConfigValue,
       }}
     >
       {children}
