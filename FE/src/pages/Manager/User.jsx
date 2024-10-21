@@ -263,7 +263,8 @@ const Users = ({ isLogin }) => {
                 rowKey={(record) => record.fuId}
                 pagination={{
                   pageSize: 7,
-                  showSizeChanger: true,
+                  showSizeChanger: false,
+                  showQuickJumper: false,
                   pageSizeOptions: ["8", "16", "24"],
                 }}
               />

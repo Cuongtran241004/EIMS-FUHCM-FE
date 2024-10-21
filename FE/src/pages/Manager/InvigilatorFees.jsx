@@ -60,12 +60,12 @@ export default function InvigilatorFees() {
             key: "registeredSlots",
         },
        {
-        title: "Provisional fee",
+        title: "Provisional fees",
         dataIndex: "provisionalFee",
         key: "provisionalFee",
         },
         {
-            title: "Actual fee",
+            title: "Actual fees",
             dataIndex: "actualFee",
             key: "actualFee",
         },

@@ -42,10 +42,11 @@ export const SemesterProviderInvigilator = ({ children }) => {
       const validSemesters = semesters.filter(semesters => moment(semesters.startAt).isSameOrBefore(currentDate));
       if (validSemesters.length > 0) {
         const lastestSemester = validSemesters.reduce((last, current) => {
-          return moment(current.startAt).isAfter(last.startAt) ? current : last;
+          return moment(current.startAt).isSameOrAfter(last.startAt) ? current : last;
         }, validSemesters[0]);
 
         setLasestSemester(lastestSemester);
+        console.log(lastestSemester.id);
       }
     }
   }, [semesters])
