@@ -13,6 +13,7 @@ import {
   Calendar,
   theme,
   Modal,
+  notification,
 } from "antd";
 import examSlotApi from "../../services/ExamSlot.js";
 import { useSemester } from "../../components/Context/SemesterContext.jsx";
@@ -34,6 +35,10 @@ import moment from "moment";
 import dayjs from "dayjs"; // Import dayjs
 import attendanceApi from "../../services/InvigilatorAttendance.js";
 import { examTypeTag } from "../../design-systems/CustomTag.jsx";
+import {
+  checkInNotification,
+  checkOutNotification,
+} from "../../design-systems/CustomNotification.jsx";
 const Attendance = () => {
   const [data, setData] = useState([]);
   const [loadingData, setLoadingData] = useState(false);
@@ -130,7 +135,17 @@ const Attendance = () => {
   const handleCheckIn = async (examSlotId) => {
     setLoading(true);
     setIsCheckIn(true);
+
     try {
+      const examSlot = await examSlotApi.getExamSlotById(examSlotId);
+      // check-in time is 30 minutes before the exam start time
+      const checkInTime = moment(examSlot.startAt).subtract(30, "minutes");
+
+      if (moment().isBefore(checkInTime)) {
+        checkInNotification();
+        return;
+      }
+
       // Assign invigilators
       const response =
         await attendanceApi.getAttendanceByExamSlotId(examSlotId);
@@ -160,6 +175,15 @@ const Attendance = () => {
     setLoading(true);
     setIsCheckIn(false);
     try {
+      const examSlot = await examSlotApi.getExamSlotById(examSlotId);
+      // check-out time is after the exam end time
+      const checkOutTime = moment(examSlot.endAt);
+
+      if (moment().isBefore(checkOutTime)) {
+        checkOutNotification();
+        return;
+      }
+
       // Assign invigilators
       const response =
         await attendanceApi.getAttendanceByExamSlotId(examSlotId);
