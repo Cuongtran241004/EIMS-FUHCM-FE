@@ -117,8 +117,6 @@ const Request = () => {
     setSelectedRequest(null);
   };
 
-  const [selectedInvigilator, setSelectedInvigilator] = useState(null); // Declare the state for selected invigilator
-
   const handleApprove = async (record) => {
     if (record.status === "PENDING") {
       setDetailLoading((prev) => ({ ...prev, [record.requestId]: true }));
@@ -129,13 +127,26 @@ const Request = () => {
           await invigilatorAssignmentApi.getUnassignedInvigilatorByExamSlotId(
             record.examSlotId
           );
-        const unassignedInvigilator =
+        const unassignedInvigilators =
           managerMapperUtil.mapUnassignedInvigilator(response);
 
-        const user = await userApi.getAllUsers();
-        const invigilators = user.filter((user) => user.role == 3);
-        const allInvigilators =
-          managerMapperUtil.mapUnassignedInvigilator(invigilators);
+        const userResponse = await userApi.getAllUsers();
+        const allInvigilators = userResponse
+          .filter((user) => user.role === 3) // Assuming role 3 is for invigilators
+          .map((invigilator) => ({
+            fuId: invigilator.fuId,
+            lastName: invigilator.lastName,
+            firstName: invigilator.firstName,
+            isUnassigned: unassignedInvigilators.some(
+              (unassigned) => unassigned.fuId === invigilator.fuId
+            ),
+          }));
+        // Sort by unassigned status, with priority: true -> false
+        const unassignedInvigilatorsFirst = allInvigilators.sort(
+          (a, b) => b.isUnassigned - a.isUnassigned
+        );
+        // Use local state for selectedInvigilator within the modal
+        let selectedInvigilator = null;
 
         // Show a modal to select an invigilator
         Modal.confirm({
@@ -146,22 +157,20 @@ const Request = () => {
               style={{ width: "100%" }}
               showSearch
               optionFilterProp="children"
-              onChange={(value) => setSelectedInvigilator(value)}
+              onChange={(value) => {
+                selectedInvigilator = value; // Update local variable
+                console.log("Selected invigilator:", value);
+              }}
             >
-              {allInvigilators.map((invigilator) => (
+              {unassignedInvigilatorsFirst.map((invigilator) => (
                 <Select.Option key={invigilator.fuId} value={invigilator.fuId}>
-                  {unassignedInvigilator.some(
-                    (unassigned) => unassigned.fuId === invigilator.fuId
-                  ) ? (
+                  {invigilator.isUnassigned ? (
                     <Tag icon={<CheckCircleOutlined />} color="cyan">
                       {invigilator.fuId} - {invigilator.lastName}{" "}
                       {invigilator.firstName}
                     </Tag>
                   ) : (
-                    <>
-                      {invigilator.fuId} - {invigilator.lastName}{" "}
-                      {invigilator.firstName}
-                    </>
+                    `${invigilator.fuId} - ${invigilator.lastName} ${invigilator.firstName}`
                   )}
                 </Select.Option>
               ))}
@@ -189,22 +198,24 @@ const Request = () => {
               // Optionally refetch the updated requests
               fetchData(selectedSemester.id);
             } catch (error) {
-              message.error("Failed to approve the request");
-              console.error(error); // Log the error for debugging
+              notification.warning({
+                message: "Warning",
+                description: "Invigilator is not available at that time!",
+              });
             } finally {
               setDetailLoading((prev) => ({
                 ...prev,
                 [record.requestId]: false,
               }));
-              setSelectedInvigilator(null); // Reset selected invigilator after approval
             }
           },
           onCancel: () => {
-            setSelectedInvigilator(null); // Reset selected invigilator if cancelled
+            // Reset logic not needed here since selectedInvigilator is local
           },
         });
       } catch (error) {
         message.warning("No available invigilators");
+        console.error(error); // Log the error for debugging
       } finally {
         setDetailLoading((prev) => ({ ...prev, [record.requestId]: false }));
       }
