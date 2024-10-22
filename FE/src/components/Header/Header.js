@@ -25,7 +25,7 @@ const headerConfig = {
     { name: "Attendance", path: STAFF_ATTENDANCE_URL },
   ],
   3: [
-    { name: "Dashboard", path: "/" },
+    { name: "Home", path: "/" },
     { name: "Register", path: "/register" },
     {
       name: "Request",

@@ -23,7 +23,7 @@ import moment from "moment";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import "./invigilatorRegistration.css";
 import { ConfigType } from "../../configs/enum";
-
+import { titleStyle } from "../../design-systems/CSS/Title";
 const { confirm } = Modal;
 const localizer = momentLocalizer(moment);
 
@@ -236,8 +236,15 @@ function InvigilatorRegistration() {
   } else {
     return (
       <div>
-        <h2 style={{ marginTop: 10, marginBottom: 0, marginLeft: 50 }}>
-          Invigilator Register
+        <h2
+          style={{
+            marginTop: "10px",
+            marginBottom: 0,
+            textAlign: "center",
+            ...titleStyle,
+          }}
+        >
+          EXAM SLOTS REGISTRATION
         </h2>
         <div style={{ display: "flex", alignItems: "flex-start" }}>
           <Calendar

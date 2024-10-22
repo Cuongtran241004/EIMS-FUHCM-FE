@@ -6,6 +6,8 @@ import "react-big-calendar/lib/css/react-big-calendar.css";
 import { Calendar as BigCalendar, momentLocalizer } from "react-big-calendar";
 import { useSemester } from "../../components/SemesterContext";
 import "./dashboard.css";
+import { selectButtonStyle } from "../../design-systems/CSS/Button";
+import { titleStyle } from "../../design-systems/CSS/Title";
 
 const localizer = momentLocalizer(moment);
 
@@ -48,15 +50,23 @@ function InvigilatorDashboard() {
   const EventComponent = ({ event }) => (
     <span>
       <p style={{ margin: 0, fontWeight: 500, fontSize: 13.33333 }}>
-        {new moment(event.startAt).format("HH:mm")} - {new moment(event.endAt).format("HH:mm")}
+        {new moment(event.startAt).format("HH:mm")} -{" "}
+        {new moment(event.endAt).format("HH:mm")}
       </p>
     </span>
   );
 
   return (
     <div>
-      <h2 style={{ marginTop: 10, marginBottom: 0, marginLeft: 50 }}>
-        Invigilator Dashboard
+      <h2
+        style={{
+          marginTop: "10px",
+          marginBottom: 0,
+          textAlign: "center",
+          ...titleStyle,
+        }}
+      >
+        OFFICIAL EXAM SCHEDULES
       </h2>
       <div style={{ display: "flex", alignItems: "flex-start" }}>
         <BigCalendar
@@ -95,9 +105,16 @@ function InvigilatorDashboard() {
             </div>
           )}
         </Modal>
-        <div style={{ marginLeft: 30, marginTop: 40, display: 'grid', width: '15%' }}>
+        <div
+          style={{
+            marginLeft: 30,
+            marginTop: 40,
+            display: "grid",
+            width: "15%",
+          }}
+        >
           <Dropdown menu={menu} trigger={["click"]}>
-            <Button size="large">
+            <Button size="large" style={selectButtonStyle}>
               <Space>
                 {selectedSemester
                   ? selectedSemester.name
