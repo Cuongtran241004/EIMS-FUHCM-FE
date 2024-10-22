@@ -59,6 +59,11 @@ const CustomToolbar = (toolbar) => {
         const today = new Date();
         toolbar.onNavigate('date', today);
         const currentWeek = weeks.findIndex(week => moment(today).isBetween(week.start, week.end, null, '[]'));
+        if (currentWeek !== -1) {
+            const selectedWeek = weeks[currentWeek];
+    
+            toolbar.onNavigate('date', selectedWeek.start); 
+        }
         setSelectCurrentWeek(currentWeek);
     }
 

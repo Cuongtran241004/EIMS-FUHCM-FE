@@ -84,6 +84,7 @@ function InvigilatorDashboard() {
           events={examSlotDetail}
           defaultView='month'
           views={['month', 'agenda']}
+          length={6}
           onView={setView}
           view={view}
           onDrillDown={handleDrillDown}
