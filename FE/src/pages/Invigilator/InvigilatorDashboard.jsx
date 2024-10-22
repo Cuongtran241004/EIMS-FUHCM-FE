@@ -122,6 +122,12 @@ function InvigilatorDashboard() {
                 <strong>End Time:</strong>{" "}
                 {new moment(selectedEvent.endAt).format("HH:mm")}
               </p>
+              <p>
+                <strong>Check in:</strong> {" "} Checked
+              </p>
+              <p>
+                <strong>Check out:</strong> {" "} Checked
+              </p>
             </div>
           )}
         </Modal>

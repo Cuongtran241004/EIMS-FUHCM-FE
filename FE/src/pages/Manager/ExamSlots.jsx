@@ -9,12 +9,14 @@ import {
   Table,
   Checkbox,
   message,
+  Radio,
 } from "antd";
 import { DownOutlined, ExclamationCircleOutlined } from "@ant-design/icons";
 import NavBar_Manager from "../../components/NavBar/NavBar_Manager";
 import Header from "../../components/Header/Header.jsx";
 import { useSemester } from "../../components/Context/SemesterContext.jsx";
 import { Calendar as BigCalendar, momentLocalizer } from "react-big-calendar";
+import CustomToolbar from "../../components/CustomCalendar/CustomToolbar";
 import moment from "moment";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import examSlotApi from "../../services/ExamSlot.js";
@@ -36,14 +38,14 @@ const ExamSlots = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [pendingSlots, setPendingSlots] = useState([]);
-  const [showPending, setShowPending] = useState(false);
-  const [showRejected, setShowRejected] = useState(false);
   const [checkedSlots, setCheckedSlots] = useState([]);
+  const [modalState, setModalState] = useState({ show: false, action: "" });
+  const [selectedAction, setSelectedAction] = useState("");
+  const [view, setView] = useState('month');
+
 
   const handleMenuClick = (e) => {
-    const selected = semesters.find(
-      (semester) => semester.id === parseInt(e.key)
-    );
+    const selected = semesters.find((semester) => semester.id === parseInt(e.key));
     setSelectedSemester(selected);
   };
 
@@ -57,34 +59,16 @@ const ExamSlots = () => {
     onClick: handleMenuClick,
   };
 
+
   const handleSelectEvent = (event) => {
     setSelectedEvent(event);
     setIsModalVisible(true);
   };
 
-  const handleOk = () => {
+  const handleCloseEventModal = () => {
     setIsModalVisible(false);
   };
 
-  const handleCancel = () => {
-    setIsModalVisible(false);
-  };
-
-  const handleApprove = () => {
-    const pending = examSlotBySemester.filter(
-      (slot) => slot.status === "PENDING"
-    );
-    setPendingSlots(pending);
-    setShowPending(true);
-  };
-
-  const handleReject = () => {
-    const pending = examSlotBySemester.filter(
-      (slot) => slot.status === "PENDING"
-    );
-    setPendingSlots(pending);
-    setShowRejected(true);
-  };
 
   const handleCheckboxChange = (slotId) => {
     setCheckedSlots((prev) =>
@@ -94,9 +78,15 @@ const ExamSlots = () => {
     );
   };
 
-  const handleConfirm = async () => {
+  const handleConfirmSlots = async () => {
+    if (!selectedAction) {
+      message.error("Please select an action (Approve or Reject)");
+      return;
+    }
+
+    const status = selectedAction === "approve" ? "APPROVED" : "REJECTED";
     confirm({
-      title: "Do you want to approve these slots?",
+      title: `Do you want to ${status.toLowerCase()} these slots?`,
       icon: <ExclamationCircleOutlined />,
       onOk: async () => {
         const updatedSlots = checkedSlots.map((slot) => ({
@@ -104,57 +94,34 @@ const ExamSlots = () => {
           startAt: slot.startAt,
           endAt: slot.endAt,
           requiredInvigilators: slot.requiredInvigilators,
-          status: "APPROVED",
+          status,
         }));
 
         try {
           const success = await examSlotApi.updateExamSlotByManager(updatedSlots);
           if (success) {
-            message.success("Approved successfully!");
+            message.success(`${status} successfully!`);
             setCheckedSlots([]);
-            setShowPending(false);
+            setModalState({ show: false, action: "" });
           }
         } catch (error) {
-          message.error("There was an error approving the slots!");
+          message.error(`There was an error ${status.toLowerCase()} the slots!`);
           console.error(error);
         }
       },
     });
   };
 
-  const handleConfirmReject = async () => {
-    confirm({
-      title: "Do you want to reject these slots?",
-      icon: <ExclamationCircleOutlined />,
-      onOk: async () => {
-        const updatedSlots = checkedSlots.map((slot) => ({
-          subjectExamId: slot.id,
-          startAt: slot.startAt,
-          endAt: slot.endAt,
-          requiredInvigilators: slot.requiredInvigilators,
-          status: "REJECTED",
-        }));
-
-        try {
-          const success = await examSlotApi.updateExamSlotByManager(updatedSlots);
-          if (success) {
-            message.success("Rejected successfully!");
-            setCheckedSlots([]);
-            setShowRejected(false);
-          }
-        } catch (error) {
-          message.error("There was an error rejecting the slots!");
-          console.error(error);
-        }
-      },
-    });
+  const openModalForAction = () => {
+    const pending = examSlotBySemester.filter((slot) => slot.status === "PENDING");
+    setPendingSlots(pending);
+    setModalState({ show: true, action: "" });
   };
 
   const EventComponent = ({ event }) => (
     <span>
       <p style={{ margin: 0, fontWeight: 500, fontSize: 13.33333 }}>
-        {moment(event.startAt).format("HH:mm")} -{" "}
-        {moment(event.endAt).format("HH:mm")}
+        {moment(event.startAt).format("HH:mm")} - {moment(event.endAt).format("HH:mm")}
       </p>
     </span>
   );
@@ -166,6 +133,7 @@ const ExamSlots = () => {
       key: "select",
       render: (_, record) => (
         <Checkbox
+          style={{ display: "flex", justifyContent: "left", width: "100%" }}
           checked={checkedSlots.includes(record)}
           onChange={() => handleCheckboxChange(record)}
         />
@@ -177,6 +145,14 @@ const ExamSlots = () => {
       key: "subjectName",
       render: (text, record) =>
         `${record.subjectExamDTO.subjectName} (${record.subjectExamDTO.subjectCode})`,
+    },
+    {
+      title: "Invigilators",
+      dataIndex: "requiredInvigilators",
+      key: "requiredInvigilators",
+      render: (text, record) => (
+        <span style={{ display: 'flex', justifyContent: 'center' }}>{`${record.requiredInvigilators}`}</span>
+      ),
     },
     {
       title: "Date",
@@ -196,12 +172,13 @@ const ExamSlots = () => {
       key: "endAt",
       render: (text) => moment(text).format("HH:mm"),
     },
-    {
-      title: "Status",
-      dataIndex: "status",
-      key: "status",
-    },
   ];
+
+  const handleDrillDown = () => {
+    if (view === 'month') {
+      setView('agenda');
+    }
+  };
 
   return (
     <Layout style={{ height: "100vh", overflowY: "hidden" }}>
@@ -217,19 +194,21 @@ const ExamSlots = () => {
             ) : (
               <div style={{ display: "flex", alignItems: "flex-start" }}>
                 <BigCalendar
-                  views={{ day: true, week: true, month: true }}
+                  views={['month', 'agenda']}
                   localizer={localizer}
-                  events={examSlotBySemester}
+                  events={examSlotBySemester.filter((slot) => slot.status !== "NEEDS_ROOM_ASSIGNMENT")}
+                  length={6}
+                  onView={setView}
+                  view={view}
+                  onDrillDown={handleDrillDown}
                   onSelectEvent={handleSelectEvent}
-                  startAccessor={(event) => {
-                    return new Date(event.startAt);
-                  }}
-                  endAccessor={(event) => {
-                    return new Date(event.endAt);
-                  }}
+                  startAccessor={(event) => new Date(event.startAt)}
+                  endAccessor={(event) => new Date(event.endAt)}
                   style={{ height: 500, margin: "50px", width: "70%" }}
-                  components={{
-                    event: EventComponent,
+                  components={{ event: EventComponent, toolbar: CustomToolbar }}
+                  messages={{ event: "Time" }}
+                  formats={{
+                    agendaDateFormat: (date) => moment(date).format("DD/MM/YYYY")
                   }}
                   eventPropGetter={(event) => {
                     let backgroundColor;
@@ -259,8 +238,8 @@ const ExamSlots = () => {
                 <Modal
                   title="Details"
                   open={isModalVisible}
-                  onOk={handleOk}
-                  onCancel={handleCancel}
+                  onOk={handleCloseEventModal}
+                  onCancel={handleCloseEventModal}
                 >
                   {selectedEvent && (
                     <div>
@@ -275,15 +254,6 @@ const ExamSlots = () => {
                       <p>
                         <strong>End Time:</strong>{" "}
                         {moment(selectedEvent.endAt).format("HH:MM")}
-                      </p>
-                      <p>
-                        <strong>Created At:</strong>{" "}
-                        {moment(selectedEvent.createdAt).format(
-                          "DD/MM/YYYY HH:MM"
-                        )}
-                      </p>
-                      <p>
-                        <strong>Created By:</strong> {selectedEvent.createdBy}
                       </p>
                       <p>
                         <strong>Required Invigilators:</strong>{" "}
@@ -308,52 +278,28 @@ const ExamSlots = () => {
                     </div>
                   )}
                 </Modal>
-                <div
-                  style={{
-                    marginRight: 30,
-                    marginTop: 40,
-                    display: "grid",
-                    width: "20%",
-                  }}
-                >
-                  <Dropdown menu={menu} trigger={["click"]}>
-                    <Button size="large" style={selectButtonStyle}>
-                      <Space>
-                        {selectedSemester
-                          ? selectedSemester.name
-                          : "No Semesters Available"}
-                        <DownOutlined />
-                      </Space>
+                <div style={{ display: 'grid', paddingTop: 50, paddingLeft: 40, paddingRight: 60, width: "30%" }}>
+                  <Dropdown menu={menu} >
+                    <Button style={selectButtonStyle}>
+                      {selectedSemester ? selectedSemester.name : "Select a Semester"}{" "}
+                      <DownOutlined />
                     </Button>
                   </Dropdown>
-                  <div style={{ marginTop: 10 }}>
-                    <Button
-                      style={{ width: 100, marginLeft: 20 }}
-                      onClick={handleApprove}
-                    >
-                      Approve
-                    </Button>
-                    <Button
-                      style={{ width: 100, marginLeft: 20 }}
-                      onClick={handleReject}
-                    >
-                      Reject
-                    </Button>
-                  <div style={{marginLeft: 50}}>
-                      <p style={{ fontWeight: "bold" }}>
-                        <span style={{ marginRight: 10, color: "#52c41a" }}>
-                          APPROVED
-                        </span>
-                        <span style={{ marginRight: 10, color: "#d9363e" }}>
-                          REJECTED
-                        </span> <br/> 
-                        <span style={{ marginRight: 10, color: "rgb(249, 199, 79)" }}>
-                          PENDING
-                        </span>
-                        <span style={{ marginRight: 10, color: "#1890ff" }}>NEED ROOM</span>
-                      </p>
-                    </div>
-                  </div>
+                  <Button
+                    style={{
+                      backgroundColor: "#1890ff",
+                      color: "white",
+                      width: "100%",
+                    }}
+                    onClick={openModalForAction}
+                  >
+                    Update
+                  </Button>
+                  <p>
+                    <span style={{ color: "#52c41a" }}><strong>Approved</strong></span> <br />
+                    <span style={{ color: "#d9363e" }}><strong>Rejected</strong></span> <br />
+                    <span style={{ color: "rgb(249, 199, 79)" }}><strong>Pending</strong></span>
+                  </p>
                 </div>
               </div>
             )}
@@ -361,45 +307,35 @@ const ExamSlots = () => {
         </Layout>
       </Layout>
 
-      {showPending && (
+      {modalState.show && (
         <Modal
-          title="Pending Slots"
-          open={showPending}
-          onOk={handleConfirm}
-          onCancel={() => setShowPending(false)}
+          title="Handle Pending Slots"
+          open={modalState.show}
+          onCancel={() => setModalState({ show: false, action: "" })}
           footer={[
-            <Button key="back" onClick={() => setShowPending(false)}>
+            <Button key="back" onClick={() => setModalState({ show: false, action: "" })}>
               Cancel
             </Button>,
-            <Button key="submit" type="primary" onClick={handleConfirm}>
+            <Button
+              key="approve"
+              type="primary"
+              style={{ backgroundColor: "#52c41a", borderColor: "#52c41a" }}
+              onClick={() => {
+                setSelectedAction("approve");
+                handleConfirmSlots();
+              }}
+            >
               Approve
             </Button>,
-          ]}
-        >
-          <Table
-            columns={columns}
-            dataSource={pendingSlots}
-            rowKey="id"
-            pagination={{
-              pageSize: 4,
-              showSizeChanger: false,
-              showQuickJumper: false,
-              position: ["bottomCenter"],
-            }}
-          />
-        </Modal>
-      )}
-      {showRejected && (
-        <Modal
-          title="Pending Slots"
-          open={showRejected}
-          onOk={handleConfirmReject}
-          onCancel={() => setShowRejected(false)}
-          footer={[
-            <Button key="back" onClick={() => setShowRejected(false)}>
-              Cancel
-            </Button>,
-            <Button key="submit" type="primary" onClick={handleConfirmReject}>
+            <Button
+              key="reject"
+              type="primary"
+              style={{ backgroundColor: "#d9363e", borderColor: "#d9363e" }}
+              onClick={() => {
+                setSelectedAction("reject");
+                handleConfirmSlots();
+              }}
+            >
               Reject
             </Button>,
           ]}
@@ -416,6 +352,8 @@ const ExamSlots = () => {
             }}
           />
         </Modal>
+
+
       )}
     </Layout>
   );

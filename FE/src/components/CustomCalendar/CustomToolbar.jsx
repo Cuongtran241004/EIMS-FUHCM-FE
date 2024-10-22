@@ -105,6 +105,14 @@ const CustomToolbar = (toolbar) => {
         toolbar.onView('agenda');
     };
 
+    const handleMonthView = () => {
+        if (selectCurrentMonth !== null) {
+            const selectedMonth = months[selectCurrentMonth];
+            toolbar.onNavigate('date', selectedMonth);
+        }
+        toolbar.onView('month');
+    };
+
     return (
         <div className="custom-toolbar">
             <div>
@@ -127,7 +135,7 @@ const CustomToolbar = (toolbar) => {
             </div>
             <span>{label()}</span>
             <div>
-                <button onClick={() => toolbar.onView('month')} className={currentView === 'month' ? 'active-view' : ''}>Month</button>
+                <button onClick={handleMonthView} className={currentView === 'month' ? 'active-view' : ''}>Month</button>
                 <button onClick={handleWeekView} className={currentView === 'agenda' ? 'active-view' : ''}>Week</button>
             </div>
         </div>
