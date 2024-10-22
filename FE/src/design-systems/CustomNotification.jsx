@@ -36,10 +36,18 @@ const assignmentNotification = () => {
     description: "You cannot assign when invigilators are not enough",
   });
 };
+
+const requestNotification = () => {
+  notification.warning({
+    message: "Warning",
+    description: "This request has been processed",
+  });
+};
 export {
   editNotification,
   deleteNotification,
   checkInNotification,
   checkOutNotification,
   assignmentNotification,
+  requestNotification,
 };

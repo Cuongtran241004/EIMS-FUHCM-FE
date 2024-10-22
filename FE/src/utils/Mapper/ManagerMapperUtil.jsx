@@ -18,6 +18,16 @@ const managerMapperUtil = {
       };
     });
   },
+  mapUnassignedInvigilator: (invigilators) => {
+    return invigilators.map((invigilator) => {
+      return {
+        fuId: invigilator.fuId,
+        firstName: invigilator.firstName,
+        lastName: invigilator.lastName,
+        email: invigilator.email,
+      };
+    });
+  },
 };
 
 export { managerMapperUtil };

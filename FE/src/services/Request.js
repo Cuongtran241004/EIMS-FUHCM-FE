@@ -90,5 +90,20 @@ const requestApi = {
       handleError(error);
     }
   },
+
+  updateRequest: async (request) => {
+    try {
+      const response = await axios.put(`${REQUEST_API_BASE_URL}`, request, {
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        withCredentials: true,
+      });
+      return response.data;
+    } catch (error) {
+      handleError(error);
+    }
+  },
 };
 export default requestApi;

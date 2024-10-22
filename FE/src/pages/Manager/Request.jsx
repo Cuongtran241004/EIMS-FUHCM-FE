@@ -11,14 +11,22 @@ import {
   Modal,
   Popover,
   Input,
+  notification,
+  Select,
 } from "antd";
-import { DownOutlined, EyeOutlined } from "@ant-design/icons";
+import {
+  CheckCircleOutlined,
+  CheckOutlined,
+  CloseOutlined,
+  DownOutlined,
+  EyeOutlined,
+} from "@ant-design/icons";
 import NavBar_Manager from "../../components/NavBar/NavBar_Manager";
 import Header from "../../components/Header/Header.jsx";
 import { useSemester } from "../../components/Context/SemesterContext.jsx";
 import requestApi from "../../services/Request.js";
 import moment from "moment";
-import { requestTag } from "../../design-systems/CustomTag.jsx";
+import { examTypeTag, requestTag } from "../../design-systems/CustomTag.jsx";
 import { managerMapperUtil } from "../../utils/Mapper/ManagerMapperUtil.jsx";
 import {
   buttonStyle,
@@ -27,7 +35,8 @@ import {
 } from "../../design-systems/CSS/Button.js";
 import { titleStyle } from "../../design-systems/CSS/Title.js";
 import userApi from "../../services/User.js";
-
+import { requestNotification } from "../../design-systems/CustomNotification.jsx";
+import invigilatorAssignmentApi from "../../services/InvigilatorAssignment.js";
 const { Content, Sider } = Layout;
 
 const Request = () => {
@@ -45,7 +54,18 @@ const Request = () => {
     try {
       const response = await requestApi.getAllRequestsBySemesterId(semesterId);
       const result = managerMapperUtil.mapRequest(response);
-      result.sort((a, b) => new Date(b.requestId) - new Date(a.requestId));
+      // Sort by status, with priority: PENDING -> APPROVED -> REJECTED
+      result.sort((a, b) => {
+        const statusPriority = { PENDING: 1, APPROVED: 2, REJECTED: 3 };
+
+        // Compare statuses first
+        if (statusPriority[a.status] !== statusPriority[b.status]) {
+          return statusPriority[a.status] - statusPriority[b.status];
+        }
+
+        // If statuses are the same, sort by requestId in descending order
+        return new Date(b.requestId) - new Date(a.requestId);
+      });
       setRequests(result || []);
     } catch (error) {
       message.error("Failed to fetch requests");
@@ -97,63 +117,156 @@ const Request = () => {
     setSelectedRequest(null);
   };
 
-  // Approve the request
-  const handleApprove = async (record) => {
-    try {
-      setDetailLoading((prev) => ({ ...prev, [record.requestId]: true }));
-      // Call API to approve the request
-      await requestApi.approveRequest(record.requestId);
-      message.success("Request approved successfully");
+  const [selectedInvigilator, setSelectedInvigilator] = useState(null); // Declare the state for selected invigilator
 
-      // Optionally refetch the updated requests
-      fetchData(selectedSemester.id);
-    } catch (error) {
-      message.error("Failed to approve the request");
-    } finally {
-      setDetailLoading((prev) => ({ ...prev, [record.requestId]: false }));
+  const handleApprove = async (record) => {
+    if (record.status === "PENDING") {
+      setDetailLoading((prev) => ({ ...prev, [record.requestId]: true }));
+
+      try {
+        // Fetch the list of available invigilators
+        const response =
+          await invigilatorAssignmentApi.getUnassignedInvigilatorByExamSlotId(
+            record.examSlotId
+          );
+        const unassignedInvigilator =
+          managerMapperUtil.mapUnassignedInvigilator(response);
+
+        const user = await userApi.getAllUsers();
+        const invigilators = user.filter((user) => user.role == 3);
+        const allInvigilators =
+          managerMapperUtil.mapUnassignedInvigilator(invigilators);
+
+        // Show a modal to select an invigilator
+        Modal.confirm({
+          title: "Select Invigilator",
+          content: (
+            <Select
+              placeholder="Select an invigilator"
+              style={{ width: "100%" }}
+              showSearch
+              optionFilterProp="children"
+              onChange={(value) => setSelectedInvigilator(value)}
+            >
+              {allInvigilators.map((invigilator) => (
+                <Select.Option key={invigilator.fuId} value={invigilator.fuId}>
+                  {unassignedInvigilator.some(
+                    (unassigned) => unassigned.fuId === invigilator.fuId
+                  ) ? (
+                    <Tag icon={<CheckCircleOutlined />} color="cyan">
+                      {invigilator.fuId} - {invigilator.lastName}{" "}
+                      {invigilator.firstName}
+                    </Tag>
+                  ) : (
+                    <>
+                      {invigilator.fuId} - {invigilator.lastName}{" "}
+                      {invigilator.firstName}
+                    </>
+                  )}
+                </Select.Option>
+              ))}
+            </Select>
+          ),
+          onOk: async () => {
+            if (!selectedInvigilator) {
+              notification.warning({
+                message: "Warning",
+                description: "Please select an invigilator",
+              });
+              return;
+            }
+
+            try {
+              const requestData = {
+                newInvigilatorFuId: selectedInvigilator,
+                requestId: record.requestId,
+                status: "APPROVED",
+              };
+              // Call API to approve the request with the selected invigilator
+              await requestApi.updateRequest(requestData);
+              message.success("Request approved successfully");
+
+              // Optionally refetch the updated requests
+              fetchData(selectedSemester.id);
+            } catch (error) {
+              message.error("Failed to approve the request");
+              console.error(error); // Log the error for debugging
+            } finally {
+              setDetailLoading((prev) => ({
+                ...prev,
+                [record.requestId]: false,
+              }));
+              setSelectedInvigilator(null); // Reset selected invigilator after approval
+            }
+          },
+          onCancel: () => {
+            setSelectedInvigilator(null); // Reset selected invigilator if cancelled
+          },
+        });
+      } catch (error) {
+        message.warning("No available invigilators");
+      } finally {
+        setDetailLoading((prev) => ({ ...prev, [record.requestId]: false }));
+      }
+    } else {
+      requestNotification();
     }
   };
 
   // Reject the request (with reason)
   const handleReject = (record) => {
-    let rejectionReason = "";
+    if (record.status === "PENDING") {
+      let rejectionReason = "";
 
-    const handleRejectConfirm = async () => {
-      if (!rejectionReason) {
-        message.error("Please enter a reason for rejection");
-        return;
-      }
+      const handleRejectConfirm = async () => {
+        if (!rejectionReason) {
+          notification.warning({
+            message: "Warning",
+            description: "Please enter a reason for rejection",
+          });
+          return;
+        }
 
-      try {
-        setDetailLoading((prev) => ({ ...prev, [record.requestId]: true }));
-        // Call API to reject the request with the provided reason
-        await requestApi.rejectRequest(record.requestId, rejectionReason);
-        message.success("Request rejected successfully");
+        try {
+          setDetailLoading((prev) => ({ ...prev, [record.requestId]: true }));
+          // Call API to reject the request with the provided reason
+          const requestData = {
+            requestId: record.requestId,
+            status: "REJECTED",
+            note: rejectionReason,
+          };
+          await requestApi.updateRequest(requestData);
+          message.success("Request rejected successfully");
+          // Optionally refetch the updated requests
+          fetchData(selectedSemester.id);
+        } catch (error) {
+          message.error("Failed to reject the request");
+        } finally {
+          setDetailLoading((prev) => ({ ...prev, [record.requestId]: false }));
+        }
+      };
 
-        // Optionally refetch the updated requests
-        fetchData(selectedSemester.id);
-      } catch (error) {
-        message.error("Failed to reject the request");
-      } finally {
-        setDetailLoading((prev) => ({ ...prev, [record.requestId]: false }));
-      }
-    };
-
-    Modal.confirm({
-      title: "Reject Request",
-      content: (
-        <>
-          <p>Please enter the reason for rejection:</p>
-          <Input.TextArea
-            onChange={(e) => (rejectionReason = e.target.value)}
-            rows={4}
-            placeholder="Enter rejection reason"
-          />
-        </>
-      ),
-      onOk: handleRejectConfirm,
-      onCancel: () => (rejectionReason = ""), // Reset reason if canceled
-    });
+      Modal.confirm({
+        title: "Reject Reason",
+        content: (
+          <div style={{ paddingBottom: "20px" }}>
+            {" "}
+            {/* Add padding to avoid overlap */}
+            <Input.TextArea
+              onChange={(e) => (rejectionReason = e.target.value)}
+              rows={4}
+              maxLength={1000}
+              showCount
+              placeholder="Enter rejection reason"
+            />
+          </div>
+        ),
+        onOk: handleRejectConfirm,
+        onCancel: () => (rejectionReason = ""), // Reset reason if canceled
+      });
+    } else {
+      requestNotification();
+    }
   };
 
   const columns = [
@@ -161,12 +274,14 @@ const Request = () => {
       title: "No",
       dataIndex: "no",
       key: "no",
+      align: "center",
       render: (_, __, index) => (currentPage - 1) * pageSize + index + 1,
     },
     {
       title: "FUID",
       dataIndex: "fuId",
       key: "fuId",
+      align: "center",
     },
     {
       title: "Subject",
@@ -178,17 +293,20 @@ const Request = () => {
       title: "Exam Type",
       dataIndex: "examType",
       key: "examType",
+      render: (text) => examTypeTag(text),
     },
     {
       title: "Date",
       dataIndex: "date",
       key: "date",
+      align: "center",
       render: (text, record) => moment(record.startAt).format("DD/MM/YYYY"),
     },
     {
       title: "Time",
       dataIndex: "time",
       key: "time",
+      align: "center",
       render: (text, record) =>
         `${moment(record.startAt).format("HH:mm")} - ${moment(record.endAt).format("HH:mm")}`,
     },
@@ -202,6 +320,7 @@ const Request = () => {
       title: "Action",
       dataIndex: "action",
       key: "action",
+      align: "center",
       render: (text, record) => (
         <Space size="large">
           <Button
@@ -213,10 +332,10 @@ const Request = () => {
             <EyeOutlined style={{ fontSize: "20px", color: "#43AA8B" }} />
           </Button>
           <Button style={buttonStyle} onClick={() => handleApprove(record)}>
-            Approve
+            <CheckOutlined />
           </Button>
           <Button danger onClick={() => handleReject(record)}>
-            Reject
+            <CloseOutlined />
           </Button>
         </Space>
       ),
