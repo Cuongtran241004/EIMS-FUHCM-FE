@@ -30,9 +30,16 @@ const checkOutNotification = () => {
   });
 };
 
+const assignmentNotification = () => {
+  notification.info({
+    message: "Information",
+    description: "You cannot assign when invigilators are not enough",
+  });
+};
 export {
   editNotification,
   deleteNotification,
   checkInNotification,
   checkOutNotification,
+  assignmentNotification,
 };

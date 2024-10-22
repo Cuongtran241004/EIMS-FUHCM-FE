@@ -110,4 +110,29 @@ const requestTag = (status) => {
     </Tag>
   );
 };
-export { examScheduleTag, userRoleTag, examTypeTag, requestTag };
+
+const assignmentTag = (status) => {
+  let color = "";
+  let text = "";
+  // Define color and label based on the status value
+  switch (status) {
+    case "UNASSIGNED":
+      color = "orange";
+      text = "UNASSIGNED";
+      break;
+    case "ASSIGNED":
+      color = "green";
+      text = "ASSIGNED";
+      break;
+    default:
+      color = "gray";
+      text = "Unknown";
+  }
+
+  return (
+    <Tag color={color}>
+      <strong>{text}</strong>
+    </Tag>
+  );
+};
+export { examScheduleTag, userRoleTag, examTypeTag, requestTag, assignmentTag };

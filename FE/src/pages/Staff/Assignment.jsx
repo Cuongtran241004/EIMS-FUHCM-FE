@@ -22,7 +22,9 @@ import Header from "../../components/Header/Header.jsx";
 import { useSemester } from "../../components/Context/SemesterContext.jsx";
 import { selectButtonStyle } from "../../design-systems/CSS/Button.js";
 import { FETCH_EXAM_SCHEDULE_FAILED } from "../../configs/messages";
-
+import { assignmentTag } from "../../design-systems/CustomTag.jsx";
+import { examTypeTag } from "../../design-systems/CustomTag.jsx";
+import { assignmentNotification } from "../../design-systems/CustomNotification.jsx";
 const { Content } = Layout;
 
 const AssignmentInvigilator = () => {
@@ -32,19 +34,18 @@ const AssignmentInvigilator = () => {
   const [selectedAssignment, setSelectedAssignment] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
   const { selectedSemester, setSelectedSemester, semesters } = useSemester(); // Access shared semester state
-  const pageSize = 7;
+  const pageSize = 6;
 
   const fetchExamSchedule = async (semesterId, page) => {
     setLoading(true);
     try {
-      const response = await examSlotApi.getExamSlotBySemesterId(
-        semesterId,
-        page
-      );
-      const mapResponse = staffMapperUtil.mapExamSchedule(response);
+      const response =
+        await invigilatorAssignmentApi.getExamSlotWithStatus(semesterId);
 
-      const result = mapResponse.filter((item) => item.status === "APPROVED");
-      result.sort((a, b) => {
+      console.log(response);
+      const mapResponse = staffMapperUtil.mapExamSlotWithStatus(response);
+
+      const result = mapResponse.sort((a, b) => {
         return (
           moment(a.startAt).format("YYYYMMDDHHmm") -
           moment(b.startAt).format("YYYYMMDDHHmm")
@@ -64,7 +65,7 @@ const AssignmentInvigilator = () => {
     if (selectedSemester) {
       fetchExamSchedule(selectedSemester.id, currentPage);
     }
-  }, [selectedSemester, currentPage]);
+  }, [selectedSemester]);
 
   const fetchInvigilatorAssignment = async (examSlotId) => {
     const response =
@@ -73,18 +74,25 @@ const AssignmentInvigilator = () => {
   };
 
   const handleAssignmentClick = async (examSlotId) => {
-    setLoading(true);
-    try {
-      // Assign invigilators
-      const assignmentResult = await fetchInvigilatorAssignment(examSlotId);
-      // Here, you can implement the logic to assign invigilators
-      // For demonstration, let's assume assignment was successful and set the selected assignment
-      setSelectedAssignment(assignmentResult);
-      setModalVisible(true);
-    } catch (error) {
-      message.error("Failed to assign invigilators.");
-    } finally {
-      setLoading(false);
+    // getAssignmentById from examSchedule
+    const examSlot = examSchedule.find((slot) => slot.id === examSlotId);
+
+    if (examSlot.requiredInvigilators <= examSlot.numberOfRegistered) {
+      setLoading(true);
+      try {
+        // Assign invigilators
+        const assignmentResult = await fetchInvigilatorAssignment(examSlotId);
+        // Here, you can implement the logic to assign invigilators
+        // For demonstration, let's assume assignment was successful and set the selected assignment
+        setSelectedAssignment(assignmentResult);
+        setModalVisible(true);
+      } catch (error) {
+        message.error("Failed to assign invigilators.");
+      } finally {
+        setLoading(false);
+      }
+    } else {
+      assignmentNotification();
     }
   };
 
@@ -110,6 +118,7 @@ const AssignmentInvigilator = () => {
       dataIndex: "examType",
       key: "examType",
       align: "center",
+      render: (text) => examTypeTag(text),
     },
     {
       title: "Date (DD-MM-YYYY)",
@@ -135,6 +144,14 @@ const AssignmentInvigilator = () => {
       },
     },
     {
+      title: "Registration",
+      dataIndex: "registration",
+      key: "registration",
+      align: "center",
+      render: (text, record) =>
+        ` ${record.numberOfRegistered}/${record.requiredInvigilators}`,
+    },
+    {
       title: "Invigilator",
       key: "invigilator",
       align: "center",
@@ -144,11 +161,12 @@ const AssignmentInvigilator = () => {
         </Button>
       ),
     },
-    // {
-    //   title: "Status",
-    //   dataIndex: "status",
-    //   key: "status",
-    // },
+    {
+      title: "Status",
+      dataIndex: "status",
+      key: "status",
+      render: (text) => assignmentTag(text),
+    },
   ];
 
   const assignmentColumns = [

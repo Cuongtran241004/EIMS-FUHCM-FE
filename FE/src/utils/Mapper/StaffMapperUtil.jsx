@@ -105,5 +105,25 @@ const staffMapperUtil = {
       };
     });
   },
+
+  mapExamSlotWithStatus: (examSchedule) => {
+    // check if examSchedule is an array
+    if (!Array.isArray(examSchedule)) {
+      return [];
+    }
+    return examSchedule.map((item) => {
+      return {
+        key: item.examSlotId,
+        id: item.examSlotId,
+        subjectCode: item.subjectCode,
+        examType: item.examType,
+        numberOfRegistered: item.numberOfRegistered,
+        requiredInvigilators: item.requiredInvigilators,
+        startAt: item.startAt,
+        endAt: item.endAt,
+        status: item.status,
+      };
+    });
+  },
 };
 export { staffMapperUtil };

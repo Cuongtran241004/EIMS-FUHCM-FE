@@ -22,9 +22,9 @@ const semesterApi = {
       handleError(error);
     }
   },
-  getSemesterById: async (id) => {
+  getSemesterByName: async (name) => {
     try {
-      const response = await axios.get(`${SEMESTER_API_BASE_URL}/${id}`, {
+      const response = await axios.get(`${SEMESTER_API_BASE_URL}/${name}`, {
         headers: {
           "Content-Type": "application/json",
           Accept: "application/json",
