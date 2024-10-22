@@ -259,8 +259,8 @@ function InvigilatorRegistration() {
           <Calendar
             localizer={localizer}
             events={events}
-            defaultView='month'
             views={['month', 'agenda']}
+            length={6}
             onView={setView}
             view={view}
             onDrillDown={handleDrillDown}

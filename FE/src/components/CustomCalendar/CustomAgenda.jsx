@@ -2,7 +2,7 @@ import React from 'react';
 import moment from 'moment';
 
 const CustomAgenda = ({ event }) => (
-  <div className="custom-agenda-event">
+  <div>
     <p style={{ margin: 0, fontWeight: 500, fontSize: 13.33333 }}>
         {moment(event.startAt).format("HH:mm")} -{" "}
         {moment(event.endAt).format("HH:mm")}
