@@ -34,6 +34,7 @@ const headerConfig = {
         { name: "View requests", path: "/request/view" },
       ],
     },
+    { name: "Report", path: "/report" },
   ],
 };
 

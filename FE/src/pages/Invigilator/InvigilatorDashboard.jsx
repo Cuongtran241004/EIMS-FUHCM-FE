@@ -5,7 +5,7 @@ import moment from "moment";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import { Calendar as BigCalendar, momentLocalizer } from "react-big-calendar";
 import CustomToolbar from "../../components/CustomCalendar/CustomToolbar";
-import CustomAgenda from "../../components/CustomCalendar/CustomAgenda";
+import { ConfigType } from "../../configs/enum";
 import { useSemester } from "../../components/SemesterContext";
 import "./dashboard.css";
 import { selectButtonStyle } from "../../design-systems/CSS/Button";
@@ -14,7 +14,7 @@ import { titleStyle } from "../../design-systems/CSS/Title";
 const localizer = momentLocalizer(moment);
 
 function InvigilatorDashboard() {
-  const { semesters, selectedSemester, setSelectedSemester, examSlotDetail } =
+  const { semesters, selectedSemester, setSelectedSemester, examSlotDetail, getConfigValue } =
     useSemester();
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState(null);
@@ -122,12 +122,6 @@ function InvigilatorDashboard() {
                 <strong>End Time:</strong>{" "}
                 {new moment(selectedEvent.endAt).format("HH:mm")}
               </p>
-              <p>
-                <strong>Check in:</strong> {" "} Checked
-              </p>
-              <p>
-                <strong>Check out:</strong> {" "} Checked
-              </p>
             </div>
           )}
         </Modal>
@@ -149,7 +143,18 @@ function InvigilatorDashboard() {
               </Space>
             </Button>
           </Dropdown>
+
+          <p style={{ fontStyle: "italic" }}>
+            *Note: Arrive {getConfigValue(ConfigType.TIME_BEFORE_EXAM)}{" "}
+            minutes before exam time in room{" "}
+            <span style={{ fontWeight: "bolder" }}>
+              {getConfigValue(ConfigType.INVIGILATOR_ROOM)} 
+            </span>
+            .
+          </p>
         </div>
+
+
       </div>
     </div>
   );
