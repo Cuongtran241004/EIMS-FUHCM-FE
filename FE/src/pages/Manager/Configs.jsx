@@ -83,6 +83,7 @@ const Configs = ({ isLogin }) => {
       ]);
       const result = [
         {
+          id: hourly_rate.id,
           key: "hourly_rate",
           configType: "Hourly Rate",
           value: new Intl.NumberFormat("vi-VN", {
@@ -92,43 +93,49 @@ const Configs = ({ isLogin }) => {
           unit: "VND/hour",
         },
         {
+          id: allowed_slot.id,
           key: "allowed_slot",
           configType: "Allowed Slot",
           value: allowed_slot.value,
           unit: "slot(s)",
         },
         {
+          id: invigilator_room.id,
           key: "invigilator_room",
           configType: "Invigilator Room",
           value: invigilator_room.value,
           unit: "room",
         },
         {
+          id: time_before_exam.id,
           key: "time_before_exam",
           configType: "Time Before Exam",
           value: time_before_exam.value,
           unit: "day(s)",
         },
         {
+          id: time_before_open_registration.id,
           key: "time_before_open_registration",
           configType: "Time Before Open Registration",
           value: time_before_open_registration.value,
           unit: "day(s)",
         },
         {
+          id: time_before_close_registration.id,
           key: "time_before_close_registration",
           configType: "Time Before Close Registration",
           value: time_before_close_registration.value,
           unit: "day(s)",
         },
         {
+          id: time_before_close_request.id,
           key: "time_before_close_request",
           configType: "Time Before Close Request",
           value: time_before_close_request.value,
           unit: "day(s)",
         },
       ];
-
+      console.log(result);
       setConfigs(result);
     } catch (error) {
       message.error("Failed to fetch configs");
