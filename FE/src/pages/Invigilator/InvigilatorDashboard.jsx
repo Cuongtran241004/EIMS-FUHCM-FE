@@ -4,6 +4,8 @@ import { DownOutlined } from "@ant-design/icons";
 import moment from "moment";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import { Calendar as BigCalendar, momentLocalizer } from "react-big-calendar";
+import CustomToolbar from "../../components/CustomCalendar/CustomToolbar";
+import CustomAgenda from "../../components/CustomCalendar/CustomAgenda";
 import { useSemester } from "../../components/SemesterContext";
 import "./dashboard.css";
 import { selectButtonStyle } from "../../design-systems/CSS/Button";
@@ -16,6 +18,7 @@ function InvigilatorDashboard() {
     useSemester();
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState(null);
+  const [view, setView] = useState('month');
 
   const handleMenuClick = (e) => {
     const selected = semesters.find(
@@ -56,6 +59,13 @@ function InvigilatorDashboard() {
     </span>
   );
 
+  const handleDrillDown = () => {
+    if (view === 'month') {
+      setView('agenda');
+    }
+  };
+
+
   return (
     <div>
       <h2
@@ -70,15 +80,24 @@ function InvigilatorDashboard() {
       </h2>
       <div style={{ display: "flex", alignItems: "flex-start" }}>
         <BigCalendar
-          views={{ day: true, week: true, month: true }}
           localizer={localizer}
           events={examSlotDetail}
+          defaultView='month'
+          views={['month', 'agenda']}
+          onView={setView}
+          view={view}
+          onDrillDown={handleDrillDown}
           onSelectEvent={handleSelectEvent}
           startAccessor="startAt"
           endAccessor="endAt"
           style={{ height: 500, margin: "50px", width: "70%" }}
           components={{
-            event: EventComponent,
+            event: EventComponent, toolbar: CustomToolbar
+          }}
+          messages={{ event: 'Time' }}
+          formats={{
+            agendaDateFormat: (date) =>
+              moment(date).format('DD/MM/YYYY'),
           }}
         />
         <Modal
