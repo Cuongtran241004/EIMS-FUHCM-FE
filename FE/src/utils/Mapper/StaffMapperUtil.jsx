@@ -105,7 +105,6 @@ const staffMapperUtil = {
       };
     });
   },
-
   mapExamSlotWithStatus: (examSchedule) => {
     // check if examSchedule is an array
     if (!Array.isArray(examSchedule)) {

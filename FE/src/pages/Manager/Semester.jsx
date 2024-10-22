@@ -57,7 +57,7 @@ const Semester = ({ isLogin }) => {
     try {
       const result = await semesterApi.getAllSemesters();
       const sortedSemesters = result.sort(
-        (a, b) => new Date(a.endAt) - new Date(b.endAt)
+        (a, b) => new Date(b.endAt) - new Date(a.endAt)
       );
       setData(sortedSemesters);
     } catch (error) {

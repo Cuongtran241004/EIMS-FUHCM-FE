@@ -9,6 +9,8 @@ import {
   Spin,
   Tag,
   Modal,
+  Popover,
+  Input,
 } from "antd";
 import { DownOutlined, EyeOutlined } from "@ant-design/icons";
 import NavBar_Manager from "../../components/NavBar/NavBar_Manager";
@@ -36,7 +38,7 @@ const Request = () => {
   const pageSize = 8;
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedRequest, setSelectedRequest] = useState(null);
-  const [detailLoading, setDetailLoading] = useState({}); // Change to an object to track loading by row
+  const [detailLoading, setDetailLoading] = useState({});
 
   const fetchData = async (semesterId) => {
     setLoading(true);
@@ -95,6 +97,65 @@ const Request = () => {
     setSelectedRequest(null);
   };
 
+  // Approve the request
+  const handleApprove = async (record) => {
+    try {
+      setDetailLoading((prev) => ({ ...prev, [record.requestId]: true }));
+      // Call API to approve the request
+      await requestApi.approveRequest(record.requestId);
+      message.success("Request approved successfully");
+
+      // Optionally refetch the updated requests
+      fetchData(selectedSemester.id);
+    } catch (error) {
+      message.error("Failed to approve the request");
+    } finally {
+      setDetailLoading((prev) => ({ ...prev, [record.requestId]: false }));
+    }
+  };
+
+  // Reject the request (with reason)
+  const handleReject = (record) => {
+    let rejectionReason = "";
+
+    const handleRejectConfirm = async () => {
+      if (!rejectionReason) {
+        message.error("Please enter a reason for rejection");
+        return;
+      }
+
+      try {
+        setDetailLoading((prev) => ({ ...prev, [record.requestId]: true }));
+        // Call API to reject the request with the provided reason
+        await requestApi.rejectRequest(record.requestId, rejectionReason);
+        message.success("Request rejected successfully");
+
+        // Optionally refetch the updated requests
+        fetchData(selectedSemester.id);
+      } catch (error) {
+        message.error("Failed to reject the request");
+      } finally {
+        setDetailLoading((prev) => ({ ...prev, [record.requestId]: false }));
+      }
+    };
+
+    Modal.confirm({
+      title: "Reject Request",
+      content: (
+        <>
+          <p>Please enter the reason for rejection:</p>
+          <Input.TextArea
+            onChange={(e) => (rejectionReason = e.target.value)}
+            rows={4}
+            placeholder="Enter rejection reason"
+          />
+        </>
+      ),
+      onOk: handleRejectConfirm,
+      onCancel: () => (rejectionReason = ""), // Reset reason if canceled
+    });
+  };
+
   const columns = [
     {
       title: "No",
@@ -151,8 +212,12 @@ const Request = () => {
           >
             <EyeOutlined style={{ fontSize: "20px", color: "#43AA8B" }} />
           </Button>
-          <Button style={buttonStyle}>Approve</Button>
-          <Button danger>Reject</Button>
+          <Button style={buttonStyle} onClick={() => handleApprove(record)}>
+            Approve
+          </Button>
+          <Button danger onClick={() => handleReject(record)}>
+            Reject
+          </Button>
         </Space>
       ),
     },
