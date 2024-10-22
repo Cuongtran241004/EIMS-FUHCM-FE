@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Table, message, Tag } from "antd";
 import { getRequests } from "../../components/API/getRequests";
 import moment from "moment";
-
+import { titleStyle } from "../../design-systems/CSS/Title";
 function InvigilatorRequestsList() {
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -113,7 +113,9 @@ function InvigilatorRequestsList() {
 
   return (
     <div style={{ padding: 20, height: "100%" }}>
-      <h2>Submitted Requests</h2>
+      <h2 style={{ textAlign: "center", marginBottom: "10px", ...titleStyle }}>
+        SUBMITTED REQUESTS
+      </h2>
       <Table
         columns={columns}
         dataSource={requests}

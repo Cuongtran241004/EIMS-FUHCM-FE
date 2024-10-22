@@ -60,7 +60,7 @@ function InvigilatorRequest() {
             form={form}
             layout="vertical"
             onFinish={onFinish}
-            style={{ width: "80%", margin: "auto" }}
+            style={{ width: "90%", margin: "auto" }}
           >
             <Form.Item
               label="Exam slot"
