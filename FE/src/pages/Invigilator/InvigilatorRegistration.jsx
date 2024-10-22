@@ -19,6 +19,8 @@ import { postRegisterSlots } from "../../components/API/postRegisterSlots";
 import { cancelRegisteredSlot } from "../../components/API/cancelRegisteredSlot";
 import { useSemester } from "../../components/SemesterContext";
 import { Calendar, momentLocalizer } from "react-big-calendar";
+import CustomToolbar from "../../components/CustomCalendar/CustomToolbar";
+import CustomAgenda from "../../components/CustomCalendar/CustomAgenda";
 import moment from "moment";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import "./invigilatorRegistration.css";
@@ -48,6 +50,7 @@ function InvigilatorRegistration() {
   const [loading, setLoading] = useState(true);
   const [registerLoading, setRegisterLoading] = useState(false);
   const allowedSlots = getConfigValue(ConfigType.ALLOWED_SLOT) || 0;
+  const [view, setView] = useState('month');
 
   if (selectedSemester != lastestSemester) {
     setSelectedSemester(lastestSemester);
@@ -231,6 +234,12 @@ function InvigilatorRegistration() {
     </div>
   );
 
+  const handleDrillDown = () => {
+    if (view === 'month') {
+      setView('agenda');
+    }
+  };
+
   if (loading) {
     return <Skeleton />;
   } else {
@@ -248,9 +257,13 @@ function InvigilatorRegistration() {
         </h2>
         <div style={{ display: "flex", alignItems: "flex-start" }}>
           <Calendar
-            views={{ day: true, week: true, month: true }}
             localizer={localizer}
             events={events}
+            defaultView='month'
+            views={['month', 'agenda']}
+            onView={setView}
+            view={view}
+            onDrillDown={handleDrillDown}
             startAccessor={(event) => {
               return new Date(event.startAt);
             }}
@@ -263,7 +276,12 @@ function InvigilatorRegistration() {
               width: "70%",
               fontWeight: "lighter",
             }}
-            components={{ event: EventComponent }}
+            components={{ event: EventComponent, toolbar: CustomToolbar, agenda: { event: CustomAgenda } }}
+            messages={{ event: 'Time' }}
+            formats={{
+              agendaDateFormat: (date) =>
+                moment(date).format('DD/MM/YYYY'),
+            }}
             onSelectEvent={handleSelectEvent}
             eventPropGetter={(event) => {
               const { startAt } = event;

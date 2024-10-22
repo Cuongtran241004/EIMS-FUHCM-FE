@@ -108,7 +108,7 @@ const ExamSlots = () => {
         }));
 
         try {
-          const success = await examSlotApi.updateExamSlot(updatedSlots);
+          const success = await examSlotApi.updateExamSlotByManager(updatedSlots);
           if (success) {
             message.success("Approved successfully!");
             setCheckedSlots([]);
@@ -136,7 +136,7 @@ const ExamSlots = () => {
         }));
 
         try {
-          const success = await examSlotApi.updateExamSlot(updatedSlots);
+          const success = await examSlotApi.updateExamSlotByManager(updatedSlots);
           if (success) {
             message.success("Rejected successfully!");
             setCheckedSlots([]);

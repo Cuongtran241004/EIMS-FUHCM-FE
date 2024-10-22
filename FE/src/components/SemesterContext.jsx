@@ -46,7 +46,6 @@ export const SemesterProviderInvigilator = ({ children }) => {
         }, validSemesters[0]);
 
         setLasestSemester(lastestSemester);
-        console.log(lastestSemester.id);
       }
     }
   }, [semesters])

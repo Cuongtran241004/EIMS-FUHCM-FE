@@ -270,9 +270,9 @@ const Configs = ({ isLogin }) => {
               <h2 style={titleStyle}>Configs System</h2>
             </div>
             <Spin spinning={loading}>
-              <div style={{ width: "60%", margin: "0 auto" }}>
-                <Form form={form} component={false}>
-                  <Table
+              <div style={{ width: "100%", margin: "0 auto" }}>
+                <Form form={form} component={false} >
+                  <Table 
                     bordered
                     components={{
                       body: {
