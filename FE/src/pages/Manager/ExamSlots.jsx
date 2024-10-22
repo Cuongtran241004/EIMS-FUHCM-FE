@@ -240,6 +240,9 @@ const ExamSlots = () => {
                       case "REJECTED":
                         backgroundColor = "#d9363e";
                         break;
+                      case "PENDING":
+                        backgroundColor = "rgb(249, 199, 79)";
+                        break;
                       default:
                         backgroundColor = "#1890ff";
                         break;
@@ -310,7 +313,7 @@ const ExamSlots = () => {
                     marginRight: 30,
                     marginTop: 40,
                     display: "grid",
-                    width: "15%",
+                    width: "20%",
                   }}
                 >
                   <Dropdown menu={menu} trigger={["click"]}>
@@ -336,17 +339,20 @@ const ExamSlots = () => {
                     >
                       Reject
                     </Button>
-                    <p style={{ fontWeight: "bold" }}>
-                      <span style={{ marginRight: 20, color: "#52c41a" }}>
-                        APPROVED
-                      </span>
-                      <span style={{ marginRight: 20, color: "#d9363e" }}>
-                        REJECTED
-                      </span>
-                      <span style={{ marginRight: 20, color: "#1890ff" }}>
-                        PENDING
-                      </span>
-                    </p>
+                  <div style={{marginLeft: 50}}>
+                      <p style={{ fontWeight: "bold" }}>
+                        <span style={{ marginRight: 10, color: "#52c41a" }}>
+                          APPROVED
+                        </span>
+                        <span style={{ marginRight: 10, color: "#d9363e" }}>
+                          REJECTED
+                        </span> <br/> 
+                        <span style={{ marginRight: 10, color: "rgb(249, 199, 79)" }}>
+                          PENDING
+                        </span>
+                        <span style={{ marginRight: 10, color: "#1890ff" }}>NEED ROOM</span>
+                      </p>
+                    </div>
                   </div>
                 </div>
               </div>

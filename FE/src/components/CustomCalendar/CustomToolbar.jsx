@@ -27,18 +27,31 @@ function getWeeksInYear(year) {
     return weeks;
 }
 
+function getMonthInYear(year) {
+    const months = [];
+    for (let i = 0; i < 12; i++) {
+        const monthStart = new Date(year, i, 1);
+        months.push(monthStart);
+    }
+    return months;
+
+}
+
 const CustomToolbar = (toolbar) => {
     const [weeks, setWeeks] = useState([]);
+    const [months, setMonths] = useState([]);
     const [selectCurrentWeek, setSelectCurrentWeek] = useState(null);
+    const [selectCurrentMonth, setSelectCurrentMonth] = useState(null);
     const [currentView, setCurrentView] = useState(toolbar.view);
 
     useEffect(() => {
-        setCurrentView(toolbar.view); 
-      }, [toolbar.view]);
+        setCurrentView(toolbar.view);
+    }, [toolbar.view]);
 
     useEffect(() => {
         const year = new Date().getFullYear();
         setWeeks(getWeeksInYear(year));
+        setMonths(getMonthInYear(year));
 
         const today = moment();
         const currentWeek = getWeeksInYear(year).findIndex(week => today.isBetween(week.start, week.end, null, '[]'));
@@ -55,24 +68,36 @@ const CustomToolbar = (toolbar) => {
         }
     };
 
+    const handleMonthSelect = (e) => {
+        const selectedMonthIndex = e.target.value;
+        const selectedMonth = months[selectedMonthIndex];
+
+        if (selectedMonth) {
+            toolbar.onNavigate('date', selectedMonth);
+            setSelectCurrentMonth(selectedMonthIndex);
+        }
+    }
+
+
     const goToToday = () => {
         const today = new Date();
         toolbar.onNavigate('date', today);
         const currentWeek = weeks.findIndex(week => moment(today).isBetween(week.start, week.end, null, '[]'));
+        const currentMonth = months.findIndex(month => moment(today).isSame(month, 'month'));
         if (currentWeek !== -1) {
             const selectedWeek = weeks[currentWeek];
-    
-            toolbar.onNavigate('date', selectedWeek.start); 
+            toolbar.onNavigate('date', selectedWeek.start);
         }
         setSelectCurrentWeek(currentWeek);
+        setSelectCurrentMonth(currentMonth);
     }
 
     const label = () => {
         const date = toolbar.date;
         return moment(date).format('MMMM YYYY');
-      };
+    };
 
-      const handleWeekView = () => {
+    const handleWeekView = () => {
         if (selectCurrentWeek !== null) {
             const selectedWeek = weeks[selectCurrentWeek];
             toolbar.onNavigate('date', selectedWeek.start);
@@ -82,22 +107,29 @@ const CustomToolbar = (toolbar) => {
 
     return (
         <div className="custom-toolbar">
-           <div>
-           <button onClick={goToToday}>Today</button>
-            <select value={selectCurrentWeek || ""} onChange={handleWeekSelect}>
-                <option value="">Select a week</option>
-                {weeks.map((week, index) => (
-                    <option key={index} value={index}>
-                        {`${moment(week.start).format('DD/MM')} - ${moment(week.end).format('DD/MM')}`}
-                    </option>
-                ))}
-            </select>
-           </div>
+            <div>
+                <button onClick={goToToday}>Today</button>
+                <select value={currentView === 'agenda' ? selectCurrentWeek : selectCurrentMonth}
+                    onChange={currentView === 'agenda' ? handleWeekSelect : handleMonthSelect}>
+                    <option value="">{currentView === 'agenda' ? "Select a week" : "Select a month"}</option>
+                    {currentView === 'agenda' ?
+                        weeks.map((week, index) => (
+                            <option key={index} value={index}>
+                                {`${moment(week.start).format('DD/MM')} - ${moment(week.end).format('DD/MM')}`}
+                            </option>
+                        )) :
+                        months.map((month, index) => (
+                            <option key={index} value={index}>
+                                {`${moment(month).format('MMMM')}`}
+                            </option>
+                        ))}
+                </select>
+            </div>
             <span>{label()}</span>
-           <div>
-           <button onClick={() => toolbar.onView('month')} className={currentView === 'month' ? 'active-view' : ''}>Month</button>
-           <button onClick={handleWeekView} className={currentView === 'agenda' ? 'active-view' : ''}>Week</button>
-           </div>
+            <div>
+                <button onClick={() => toolbar.onView('month')} className={currentView === 'month' ? 'active-view' : ''}>Month</button>
+                <button onClick={handleWeekView} className={currentView === 'agenda' ? 'active-view' : ''}>Week</button>
+            </div>
         </div>
     );
 };
