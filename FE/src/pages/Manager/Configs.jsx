@@ -7,20 +7,17 @@ import {
   Table,
   Input,
   message,
-  Popconfirm,
-  InputNumber,
-  Typography,
-  Spin,
   Button,
+  Spin,
+  Typography,
+  InputNumber,
 } from "antd";
 import configApi from "../../services/Config.js";
 
 import Header from "../../components/Header/Header.jsx";
 import { titleStyle } from "../../design-systems/CSS/Title.js";
-import { EyeOutlined } from "@ant-design/icons";
 
 const { Content, Sider } = Layout;
-
 const EditableCell = ({
   editing,
   dataIndex,
@@ -67,18 +64,23 @@ const Configs = ({ isLogin }) => {
   const fetchConfigs = async () => {
     setLoading(true);
     try {
-      const hourly_rate = await configApi.getHourlyRate();
-      console.log(hourly_rate);
-      const allowed_slot = await configApi.getAllowedSlot();
-      const time_before_exam = await configApi.getTimeBeforeExam();
-      const time_before_open_registration =
-        await configApi.getTimeBeforeOpenRegistration();
-      const invigilator_room = await configApi.getInvigilatorRoom();
-      const time_before_close_registration =
-        await configApi.getTimeBeforeCloseRegistration();
-      const time_before_close_request =
-        await configApi.getTimeBeforeCloseRequest();
-
+      const [
+        hourly_rate,
+        allowed_slot,
+        time_before_exam,
+        time_before_open_registration,
+        invigilator_room,
+        time_before_close_registration,
+        time_before_close_request,
+      ] = await Promise.all([
+        configApi.getHourlyRate(),
+        configApi.getAllowedSlot(),
+        configApi.getTimeBeforeExam(),
+        configApi.getTimeBeforeOpenRegistration(),
+        configApi.getInvigilatorRoom(),
+        configApi.getTimeBeforeCloseRegistration(),
+        configApi.getTimeBeforeCloseRequest(),
+      ]);
       const result = [
         {
           key: "hourly_rate",
@@ -86,7 +88,7 @@ const Configs = ({ isLogin }) => {
           value: new Intl.NumberFormat("vi-VN", {
             style: "currency",
             currency: "VND",
-          }).format(hourly_rate.value), // Format as Vietnamese currency
+          }).format(hourly_rate.value),
           unit: "VND/hour",
         },
         {
@@ -113,7 +115,6 @@ const Configs = ({ isLogin }) => {
           value: time_before_open_registration.value,
           unit: "day(s)",
         },
-
         {
           key: "time_before_close_registration",
           configType: "Time Before Close Registration",
@@ -141,6 +142,7 @@ const Configs = ({ isLogin }) => {
   }, []);
 
   const handleEdit = (record) => {
+    console.log(record);
     form.setFieldsValue({ value: "", ...record });
     setEditingKey(record.key);
   };
@@ -151,28 +153,39 @@ const Configs = ({ isLogin }) => {
 
   const handleSave = async (key) => {
     try {
+      console.log(key);
       const row = await form.validateFields();
-      const newData = [...configs];
-      const index = newData.findIndex((item) => key === item.key);
-      if (index > -1) {
-        const item = newData[index];
-        newData.splice(index, 1, { ...item, ...row });
-        setConfigs(newData);
-        setEditingKey("");
-        // Here, you would also call the API to update the config in the backend
-      } else {
-        newData.push(row);
-        setConfigs(newData);
-        setEditingKey("");
+      console.log(row);
+      switch (key) {
+        case "hourly_rate":
+          await configApi.addHourlyRate(row.value);
+          break;
+        case "allowed_slot":
+          await configApi.addAllowedSlot(row.value);
+          break;
+        case "time_before_exam":
+          await configApi.addTimeBeforeExam(row.value);
+          break;
+        case "time_before_open_registration":
+          await configApi.addTimeBeforeOpenRegistration(row.value);
+          break;
+        case "invigilator_room":
+          await configApi.addInvigilatorRoom(row.value);
+          break;
+        case "time_before_close_registration":
+          await configApi.addTimeBeforeCloseRegistration(row.value);
+          break;
+        case "time_before_close_request":
+          await configApi.addTimeBeforeCloseRequest(row.value);
+          break;
+        default:
+          break;
       }
     } catch (errInfo) {
       message.error("Save failed:", errInfo);
     }
   };
 
-  const handleViewHistory = (record) => {
-    message.info("View history of " + record.configType);
-  };
   const columns = [
     {
       title: <strong>Config Type</strong>,
@@ -194,15 +207,10 @@ const Configs = ({ isLogin }) => {
       render: (text, record, index) => {
         // Merge the "days" unit for the last four rows
         if (index === 3) {
-          return {
-            children: text,
-            props: { rowSpan: 4 }, // Merge 4 rows starting from index 3
-          };
+          onCell: (record) => ({ colSpan: 4 });
         }
         if (index > 3) {
-          return {
-            props: { colSpan: 0 }, // Hide unit for merged rows
-          };
+          onCell: (record) => ({ colSpan: 0 });
         }
         return text; // Regular display for other rows
       },
@@ -212,7 +220,6 @@ const Configs = ({ isLogin }) => {
       dataIndex: "update",
       width: "15%",
       align: "center",
-      editable: true,
     },
     {
       title: <strong>Action</strong>,
@@ -234,20 +241,12 @@ const Configs = ({ isLogin }) => {
             <a onClick={handleCancel}>Cancel</a>
           </span>
         ) : (
-          <>
-            <Button
-              disabled={editingKey !== ""}
-              onClick={() => handleEdit(record)}
-            >
-              Edit
-            </Button>
-            <Button
-              disabled={editingKey !== ""}
-              onClick={() => handleViewHistory(record)}
-            >
-              <EyeOutlined />
-            </Button>
-          </>
+          <Button
+            disabled={editingKey !== ""}
+            onClick={() => handleEdit(record)}
+          >
+            Edit
+          </Button>
         );
       },
     },

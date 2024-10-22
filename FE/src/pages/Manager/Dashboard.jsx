@@ -26,19 +26,37 @@ const Dashboard = () => {
           <div style={{ height: "49%" }}>
             <Row style={{ height: "100%" }}>
               <Col
-                span={17}
+                span={12}
                 style={{ backgroundColor: "#f0f2f5", padding: "20px" }}
               >
                 {/* Content for the left part (70%) */}
-                <h2>Dashboard Summary</h2>
+                <h2>Exam Slot Summary</h2>
+                <p>
+                  Thống kê có bao nhiêu exam slot diễn ra từ ngày A đến ngày B
+                </p>
+                <p>
+                  API nhận start date, end date, và trả về json dạng:{" "}
+                  {`{"date": "2021-09-01",
+                  "total_exam_slot": 10}`}{" "}
+                </p>
                 {/* Your content here */}
               </Col>
               <Col
-                span={7}
+                span={12}
                 style={{ backgroundColor: "#e6f7ff", padding: "20px" }}
               >
                 {/* Content for the right part (30%) */}
-                <h2>Quick Actions</h2>
+                <h2>Invigilation Summary</h2>
+                <p>
+                  Thống kê có bao nhiêu invigilator đã đăng ký, bao nhiêu
+                  invigilator được assign trong ngày A (bởi vì 1 ngày có nhiều
+                  exam slot nên hiển thị trong 1 ngày sẽ dễ nhìn hơn)
+                </p>
+                <p>
+                  API nhận vào date, và trả về json dạng:{" "}
+                  {`{"exam slot": {thông tin của exam slot},
+                  "registered": 10, "assigned": 8`}{" "}
+                </p>
                 {/* Your content here */}
               </Col>
             </Row>
@@ -52,6 +70,7 @@ const Dashboard = () => {
               >
                 {/* Table for today's exam slots */}
                 <h3>Today's Exam Slots</h3>
+                <p>Danh sách exam slot của ngày hôm nay</p>
                 {/* Your table component here */}
               </Col>
               <Col
@@ -60,6 +79,7 @@ const Dashboard = () => {
               >
                 {/* Table for today's invigilators */}
                 <h3>Today's Invigilators</h3>
+                <p>Danh sách các giảng viên coi thi ngày hôm nay</p>
                 {/* Your table component here */}
               </Col>
               <Col
@@ -68,6 +88,8 @@ const Dashboard = () => {
               >
                 {/* Table for today's reports */}
                 <h3>Today's Reports</h3>
+                <p>bao gồm exam slot report và attendance report</p>
+                <p>api trả về con số</p>
                 {/* Your table component here */}
               </Col>
             </Row>
