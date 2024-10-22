@@ -2,16 +2,16 @@ import { notification } from "antd";
 
 const editNotification = () => {
   notification.warning({
-    message: "Semester Not Available",
-    description: `You cannot edit the past semester!`,
+    message: "Warning",
+    description: `You cannot edit the exam slot!`,
     placement: "topRight",
   });
 };
 
 const deleteNotification = () => {
   notification.warning({
-    message: "Semester Not Available",
-    description: `You cannot delete the past semester!`,
+    message: "Warning",
+    description: `You cannot delete the exam slot!`,
     placement: "topRight",
   });
 };

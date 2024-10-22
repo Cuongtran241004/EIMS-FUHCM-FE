@@ -97,6 +97,14 @@ const Exam_Schedule = () => {
     }
   };
 
+  const fetchExamScheduleById = async (id) => {
+    try {
+      const response = await examSlotApi.getExamSlotById(id);
+      return response;
+    } catch (error) {
+      console.error("Error fetching exam schedule by ID:", error);
+    }
+  };
   const fetchExams = async (semesterId) => {
     try {
       const result = await examApi.getExamBySemesterId(semesterId);
@@ -125,16 +133,29 @@ const Exam_Schedule = () => {
     }
   };
 
+  const isAvailable = async (id) => {
+    const examSlot = await fetchExamScheduleById(id);
+    const result =
+      availableSemesters.find(
+        (semester) => semester.id === selectedSemester.id
+      ) &&
+      examSlot.status != "APPROVED" &&
+      examSlot.status != "REJECTED";
+    console.log("isAvailable", result);
+    return result;
+  };
+
   const handleDelete = async (id) => {
-    if (
-      availableSemesters.find((semester) => semester.id === selectedSemester.id)
-    ) {
+    if (isAvailable(id)) {
       try {
         await examSlotApi.deleteExamSlot(id);
         message.success(DELETE_EXAM_SCHEDULE_SUCCESS);
         fetchExamSchedule(selectedSemester.id); // Refresh schedule
       } catch (error) {
-        notification.error({ message: DELETE_EXAM_SCHEDULE_FAILED });
+        notification.warning({
+          message: "Warning",
+          description: DELETE_EXAM_SCHEDULE_FAILED,
+        });
       }
     } else {
       deleteNotification();
@@ -142,10 +163,7 @@ const Exam_Schedule = () => {
   };
 
   const handleEdit = async (record) => {
-    console.log("Editing exam slot:", record);
-    if (
-      availableSemesters.find((semester) => semester.id === selectedSemester.id)
-    ) {
+    if (await isAvailable(record.id)) {
       setIsEditing(true);
       setEditingExamSlot(record);
       setExamId(record.examId);
@@ -157,7 +175,7 @@ const Exam_Schedule = () => {
         startTime: moment(record.startAt),
         endTime: moment(record.endAt),
       });
-      await fetchExams(selectedSemester.id);
+      //  await fetchExams(selectedSemester.id);
     } else {
       editNotification();
     }
@@ -189,7 +207,7 @@ const Exam_Schedule = () => {
       setLoadingSubmit(true); // Start loading
       try {
         if (isEditing) {
-          await examSlotApi.updateExamSlot(examSlotDataUpdate);
+          await examSlotApi.updateExamSlotByStaff(examSlotDataUpdate);
           message.success(EDIT_EXAM_SCHEDULE_SUCCESS);
         } else {
           await examSlotApi.addExamSlot(examSlotDataAdd); // Assuming API returns the new slot

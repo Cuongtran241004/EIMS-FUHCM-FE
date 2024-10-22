@@ -107,17 +107,35 @@ const examSlotApi = {
       handleError(error);
     }
   },
-  updateExamSlot: async (examSlots) => {
+  updateExamSlotByStaff: async (examSlot) => {
     try {
-      const updatePromises = examSlots.map(slot => {
+      const response = await axios.put(
+        `${EXAM_SLOT_API_BASE_URL}/${examSlot.id}`,
+        examSlot,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+          withCredentials: true,
+        }
+      );
+      return response.data;
+    } catch (error) {
+      handleError(error);
+    }
+  },
+  updateExamSlotByManager: async (examSlots) => {
+    try {
+      const updatePromises = examSlots.map((slot) => {
         return axios.put(
-          `${EXAM_SLOT_API_BASE_URL}/manager-update/${slot.subjectExamId}`, 
+          `${EXAM_SLOT_API_BASE_URL}/manager-update/${slot.subjectExamId}`,
           {
             subjectExamId: slot.subjectExamId,
             startAt: slot.startAt,
             endAt: slot.endAt,
             requiredInvigilators: slot.requiredInvigilators,
-            status: slot.status 
+            status: slot.status,
           },
           {
             headers: {
@@ -129,7 +147,7 @@ const examSlotApi = {
         );
       });
       const responses = await Promise.all(updatePromises);
-      return responses.map(response => response.data);
+      return responses.map((response) => response.data);
     } catch (error) {
       handleError(error);
     }
