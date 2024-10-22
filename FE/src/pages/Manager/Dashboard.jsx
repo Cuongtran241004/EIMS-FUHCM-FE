@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import NavBar_Manager from "../../components/NavBar/NavBar_Manager";
 import Header from "../../components/Header/Header.jsx";
 import { Layout, Typography, Row, Col, Card, Statistic } from "antd";

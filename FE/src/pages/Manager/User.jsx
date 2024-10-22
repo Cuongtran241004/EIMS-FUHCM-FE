@@ -61,8 +61,9 @@ const Users = ({ isLogin }) => {
   const fetchData = async () => {
     setLoading(true);
     try {
-      const result = await userApi.getAllUsers();
-
+      const response = await userApi.getAllUsers();
+      // only return if role != 1
+      const result = response.filter((user) => user.role !== 1);
       result.sort((a, b) => {
         // sort by createAt
         return new Date(b.createdAt) - new Date(a.createdAt);

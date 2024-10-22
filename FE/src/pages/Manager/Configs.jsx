@@ -11,11 +11,13 @@ import {
   InputNumber,
   Typography,
   Spin,
+  Button,
 } from "antd";
 import configApi from "../../services/Config.js";
 
 import Header from "../../components/Header/Header.jsx";
 import { titleStyle } from "../../design-systems/CSS/Title.js";
+import { EyeOutlined } from "@ant-design/icons";
 
 const { Content, Sider } = Layout;
 
@@ -138,16 +140,16 @@ const Configs = ({ isLogin }) => {
     fetchConfigs();
   }, []);
 
-  const edit = (record) => {
+  const handleEdit = (record) => {
     form.setFieldsValue({ value: "", ...record });
     setEditingKey(record.key);
   };
 
-  const cancel = () => {
+  const handleCancel = () => {
     setEditingKey("");
   };
 
-  const save = async (key) => {
+  const handleSave = async (key) => {
     try {
       const row = await form.validateFields();
       const newData = [...configs];
@@ -168,11 +170,14 @@ const Configs = ({ isLogin }) => {
     }
   };
 
+  const handleViewHistory = (record) => {
+    message.info("View history of " + record.configType);
+  };
   const columns = [
     {
       title: <strong>Config Type</strong>,
       dataIndex: "configType",
-      width: "40%",
+      width: "30%",
     },
     {
       title: <strong>Value</strong>,
@@ -185,7 +190,7 @@ const Configs = ({ isLogin }) => {
       title: <strong>Unit</strong>,
       dataIndex: "unit",
       align: "center",
-      width: "20%",
+      width: "15%",
       render: (text, record, index) => {
         // Merge the "days" unit for the last four rows
         if (index === 3) {
@@ -203,6 +208,13 @@ const Configs = ({ isLogin }) => {
       },
     },
     {
+      title: <strong>Lastest Update</strong>,
+      dataIndex: "update",
+      width: "15%",
+      align: "center",
+      editable: true,
+    },
+    {
       title: <strong>Action</strong>,
       dataIndex: "action",
       align: "center",
@@ -211,24 +223,31 @@ const Configs = ({ isLogin }) => {
         return editable ? (
           <span>
             <Typography.Link
-              onClick={() => save(record.key)}
+              onClick={() => handleSave(record.key)}
               style={{
                 marginRight: 8,
               }}
             >
               Save
             </Typography.Link>
-            <Popconfirm title="Sure to cancel?" onConfirm={cancel}>
-              <a>Cancel</a>
-            </Popconfirm>
+
+            <a onClick={handleCancel}>Cancel</a>
           </span>
         ) : (
-          <Typography.Link
-            disabled={editingKey !== ""}
-            onClick={() => edit(record)}
-          >
-            Edit
-          </Typography.Link>
+          <>
+            <Button
+              disabled={editingKey !== ""}
+              onClick={() => handleEdit(record)}
+            >
+              Edit
+            </Button>
+            <Button
+              disabled={editingKey !== ""}
+              onClick={() => handleViewHistory(record)}
+            >
+              <EyeOutlined />
+            </Button>
+          </>
         );
       },
     },
@@ -270,7 +289,7 @@ const Configs = ({ isLogin }) => {
               <h2 style={titleStyle}>Configs System</h2>
             </div>
             <Spin spinning={loading}>
-              <div style={{ width: "60%", margin: "0 auto" }}>
+              <div style={{ width: "100%", margin: "0 auto" }}>
                 <Form form={form} component={false}>
                   <Table
                     bordered

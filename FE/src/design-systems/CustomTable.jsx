@@ -2,8 +2,6 @@ import { Button, Popconfirm, Space } from "antd";
 import {
   DeleteOutlined,
   EditOutlined,
-  EyeOutlined,
-  PlusCircleOutlined,
   PlusSquareOutlined,
 } from "@ant-design/icons";
 import moment from "moment";
@@ -178,8 +176,9 @@ const userTable = (handleEdit, handleDelete) => [
     key: "role",
     // using tag of ant design to display role
     render: (text, record) => {
-      const role = roleOptions.find((role) => role.value === record.role);
-      userRoleTag(role.label);
+      const role = roleOptions.find((role) => role.value == record.role);
+      console.log(role);
+      return userRoleTag(role.label);
     },
   },
   {
