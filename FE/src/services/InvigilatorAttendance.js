@@ -1,36 +1,39 @@
 import axios from "axios";
 import { API_BASE_URL } from "../configs/urlApi.js";
-const ATTENDANCE_API_BASE_URL = `${API_BASE_URL}/invigilator-attendance`;
-
+const STAFF_ATTENDANCE_API_BASE_URL = `${API_BASE_URL}/invigilator-attendance/staff`;
+const MANAGER_ATTENDANCE_API_BASE_URL = `${API_BASE_URL}/invigilator-attendance/manager`;
 const handleError = (error) => {
   console.error("Error fetching data:", error);
   throw error;
 };
 
 const attendanceApi = {
-  getAllAttendance: async () => {
-    try {
-      const response = await axios.get(`${ATTENDANCE_API_BASE_URL}`, {
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-        },
-        withCredentials: true,
-      });
-      return response.data;
-    } catch (error) {
-      handleError(error);
-    }
-  },
+  // getAllAttendance: async () => {
+  //   try {
+  //     const response = await axios.get(`${ATTENDANCE_API_BASE_URL}`, {
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //         Accept: "application/json",
+  //       },
+  //       withCredentials: true,
+  //     });
+  //     return response.data;
+  //   } catch (error) {
+  //     handleError(error);
+  //   }
+  // },
   getAllAttendanceToday: async () => {
     try {
-      const response = await axios.get(`${ATTENDANCE_API_BASE_URL}/today`, {
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-        },
-        withCredentials: true,
-      });
+      const response = await axios.get(
+        `${STAFF_ATTENDANCE_API_BASE_URL}/today`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+          withCredentials: true,
+        }
+      );
       return response.data;
     } catch (error) {
       handleError(error);
@@ -38,7 +41,7 @@ const attendanceApi = {
   },
   getAllAttendanceByDate: async () => {
     try {
-      const response = await axios.get(`${ATTENDANCE_API_BASE_URL}/day`, {
+      const response = await axios.get(`${STAFF_ATTENDANCE_API_BASE_URL}/day`, {
         headers: {
           "Content-Type": "application/json",
           Accept: "application/json",
@@ -53,7 +56,7 @@ const attendanceApi = {
   getExamSlotByDate: async (date) => {
     try {
       const response = await axios.get(
-        `${ATTENDANCE_API_BASE_URL}/exam-slots-by-day`,
+        `${STAFF_ATTENDANCE_API_BASE_URL}/exam-slots-by-day`,
         {
           params: {
             date,
@@ -73,7 +76,7 @@ const attendanceApi = {
   getAttendanceByExamSlotId: async (examSlotId) => {
     try {
       const response = await axios.get(
-        `${ATTENDANCE_API_BASE_URL}/exam-slot/${examSlotId}`,
+        `${STAFF_ATTENDANCE_API_BASE_URL}/exam-slot/${examSlotId}`,
         {
           headers: {
             "Content-Type": "application/json",
@@ -90,7 +93,7 @@ const attendanceApi = {
   addAllAttendanceByDate: async (date) => {
     try {
       const response = await axios.post(
-        `${ATTENDANCE_API_BASE_URL}/add-by-day`,
+        `${STAFF_ATTENDANCE_API_BASE_URL}/add-by-day`,
         {},
         {
           params: {
@@ -111,7 +114,7 @@ const attendanceApi = {
   updateCheckinAllByExamSlotId: async (checkin) => {
     try {
       const response = await axios.put(
-        `${ATTENDANCE_API_BASE_URL}/checkin-all/${checkin.examSlotId}`,
+        `${STAFF_ATTENDANCE_API_BASE_URL}/checkin-all/${checkin.examSlotId}`,
         checkin,
         {
           headers: {
@@ -129,7 +132,7 @@ const attendanceApi = {
   updateCheckinList: async (checkin) => {
     try {
       const response = await axios.put(
-        `${ATTENDANCE_API_BASE_URL}/checkin-all`,
+        `${STAFF_ATTENDANCE_API_BASE_URL}/checkin-all`,
         checkin,
         {
           headers: {
@@ -147,7 +150,7 @@ const attendanceApi = {
   updateCheckinById: async (checkin) => {
     try {
       const response = await axios.put(
-        `${ATTENDANCE_API_BASE_URL}/checkin/${checkin.id}`,
+        `${STAFF_ATTENDANCE_API_BASE_URL}/checkin/${checkin.id}`,
         checkin,
         {
           headers: {
@@ -165,7 +168,7 @@ const attendanceApi = {
   updateCheckoutByExamSlotId: async (checkout) => {
     try {
       const response = await axios.put(
-        `${ATTENDANCE_API_BASE_URL}/checkout/${checkout.examSlotId}`,
+        `${STAFF_ATTENDANCE_API_BASE_URL}/checkout/${checkout.examSlotId}`,
         checkout,
         {
           headers: {
@@ -183,7 +186,7 @@ const attendanceApi = {
   updateCheckoutById: async (checkout) => {
     try {
       const response = await axios.put(
-        `${ATTENDANCE_API_BASE_URL}/checkout/${checkout.id}`,
+        `${STAFF_ATTENDANCE_API_BASE_URL}/checkout/${checkout.id}`,
         checkout,
         {
           headers: {
@@ -201,7 +204,7 @@ const attendanceApi = {
   updateCheckoutList: async (checkout) => {
     try {
       const response = await axios.put(
-        `${ATTENDANCE_API_BASE_URL}/checkout-all`,
+        `${STAFF_ATTENDANCE_API_BASE_URL}/checkout-all`,
         checkout,
         {
           headers: {
