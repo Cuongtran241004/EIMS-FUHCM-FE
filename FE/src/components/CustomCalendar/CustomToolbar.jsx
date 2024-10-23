@@ -40,9 +40,9 @@ function getMonthInYear(year) {
 const CustomToolbar = (toolbar) => {
     const [weeks, setWeeks] = useState([]);
     const [months, setMonths] = useState([]);
-    const [selectCurrentWeek, setSelectCurrentWeek] = useState(null);
-    const [selectCurrentMonth, setSelectCurrentMonth] = useState(null);
-    const [currentView, setCurrentView] = useState(toolbar.view);
+    const [selectCurrentWeek, setSelectCurrentWeek] = useState("");
+    const [selectCurrentMonth, setSelectCurrentMonth] = useState("");
+    const [currentView, setCurrentView] = useState('month');
 
     useEffect(() => {
         setCurrentView(toolbar.view);
@@ -56,6 +56,8 @@ const CustomToolbar = (toolbar) => {
         const today = moment();
         const currentWeek = getWeeksInYear(year).findIndex(week => today.isBetween(week.start, week.end, null, '[]'));
         setSelectCurrentWeek(currentWeek);
+        const currentMonth = getMonthInYear(year).findIndex(month => today.isSame(month, 'month'));
+        setSelectCurrentMonth(currentMonth);
     }, []);
 
     const handleWeekSelect = (e) => {

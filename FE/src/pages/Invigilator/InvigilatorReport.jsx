@@ -18,7 +18,6 @@ const InvigilatorReport = () => {
     const [slotData, setSlotData] = useState([]);
     const [feeData, setFeeData] = useState([]);
     const [loading, setLoading] = useState(false);
-    const [selectedDate, setSelectedDate] = useState(null);
     const formatNumber  = new Intl.NumberFormat('en-US');
 
 
@@ -53,7 +52,6 @@ const InvigilatorReport = () => {
 
     const handleDateChange = (date, string) => {
         if (string === null || string === "") {
-            setSelectedDate(null);
             try {
                 setSlotData(examSlotDetail); 
             } catch (error) {
@@ -62,7 +60,6 @@ const InvigilatorReport = () => {
                 setLoading(false);
             }
         } else {
-            setSelectedDate(string);
             const filteredData = examSlotDetail.filter((slot) =>
                 moment(slot.startAt).format("DD-MM-YYYY") === string
         );
@@ -105,7 +102,9 @@ const InvigilatorReport = () => {
             title: "Status",
             dataIndex: "status",
             key: "status",
-            render: (status) => (status ? status : "Not Yet"),
+            render: (status) => {
+                return <span style={{ color: status === "APPROVED" ? "green" : "red" }}><strong>{status || "Not Yet"}</strong></span>;
+            },
         },
 
     ];
@@ -117,7 +116,8 @@ const InvigilatorReport = () => {
             {loadingSemesters ? (
                 <Spin />
             ) : (
-                <>
+                <div style={{marginLeft: 30}}>
+                    <div style={{marginLeft: 30}}>
                     <Dropdown menu={menu} trigger={["click"]}>
                         <Button size="large" style={selectButtonStyle}>
                             <Space>
@@ -129,11 +129,13 @@ const InvigilatorReport = () => {
                         </Button>
                     </Dropdown>
 
-                    <DatePicker format={'DD-MM-YYYY'} onChange={handleDateChange} />
+                    
+                    </div>
 
                     <div style={{ display: 'flex', justifyContent: 'space-between', marginLeft: 30, paddingRight: 200 }}>
                         <div style={{ width: '60%' }}>
                             <h3 style={{ display: 'flex', justifyContent: 'center' }}>Slot Report</h3>
+                            <DatePicker style={{ width: '40%', marginBottom: 20}} format={'DD-MM-YYYY'} onChange={handleDateChange} />
                             <Table
                                 columns={slotColumns}
                                 dataSource={slotData}
@@ -145,15 +147,17 @@ const InvigilatorReport = () => {
                                     showQuickJumper: false,
                                     position: ["bottomCenter"],
                                   }}
+                                  style={{ border: '2px solid #f0f0f0', padding: '16px', borderRadius: '8px'}}
+                                
                             />
 
                         </div>
 
-                        <div style={{ width: '20%' }}>
-                            <h3 style={{ display: 'flex', justifyContent: 'center' }}>Fee Summary</h3>
-                            <div style={{ border: '2px solid #f0f0f0', padding: '16px', borderRadius: '8px' }}>
+                        <div style={{ width: '30%' }}>
+                            <h3 style={{ display: 'flex', justifyContent: 'center', marginBottom: 70 }}>Fee Summary</h3>
+                            <div style={{ border: '2px solid #f0f0f0', padding: '30px', borderRadius: '8px' }}>
                                 <div>
-                                    <strong>Total hours:</strong> {feeData.totalHours || 0}
+                                    <strong>Total hours:</strong> {feeData.totalHours || 0} hours
                                 </div>
                                 <br />
                                 <div>
@@ -161,12 +165,12 @@ const InvigilatorReport = () => {
                                 </div>
                                 <br />
                                 <div>
-                                    <strong>Estimated Fee:</strong> {formatNumber.format(feeData.preCalculatedInvigilatorFree) || 0}
+                                    <strong>Estimated fee:</strong> {formatNumber.format(feeData.preCalculatedInvigilatorFree) || 0} VND
                                 </div>
                             </div>
                         </div>
                     </div>
-                </>
+                </div>
             )}
         </div>
     );
