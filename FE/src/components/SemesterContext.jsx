@@ -1,9 +1,9 @@
 import React, { createContext, useState, useEffect, useContext } from "react";
 import { useFetchSemesters } from "./Hook/useFetchSemesters";
 import { useFetchAvailableSlots } from "./Hook/useFetchAvailableSlots";
-import { useFetchSchedules } from "./Hook/useFetchSchedules";
 import { useSemesterConfig } from "./Hook/useSemesterConfig";
 import moment from "moment";
+import { useInviAttendance } from "./Hook/useInviAttendance";
 
 const SemesterContext = createContext();
 
@@ -16,7 +16,7 @@ export const SemesterProviderInvigilator = ({ children }) => {
   const [reloadSlots, setReloadSlots] = useState(0);
   const { availableSlotsData, loading: loadingAvailableSlots } =
     useFetchAvailableSlots(lastestSemester?.id, reloadSlots);
-  const { examSlotDetail, loading: loadingSchedules } = useFetchSchedules(
+  const { examSlotDetail, inviFee,  loading: loadingSchedules } = useInviAttendance(
     selectedSemester?.id, reloadSlots);
   const { semesterConfig, getConfigValue } = useSemesterConfig(lastestSemester?.id);
 
@@ -70,6 +70,7 @@ export const SemesterProviderInvigilator = ({ children }) => {
         setLasestSemester,
         semesterConfig,
         getConfigValue,
+        inviFee,
       }}
     >
       {children}

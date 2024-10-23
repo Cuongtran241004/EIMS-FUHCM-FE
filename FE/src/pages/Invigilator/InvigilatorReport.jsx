@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { Table, Select, DatePicker, Spin, Flex } from "antd";
+import { Table, DatePicker, Spin, Dropdown, Button, Space } from "antd";
+import { DownOutlined } from "@ant-design/icons";
+import { selectButtonStyle } from "../../design-systems/CSS/Button";
 import { useSemester } from "../../components/SemesterContext";
 import moment from "moment";
 
@@ -9,84 +11,104 @@ const InvigilatorReport = () => {
         selectedSemester,
         setSelectedSemester,
         loadingSemesters,
+        examSlotDetail,
+        inviFee,
     } = useSemester() || {};
 
     const [slotData, setSlotData] = useState([]);
     const [feeData, setFeeData] = useState([]);
     const [loading, setLoading] = useState(false);
     const [selectedDate, setSelectedDate] = useState(null);
+    const formatNumber  = new Intl.NumberFormat('en-US');
+
 
     useEffect(() => {
-        if (loadingSemesters) return;
-
-        if (semesters && semesters.length > 0) {
-            fetchSlotData(selectedSemester, selectedDate);
-            fetchFeeData(selectedSemester);
+        if (examSlotDetail) {
+            setSlotData(examSlotDetail);
         }
-    }, [semesters, selectedSemester, selectedDate, loadingSemesters]);
+    }, [examSlotDetail]);
 
-    const fetchSlotData = async (semester, date) => {
-        setLoading(true);
-        try {
-            // Replace this URL with your actual API endpoint
-            const response = await fetch(`/api/slots?semesterId=${semester?.id}&date=${date ? moment(date).format("YYYY-MM-DD") : ''}`);
-            const data = await response.json();
-            setSlotData(data);
-        } catch (error) {
-            console.error("Error fetching slot data:", error);
-        } finally {
-            setLoading(false);
+    useEffect(() => {
+        if (inviFee) {
+            setFeeData(inviFee);
         }
+    }, [inviFee]);
+
+    const handleMenuClick = (e) => {
+        const selected = semesters.find(
+            (semester) => semester.id === parseInt(e.key)
+        );
+        setSelectedSemester(selected);
     };
 
-    const fetchFeeData = async (semester) => {
-        setLoading(true);
-        try {
-            // Replace this URL with your actual API endpoint
-            const response = await fetch(`/api/fees?semesterId=${semester?.id}`);
-            const data = await response.json();
-            setFeeData(data);
-        } catch (error) {
-            console.error("Error fetching fee data:", error);
-        } finally {
-            setLoading(false);
-        }
+    const menuItems = semesters.map((semester) => ({
+        key: semester.id,
+        label: semester.name,
+    }));
+
+    const menu = {
+        items: menuItems,
+        onClick: handleMenuClick,
     };
 
-    const handleDateChange = (date) => {
-        setSelectedDate(date);
-        fetchSlotData(selectedSemester, date); // Fetch new data when date changes
+    const handleDateChange = (date, string) => {
+        if (string === null || string === "") {
+            setSelectedDate(null);
+            try {
+                setSlotData(examSlotDetail); // Reset to original data
+            } catch (error) {
+                console.error("Error fetching slot data:", error);
+            } finally {
+                setLoading(false);
+            }
+        } else {
+            setSelectedDate(date);
+            const filteredData = examSlotDetail.filter((slot) =>
+                moment(slot.startAt).isSame(date, "day")
+            );
+            setSlotData(filteredData); // Set filtered data
+        }
     };
 
     const slotColumns = [
         {
             title: "Date",
-            dataIndex: "date",
-            key: "date",
-            render: (date) => moment(date).format("YYYY-MM-DD"),
+            dataIndex: "startAt",
+            key: "startAt",
+            render: (startAt) => moment(startAt).format("DD-MM-YYYY"),
         },
         {
             title: "Start",
-            dataIndex: "start",
+            dataIndex: "startAt",
             key: "start",
+            render: (startAt) => moment(startAt).format("HH:mm"),
         },
         {
             title: "End",
-            dataIndex: "end",
+            dataIndex: "endAt",
             key: "end",
+            render: (endAt) => moment(endAt).format("HH:mm"),
         },
         {
             title: "Check In",
             dataIndex: "checkIn",
             key: "checkIn",
+            render: (checkIn) => (checkIn ? moment(checkIn).format("DD-MM-YYYY HH:mm") : "-"),
         },
         {
             title: "Check Out",
             dataIndex: "checkOut",
             key: "checkOut",
+            render: (checkOut) => (checkOut ? moment(checkOut).format("DD-MM-YYYY HH:mm") : "-"),
         },
-    ];
+        {
+            title: "Status",
+            dataIndex: "status",
+            key: "status",
+            render: (status) => (status ? status : "Not Yet"),
+        },
 
+    ];
 
     return (
         <div>
@@ -96,53 +118,50 @@ const InvigilatorReport = () => {
                 <Spin />
             ) : (
                 <>
-                    <Select
-                        value={selectedSemester?.id}
-                        onChange={(value) => {
-                            const semester = semesters.find((sem) => sem.id === value);
-                            setSelectedSemester(semester);
-                            fetchSlotData(semester, selectedDate);
-                            fetchFeeData(semester);
-                        }}
-                        placeholder="Select Semester"
-                        style={{ width: 200, marginBottom: 20, marginLeft: 30 }}
-                    >
-                        {semesters.map((semester) => (
-                            <Select.Option key={semester.id} value={semester.id}>
-                                {semester.name}
-                            </Select.Option>
-                        ))}
-                    </Select>
+                    <Dropdown menu={menu} trigger={["click"]}>
+                        <Button size="large" style={selectButtonStyle}>
+                            <Space>
+                                {selectedSemester
+                                    ? selectedSemester.name
+                                    : "No Semesters Available"}
+                                <DownOutlined />
+                            </Space>
+                        </Button>
+                    </Dropdown>
 
+                    <DatePicker format={'DD-MM-YYYY'} onChange={handleDateChange} />
 
                     <div style={{ display: 'flex', justifyContent: 'space-between', marginLeft: 30, paddingRight: 200 }}>
-                        <div style={{width: '60%'}}>
-                            <h3 style={{ display: 'flex', justifyContent: 'center'}}>Slot Report</h3>
-                            <Table 
+                        <div style={{ width: '60%' }}>
+                            <h3 style={{ display: 'flex', justifyContent: 'center' }}>Slot Report</h3>
+                            <Table
                                 columns={slotColumns}
                                 dataSource={slotData}
                                 loading={loading}
-                                rowKey="id"
+                                rowKey={(record) => record.examSlotId}
+                                pagination={{
+                                    pageSize: 5,
+                                    showSizeChanger: false,
+                                    showQuickJumper: false,
+                                    position: ["bottomCenter"],
+                                  }}
                             />
+
                         </div>
 
-                        <div style={{width: '20%'}}>
+                        <div style={{ width: '20%' }}>
                             <h3 style={{ display: 'flex', justifyContent: 'center' }}>Fee Summary</h3>
                             <div style={{ border: '2px solid #f0f0f0', padding: '16px', borderRadius: '8px' }}>
                                 <div>
-                                    <strong>Estimated Fee:</strong> {feeData.estimatedFee || 0}
+                                    <strong>Total hours:</strong> {feeData.totalHours || 0}
                                 </div>
                                 <br />
                                 <div>
-                                    <strong>Actual Fee:</strong> {feeData.actualFee || 0}
+                                    <strong>Hour rate:</strong> {formatNumber.format(feeData.hourlyRate) || 0} / hour
                                 </div>
                                 <br />
                                 <div>
-                                    <strong>Amount Received:</strong> {feeData.amountReceived || 0}
-                                </div>
-                                <br />
-                                <div>
-                                    <strong>Rate:</strong> {feeData.rate || 0} / hour
+                                    <strong>Estimated Fee:</strong> {formatNumber.format(feeData.preCalculatedInvigilatorFree) || 0}
                                 </div>
                             </div>
                         </div>
