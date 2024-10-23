@@ -114,6 +114,13 @@ const Configs = ({ isLogin }) => {
 
   const columns = [
     {
+      title: <strong>No</strong>,
+      dataIndex: "no",
+      key: "no",
+      align: "center",
+      render: (_, __, index) => index + 1,
+    },
+    {
       title: <strong>Config Type</strong>,
       dataIndex: "configType",
       width: "30%",
@@ -124,6 +131,11 @@ const Configs = ({ isLogin }) => {
       width: "20%",
       align: "center",
       editable: true,
+      render: (text) => {
+        return new Intl.NumberFormat("vi-VN", {
+          maximumFractionDigits: 0, // No decimal places
+        }).format(text);
+      },
     },
     {
       title: <strong>Unit</strong>,
