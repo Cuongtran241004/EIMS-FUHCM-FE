@@ -55,18 +55,18 @@ const InvigilatorReport = () => {
         if (string === null || string === "") {
             setSelectedDate(null);
             try {
-                setSlotData(examSlotDetail); // Reset to original data
+                setSlotData(examSlotDetail); 
             } catch (error) {
                 console.error("Error fetching slot data:", error);
             } finally {
                 setLoading(false);
             }
         } else {
-            setSelectedDate(date);
+            setSelectedDate(string);
             const filteredData = examSlotDetail.filter((slot) =>
-                moment(slot.startAt).isSame(date, "day")
-            );
-            setSlotData(filteredData); // Set filtered data
+                moment(slot.startAt).format("DD-MM-YYYY") === string
+        );
+            setSlotData(filteredData); 
         }
     };
 
