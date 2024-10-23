@@ -117,6 +117,24 @@ const managerMapperUtil = {
       };
     });
   },
+
+  mapAttendanceReport: (list) => {
+    return list.map((item) => {
+      return {
+        key: item.id,
+        id: item.id,
+        fuId: item.fuId,
+        firstName: item.firstName,
+        lastName: item.lastName,
+        email: item.email,
+        phone: item.phoneNum,
+        totalSlots: item.totalExamSlots,
+        totalHours: item.totalHours,
+        hourlyRate: item.hourlyRate,
+        fee: item.preCalculatedInvigilatorFree,
+      };
+    });
+  },
 };
 
 export { managerMapperUtil };

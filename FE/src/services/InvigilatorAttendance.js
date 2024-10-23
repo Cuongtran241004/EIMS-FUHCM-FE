@@ -2,6 +2,7 @@ import axios from "axios";
 import { API_BASE_URL } from "../configs/urlApi.js";
 const STAFF_ATTENDANCE_API_BASE_URL = `${API_BASE_URL}/invigilator-attendance/staff`;
 const MANAGER_ATTENDANCE_API_BASE_URL = `${API_BASE_URL}/invigilator-attendance/manager`;
+
 const handleError = (error) => {
   console.error("Error fetching data:", error);
   throw error;
@@ -247,6 +248,24 @@ const attendanceApi = {
     try {
       const response = await axios.get(
         `${MANAGER_ATTENDANCE_API_BASE_URL}/exam-slot-by-semester/${semesterId}`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+          withCredentials: true,
+        }
+      );
+      return response.data;
+    } catch (error) {
+      handleError(error);
+    }
+  },
+
+  getAttendanceReportBySemesterIdManager: async (semesterId) => {
+    try {
+      const response = await axios.get(
+        `${MANAGER_ATTENDANCE_API_BASE_URL}/report/invigilator/${semesterId}`,
         {
           headers: {
             "Content-Type": "application/json",
