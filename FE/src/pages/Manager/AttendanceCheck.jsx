@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Layout } from "antd";
 import NavBar_Manager from "../../components/NavBar/NavBar_Manager";
 import Header from "../../components/Header/Header.jsx";
-import { Dropdown, Button, Space, Table, Spin, DatePicker } from "antd";
+import { Dropdown, Button, Space, Table, Spin, DatePicker, Modal } from "antd";
 import { DownOutlined } from "@ant-design/icons";
 import { useSemester } from "../../components/Context/SemesterContext.jsx";
 import dayjs from "dayjs";
@@ -19,6 +19,7 @@ const AttendanceCheck = () => {
   const [examSlots, setExamSlots] = useState([]);
   const [loading, setLoading] = useState(false);
   const [listLoading, setListLoading] = useState(false);
+  const [isModalVisible, setIsModalVisible] = useState(false);
   const { selectedSemester, setSelectedSemester, semesters } = useSemester(); // Access shared semester state
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 8;
@@ -72,12 +73,19 @@ const AttendanceCheck = () => {
     }
   };
 
+  const handleCancel = () => {
+    setIsModalVisible(false);
+  };
+
   const showListAttendance = async (examSlotId) => {
+    setIsModalVisible(true);
     setListLoading(true);
     try {
       const response =
         await attendanceApi.getAttendanceByExamSlotIdManager(examSlotId);
-      setAttendances(response || []);
+      console.log(response);
+      const result = managerMapperUtil.mapAttendanceList(response);
+      setAttendances(result || []);
     } catch (error) {
       // Handle error
     } finally {
@@ -139,8 +147,7 @@ const AttendanceCheck = () => {
       render: (text, record) => (
         <Button
           type="link"
-          loading={listLoading}
-          onClick={() => showListAttendance(record.id)}
+          onClick={() => showListAttendance(record.examSlotId)}
         >
           Show
         </Button>
@@ -156,6 +163,45 @@ const AttendanceCheck = () => {
           <Button type="primary">Approve</Button>
         </Space>
       ),
+    },
+  ];
+
+  const columnsAttendance = [
+    {
+      title: "FUID",
+      dataIndex: "fuId",
+      key: "fuId",
+      align: "center",
+    },
+    {
+      title: "Invigilator Name",
+      dataIndex: "invigilatorName",
+      key: "invigilatorName",
+      align: "center",
+      render: (text, record) => `${record.lastName} ${record.firstName}`,
+    },
+    {
+      title: "Email",
+      dataIndex: "email",
+      key: "email",
+      align: "center",
+    },
+
+    {
+      title: "Check In",
+      dataIndex: "checkIn",
+      key: "checkIn",
+      align: "center",
+      render: (text, record) =>
+        record.checkIn ? moment(record.checkIn).format("HH:mm") : "N/A",
+    },
+    {
+      title: "Check Out",
+      dataIndex: "checkOut",
+      key: "checkOut",
+      align: "center",
+      render: (text, record) =>
+        record.checkOut ? moment(record.checkOut).format("HH:mm") : "N/A",
     },
   ];
   return (
@@ -200,6 +246,23 @@ const AttendanceCheck = () => {
               pagination={{ pageSize }}
             />
           </Spin>
+
+          <Modal
+            title="Attendance List"
+            open={isModalVisible}
+            onCancel={handleCancel}
+            width={650}
+            height={500}
+            footer={null}
+            loading={listLoading}
+          >
+            <p>Check Attendance By: </p>
+            <Table
+              dataSource={attendances} // Add a key property to each request object
+              columns={columnsAttendance}
+              pagination={{ pageSize: 8 }}
+            />
+          </Modal>
         </Content>
       </Layout>
     </Layout>

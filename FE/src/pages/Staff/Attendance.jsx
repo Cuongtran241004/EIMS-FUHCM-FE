@@ -70,10 +70,8 @@ const Attendance = () => {
     try {
       // Define today's date at the start of the day (using currentDate)
       const date = selectedDate.format("YYYY-MM-DD");
-
       const response = await attendanceApi.getExamSlotByDate(date);
       const result = staffMapperUtil.mapExamSchedule(response);
-
       setData(result || []);
     } catch (error) {
       message.error("Failed to fetch exam schedule");
@@ -113,17 +111,14 @@ const Attendance = () => {
     setLoading(true);
     try {
       const today = moment().startOf("day"); // Get today's date without time
-
       // Filter attendance for dates before today
       const history = allAttendance.filter((item) => {
         return moment(item.startAt).isBefore(today);
       });
-
       // Sort by `startAt` in descending order (most recent first)
       history.sort((a, b) => {
         return moment(b.startAt).diff(moment(a.startAt));
       });
-
       setData(history || []);
     } catch (error) {
       message.error("Failed to fetch history attendance");
@@ -133,37 +128,29 @@ const Attendance = () => {
   };
 
   const handleCheckIn = async (examSlotId) => {
+    setModalVisible(true);
     setLoading(true);
     setIsCheckIn(true);
-
     try {
       const examSlot = await examSlotApi.getExamSlotById(examSlotId);
       // check-in time is 30 minutes before the exam start time
       const checkInTime = moment(examSlot.startAt).subtract(30, "minutes");
-
       if (moment().isBefore(checkInTime)) {
         checkInNotification();
         return;
       }
-
       // Assign invigilators
       const response =
         await attendanceApi.getAttendanceByExamSlotId(examSlotId);
-
       const result = staffMapperUtil.mapAttendance(response);
-
       // loop all object of result, if checkIn not null, setSelectedRowKeys
       // if checkIn is null, setSelectedRowKeys to empty array
       const checkedbox = result.map((item) => {
         return item.checkIn != null ? item.id : null;
       });
-
       const check = checkedbox.filter((item) => item != null);
-
       setSelectedRowKeys(check);
       setAttendance(result || []);
-
-      setModalVisible(true);
     } catch (error) {
       message.error("Failed to assign invigilators.");
     } finally {
@@ -172,34 +159,28 @@ const Attendance = () => {
   };
 
   const handleCheckOut = async (examSlotId) => {
+    setModalVisible(true);
     setLoading(true);
     setIsCheckIn(false);
     try {
       const examSlot = await examSlotApi.getExamSlotById(examSlotId);
       // check-out time is after the exam end time
       const checkOutTime = moment(examSlot.endAt);
-
       if (moment().isBefore(checkOutTime)) {
         checkOutNotification();
         return;
       }
-
       // Assign invigilators
       const response =
         await attendanceApi.getAttendanceByExamSlotId(examSlotId);
-
       const result = staffMapperUtil.mapAttendance(response);
-
       const checkedbox = result.map((item) => {
         return item.checkOut != null ? item.id : null;
       });
 
       const check = checkedbox.filter((item) => item != null);
-
       setSelectedRowKeys(check);
       setAttendance(result || []);
-
-      setModalVisible(true);
     } catch (error) {
       message.error("Failed to assign invigilators.");
     } finally {
@@ -214,7 +195,6 @@ const Attendance = () => {
       const response = isCheckIn
         ? await attendanceApi.updateCheckinList(selectedRowKeys)
         : await attendanceApi.updateCheckoutList(selectedRowKeys);
-
       if (response) {
         message.success("Check attendance saved successfully");
         setModalVisible(false);
@@ -233,6 +213,7 @@ const Attendance = () => {
     setModalVisible(false);
     setIsCheckIn(!isCheckIn);
   };
+
   const handleCheckAll = (e) => {
     const checked = e.target.checked;
     setCheckAll(checked);
@@ -300,7 +281,6 @@ const Attendance = () => {
             type="text"
             style={{ backgroundColor: "#43AA8B", color: "#fff" }}
             size="middle"
-            loading={loading && isCheckIn}
             onClick={() => handleCheckIn(record.id)}
           >
             Check-in
@@ -309,7 +289,6 @@ const Attendance = () => {
             type="link"
             size="middle"
             style={{ backgroundColor: "#F9844A", color: "#fff" }}
-            loading={loading && !isCheckIn}
             onClick={() => handleCheckOut(record.id)}
           >
             Check-out
@@ -505,6 +484,7 @@ const Attendance = () => {
             onCancel={() => setModalVisible(false)}
             footer={null}
             className="scrollable-modal"
+            loading={loading}
           >
             <Table
               className="modal-content-container"

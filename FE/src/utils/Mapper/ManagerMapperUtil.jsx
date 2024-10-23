@@ -101,6 +101,22 @@ const managerMapperUtil = {
       };
     });
   },
+
+  mapAttendanceList: (attendanceList) => {
+    return attendanceList.map((attendance) => {
+      return {
+        id: attendance.id,
+        key: attendance.id,
+        attendanceId: attendance.id,
+        fuId: attendance.invigilatorFuId,
+        firstName: attendance.invigilatorFirstName,
+        lastName: attendance.invigilatorLastName,
+        email: attendance.invigilatorEmail,
+        phone: attendance.invigilatorPhone,
+        updateBy: attendance.updateBy,
+      };
+    });
+  },
 };
 
 export { managerMapperUtil };
