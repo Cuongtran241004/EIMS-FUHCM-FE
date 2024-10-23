@@ -5,6 +5,7 @@ import Header from "../../components/Header/Header.jsx";
 import { Dropdown, Button, Space, Table, Spin, DatePicker } from "antd";
 import { DownOutlined } from "@ant-design/icons";
 import { useSemester } from "../../components/Context/SemesterContext.jsx";
+import dayjs from "dayjs";
 import moment from "moment";
 import { titleStyle } from "../../design-systems/CSS/Title.js";
 import { selectButtonStyle } from "../../design-systems/CSS/Button.js";
@@ -16,8 +17,6 @@ const { Content, Sider } = Layout;
 const AttendanceCheck = () => {
   const [attendances, setAttendances] = useState([]);
   const [examSlots, setExamSlots] = useState([]);
-
-  const [selectedDate, setSelectedDate] = useState(null);
   const [loading, setLoading] = useState(false);
   const [listLoading, setListLoading] = useState(false);
   const { selectedSemester, setSelectedSemester, semesters } = useSemester(); // Access shared semester state
@@ -38,11 +37,11 @@ const AttendanceCheck = () => {
       setLoading(false);
     }
   };
-  const fetchExamSlotByDate = async () => {
+
+  const fetchExamSlotByDate = async (date) => {
     setLoading(true);
     try {
-      const response =
-        await attendanceApi.getExamSlotByDateManager(selectedDate);
+      const response = await attendanceApi.getExamSlotByDateManager(date);
       const result = managerMapperUtil.mapExamSlotforAttendance(response);
       setExamSlots(result || []);
     } catch (error) {
@@ -87,10 +86,10 @@ const AttendanceCheck = () => {
   };
 
   const onchangeSelectedDate = (date) => {
-    const localDate = new Date(date).toLocaleDateString("en-CA");
-    console.log(localDate);
-    setSelectedDate(localDate);
-    fetchExamSlotByDate();
+    if (date) {
+      const formattedDate = dayjs(date).format("YYYY-MM-DD");
+      fetchExamSlotByDate(formattedDate); // Pass the formatted date directly
+    }
   };
 
   const columns = [
@@ -188,6 +187,7 @@ const AttendanceCheck = () => {
               <DatePicker
                 onChange={onchangeSelectedDate}
                 style={{ marginBottom: "10px" }}
+                format={"DD/MM/YYYY"}
               />
             </Space>
           </div>

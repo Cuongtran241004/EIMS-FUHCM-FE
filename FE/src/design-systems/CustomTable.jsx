@@ -177,7 +177,7 @@ const userTable = (handleEdit, handleDelete) => [
     // using tag of ant design to display role
     render: (text, record) => {
       const role = roleOptions.find((role) => role.value == record.role);
-      console.log(role);
+
       return userRoleTag(role.label);
     },
   },
