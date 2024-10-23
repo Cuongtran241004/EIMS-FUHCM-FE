@@ -225,7 +225,7 @@ const Configs = ({ isLogin }) => {
               <div style={{ width: "100%", margin: "0 auto" }}>
                 <Form form={form} component={false}>
                   <Table
-                    className="custom-table"
+                    className="custom-table-config"
                     bordered
                     components={{
                       body: {

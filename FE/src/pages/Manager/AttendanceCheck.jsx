@@ -9,15 +9,17 @@ import moment from "moment";
 import { titleStyle } from "../../design-systems/CSS/Title.js";
 import { selectButtonStyle } from "../../design-systems/CSS/Button.js";
 import attendanceApi from "../../services/InvigilatorAttendance.js";
-
+import { managerMapperUtil } from "../../utils/Mapper/ManagerMapperUtil.jsx";
+import { examTypeTag } from "../../design-systems/CustomTag.jsx";
+import "./AttendanceCheck.css";
 const { Content, Sider } = Layout;
 const AttendanceCheck = () => {
   const [attendances, setAttendances] = useState([]);
   const [examSlots, setExamSlots] = useState([]);
-  const [selectedDate, setSelectedDate] = useState(
-    moment().format("YYYY-MM-DD")
-  );
+
+  const [selectedDate, setSelectedDate] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [listLoading, setListLoading] = useState(false);
   const { selectedSemester, setSelectedSemester, semesters } = useSemester(); // Access shared semester state
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 8;
@@ -26,8 +28,23 @@ const AttendanceCheck = () => {
     setLoading(true);
     try {
       const response =
+        await attendanceApi.getExamSlotBySemesterIdManager(semesterId);
+
+      const result = managerMapperUtil.mapExamSlotforAttendance(response);
+      setExamSlots(result || []);
+    } catch (error) {
+      // Handle error
+    } finally {
+      setLoading(false);
+    }
+  };
+  const fetchExamSlotByDate = async () => {
+    setLoading(true);
+    try {
+      const response =
         await attendanceApi.getExamSlotByDateManager(selectedDate);
-      setExamSlots;
+      const result = managerMapperUtil.mapExamSlotforAttendance(response);
+      setExamSlots(result || []);
     } catch (error) {
       // Handle error
     } finally {
@@ -39,7 +56,7 @@ const AttendanceCheck = () => {
     if (selectedSemester.id) {
       fetchData(selectedSemester.id);
     }
-  }, [selectedSemester.id]);
+  }, [selectedSemester]);
 
   const items = semesters.map((semester) => ({
     key: semester.id,
@@ -55,8 +72,25 @@ const AttendanceCheck = () => {
       });
     }
   };
+
+  const showListAttendance = async (examSlotId) => {
+    setListLoading(true);
+    try {
+      const response =
+        await attendanceApi.getAttendanceByExamSlotIdManager(examSlotId);
+      setAttendances(response || []);
+    } catch (error) {
+      // Handle error
+    } finally {
+      setListLoading(false);
+    }
+  };
+
   const onchangeSelectedDate = (date) => {
-    setSelectedDate(date.format("YYYY-MM-DD"));
+    const localDate = new Date(date).toLocaleDateString("en-CA");
+    console.log(localDate);
+    setSelectedDate(localDate);
+    fetchExamSlotByDate();
   };
 
   const columns = [
@@ -71,35 +105,56 @@ const AttendanceCheck = () => {
       title: "Subject Code",
       dataIndex: "subjectCode",
       key: "subjectCode",
+      align: "center",
     },
     {
       title: "Exam Type",
       dataIndex: "examType",
       key: "examType",
+      align: "center",
+      render: (text) => examTypeTag(text),
     },
     {
       title: "Date",
       dataIndex: "date",
       key: "date",
+      align: "center",
+      render: (text, record) => moment(record.startAt).format("DD/MM/YYYY"),
     },
     {
       title: "Time",
       dataIndex: "time",
       key: "time",
+      align: "center",
+      render: (text, record) =>
+        `${moment(record.startAt).format("HH:mm")} - ${moment(
+          record.endAt
+        ).format("HH:mm")}`,
     },
     {
       title: "Invigilator List",
       dataIndex: "invigilatorList",
       key: "invigilatorList",
+      align: "center",
+      // a button to show the list of invigilators
+      render: (text, record) => (
+        <Button
+          type="link"
+          loading={listLoading}
+          onClick={() => showListAttendance(record.id)}
+        >
+          Show
+        </Button>
+      ),
     },
     {
       title: "Action",
       dataIndex: "action",
       key: "action",
+      align: "center",
       render: (text, record) => (
         <Space size="middle">
           <Button type="primary">Approve</Button>
-          <Button danger>Reject</Button>
         </Space>
       ),
     },
@@ -139,12 +194,10 @@ const AttendanceCheck = () => {
 
           <Spin spinning={loading}>
             <Table
-              dataSource={attendances.map((attendance) => ({
-                ...attendance,
-                key: attendance.id,
-              }))} // Add a key property to each request object
+              className="custom-table-attendance"
+              dataSource={examSlots} // Add a key property to each request object
               columns={columns}
-              pagination={{ pageSize: 8 }}
+              pagination={{ pageSize }}
             />
           </Spin>
         </Content>

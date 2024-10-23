@@ -243,6 +243,23 @@ const attendanceApi = {
       handleError(error);
     }
   },
+  getExamSlotBySemesterIdManager: async (semesterId) => {
+    try {
+      const response = await axios.get(
+        `${MANAGER_ATTENDANCE_API_BASE_URL}/exam-slot-by-semester/${semesterId}`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+          withCredentials: true,
+        }
+      );
+      return response.data;
+    } catch (error) {
+      handleError(error);
+    }
+  },
 };
 
 export default attendanceApi;

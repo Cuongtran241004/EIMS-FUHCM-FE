@@ -36,6 +36,7 @@ import {
 import { selectButtonStyle } from "../../design-systems/CSS/Button.js";
 import { titleStyle } from "../../design-systems/CSS/Title.js";
 import configApi from "../../services/Config.js";
+import { managerMapperUtil } from "../../utils/Mapper/ManagerMapperUtil.jsx";
 
 const { Content, Sider } = Layout;
 const { RangePicker } = DatePicker;
@@ -121,55 +122,7 @@ const Semester = ({ isLogin }) => {
     setLoading(true);
     try {
       const response = await configApi.getAllConfigsBySemesterId(semesterId);
-      console.log(response);
-      const result = [
-        {
-          key: response[0].id,
-          configType: "Hourly Rate",
-          value: new Intl.NumberFormat("vi-VN", {
-            style: "currency",
-            currency: "VND",
-          }).format(response[0].value), // Format as Vietnamese currency
-          unit: "VND/hour",
-        },
-        {
-          key: response[1].id,
-          configType: "Allowed Slot",
-          value: response[1].value,
-          unit: "slot(s)",
-        },
-        {
-          key: response[6].id,
-          configType: "Invigilator Room",
-          value: response[6].value,
-          unit: "room",
-        },
-        {
-          key: response[2].id,
-          configType: "Time Before Exam",
-          value: response[2].value,
-          unit: "day(s)",
-        },
-        {
-          key: response[3].id,
-          configType: "Time Before Open Registration",
-          value: response[3].value,
-          unit: "day(s)",
-        },
-
-        {
-          key: response[4].id,
-          configType: "Time Before Close Registration",
-          value: response[4].value,
-          unit: "day(s)",
-        },
-        {
-          key: response[5].id,
-          configType: "Time Before Close Request",
-          value: response[5].value,
-          unit: "day(s)",
-        },
-      ];
+      const result = managerMapperUtil.mapConfigs(response);
       setConfigData(result);
       setViewModalVisible(true);
     } catch (error) {
@@ -212,6 +165,11 @@ const Semester = ({ isLogin }) => {
       dataIndex: "value",
       key: "value",
       align: "center",
+      render: (text) => {
+        return new Intl.NumberFormat("vi-VN", {
+          maximumFractionDigits: 0, // No decimal places
+        }).format(text);
+      },
     },
     {
       title: "Unit",
@@ -232,14 +190,14 @@ const Semester = ({ isLogin }) => {
       dataIndex: "startAt",
       key: "startAt",
       align: "center",
-      render: (text) => moment(text).format("YYYY-MM-DD"),
+      render: (text) => moment(text).format("DD-MM-YYYY"),
     },
     {
       title: "End Date",
       dataIndex: "endAt",
       key: "endAt",
       align: "center",
-      render: (text) => moment(text).format("YYYY-MM-DD"),
+      render: (text) => moment(text).format("DD-MM-YYYY"),
     },
     {
       title: "Action",
@@ -354,6 +312,7 @@ const Semester = ({ isLogin }) => {
                     disabledDate={(current) =>
                       current && current < moment().startOf("day")
                     }
+                    format="DD-MM-YYYY"
                   />
                 </Form.Item>
               </Form.Item>
@@ -376,6 +335,7 @@ const Semester = ({ isLogin }) => {
           ]}
         >
           <Table
+            className="custom-table-config"
             columns={columnConfig}
             dataSource={configData}
             rowKey={(record) => record.id}

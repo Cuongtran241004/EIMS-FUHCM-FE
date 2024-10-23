@@ -90,14 +90,13 @@ const managerMapperUtil = {
   mapExamSlotforAttendance: (examSlots) => {
     return examSlots.map((examSlot) => {
       return {
-        key: examSlot.examSlotId,
-        examSlotId: examSlot.examSlotId,
+        key: examSlot.id,
+        examSlotId: examSlot.id,
         startAt: examSlot.startAt,
         endAt: examSlot.endAt,
-        examType: examSlot.examType,
-        subjectName: examSlot.subject?.name,
-        subjectCode: examSlot.subject?.code,
-        room: examSlot.room,
+        examType: examSlot.subjectExamDTO?.examType,
+        subjectName: examSlot.subjectExamDTO?.subjectName,
+        subjectCode: examSlot.subjectExamDTO?.subjectCode,
         status: examSlot.status,
       };
     });
