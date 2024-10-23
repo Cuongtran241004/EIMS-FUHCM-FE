@@ -38,6 +38,23 @@ const configApi = {
       handleError(error);
     }
   },
+  getAllConfigsLatestSemester: async () => {
+    try {
+      const response = await axios.get(
+        `${CONFIG_API_BASE_URL}/latest-semester`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+          withCredentials: true,
+        }
+      );
+      return response.data;
+    } catch (error) {
+      handleError(error);
+    }
+  },
   getTimeBeforeExam: async () => {
     try {
       const response = await axios.get(

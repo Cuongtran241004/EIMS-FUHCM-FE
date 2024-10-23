@@ -28,6 +28,64 @@ const managerMapperUtil = {
       };
     });
   },
+
+  mapConfigs: (configs) => {
+    return configs.map((config) => {
+      let configType = "";
+      let unit = "";
+      switch (config.configType) {
+        case "hourly_rate":
+          configType = "Hourly Rate";
+          unit = "VND";
+          break;
+        case "allowed_slot":
+          configType = "Allowed Slot";
+          unit = config.value === "1" ? "Slot" : "Slots";
+          break;
+        case "time_before_exam":
+          configType = "Time Before Exam";
+          unit = config.value === "1" ? "Day" : "Days";
+          break;
+        case "time_before_open_registration":
+          configType = "Time Before Open Registration";
+          unit = config.value === "1" ? "Day" : "Days";
+          break;
+        case "invigilator_room":
+          configType = "Invigilator Room";
+          unit = "Room";
+          break;
+        case "time_before_close_registration":
+          configType = "Time Before Close Registration";
+          unit = config.value === "1" ? "Day" : "Days";
+          break;
+        case "time_before_close_request":
+          configType = "Time Before Close Request";
+          unit = config.value === "1" ? "Day" : "Days";
+          break;
+        case "check_in_time_before_exam_slot":
+          configType = "Check In Time Before Exam Slot";
+          unit = "Minutes";
+          break;
+        case "check_out_time_after_exam_slot":
+          configType = "Check Out Time After Exam Slot";
+          unit = "Minutes";
+          break;
+        case "extra_invigilator":
+          configType = "Extra Invigilator";
+          unit = config.value === "1" ? "Person" : "People";
+          break;
+        default:
+          break;
+      }
+      return {
+        id: config.id,
+        key: config.id,
+        configType: configType,
+        value: config.value,
+        unit: unit,
+      };
+    });
+  },
 };
 
 export { managerMapperUtil };

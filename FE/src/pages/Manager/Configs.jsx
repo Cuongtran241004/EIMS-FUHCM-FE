@@ -16,7 +16,9 @@ import configApi from "../../services/Config.js";
 
 import Header from "../../components/Header/Header.jsx";
 import { titleStyle } from "../../design-systems/CSS/Title.js";
-
+import { managerMapperUtil } from "../../utils/Mapper/ManagerMapperUtil.jsx";
+import "./Configs.css";
+import { EditOutlined } from "@ant-design/icons";
 const { Content, Sider } = Layout;
 const EditableCell = ({
   editing,
@@ -58,84 +60,15 @@ const Configs = ({ isLogin }) => {
   const [configs, setConfigs] = useState([]);
   const [form] = Form.useForm();
   const [editingKey, setEditingKey] = useState("");
-
+  const [saveLoading, setSaveLoading] = useState(false);
   const isEditing = (record) => record.key === editingKey;
 
   const fetchConfigs = async () => {
     setLoading(true);
     try {
-      const [
-        hourly_rate,
-        allowed_slot,
-        time_before_exam,
-        time_before_open_registration,
-        invigilator_room,
-        time_before_close_registration,
-        time_before_close_request,
-      ] = await Promise.all([
-        configApi.getHourlyRate(),
-        configApi.getAllowedSlot(),
-        configApi.getTimeBeforeExam(),
-        configApi.getTimeBeforeOpenRegistration(),
-        configApi.getInvigilatorRoom(),
-        configApi.getTimeBeforeCloseRegistration(),
-        configApi.getTimeBeforeCloseRequest(),
-      ]);
-      const result = [
-        {
-          id: hourly_rate.id,
-          key: "hourly_rate",
-          configType: "Hourly Rate",
-          value: new Intl.NumberFormat("vi-VN", {
-            style: "currency",
-            currency: "VND",
-          }).format(hourly_rate.value),
-          unit: "VND/hour",
-        },
-        {
-          id: allowed_slot.id,
-          key: "allowed_slot",
-          configType: "Allowed Slot",
-          value: allowed_slot.value,
-          unit: "slot(s)",
-        },
-        {
-          id: invigilator_room.id,
-          key: "invigilator_room",
-          configType: "Invigilator Room",
-          value: invigilator_room.value,
-          unit: "room",
-        },
-        {
-          id: time_before_exam.id,
-          key: "time_before_exam",
-          configType: "Time Before Exam",
-          value: time_before_exam.value,
-          unit: "day(s)",
-        },
-        {
-          id: time_before_open_registration.id,
-          key: "time_before_open_registration",
-          configType: "Time Before Open Registration",
-          value: time_before_open_registration.value,
-          unit: "day(s)",
-        },
-        {
-          id: time_before_close_registration.id,
-          key: "time_before_close_registration",
-          configType: "Time Before Close Registration",
-          value: time_before_close_registration.value,
-          unit: "day(s)",
-        },
-        {
-          id: time_before_close_request.id,
-          key: "time_before_close_request",
-          configType: "Time Before Close Request",
-          value: time_before_close_request.value,
-          unit: "day(s)",
-        },
-      ];
-      console.log(result);
+      const response = await configApi.getAllConfigsLatestSemester();
+      const result = managerMapperUtil.mapConfigs(response);
+
       setConfigs(result);
     } catch (error) {
       message.error("Failed to fetch configs");
@@ -158,38 +91,24 @@ const Configs = ({ isLogin }) => {
     setEditingKey("");
   };
 
-  const handleSave = async (key) => {
+  const handleSave = async (record) => {
+    setSaveLoading(true);
     try {
-      console.log(key);
-      const row = await form.validateFields();
-      console.log(row);
-      switch (key) {
-        case "hourly_rate":
-          await configApi.addHourlyRate(row.value);
-          break;
-        case "allowed_slot":
-          await configApi.addAllowedSlot(row.value);
-          break;
-        case "time_before_exam":
-          await configApi.addTimeBeforeExam(row.value);
-          break;
-        case "time_before_open_registration":
-          await configApi.addTimeBeforeOpenRegistration(row.value);
-          break;
-        case "invigilator_room":
-          await configApi.addInvigilatorRoom(row.value);
-          break;
-        case "time_before_close_registration":
-          await configApi.addTimeBeforeCloseRegistration(row.value);
-          break;
-        case "time_before_close_request":
-          await configApi.addTimeBeforeCloseRequest(row.value);
-          break;
-        default:
-          break;
-      }
-    } catch (errInfo) {
-      message.error("Save failed:", errInfo);
+      await form.validateFields().then(async () => {
+        const value = form.getFieldValue();
+        const configData = {
+          id: record.id,
+          value: value.value,
+        };
+        await configApi.updateConfig(configData);
+        setEditingKey("");
+        fetchConfigs();
+        message.success("Save successfully");
+      });
+    } catch (error) {
+      message.error("Failed to save");
+    } finally {
+      setSaveLoading(false);
     }
   };
 
@@ -211,16 +130,6 @@ const Configs = ({ isLogin }) => {
       dataIndex: "unit",
       align: "center",
       width: "15%",
-      render: (text, record, index) => {
-        // Merge the "days" unit for the last four rows
-        if (index === 3) {
-          onCell: (record) => ({ colSpan: 4 });
-        }
-        if (index > 3) {
-          onCell: (record) => ({ colSpan: 0 });
-        }
-        return text; // Regular display for other rows
-      },
     },
     {
       title: <strong>Lastest Update</strong>,
@@ -236,23 +145,29 @@ const Configs = ({ isLogin }) => {
         const editable = isEditing(record);
         return editable ? (
           <span>
-            <Typography.Link
-              onClick={() => handleSave(record.key)}
+            <Button
+              type="link"
+              onClick={() => handleSave(record)}
               style={{
                 marginRight: 8,
+                color: "#F3722C",
               }}
+              loading={saveLoading}
             >
               Save
-            </Typography.Link>
+            </Button>
 
-            <a onClick={handleCancel}>Cancel</a>
+            <a onClick={handleCancel} style={{ color: "#F3722C" }}>
+              Cancel
+            </a>
           </span>
         ) : (
           <Button
             disabled={editingKey !== ""}
+            type="link"
             onClick={() => handleEdit(record)}
           >
-            Edit
+            <EditOutlined style={{ color: "#4D908E" }} />
           </Button>
         );
       },
@@ -298,6 +213,7 @@ const Configs = ({ isLogin }) => {
               <div style={{ width: "100%", margin: "0 auto" }}>
                 <Form form={form} component={false}>
                   <Table
+                    className="custom-table"
                     bordered
                     components={{
                       body: {

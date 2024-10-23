@@ -1,0 +1,4 @@
+/* CSS for a specific table */
+.custom-table .ant-table-tbody > tr > td {
+  padding: 7px; /* Adjust as per your requirement */
+}
