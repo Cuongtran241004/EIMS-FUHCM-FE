@@ -86,6 +86,22 @@ const managerMapperUtil = {
       };
     });
   },
+
+  mapExamSlotforAttendance: (examSlots) => {
+    return examSlots.map((examSlot) => {
+      return {
+        key: examSlot.examSlotId,
+        examSlotId: examSlot.examSlotId,
+        startAt: examSlot.startAt,
+        endAt: examSlot.endAt,
+        examType: examSlot.examType,
+        subjectName: examSlot.subject?.name,
+        subjectCode: examSlot.subject?.code,
+        room: examSlot.room,
+        status: examSlot.status,
+      };
+    });
+  },
 };
 
 export { managerMapperUtil };

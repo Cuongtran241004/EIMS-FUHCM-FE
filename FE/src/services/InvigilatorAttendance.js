@@ -8,20 +8,6 @@ const handleError = (error) => {
 };
 
 const attendanceApi = {
-  // getAllAttendance: async () => {
-  //   try {
-  //     const response = await axios.get(`${ATTENDANCE_API_BASE_URL}`, {
-  //       headers: {
-  //         "Content-Type": "application/json",
-  //         Accept: "application/json",
-  //       },
-  //       withCredentials: true,
-  //     });
-  //     return response.data;
-  //   } catch (error) {
-  //     handleError(error);
-  //   }
-  // },
   getAllAttendanceToday: async () => {
     try {
       const response = await axios.get(
@@ -207,6 +193,44 @@ const attendanceApi = {
         `${STAFF_ATTENDANCE_API_BASE_URL}/checkout-all`,
         checkout,
         {
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+          withCredentials: true,
+        }
+      );
+      return response.data;
+    } catch (error) {
+      handleError(error);
+    }
+  },
+
+  getAttendanceByExamSlotIdManager: async (examSlotId) => {
+    try {
+      const response = await axios.get(
+        `${MANAGER_ATTENDANCE_API_BASE_URL}/exam-slot/${examSlotId}`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+          withCredentials: true,
+        }
+      );
+      return response.data;
+    } catch (error) {
+      handleError(error);
+    }
+  },
+  getExamSlotByDateManager: async (date) => {
+    try {
+      const response = await axios.get(
+        `${MANAGER_ATTENDANCE_API_BASE_URL}/exam-slots-by-day`,
+        {
+          params: {
+            date,
+          },
           headers: {
             "Content-Type": "application/json",
             Accept: "application/json",
