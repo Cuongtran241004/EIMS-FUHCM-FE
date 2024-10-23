@@ -35,6 +35,7 @@ const headerConfig = {
       ],
     },
     { name: "Report", path: "/report" },
+    { name: "Attendance", path: "/attendance" },
   ],
 };
 

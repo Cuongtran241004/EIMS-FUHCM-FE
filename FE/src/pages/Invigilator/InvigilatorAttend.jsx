@@ -5,33 +5,25 @@ import { selectButtonStyle } from "../../design-systems/CSS/Button";
 import { useSemester } from "../../components/SemesterContext";
 import moment from "moment";
 
-const InvigilatorReport = () => {
+const InvigilatorAttend = () => {
     const {
         semesters,
         selectedSemester,
         setSelectedSemester,
         loadingSemesters,
-        examSlotApproved,
-        inviFee,
+        attendance,
     } = useSemester() || {};
 
     const [slotData, setSlotData] = useState([]);
-    const [feeData, setFeeData] = useState([]);
     const [loading, setLoading] = useState(false);
-    const formatNumber  = new Intl.NumberFormat('en-US');
 
 
     useEffect(() => {
-        if (examSlotApproved) {
-            setSlotData(examSlotApproved);
+        if (attendance) {
+            setSlotData(attendance);
         }
-    }, [examSlotApproved]);
+    }, [attendance]);
 
-    useEffect(() => {
-        if (inviFee) {
-            setFeeData(inviFee);
-        }
-    }, [inviFee]);
 
     const handleMenuClick = (e) => {
         const selected = semesters.find(
@@ -53,14 +45,14 @@ const InvigilatorReport = () => {
     const handleDateChange = (date, string) => {
         if (string === null || string === "") {
             try {
-                setSlotData(examSlotApproved); 
+                setSlotData(attendance); 
             } catch (error) {
                 console.error("Error fetching slot data:", error);
             } finally {
                 setLoading(false);
             }
         } else {
-            const filteredData = examSlotApproved.filter((slot) =>
+            const filteredData = attendance.filter((slot) =>
                 moment(slot.startAt).format("DD-MM-YYYY") === string
         );
             setSlotData(filteredData); 
@@ -103,7 +95,13 @@ const InvigilatorReport = () => {
             dataIndex: "status",
             key: "status",
             render: (status) => {
-                return <span style={{ color: status === "APPROVED" ? "green" : "" }}><strong>{status}</strong></span>;
+                if (status === "APPROVED") {
+                    return <span style={{ color: "green" }}><strong>{status}</strong></span>;
+                } else if (status === "PENDING") {
+                    return <span style={{ color: "rgb(249, 199, 79)" }}><strong>{status}</strong></span>;
+                } else {
+                    return <span style={{ color: "#40a9ff" }}><strong>{status}</strong></span>;
+                }
             },
         },
 
@@ -111,13 +109,12 @@ const InvigilatorReport = () => {
 
     return (
         <div>
-            <h1 style={{ color: 'red', display: 'flex', justifyContent: 'center', marginTop: 0 }}>Invigilator Report</h1>
+            <h1 style={{ color: 'red', display: 'flex', justifyContent: 'center', marginTop: 0 }}>Invigilator Attendance</h1>
 
             {loadingSemesters ? (
                 <Spin />
             ) : (
-                <div style={{marginLeft: 30}}>
-                    <div style={{marginLeft: 30}}>
+                <div style={{marginLeft: 80, marginRight: -70}}>
                     <Dropdown menu={menu} trigger={["click"]}>
                         <Button size="large" style={selectButtonStyle}>
                             <Space>
@@ -130,12 +127,11 @@ const InvigilatorReport = () => {
                     </Dropdown>
 
                     
-                    </div>
+                    
 
-                    <div style={{ display: 'flex', justifyContent: 'space-between', marginLeft: 30, paddingRight: 200 }}>
-                        <div style={{ width: '60%' }}>
-                            <h3 style={{ display: 'flex', justifyContent: 'center' }}>Slot Report</h3>
-                            <DatePicker style={{ width: '40%', marginBottom: 20}} format={'DD-MM-YYYY'} onChange={handleDateChange} />
+                    <div style={{ display: 'flex', justifyContent: 'space-between', paddingRight: 200 }}>
+                        <div style={{ width: '100%' }}>
+                            <DatePicker style={{ width: '23%', marginBottom: 20}} format={'DD-MM-YYYY'} onChange={handleDateChange} />
                             <Table
                                 columns={slotColumns}
                                 dataSource={slotData}
@@ -148,27 +144,10 @@ const InvigilatorReport = () => {
                                     position: ["bottomCenter"],
                                   }}
                                   style={{ border: '2px solid #f0f0f0', padding: '16px', borderRadius: '8px'}}
-                                
                             />
 
                         </div>
 
-                        <div style={{ width: '30%' }}>
-                            <h3 style={{ display: 'flex', justifyContent: 'center', marginBottom: 70 }}>Fee Summary</h3>
-                            <div style={{ border: '2px solid #f0f0f0', padding: '30px', borderRadius: '8px' }}>
-                                <div>
-                                    <strong>Total hours:</strong> {feeData.totalHours || 0} hours
-                                </div>
-                                <br />
-                                <div>
-                                    <strong>Hour rate:</strong> {formatNumber.format(feeData.hourlyRate) || 0} / hour
-                                </div>
-                                <br />
-                                <div>
-                                    <strong>Estimated fee:</strong> {formatNumber.format(feeData.preCalculatedInvigilatorFree) || 0} VND
-                                </div>
-                            </div>
-                        </div>
                     </div>
                 </div>
             )}
@@ -176,4 +155,4 @@ const InvigilatorReport = () => {
     );
 };
 
-export default InvigilatorReport;
+export default InvigilatorAttend;

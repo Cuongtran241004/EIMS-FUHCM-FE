@@ -45,6 +45,7 @@ import Header from "./components/Header/Header.jsx";
 import HandlePassword from "./pages/Login/HandlePassword.jsx";
 import AssignmentInvigilator from "./pages/Staff/Assignment.jsx";
 import InvigilatorReport from "./pages/Invigilator/InvigilatorReport.jsx";
+import InvigilatorAttend from "./pages/Invigilator/InvigilatorAttend.jsx";
 
 function App() {
   const [isLogin, setIsLogin] = useState(false);
@@ -145,6 +146,7 @@ function App() {
             <Route path="/request/send" element={<InvigilatorRequest />} />
             <Route path="/request/view" element={<InvigilatorRequestsList />} />
             <Route path="/report" element={<InvigilatorReport />} />
+            <Route path="/attendance" element={<InvigilatorAttend />} />
           </>
         )}
         {/* Common Routes */}

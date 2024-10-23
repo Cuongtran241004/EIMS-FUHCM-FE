@@ -1,10 +1,8 @@
-
-
 import axios from "axios";
 
-export const getInvigilatorAttendance = async (semesterId) => {
+export const getInvigilatorReport = async (semesterId) => {
     const API_URL = import.meta.env.VITE_APP_API_URL;
-    const path = `/invigilator-attendance/invigilator/${semesterId}`;
+    const path = `/invigilator-attendance/invigilator/report/${semesterId}`;
 
     try {
         const response = await axios.get(`${API_URL}${path}`, {

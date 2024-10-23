@@ -3,7 +3,10 @@ import { useFetchSemesters } from "./Hook/useFetchSemesters";
 import { useFetchAvailableSlots } from "./Hook/useFetchAvailableSlots";
 import { useSemesterConfig } from "./Hook/useSemesterConfig";
 import moment from "moment";
+import { useInviReport } from "./Hook/useInviReport";
+import { useFetchSchedules } from "./Hook/useFetchSchedules";
 import { useInviAttendance } from "./Hook/useInviAttendance";
+
 
 const SemesterContext = createContext();
 
@@ -16,8 +19,13 @@ export const SemesterProviderInvigilator = ({ children }) => {
   const [reloadSlots, setReloadSlots] = useState(0);
   const { availableSlotsData, loading: loadingAvailableSlots } =
     useFetchAvailableSlots(lastestSemester?.id, reloadSlots);
-  const { examSlotDetail, inviFee,  loading: loadingSchedules } = useInviAttendance(
+  const { examSlotApproved, inviFee, loading: loadingReport } = useInviReport(
     selectedSemester?.id, reloadSlots);
+  const { examSlotDetail, loading: loadingSchedules } = useFetchSchedules(
+    selectedSemester?.id, reloadSlots);
+    const {attendance, loading: loadingAttendance} = useInviAttendance(
+      selectedSemester?.id, reloadSlots);
+
   const { semesterConfig, getConfigValue } = useSemesterConfig(lastestSemester?.id);
 
   useEffect(() => {
@@ -65,15 +73,20 @@ export const SemesterProviderInvigilator = ({ children }) => {
         loadingSemesters,
         loadingAvailableSlots,
         loadingSchedules,
+        loadingReport,
+        loadingAttendance,
         reloadAvailableSlots,
         lastestSemester,
         setLasestSemester,
         semesterConfig,
         getConfigValue,
+        examSlotApproved,
         inviFee,
+        attendance,
       }}
     >
       {children}
     </SemesterContext.Provider>
   );
 };
+
