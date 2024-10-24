@@ -13,7 +13,8 @@ const InvigilatorAttendance = () => {
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState([]);
   const { selectedSemester, setSelectedSemester, semesters } = useSemester();
-
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 7;
   const fetchData = async (semesterId) => {
     setLoading(true);
     try {
@@ -51,6 +52,13 @@ const InvigilatorAttendance = () => {
 
   const columns = [
     {
+      title: "No",
+      dataIndex: "no",
+      key: "no",
+      align: "center",
+      render: (_, __, index) => (currentPage - 1) * pageSize + index + 1,
+    },
+    {
       title: "FuID",
       dataIndex: "fuId",
       key: "fuId",
@@ -68,7 +76,6 @@ const InvigilatorAttendance = () => {
       title: "Email",
       dataIndex: "email",
       key: "email",
-      align: "center",
     },
     {
       title: "Phone",
@@ -91,7 +98,7 @@ const InvigilatorAttendance = () => {
       render: (text, record) => {
         return (
           <Button type="link">
-            <EyeOutlined />
+            <EyeOutlined style={{ color: "#4D908E" }} />
           </Button>
         );
       },

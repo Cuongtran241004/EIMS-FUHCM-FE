@@ -44,6 +44,7 @@ const Attendance = () => {
   const [loadingData, setLoadingData] = useState(false);
   const [loading, setLoading] = useState(false);
   const [saveLoading, setSaveLoading] = useState(false);
+
   const {
     selectedSemester,
     setSelectedSemester,
@@ -128,7 +129,7 @@ const Attendance = () => {
   };
 
   const handleCheckIn = async (examSlotId) => {
-    setModalVisible(true);
+    console.log("examSlotId", examSlotId);
     setLoading(true);
     setIsCheckIn(true);
     try {
@@ -139,6 +140,7 @@ const Attendance = () => {
         checkInNotification();
         return;
       }
+      setModalVisible(true);
       // Assign invigilators
       const response =
         await attendanceApi.getAttendanceByExamSlotId(examSlotId);
@@ -159,7 +161,6 @@ const Attendance = () => {
   };
 
   const handleCheckOut = async (examSlotId) => {
-    setModalVisible(true);
     setLoading(true);
     setIsCheckIn(false);
     try {
@@ -170,6 +171,7 @@ const Attendance = () => {
         checkOutNotification();
         return;
       }
+      setModalVisible(true);
       // Assign invigilators
       const response =
         await attendanceApi.getAttendanceByExamSlotId(examSlotId);

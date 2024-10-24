@@ -192,16 +192,14 @@ const AttendanceCheck = () => {
       dataIndex: "checkIn",
       key: "checkIn",
       align: "center",
-      render: (text, record) =>
-        record.checkIn ? moment(record.checkIn).format("HH:mm") : "N/A",
+      render: (text, record) => "-",
     },
     {
       title: "Check Out",
       dataIndex: "checkOut",
       key: "checkOut",
       align: "center",
-      render: (text, record) =>
-        record.checkOut ? moment(record.checkOut).format("HH:mm") : "N/A",
+      render: (text, record) => "-",
     },
   ];
   return (

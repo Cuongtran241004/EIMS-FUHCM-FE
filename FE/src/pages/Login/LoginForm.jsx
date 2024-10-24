@@ -1,31 +1,26 @@
-import React, { useState } from 'react';
-import { Button, Form, Input } from 'antd';
-import './Form.css';
-import { ENTER_EMAIL, ENTER_PASSWORD } from '../../configs/messages';
-import HandleEmail from '../../components/Handle/HandleEmail';
-import { postEmail } from '../../components/API/postEmail';
+import React, { useState } from "react";
+import { Button, Form, Input } from "antd";
+import "./Form.css";
+import { ENTER_EMAIL, ENTER_PASSWORD } from "../../configs/messages";
+import HandleEmail from "../../components/Handle/HandleEmail";
+import { postEmail } from "../../components/API/postEmail";
 
-
-
-function LoginForm( {onLoginForm} ) {
-  const [email, setEmail] = useState('');
+function LoginForm({ onLoginForm }) {
+  const [email, setEmail] = useState("");
   const [isValid, setIsValid] = useState(true);
 
-
   const onFinish = (values) => {
-    console.log('Success:', values);
+    console.log("Success:", values);
     onLoginForm(values);
-    
   };
-  
+
   const onFinishFailed = (errorInfo) => {
-    console.log('Failed:', errorInfo);
+    console.log("Failed:", errorInfo);
   };
 
   const handleEmailChange = (email, isValid) => {
     setEmail(email);
     setIsValid(isValid);
-
   };
 
   return (
@@ -73,8 +68,6 @@ function LoginForm( {onLoginForm} ) {
           Login
         </Button>
       </Form.Item>
-
-     
     </Form>
   );
 }
