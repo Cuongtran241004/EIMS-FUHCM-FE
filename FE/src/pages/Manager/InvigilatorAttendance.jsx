@@ -23,9 +23,8 @@ const InvigilatorAttendance = () => {
     try {
       const response =
         await attendanceApi.getAttendanceReportBySemesterIdManager(semesterId);
-      console.log(response);
       const result = managerMapperUtil.mapAttendanceReport(response);
-
+      console.log(result);
       setData(result || []);
     } catch (error) {
       // Handle error
@@ -51,10 +50,6 @@ const InvigilatorAttendance = () => {
         name: selected.label,
       });
     }
-  };
-
-  const handleViewDetailAttendance = () => {
-    // Handle view detail attendance
   };
 
   const handleCancel = () => {
@@ -100,21 +95,8 @@ const InvigilatorAttendance = () => {
       key: "totalSlots",
       align: "center",
     },
-
-    {
-      title: "Details",
-      dataIndex: "details",
-      key: "details",
-      align: "center",
-      render: (text, record) => {
-        return (
-          <Button type="link" onClick={handleViewDetailAttendance}>
-            <EyeOutlined style={{ color: "#4D908E" }} />
-          </Button>
-        );
-      },
-    },
   ];
+
   const columnsAttendance = [
     {
       title: "No",
@@ -150,7 +132,7 @@ const InvigilatorAttendance = () => {
     },
   ];
   return (
-    <Layout style={{ height: "100vh", overflowY: "hidden" }}>
+    <Layout style={{ height: "100vh" }}>
       <Header />
       <Layout>
         <Sider width={256} style={{ backgroundColor: "#4D908E" }}>
@@ -179,6 +161,26 @@ const InvigilatorAttendance = () => {
               columns={columns}
               dataSource={data}
               rowKey="id"
+              expandable={{
+                expandedRowRender: (record) => {
+                  // record.detail is an array of objects, render each object as a single line
+                  // <Table
+                  //   columns={columnsAttendance}
+                  //   dataSource={record.detail}
+                  //   pagination={false}
+                  // />
+
+                  record.detail.map((item) => {
+                    console.log(item);
+                    return (
+                      <div key={item.key}>
+                        <p>{item.subjectCode}</p>
+                        <p>{item.examType}</p>
+                      </div>
+                    );
+                  });
+                },
+              }}
               pagination={{
                 pageSize: 10,
                 showSizeChanger: false,

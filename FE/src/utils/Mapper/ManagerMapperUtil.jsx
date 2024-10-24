@@ -120,6 +120,25 @@ const managerMapperUtil = {
 
   mapAttendanceReport: (list) => {
     return list.map((item) => {
+      // detail is an array of attendance
+      let attendance = [];
+      if (item.invigilatorAttendanceList) {
+        attendance = item.invigilatorAttendanceList.map((detail) => {
+          return {
+            key: detail.id,
+            id: detail.id,
+            subjectCode: detail.examSlot?.subjectExam?.subjectId?.code,
+            subjectName: detail.examSlot?.subjectExam?.subjectId?.name,
+            examType: detail.examSlot?.subjectExam?.examType,
+            staffId: detail.examSlot?.updatedBy?.fuId,
+            staffFirstName: detail.examSlot?.updatedBy?.firstName,
+            staffLastName: detail.examSlot?.updatedBy?.lastName,
+            date: detail.startAt,
+            startAt: detail.startAt,
+            endAt: detail.endAt,
+          };
+        });
+      }
       return {
         key: item.id,
         id: item.id,
@@ -132,7 +151,7 @@ const managerMapperUtil = {
         totalHours: item.totalHours,
         hourlyRate: item.hourlyRate,
         fee: item.preCalculatedInvigilatorFree,
-        detail: item.invigilatorAttendanceList,
+        detail: attendance,
       };
     });
   },
