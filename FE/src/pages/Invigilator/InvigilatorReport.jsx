@@ -61,7 +61,7 @@ const InvigilatorReport = () => {
             }
         } else {
             const filteredData = examSlotApproved.filter((slot) =>
-                moment(slot.startAt).format("DD-MM-YYYY") === string
+                moment(slot.startAt).format("DD/MM/YYYY") === string
         );
             setSlotData(filteredData); 
         }
@@ -72,7 +72,7 @@ const InvigilatorReport = () => {
             title: "Date",
             dataIndex: "startAt",
             key: "startAt",
-            render: (startAt) => moment(startAt).format("DD-MM-YYYY"),
+            render: (startAt) => moment(startAt).format("DD/MM/YYYY"),
         },
         {
             title: "Start",
@@ -90,13 +90,13 @@ const InvigilatorReport = () => {
             title: "Check In",
             dataIndex: "checkIn",
             key: "checkIn",
-            render: (checkIn) => (checkIn ? moment(checkIn).format("DD-MM-YYYY HH:mm") : "-"),
+            render: (checkIn) => (checkIn ? moment(checkIn).format("DD/MM/YYYY HH:mm") : "-"),
         },
         {
             title: "Check Out",
             dataIndex: "checkOut",
             key: "checkOut",
-            render: (checkOut) => (checkOut ? moment(checkOut).format("DD-MM-YYYY HH:mm") : "-"),
+            render: (checkOut) => (checkOut ? moment(checkOut).format("DD/MM/YYYY HH:mm") : "-"),
         },
         {
             title: "Status",
@@ -111,7 +111,7 @@ const InvigilatorReport = () => {
 
     return (
         <div>
-            <h1 style={{ color: 'red', display: 'flex', justifyContent: 'center', marginTop: 0 }}>Invigilator Report</h1>
+            <h1 style={{ color: 'red', display: 'flex', justifyContent: 'center', marginTop: 0 }}>INVIGILATOR REPORT</h1>
 
             {loadingSemesters ? (
                 <Spin />
@@ -128,14 +128,12 @@ const InvigilatorReport = () => {
                             </Space>
                         </Button>
                     </Dropdown>
-
-                    
                     </div>
 
                     <div style={{ display: 'flex', justifyContent: 'space-between', marginLeft: 30, paddingRight: 200 }}>
                         <div style={{ width: '60%' }}>
                             <h3 style={{ display: 'flex', justifyContent: 'center' }}>Slot Report</h3>
-                            <DatePicker style={{ width: '40%', marginBottom: 20}} format={'DD-MM-YYYY'} onChange={handleDateChange} />
+                            <DatePicker style={{ width: '40%', marginBottom: 20}} format={'DD/MM/YYYY'} onChange={handleDateChange} />
                             <Table
                                 columns={slotColumns}
                                 dataSource={slotData}
@@ -154,18 +152,18 @@ const InvigilatorReport = () => {
                         </div>
 
                         <div style={{ width: '30%' }}>
-                            <h3 style={{ display: 'flex', justifyContent: 'center', marginBottom: 70 }}>Fee Summary</h3>
+                            <h3 style={{ display: 'flex', justifyContent: 'center', marginBottom: 70 }}>Amount Summary</h3>
                             <div style={{ border: '2px solid #f0f0f0', padding: '30px', borderRadius: '8px' }}>
                                 <div>
                                     <strong>Total hours:</strong> {feeData.totalHours || 0} hours
                                 </div>
                                 <br />
                                 <div>
-                                    <strong>Hour rate:</strong> {formatNumber.format(feeData.hourlyRate) || 0} / hour
+                                    <strong>Hour rate:</strong> {formatNumber.format(feeData.hourlyRate)} / hour
                                 </div>
                                 <br />
                                 <div>
-                                    <strong>Estimated fee:</strong> {formatNumber.format(feeData.preCalculatedInvigilatorFree) || 0} VND
+                                    <strong>Estimated fee:</strong> {formatNumber.format(feeData.preCalculatedInvigilatorFree)} VND
                                 </div>
                             </div>
                         </div>
