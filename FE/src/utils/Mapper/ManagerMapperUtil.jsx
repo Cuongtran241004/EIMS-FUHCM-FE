@@ -1,3 +1,5 @@
+import moment from "moment";
+
 const managerMapperUtil = {
   mapRequest: (requests) => {
     return requests.map((request) => {
@@ -133,9 +135,9 @@ const managerMapperUtil = {
             staffId: detail.examSlot?.updatedBy?.fuId,
             staffFirstName: detail.examSlot?.updatedBy?.firstName,
             staffLastName: detail.examSlot?.updatedBy?.lastName,
-            date: detail.startAt,
-            startAt: detail.startAt,
-            endAt: detail.endAt,
+            date: moment(detail.startAt).format("DD/MM/YYYY"),
+            startAt: moment(detail.startAt).format("HH:mm"),
+            endAt: moment(detail.endAt).format("HH:mm"),
           };
         });
       }

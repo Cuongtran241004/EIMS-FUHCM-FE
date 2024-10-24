@@ -7,7 +7,7 @@ import { DownOutlined, EyeOutlined } from "@ant-design/icons";
 import { Dropdown, Button, Space, Table, Spin, Layout, Modal } from "antd";
 import attendanceApi from "../../services/InvigilatorAttendance.js";
 import { managerMapperUtil } from "../../utils/Mapper/ManagerMapperUtil.jsx";
-
+import "./InvigilatorAttendance.css";
 const InvigilatorAttendance = () => {
   const { Sider, Content } = Layout;
   const [loading, setLoading] = useState(false);
@@ -103,6 +103,7 @@ const InvigilatorAttendance = () => {
       dataIndex: "no",
       key: "no",
       align: "center",
+      width: "10%",
       render: (_, __, index) => index + 1,
     },
     {
@@ -110,6 +111,7 @@ const InvigilatorAttendance = () => {
       dataIndex: "subjectCode",
       key: "subjectCode",
       align: "center",
+      width: "15%",
     },
     {
       title: "Exam Type",
@@ -129,6 +131,24 @@ const InvigilatorAttendance = () => {
       dataIndex: "time",
       key: "time",
       align: "center",
+      render: (text, record) => {
+        return `${record.startAt} - ${record.endAt}`;
+      },
+    },
+    {
+      title: "Staff ID",
+      dataIndex: "staffId",
+      key: "staffId",
+      align: "center",
+    },
+    {
+      title: "Staff Name",
+      dataIndex: "staffName",
+      key: "staffName",
+      align: "center",
+      render: (text, record) => {
+        return `${record.staffLastName} ${record.staffFirstName}`;
+      },
     },
   ];
   return (
@@ -157,53 +177,34 @@ const InvigilatorAttendance = () => {
 
           <Spin spinning={loading}>
             <Table
+              className="custom-table-invigilator-attendance"
+              rowClassName={(record, index) =>
+                index % 2 === 0 ? "even-row" : "odd-row"
+              }
               style={{ width: "100%" }}
               columns={columns}
               dataSource={data}
               rowKey="id"
+              rowHoverable={false}
               expandable={{
-                expandedRowRender: (record) => {
-                  // record.detail is an array of objects, render each object as a single line
-                  // <Table
-                  //   columns={columnsAttendance}
-                  //   dataSource={record.detail}
-                  //   pagination={false}
-                  // />
-
-                  record.detail.map((item) => {
-                    console.log(item);
-                    return (
-                      <div key={item.key}>
-                        <p>{item.subjectCode}</p>
-                        <p>{item.examType}</p>
-                      </div>
-                    );
-                  });
-                },
+                expandedRowRender: (record) => (
+                  <Table
+                    className="custom-table-invigilator-attendance-detail"
+                    columns={columnsAttendance}
+                    dataSource={record.detail}
+                    pagination={false}
+                    rowKey="id"
+                  />
+                ),
               }}
               pagination={{
                 pageSize: 10,
                 showSizeChanger: false,
                 showQuickJumper: false,
+                position: ["bottomRight"],
               }}
             />
           </Spin>
-
-          <Modal
-            title="Attendance List"
-            open={isModalVisible}
-            onCancel={handleCancel}
-            width={650}
-            height={500}
-            footer={null}
-            loading={listLoading}
-          >
-            <Table
-              dataSource={attendanceList} // Add a key property to each request object
-              columns={columnsAttendance}
-              pagination={{ pageSize: 8 }}
-            />
-          </Modal>
         </Content>
       </Layout>
     </Layout>

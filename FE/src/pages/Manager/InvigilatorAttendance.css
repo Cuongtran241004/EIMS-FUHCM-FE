@@ -1,0 +1,25 @@
+.custom-table-invigilator-attendance .odd-row {
+  background-color: #ffdac6;
+}
+
+.custom-table-invigilator-attendance .even-row {
+  background-color: #cbf3f0;
+}
+
+.custom-table-invigilator-attendance .ant-table-tbody .even-row: hover > td {
+  background-color: green !important;
+}
+
+.custom-table-invigilator-attendance-detail .ant-table-tbody > tr > td {
+  padding: 5px; /* Adjust as per your requirement */
+}
+
+.custom-table-invigilator-attendance-detail .ant-spin-container {
+  width: 100%;
+  margin: 5px auto;
+}
+
+.custom-table-invigilator-attendance-detail {
+  width: 90%;
+  margin: 0 auto;
+}
