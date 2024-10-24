@@ -104,7 +104,7 @@ const InvigilatorFees = () => {
       },
     },
     {
-      title: "Fee",
+      title: "Amounts",
       dataIndex: "fee",
       key: "fee",
       align: "center",

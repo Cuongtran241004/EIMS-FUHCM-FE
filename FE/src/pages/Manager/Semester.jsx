@@ -190,14 +190,14 @@ const Semester = ({ isLogin }) => {
       dataIndex: "startAt",
       key: "startAt",
       align: "center",
-      render: (text) => moment(text).format("DD-MM-YYYY"),
+      render: (text) => moment(text).format("DD/MM/YYYY"),
     },
     {
       title: "End Date",
       dataIndex: "endAt",
       key: "endAt",
       align: "center",
-      render: (text) => moment(text).format("DD-MM-YYYY"),
+      render: (text) => moment(text).format("DD/MM/YYYY"),
     },
     {
       title: "Action",
@@ -312,7 +312,7 @@ const Semester = ({ isLogin }) => {
                     disabledDate={(current) =>
                       current && current < moment().startOf("day")
                     }
-                    format="DD-MM-YYYY"
+                    format="DD/MM/YYYY"
                   />
                 </Form.Item>
               </Form.Item>

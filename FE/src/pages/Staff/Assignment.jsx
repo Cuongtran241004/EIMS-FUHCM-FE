@@ -121,11 +121,11 @@ const AssignmentInvigilator = () => {
       render: (text) => examTypeTag(text),
     },
     {
-      title: "Date (DD-MM-YYYY)",
+      title: "Date",
       dataIndex: "startAt",
       key: "date",
       align: "center",
-      render: (text) => moment(text).format("DD-MM-YYYY"),
+      render: (text) => moment(text).format("DD/MM/YYYY"),
     },
     {
       title: "Time",

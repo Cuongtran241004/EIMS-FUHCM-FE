@@ -28,12 +28,12 @@ const examScheduleTable = (handleRoomClick, handleEdit, handleDelete) => [
     render: (text) => examTypeTag(text),
   },
   {
-    title: "Date (DD-MM-YYYY)",
+    title: "Date",
     dataIndex: "startAt", // Use startAt to extract date
     key: "date",
     align: "center",
     width: "15%",
-    render: (text) => moment(text).format("DD-MM-YYYY"), // Format as DD-MM-YYYY
+    render: (text) => moment(text).format("DD/MM/YYYY"), // Format as DD-MM-YYYY
   },
   {
     title: "Time",

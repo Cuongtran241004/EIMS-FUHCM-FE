@@ -27,9 +27,8 @@ const headerConfig = {
   3: [
     { name: "Home", path: "/" },
     { name: "Register", path: "/register" },
-
-    { name: "Report", path: "/report" },
     { name: "Attendance", path: "/attendance" },
+    { name: "Report", path: "/report" },
     {
       name: "Request",
       subMenu: [
