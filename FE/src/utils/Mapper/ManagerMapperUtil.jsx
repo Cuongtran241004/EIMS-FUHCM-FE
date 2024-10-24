@@ -132,6 +132,7 @@ const managerMapperUtil = {
         totalHours: item.totalHours,
         hourlyRate: item.hourlyRate,
         fee: item.preCalculatedInvigilatorFree,
+        detail: item.invigilatorAttendanceList,
       };
     });
   },

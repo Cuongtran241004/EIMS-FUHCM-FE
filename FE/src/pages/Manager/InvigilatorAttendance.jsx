@@ -4,7 +4,7 @@ import NavBar_Manager from "../../components/NavBar/NavBar_Manager";
 import { useSemester } from "../../components/Context/SemesterContext.jsx";
 import { selectButtonStyle } from "../../design-systems/CSS/Button.js";
 import { DownOutlined, EyeOutlined } from "@ant-design/icons";
-import { Dropdown, Button, Space, Table, Spin, Layout } from "antd";
+import { Dropdown, Button, Space, Table, Spin, Layout, Modal } from "antd";
 import attendanceApi from "../../services/InvigilatorAttendance.js";
 import { managerMapperUtil } from "../../utils/Mapper/ManagerMapperUtil.jsx";
 
@@ -12,6 +12,9 @@ const InvigilatorAttendance = () => {
   const { Sider, Content } = Layout;
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState([]);
+  const [listLoading, setListLoading] = useState(false);
+  const [attendanceList, setAttendanceList] = useState([]);
+  const [isModalVisible, setIsModalVisible] = useState(false);
   const { selectedSemester, setSelectedSemester, semesters } = useSemester();
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 7;
@@ -48,6 +51,14 @@ const InvigilatorAttendance = () => {
         name: selected.label,
       });
     }
+  };
+
+  const handleViewDetailAttendance = () => {
+    // Handle view detail attendance
+  };
+
+  const handleCancel = () => {
+    setIsModalVisible(false);
   };
 
   const columns = [
@@ -97,14 +108,47 @@ const InvigilatorAttendance = () => {
       align: "center",
       render: (text, record) => {
         return (
-          <Button type="link">
+          <Button type="link" onClick={handleViewDetailAttendance}>
             <EyeOutlined style={{ color: "#4D908E" }} />
           </Button>
         );
       },
     },
   ];
+  const columnsAttendance = [
+    {
+      title: "No",
+      dataIndex: "no",
+      key: "no",
+      align: "center",
+      render: (_, __, index) => index + 1,
+    },
+    {
+      title: "Subject Code",
+      dataIndex: "subjectCode",
+      key: "subjectCode",
+      align: "center",
+    },
+    {
+      title: "Exam Type",
+      dataIndex: "examType",
+      key: "examType",
+      align: "center",
+    },
 
+    {
+      title: "Date",
+      dataIndex: "date",
+      key: "date",
+      align: "center",
+    },
+    {
+      title: "Time",
+      dataIndex: "time",
+      key: "time",
+      align: "center",
+    },
+  ];
   return (
     <Layout style={{ height: "100vh", overflowY: "hidden" }}>
       <Header />
@@ -142,6 +186,22 @@ const InvigilatorAttendance = () => {
               }}
             />
           </Spin>
+
+          <Modal
+            title="Attendance List"
+            open={isModalVisible}
+            onCancel={handleCancel}
+            width={650}
+            height={500}
+            footer={null}
+            loading={listLoading}
+          >
+            <Table
+              dataSource={attendanceList} // Add a key property to each request object
+              columns={columnsAttendance}
+              pagination={{ pageSize: 8 }}
+            />
+          </Modal>
         </Content>
       </Layout>
     </Layout>
