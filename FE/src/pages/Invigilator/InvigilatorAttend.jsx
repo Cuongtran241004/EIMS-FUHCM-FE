@@ -53,7 +53,7 @@ const InvigilatorAttend = () => {
             }
         } else {
             const filteredData = attendance.filter((slot) =>
-                moment(slot.startAt).format("DD-MM-YYYY") === string
+                moment(slot.startAt).format("DD/MM/YYYY") === string
         );
             setSlotData(filteredData); 
         }
@@ -64,7 +64,7 @@ const InvigilatorAttend = () => {
             title: "Date",
             dataIndex: "startAt",
             key: "startAt",
-            render: (startAt) => moment(startAt).format("DD-MM-YYYY"),
+            render: (startAt) => moment(startAt).format("DD/MM/YYYY"),
         },
         {
             title: "Start",
@@ -82,13 +82,13 @@ const InvigilatorAttend = () => {
             title: "Check In",
             dataIndex: "checkIn",
             key: "checkIn",
-            render: (checkIn) => (checkIn ? moment(checkIn).format("DD-MM-YYYY HH:mm") : "-"),
+            render: (checkIn) => (checkIn ? moment(checkIn).format("DD/MM/YYYY HH:mm") : "-"),
         },
         {
             title: "Check Out",
             dataIndex: "checkOut",
             key: "checkOut",
-            render: (checkOut) => (checkOut ? moment(checkOut).format("DD-MM-YYYY HH:mm") : "-"),
+            render: (checkOut) => (checkOut ? moment(checkOut).format("DD/MM/YYYY HH:mm") : "-"),
         },
         {
             title: "Status",
@@ -131,7 +131,7 @@ const InvigilatorAttend = () => {
 
                     <div style={{ display: 'flex', justifyContent: 'space-between', paddingRight: 200 }}>
                         <div style={{ width: '100%' }}>
-                            <DatePicker style={{ width: '23%', marginBottom: 20}} format={'DD-MM-YYYY'} onChange={handleDateChange} />
+                            <DatePicker style={{ width: '23%', marginBottom: 20}} format={'DD/MM/YYYY'} onChange={handleDateChange} />
                             <Table
                                 columns={slotColumns}
                                 dataSource={slotData}
