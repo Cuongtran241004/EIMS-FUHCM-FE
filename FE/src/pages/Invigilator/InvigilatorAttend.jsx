@@ -109,7 +109,7 @@ const InvigilatorAttend = () => {
 
     return (
         <div>
-            <h1 style={{ color: 'red', display: 'flex', justifyContent: 'center', marginTop: 0 }}>Invigilator Attendance</h1>
+            <h1 style={{ color: 'red', display: 'flex', justifyContent: 'center', marginTop: 0 }}>INVIGILATOR ATTENDANCE</h1>
 
             {loadingSemesters ? (
                 <Spin />

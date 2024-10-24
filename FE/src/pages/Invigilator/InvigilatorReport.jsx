@@ -111,7 +111,7 @@ const InvigilatorReport = () => {
 
     return (
         <div>
-            <h1 style={{ color: 'red', display: 'flex', justifyContent: 'center', marginTop: 0 }}>Invigilator Report</h1>
+            <h1 style={{ color: 'red', display: 'flex', justifyContent: 'center', marginTop: 0 }}>INVIGILATOR REPORT</h1>
 
             {loadingSemesters ? (
                 <Spin />

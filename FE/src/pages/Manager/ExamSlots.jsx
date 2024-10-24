@@ -189,10 +189,11 @@ const ExamSlots = () => {
         </Sider>
         <Layout>
           <Content style={{ padding: "24px", minHeight: "100vh" }}>
+            <h1 style={{ color: "red", display: "flex", justifyContent: "center", marginTop: 0, marginBottom: 0 }}> EXAM SLOTS </h1>
             {loading ? (
               <Spin tip="Loading..." size="large" />
             ) : (
-              <div style={{ display: "flex", alignItems: "flex-start" }}>
+              <div style={{ display: "flex", alignItems: "flex-start", marginTop: -20 }}>
                 <BigCalendar
                   views={['month', 'agenda']}
                   localizer={localizer}
@@ -238,8 +239,8 @@ const ExamSlots = () => {
                 <Modal
                   title="Details"
                   open={isModalVisible}
-                  onOk={handleCloseEventModal}
                   onCancel={handleCloseEventModal}
+                  footer={[<Button key="close" onClick={handleCloseEventModal}>Close</Button>]}
                 >
                   {selectedEvent && (
                     <div>
@@ -248,12 +249,8 @@ const ExamSlots = () => {
                         {moment(selectedEvent.startAt).format("DD/MM/YYYY")}
                       </p>
                       <p>
-                        <strong>Start Time:</strong>{" "}
-                        {moment(selectedEvent.startAt).format("HH:MM")}
-                      </p>
-                      <p>
-                        <strong>End Time:</strong>{" "}
-                        {moment(selectedEvent.endAt).format("HH:MM")}
+                        <strong>Time:</strong>{" "}
+                        {moment(selectedEvent.startAt).format("HH:MM")} -{" "} {moment(selectedEvent.endAt).format("HH:MM")}
                       </p>
                       <p>
                         <strong>Required Invigilators:</strong>{" "}
@@ -296,9 +293,9 @@ const ExamSlots = () => {
                     Update
                   </Button>
                   <p>
-                    <span style={{ color: "#52c41a" }}><strong>Approved</strong></span> <br />
-                    <span style={{ color: "#d9363e" }}><strong>Rejected</strong></span> <br />
-                    <span style={{ color: "rgb(249, 199, 79)" }}><strong>Pending</strong></span>
+                    <span style={{marginRight: 20, color: "#52c41a" }}><strong>Approved</strong></span> 
+                    <span style={{marginRight: 20, color: "#d9363e" }}><strong>Rejected</strong></span> 
+                    <span style={{marginRight: 20, color: "rgb(249, 199, 79)" }}><strong>Pending</strong></span>
                   </p>
                 </div>
               </div>
