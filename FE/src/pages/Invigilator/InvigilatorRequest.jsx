@@ -31,6 +31,7 @@ function InvigilatorRequest() {
         reason,
         requestType: values.requestType,
       };
+      console.log("Request Payload: ", requestPayload);
       try {
         const success = await postRequest(requestPayload);
         if (success) {
@@ -102,7 +103,7 @@ function InvigilatorRequest() {
               label="Exam slot"
               name="examSlot"
               rules={[
-                { required: true, message: "Please select an exam slot" },
+                { required: false, message: "Please select an exam slot" },
               ]}
             >
               <Select placeholder="Select Exam Slot">
