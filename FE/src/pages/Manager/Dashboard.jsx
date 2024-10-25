@@ -1,20 +1,85 @@
 import React, { useState, useEffect } from "react";
 import NavBar_Manager from "../../components/NavBar/NavBar_Manager";
 import Header from "../../components/Header/Header.jsx";
-import { Layout, Typography, Row, Col, Divider } from "antd";
+import { Layout, Typography, Row, Col, Divider, Table, Button } from "antd";
 import moment from "moment";
-import attendanceApi from "../../services/InvigilatorAttendance.js";
+import examSlotApi from "../../services/ExamSlot.js";
+import { managerMapperUtil } from "../../utils/Mapper/ManagerMapperUtil.jsx";
+import { examTypeTag } from "../../design-systems/CustomTag.jsx";
+import { EyeFilled, EyeOutlined } from "@ant-design/icons";
+import "./Dashboard.css";
 
 const { Content, Sider } = Layout;
 const { Title } = Typography;
 
 const Dashboard = () => {
-  const [todayExamSlot, setTodayExamSlot] = useState([]);
+  const [todayExamSlots, setTodayExamSlots] = useState([]);
+  const [todayInvigilators, setTodayInvigilators] = useState([]);
+
   const fetchExamSlotToday = async () => {
     // Fetch exam slot today
-
-    const response = await attendanceApi.getAllAttendanceByDate();
+    const response = await examSlotApi.getExamSlotTodayManager();
+    const result = managerMapperUtil.mapTodayExamSlots(response);
+    // sort by startAt
+    result.sort((a, b) => {
+      return new Date(a.startAt) - new Date(b.startAt);
+    });
+    setTodayExamSlots(result || []);
   };
+
+  useEffect(() => {
+    fetchExamSlotToday();
+  }, []);
+
+  const todayExamSlotColumns = [
+    {
+      title: "#",
+      dataIndex: "no",
+      key: "no",
+      align: "center",
+      width: "10%",
+      render: (text, record, index) => index + 1,
+    },
+    {
+      title: "Subject",
+      dataIndex: "subjectCode",
+      key: "subjectCode",
+    },
+    {
+      title: "Type",
+      dataIndex: "examType",
+      key: "examType",
+      align: "center",
+      render: (text) => examTypeTag(text),
+    },
+    {
+      title: "Time",
+      dataIndex: "time",
+      key: "time",
+      align: "center",
+      render: (text, record) => {
+        return (
+          <p>
+            {moment(record.startAt).format("HH:mm")} -{" "}
+            {moment(record.endAt).format("HH:mm")}
+          </p>
+        );
+      },
+    },
+    {
+      title: "Room",
+      dataIndex: "room",
+      key: "room",
+      align: "center",
+      render: (text, record) => {
+        return (
+          <Button type="link" size="small">
+            <EyeOutlined />
+          </Button>
+        );
+      },
+    },
+  ];
   return (
     <Layout style={{ height: "100vh" }}>
       <Header />
@@ -66,12 +131,22 @@ const Dashboard = () => {
             <Row style={{ height: "100%" }}>
               <Col
                 span={8}
-                style={{ backgroundColor: "#f9f9f9", padding: "5px" }}
+                style={{
+                  backgroundColor: "#f9f9f9",
+                  padding: "5px",
+                  overflow: "auto",
+                }}
               >
-                {/* Table for today's exam slots */}
-                <h3>Today's Exam Slots</h3>
-                <p>Danh sách exam slot của ngày hôm nay</p>
-                {/* Your table component here */}
+                <Table
+                  className="custom-table-today-exam-slots"
+                  columns={todayExamSlotColumns}
+                  dataSource={todayExamSlots}
+                  pagination={false}
+                  scroll={{
+                    y: 200, // Vertical scrolling if data exceeds 400px in height
+                    x: "100%", // Horizontal scrolling for wide tables
+                  }}
+                />
               </Col>
               <Col
                 span={8}

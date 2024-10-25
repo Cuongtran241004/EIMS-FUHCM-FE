@@ -101,7 +101,6 @@ const managerMapperUtil = {
       };
     });
   },
-
   mapAttendanceList: (attendanceList) => {
     return attendanceList.map((attendance) => {
       return {
@@ -119,7 +118,6 @@ const managerMapperUtil = {
       };
     });
   },
-
   mapAttendanceReport: (list) => {
     return list.map((item) => {
       // detail is an array of attendance
@@ -154,6 +152,21 @@ const managerMapperUtil = {
         hourlyRate: item.hourlyRate,
         fee: item.preCalculatedInvigilatorFree,
         detail: attendance,
+      };
+    });
+  },
+  mapTodayExamSlots: (examSlots) => {
+    return examSlots.map((examSlot) => {
+      return {
+        key: examSlot.id,
+        id: examSlot.id,
+        examSlotId: examSlot.id,
+        startAt: examSlot.startAt,
+        endAt: examSlot.endAt,
+        examType: examSlot.subjectExamDTO?.examType,
+        subjectName: examSlot.subjectExamDTO?.subjectName,
+        subjectCode: examSlot.subjectExamDTO?.subjectCode,
+        status: examSlot.status,
       };
     });
   },
