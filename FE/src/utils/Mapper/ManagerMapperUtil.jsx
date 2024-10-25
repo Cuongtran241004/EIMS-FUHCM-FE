@@ -30,7 +30,6 @@ const managerMapperUtil = {
       };
     });
   },
-
   mapConfigs: (configs) => {
     return configs.map((config) => {
       let configType = "";
@@ -88,7 +87,6 @@ const managerMapperUtil = {
       };
     });
   },
-
   mapExamSlotforAttendance: (examSlots) => {
     return examSlots.map((examSlot) => {
       return {
@@ -116,6 +114,8 @@ const managerMapperUtil = {
         email: attendance.invigilatorEmail,
         phone: attendance.invigilatorPhone,
         updateBy: attendance.updateBy,
+        checkIn: attendance.checkIn,
+        checkOut: attendance.checkOut,
       };
     });
   },

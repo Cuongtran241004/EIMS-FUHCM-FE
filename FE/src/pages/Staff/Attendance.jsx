@@ -13,7 +13,6 @@ import {
   Calendar,
   theme,
   Modal,
-  notification,
 } from "antd";
 import examSlotApi from "../../services/ExamSlot.js";
 import { useSemester } from "../../components/Context/SemesterContext.jsx";
@@ -21,7 +20,6 @@ import {
   BackwardOutlined,
   CloseOutlined,
   DownOutlined,
-  EyeOutlined,
   ForwardOutlined,
   ReloadOutlined,
 } from "@ant-design/icons";
@@ -108,25 +106,25 @@ const Attendance = () => {
     }
   };
 
-  const getHistoryAttendance = async () => {
-    setLoading(true);
-    try {
-      const today = moment().startOf("day"); // Get today's date without time
-      // Filter attendance for dates before today
-      const history = allAttendance.filter((item) => {
-        return moment(item.startAt).isBefore(today);
-      });
-      // Sort by `startAt` in descending order (most recent first)
-      history.sort((a, b) => {
-        return moment(b.startAt).diff(moment(a.startAt));
-      });
-      setData(history || []);
-    } catch (error) {
-      message.error("Failed to fetch history attendance");
-    } finally {
-      setLoading(false);
-    }
-  };
+  // const getHistoryAttendance = async () => {
+  //   setLoading(true);
+  //   try {
+  //     const today = moment().startOf("day"); // Get today's date without time
+  //     // Filter attendance for dates before today
+  //     const history = allAttendance.filter((item) => {
+  //       return moment(item.startAt).isBefore(today);
+  //     });
+  //     // Sort by `startAt` in descending order (most recent first)
+  //     history.sort((a, b) => {
+  //       return moment(b.startAt).diff(moment(a.startAt));
+  //     });
+  //     setData(history || []);
+  //   } catch (error) {
+  //     message.error("Failed to fetch history attendance");
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
 
   const handleCheckIn = async (examSlotId) => {
     console.log("examSlotId", examSlotId);
@@ -406,7 +404,7 @@ const Attendance = () => {
             boxShadow: "3px 0 5px rgba(0, 0, 0, 0.5)",
           }}
         >
-          <Button
+          {/* <Button
             onClick={getHistoryAttendance}
             style={{
               width: "100%",
@@ -417,7 +415,7 @@ const Attendance = () => {
           >
             History Attendance
             <EyeOutlined />
-          </Button>
+          </Button> */}
           <div style={wrapperStyle}>
             <Calendar
               value={selectedDate} // Use selected date or current date

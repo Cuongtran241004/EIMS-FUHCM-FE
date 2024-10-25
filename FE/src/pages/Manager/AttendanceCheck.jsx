@@ -2,8 +2,17 @@ import React, { useState, useEffect } from "react";
 import { Layout } from "antd";
 import NavBar_Manager from "../../components/NavBar/NavBar_Manager";
 import Header from "../../components/Header/Header.jsx";
-import { Dropdown, Button, Space, Table, Spin, DatePicker, Modal } from "antd";
-import { DownOutlined } from "@ant-design/icons";
+import {
+  Dropdown,
+  Button,
+  Space,
+  Table,
+  Spin,
+  DatePicker,
+  Modal,
+  Checkbox,
+} from "antd";
+import { DownOutlined, EditOutlined, SaveOutlined } from "@ant-design/icons";
 import { useSemester } from "../../components/Context/SemesterContext.jsx";
 import dayjs from "dayjs";
 import moment from "moment";
@@ -20,6 +29,8 @@ const AttendanceCheck = () => {
   const [loading, setLoading] = useState(false);
   const [listLoading, setListLoading] = useState(false);
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [editableRowId, setEditableRowId] = useState(null);
+
   const { selectedSemester, setSelectedSemester, semesters } = useSemester(); // Access shared semester state
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 8;
@@ -75,6 +86,20 @@ const AttendanceCheck = () => {
 
   const handleCancel = () => {
     setIsModalVisible(false);
+    setAttendances([]);
+  };
+  const handleCheckInChange = (e, record) => {
+    const updatedAttendances = attendances.map((item) =>
+      item.fuId === record.fuId ? { ...item, checkIn: e.target.checked } : item
+    );
+    setAttendances(updatedAttendances);
+  };
+
+  const handleCheckOutChange = (e, record) => {
+    const updatedAttendances = attendances.map((item) =>
+      item.fuId === record.fuId ? { ...item, checkOut: e.target.checked } : item
+    );
+    setAttendances(updatedAttendances);
   };
 
   const showListAttendance = async (examSlotId) => {
@@ -97,6 +122,26 @@ const AttendanceCheck = () => {
     if (date) {
       const formattedDate = dayjs(date).format("YYYY-MM-DD");
       fetchExamSlotByDate(formattedDate); // Pass the formatted date directly
+    }
+  };
+  const toggleEditMode = (record) => {
+    // If the row is already being edited, save changes and exit edit mode
+    if (editableRowId === record.id) {
+      setEditableRowId(null);
+      // Optionally save changes here
+    } else {
+      setEditableRowId(record.id); // Set this row to edit mode
+    }
+  };
+
+  const saveAttendance = async () => {
+    try {
+      // const response = await attendanceApi.updateAttendance(attendances);
+      // console.log(response);
+    } catch (error) {
+      // Handle error
+    } finally {
+      setIsEditing(false);
     }
   };
 
@@ -172,36 +217,84 @@ const AttendanceCheck = () => {
       dataIndex: "fuId",
       key: "fuId",
       align: "center",
+      width: "10%",
     },
     {
       title: "Invigilator Name",
       dataIndex: "invigilatorName",
       key: "invigilatorName",
-      align: "center",
       render: (text, record) => `${record.lastName} ${record.firstName}`,
     },
     {
       title: "Email",
       dataIndex: "email",
       key: "email",
-      align: "center",
     },
-
     {
       title: "Check In",
       dataIndex: "checkIn",
       key: "checkIn",
       align: "center",
-      render: (text, record) => "-",
+      width: "10%",
+      render: (text, record) => {
+        if (record.checkIn !== null) {
+          return (
+            <Checkbox
+              checked={record.checkIn}
+              disabled={editableRowId !== record.id} // Only allow editing if this row is being edited
+              onChange={(e) => handleCheckInChange(e, record)}
+            />
+          );
+        }
+        return (
+          <Checkbox
+            disabled={editableRowId !== record.id} // Only allow editing if this row is being edited
+            onChange={(e) => handleCheckInChange(e, record)}
+          />
+        );
+      },
     },
     {
       title: "Check Out",
       dataIndex: "checkOut",
       key: "checkOut",
       align: "center",
-      render: (text, record) => "-",
+      width: "10%",
+      render: (text, record) => {
+        if (record.checkOut !== null) {
+          return (
+            <Checkbox
+              checked={record.checkOut}
+              disabled={editableRowId !== record.id} // Only allow editing if this row is being edited
+              onChange={(e) => handleCheckOutChange(e, record)}
+            />
+          );
+        }
+        return (
+          <Checkbox
+            disabled={editableRowId !== record.id} // Only allow editing if this row is being edited
+            onChange={(e) => handleCheckOutChange(e, record)}
+          />
+        );
+      },
+    },
+
+    {
+      title: "Action",
+      dataIndex: "action",
+      key: "action",
+      align: "center",
+      render: (text, record) => (
+        <Button
+          type="link"
+          onClick={() => toggleEditMode(record)} // Pass the current row to toggle edit mode
+        >
+          {editableRowId === record.fuId ? <SaveOutlined /> : <EditOutlined />}
+        </Button>
+      ),
     },
   ];
+
   return (
     <Layout style={{ height: "100vh" }}>
       <Header />
@@ -244,24 +337,24 @@ const AttendanceCheck = () => {
               pagination={{ pageSize }}
             />
           </Spin>
-
-          <Modal
-            title="Attendance List"
-            open={isModalVisible}
-            onCancel={handleCancel}
-            width={650}
-            height={500}
-            footer={null}
-            loading={listLoading}
-          >
-            <p>Check Attendance By: </p>
-            <Table
-              dataSource={attendances} // Add a key property to each request object
-              columns={columnsAttendance}
-              pagination={{ pageSize: 8 }}
-            />
-          </Modal>
         </Content>
+        <Modal
+          title="Attendance List"
+          open={isModalVisible}
+          onCancel={handleCancel}
+          cancelText="Close"
+          width={650} // Adjust width as needed
+          footer={null}
+          bodyProps={{ maxHeight: "500px", overflowY: "auto" }} // Set custom height for content
+        >
+          <p>Check Attendance By: </p>
+          <Table
+            className="custom-table-attendance"
+            dataSource={attendances}
+            columns={columnsAttendance}
+            pagination={{ pageSize: 8 }}
+          />
+        </Modal>
       </Layout>
     </Layout>
   );

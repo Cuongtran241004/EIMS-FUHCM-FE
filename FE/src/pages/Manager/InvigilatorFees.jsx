@@ -70,7 +70,6 @@ const InvigilatorFees = () => {
       title: "Email",
       dataIndex: "email",
       key: "email",
-      align: "center",
     },
     {
       title: "Phone",
