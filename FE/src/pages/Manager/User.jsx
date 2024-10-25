@@ -9,8 +9,6 @@ import {
   Modal,
   Input,
   message,
-  Space,
-  Popconfirm,
   Upload,
   Radio,
   Col,
@@ -45,11 +43,11 @@ import { departments, roleOptions } from "../../configs/data.js";
 import { userTable } from "../../design-systems/CustomTable.jsx";
 import { selectButtonStyle } from "../../design-systems/CSS/Button.js";
 import { titleStyle } from "../../design-systems/CSS/Title.js";
-
 const { Content, Sider } = Layout;
 
 const Users = ({ isLogin }) => {
   const [data, setData] = useState([]);
+  const [filteredData, setFilteredData] = useState([]); // To store filtered users
   const [loading, setLoading] = useState(false);
   const [fileLoading, setFileLoading] = useState(false);
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -68,8 +66,8 @@ const Users = ({ isLogin }) => {
         // sort by createAt
         return new Date(b.createdAt) - new Date(a.createdAt);
       });
-
       setData(result);
+      setFilteredData(result); // Initialize filteredData with all users
     } catch (error) {
       message.error(FETCH_USERS_FAILED);
     } finally {
@@ -80,6 +78,16 @@ const Users = ({ isLogin }) => {
   useEffect(() => {
     fetchData();
   }, []);
+
+  const handleSearch = (event) => {
+    const { value } = event.target;
+    const filtered = data.filter((user) =>
+      `${user.firstName} ${user.lastName}`
+        .toLowerCase()
+        .includes(value.toLowerCase())
+    );
+    setFilteredData(filtered); // Update the filtered data displayed in the table
+  };
 
   const showModal = () => {
     setIsModalVisible(true);
@@ -224,7 +232,15 @@ const Users = ({ isLogin }) => {
               >
                 Add New User
               </Button>
-
+              <Input
+                placeholder="Search by name"
+                onChange={handleSearch}
+                allowClear
+                style={{
+                  width: 200,
+                  marginLeft: "20px",
+                }}
+              />
               <div style={{ float: "right" }}>
                 <Upload
                   beforeUpload={(file) => {
@@ -259,7 +275,7 @@ const Users = ({ isLogin }) => {
 
             <Spin spinning={loading}>
               <Table
-                dataSource={data}
+                dataSource={filteredData}
                 columns={userTable(handleEdit, handleDelete)}
                 rowKey={(record) => record.fuId}
                 pagination={{

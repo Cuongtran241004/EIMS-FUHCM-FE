@@ -3,8 +3,8 @@ import Header from "../../components/Header/Header.jsx";
 import NavBar_Manager from "../../components/NavBar/NavBar_Manager";
 import { useSemester } from "../../components/Context/SemesterContext.jsx";
 import { selectButtonStyle } from "../../design-systems/CSS/Button.js";
-import { DownOutlined, EyeOutlined } from "@ant-design/icons";
-import { Dropdown, Button, Space, Table, Spin, Layout } from "antd";
+import { DownOutlined } from "@ant-design/icons";
+import { Dropdown, Button, Space, Table, Spin, Layout, Input } from "antd";
 import attendanceApi from "../../services/InvigilatorAttendance.js";
 import { managerMapperUtil } from "../../utils/Mapper/ManagerMapperUtil.jsx";
 
@@ -13,7 +13,7 @@ const InvigilatorFees = () => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
   const { selectedSemester, setSelectedSemester, semesters } = useSemester();
-
+  const [filteredData, setFilteredData] = useState([]);
   const fetchData = async (semesterId) => {
     setLoading(true);
     try {
@@ -50,7 +50,15 @@ const InvigilatorFees = () => {
       });
     }
   };
-
+  const handleSearch = (event) => {
+    const { value } = event.target;
+    const filtered = data.filter((user) =>
+      `${user.firstName} ${user.lastName}`
+        .toLowerCase()
+        .includes(value.toLowerCase())
+    );
+    setFilteredData(filtered); // Update the filtered data displayed in the table
+  };
   const columns = [
     {
       title: "FuID",
@@ -148,13 +156,22 @@ const InvigilatorFees = () => {
                 </Space>
               </Button>
             </Dropdown>
+            <Input
+              placeholder="Search by name"
+              onChange={handleSearch}
+              allowClear
+              style={{
+                width: 200,
+                marginLeft: "20px",
+              }}
+            />
           </div>
 
           <Spin spinning={loading}>
             <Table
               style={{ width: "100%" }}
               columns={columns}
-              dataSource={data}
+              dataSource={filteredData}
               rowKey="id"
               pagination={{
                 pageSize: 10,

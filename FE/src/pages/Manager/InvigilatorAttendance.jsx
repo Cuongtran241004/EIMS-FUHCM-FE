@@ -4,7 +4,7 @@ import NavBar_Manager from "../../components/NavBar/NavBar_Manager";
 import { useSemester } from "../../components/Context/SemesterContext.jsx";
 import { selectButtonStyle } from "../../design-systems/CSS/Button.js";
 import { DownOutlined, EyeOutlined } from "@ant-design/icons";
-import { Dropdown, Button, Space, Table, Spin, Layout, Modal } from "antd";
+import { Dropdown, Button, Space, Table, Spin, Layout, Input } from "antd";
 import attendanceApi from "../../services/InvigilatorAttendance.js";
 import { managerMapperUtil } from "../../utils/Mapper/ManagerMapperUtil.jsx";
 import "./InvigilatorAttendance.css";
@@ -12,8 +12,7 @@ const InvigilatorAttendance = () => {
   const { Sider, Content } = Layout;
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState([]);
-  const [listLoading, setListLoading] = useState(false);
-  const [attendanceList, setAttendanceList] = useState([]);
+  const [filteredData, setFilteredData] = useState([]);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const { selectedSemester, setSelectedSemester, semesters } = useSemester();
   const [currentPage, setCurrentPage] = useState(1);
@@ -24,8 +23,9 @@ const InvigilatorAttendance = () => {
       const response =
         await attendanceApi.getAttendanceReportBySemesterIdManager(semesterId);
       const result = managerMapperUtil.mapAttendanceReport(response);
-      console.log(result);
+
       setData(result || []);
+      setFilteredData(result || []);
     } catch (error) {
       // Handle error
     } finally {
@@ -50,6 +50,16 @@ const InvigilatorAttendance = () => {
         name: selected.label,
       });
     }
+  };
+
+  const handleSearch = (event) => {
+    const { value } = event.target;
+    const filtered = data.filter((user) =>
+      `${user.firstName} ${user.lastName}`
+        .toLowerCase()
+        .includes(value.toLowerCase())
+    );
+    setFilteredData(filtered); // Update the filtered data displayed in the table
   };
 
   const handleCancel = () => {
@@ -173,6 +183,15 @@ const InvigilatorAttendance = () => {
                 </Space>
               </Button>
             </Dropdown>
+            <Input
+              placeholder="Search by name"
+              onChange={handleSearch}
+              allowClear
+              style={{
+                width: 200,
+                marginLeft: "20px",
+              }}
+            />
           </div>
 
           <Spin spinning={loading}>
@@ -183,7 +202,7 @@ const InvigilatorAttendance = () => {
               }
               style={{ width: "100%" }}
               columns={columns}
-              dataSource={data}
+              dataSource={filteredData}
               rowKey="id"
               rowHoverable={false}
               expandable={{

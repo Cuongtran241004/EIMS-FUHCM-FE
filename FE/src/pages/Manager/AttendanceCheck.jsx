@@ -11,13 +11,12 @@ import {
   DatePicker,
   Modal,
   Checkbox,
+  Input,
 } from "antd";
 import {
   CloseOutlined,
   DownOutlined,
   EditFilled,
-  EditOutlined,
-  EyeInvisibleOutlined,
   EyeOutlined,
   SaveOutlined,
 } from "@ant-design/icons";
@@ -38,7 +37,7 @@ const AttendanceCheck = () => {
   const [listLoading, setListLoading] = useState(false);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [editableRowId, setEditableRowId] = useState(null);
-
+  const [filteredExamSlots, setFilteredExamSlots] = useState([]);
   const { selectedSemester, setSelectedSemester, semesters } = useSemester(); // Access shared semester state
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 8;
@@ -51,6 +50,7 @@ const AttendanceCheck = () => {
 
       const result = managerMapperUtil.mapExamSlotforAttendance(response);
       setExamSlots(result || []);
+      setFilteredExamSlots(result || []);
     } catch (error) {
       // Handle error
     } finally {
@@ -64,6 +64,7 @@ const AttendanceCheck = () => {
       const response = await attendanceApi.getExamSlotByDateManager(date);
       const result = managerMapperUtil.mapExamSlotforAttendance(response);
       setExamSlots(result || []);
+      setFilteredExamSlots(result || []);
     } catch (error) {
       // Handle error
     } finally {
@@ -92,6 +93,13 @@ const AttendanceCheck = () => {
     }
   };
 
+  const handleSearch = (event) => {
+    const { value } = event.target;
+    const filtered = examSlots.filter((examSlot) =>
+      `${examSlot.subjectCode}`.toLowerCase().includes(value.toLowerCase())
+    );
+    setFilteredExamSlots(filtered); // Update the filtered data displayed in the table
+  };
   const handleCancel = () => {
     setIsModalVisible(false);
     setAttendances([]);
@@ -349,13 +357,24 @@ const AttendanceCheck = () => {
                 style={{ marginBottom: "10px" }}
                 format={"DD/MM/YYYY"}
               />
+
+              <Input
+                placeholder="Search by subject code"
+                onChange={handleSearch}
+                allowClear
+                style={{
+                  width: 200,
+                  marginLeft: "20px",
+                  marginBottom: "10px",
+                }}
+              />
             </Space>
           </div>
 
           <Spin spinning={loading}>
             <Table
               className="custom-table-attendance"
-              dataSource={examSlots} // Add a key property to each request object
+              dataSource={filteredExamSlots} // Add a key property to each request object
               columns={columns}
               pagination={{ pageSize }}
             />
