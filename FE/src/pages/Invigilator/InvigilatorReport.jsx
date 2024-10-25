@@ -4,6 +4,7 @@ import { DownOutlined } from "@ant-design/icons";
 import { selectButtonStyle } from "../../design-systems/CSS/Button";
 import { useSemester } from "../../components/SemesterContext";
 import moment from "moment";
+import { requestTag } from "../../design-systems/CustomTag.jsx";
 
 const InvigilatorReport = () => {
     const {
@@ -102,9 +103,7 @@ const InvigilatorReport = () => {
             title: "Status",
             dataIndex: "status",
             key: "status",
-            render: (status) => {
-                return <span style={{ color: status === "APPROVED" ? "green" : "" }}><strong>{status}</strong></span>;
-            },
+            render: (status) => requestTag(status),
         },
 
     ];
@@ -163,7 +162,7 @@ const InvigilatorReport = () => {
                                 </div>
                                 <br />
                                 <div>
-                                    <strong>Estimated fee:</strong> {formatNumber.format(feeData.preCalculatedInvigilatorFree)} VND
+                                    <strong>Estimated amount:</strong> {formatNumber.format(feeData.preCalculatedInvigilatorFree)} VND
                                 </div>
                             </div>
                         </div>

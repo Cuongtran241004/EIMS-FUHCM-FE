@@ -20,7 +20,6 @@ import { cancelRegisteredSlot } from "../../components/API/cancelRegisteredSlot"
 import { useSemester } from "../../components/SemesterContext";
 import { Calendar, momentLocalizer } from "react-big-calendar";
 import CustomToolbar from "../../components/CustomCalendar/CustomToolbar";
-import CustomAgenda from "../../components/CustomCalendar/CustomAgenda";
 import moment from "moment";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import "./invigilatorRegistration.css";
@@ -76,22 +75,6 @@ function InvigilatorRegistration() {
     }
   }, [lastestSemester, availableSlotsData]);
 
-  // const handleMenuClick = (e) => {
-  //   const selected = semesters.find((semester) => semester.id === parseInt(e.key));
-  //   setSelectedSemester(selected);
-  //   fetchAndSetData();
-  // };
-
-  // const menuItems = semesters.map((semester) => ({
-  //   key: semester.id,
-  //   label: semester.name,
-  // }));
-
-  // const menu = {
-  //   items: menuItems,
-  //   onClick: handleMenuClick,
-  // };
-
   const handleSelectEvent = (event) => {
     const { examSlotId, status, startAt } = event;
     const currentDate = moment();
@@ -111,12 +94,7 @@ function InvigilatorRegistration() {
       });
       return;
     }
-    //=======================================================================================================
-    // if (!selectedSemester) {
-    //   message.warning('Please select a semester first.');
-    //   return;
-    // }
-    //=======================================================================================================
+
     if (status === "REGISTERED" || status === "FULL") {
       return;
     }
@@ -138,10 +116,7 @@ function InvigilatorRegistration() {
   };
 
   const handleRegister = async () => {
-    // if (!selectedSemester) {
-    //   message.warning('Please select a semester first.');
-    //   return;
-    // }
+
 
     if (selectedSlots.length === 0) {
       message.warning("Please select at least one slot to register.");
@@ -160,7 +135,6 @@ function InvigilatorRegistration() {
       }
     } catch (e) {
       console.error("postRegisterSlots Error:", e.message);
-      // message.error(e.message || "Error registering for slots.");
       notification.warning({
         message: "Slot Not Available",
         description: e.message || "Error registering for slots.",
@@ -234,12 +208,6 @@ function InvigilatorRegistration() {
     </div>
   );
 
-  const handleDrillDown = () => {
-    if (view === 'month') {
-      setView('agenda');
-    }
-  };
-
   if (loading) {
     return <Skeleton />;
   } else {
@@ -263,7 +231,6 @@ function InvigilatorRegistration() {
             length={6}
             onView={setView}
             view={view}
-            onDrillDown={handleDrillDown}
             startAccessor={(event) => {
               return new Date(event.startAt);
             }}
@@ -276,7 +243,10 @@ function InvigilatorRegistration() {
               width: "70%",
               fontWeight: "lighter",
             }}
-            components={{ event: EventComponent, toolbar: CustomToolbar, agenda: { event: CustomAgenda } }}
+            components={{
+              event: EventComponent,
+              toolbar: CustomToolbar,
+            }}
             messages={{ event: 'Time' }}
             formats={{
               agendaDateFormat: (date) =>
@@ -352,14 +322,6 @@ function InvigilatorRegistration() {
               width: "15%",
             }}
           >
-            {/* <Dropdown menu={menu} trigger={['click']}>
-              <Button size="large" style={{ width: '100%' }}>
-                <Space>
-                  {selectedSemester ? selectedSemester.name : 'No Semesters Available'}
-                  <DownOutlined />
-                </Space>
-              </Button>
-            </Dropdown> */}
             <Button size="large" style={{ width: "100%" }}>
               {lastestSemester.name}
             </Button>
@@ -384,31 +346,19 @@ function InvigilatorRegistration() {
               <span style={{ color: "red" }}>{allowedSlots}</span>
             </p>
             <p>Selected Slots: {selectedSlots.length}</p>
-            <p style={{ fontWeight: "bold" }}>
-              <span style={{ marginRight: 10, fontSize: 13, color: "#52c41a" }}>
-                Registered
-              </span>
-              <span style={{ marginRight: 10, fontSize: 13, color: "#d9363e" }}>
-                Full
-              </span>
-              <span
-                style={{
-                  marginRight: 10,
-                  fontSize: 13,
-                  color: "rgb(221, 221, 221)",
-                }}
-              >
-                Not full
-              </span>
-              <span
-                style={{
-                  marginRight: 10,
-                  fontSize: 13,
-                  color: "rgb(83, 41, 236)",
-                }}
-              >
-                Not open
-              </span>
+            <p>
+              <span style={{ marginRight: 10, fontSize: 20, color: "#52c41a" }}>
+                &#9632;
+              </span>Registered<br />
+              <span style={{ marginRight: 10, fontSize: 20, color: "#d9363e" }}>
+                &#9632;
+              </span>Full <br />
+              <span style={{marginRight: 10,fontSize: 20,color: "rgb(221, 221, 221)"}}>
+                &#9632;
+              </span>Not full<br />
+              <span style={{marginRight: 10,fontSize: 20,color: "rgb(83, 41, 236)",}}>
+                &#9632;
+              </span>Not open
             </p>
             <p>
               <span style={{ marginRight: 10, fontSize: 13 }}>

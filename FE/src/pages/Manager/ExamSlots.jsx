@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useCallback } from "react";
 import {
   Dropdown,
   Modal,
@@ -22,10 +22,12 @@ import "react-big-calendar/lib/css/react-big-calendar.css";
 import examSlotApi from "../../services/ExamSlot.js";
 import "./ExamSlots.css";
 import { selectButtonStyle } from "../../design-systems/CSS/Button.js";
+import { requestTag } from "../../design-systems/CustomTag.jsx";
 
 const localizer = momentLocalizer(moment);
 const { Content, Sider } = Layout;
 const { confirm } = Modal;
+
 
 const ExamSlots = () => {
   const {
@@ -42,6 +44,7 @@ const ExamSlots = () => {
   const [modalState, setModalState] = useState({ show: false, action: "" });
   const [selectedAction, setSelectedAction] = useState("");
   const [view, setView] = useState('month');
+  
 
 
   const handleMenuClick = (e) => {
@@ -174,11 +177,8 @@ const ExamSlots = () => {
     },
   ];
 
-  const handleDrillDown = () => {
-    if (view === 'month') {
-      setView('agenda');
-    }
-  };
+ 
+  
 
   return (
     <Layout style={{ height: "100vh", overflowY: "hidden" }}>
@@ -201,12 +201,11 @@ const ExamSlots = () => {
                   length={6}
                   onView={setView}
                   view={view}
-                  onDrillDown={handleDrillDown}
                   onSelectEvent={handleSelectEvent}
                   startAccessor={(event) => new Date(event.startAt)}
                   endAccessor={(event) => new Date(event.endAt)}
                   style={{ height: 500, margin: "50px", width: "70%" }}
-                  components={{ event: EventComponent, toolbar: CustomToolbar }}
+                  components={{ event: EventComponent, toolbar:  CustomToolbar }}
                   messages={{ event: "Time" }}
                   formats={{
                     agendaDateFormat: (date) => moment(date).format("DD/MM/YYYY")
@@ -220,11 +219,8 @@ const ExamSlots = () => {
                       case "REJECTED":
                         backgroundColor = "#d9363e";
                         break;
-                      case "PENDING":
-                        backgroundColor = "rgb(249, 199, 79)";
-                        break;
                       default:
-                        backgroundColor = "#1890ff";
+                        backgroundColor = "rgb(249, 199, 79)";
                         break;
                     }
                     return {
@@ -237,41 +233,22 @@ const ExamSlots = () => {
                   }}
                 />
                 <Modal
-                  title="Details"
+                  title="Details of exam slot"
                   open={isModalVisible}
                   onCancel={handleCloseEventModal}
                   footer={[<Button key="close" onClick={handleCloseEventModal}>Close</Button>]}
                 >
                   {selectedEvent && (
                     <div>
-                      <p>
-                        <strong>Date:</strong>{" "}
-                        {moment(selectedEvent.startAt).format("DD/MM/YYYY")}
-                      </p>
-                      <p>
-                        <strong>Time:</strong>{" "}
-                        {moment(selectedEvent.startAt).format("HH:MM")} -{" "} {moment(selectedEvent.endAt).format("HH:MM")}
-                      </p>
-                      <p>
-                        <strong>Required Invigilators:</strong>{" "}
-                        {selectedEvent.requiredInvigilators}
-                      </p>
-                      <p>
-                        <strong>Status:</strong> {selectedEvent.status}
-                      </p>
-                      <p>
-                        <strong>Subject:</strong>{" "}
-                        {selectedEvent.subjectExamDTO.subjectName} (
-                        {selectedEvent.subjectExamDTO.subjectCode})
-                      </p>
-                      <p>
-                        <strong>Exam Type:</strong>{" "}
-                        {selectedEvent.subjectExamDTO.examType}
-                      </p>
-                      <p>
-                        <strong>Duration:</strong>{" "}
-                        {selectedEvent.subjectExamDTO.duration} minutes
-                      </p>
+                      <tb>
+                        <tr><th className="table-head"><strong>Date:</strong></th><td>{moment(selectedEvent.startAt).format("DD/MM/YYYY")}</td></tr>
+                        <tr><th className="table-head"><strong>Time:</strong></th><td>{moment(selectedEvent.startAt).format("HH:MM")} -{" "} {moment(selectedEvent.endAt).format("HH:MM")}</td></tr>
+                        <tr><th className="table-head"><strong>Subject:</strong></th><td>{selectedEvent.subjectExamDTO.subjectName} ({selectedEvent.subjectExamDTO.subjectCode})</td></tr>
+                        <tr><th className="table-head"><strong>Required Invigilators:</strong></th><td>{selectedEvent.requiredInvigilators}</td></tr>
+                        <tr><th className="table-head"><strong>Status:</strong></th><td>{requestTag(selectedEvent.status)}</td></tr>
+                        <tr><th className="table-head"><strong>Exam Type:</strong></th><td>{selectedEvent.subjectExamDTO.examType}</td></tr>
+                        <tr><th className="table-head"><strong>Duration:</strong></th><td>{selectedEvent.subjectExamDTO.duration} minutes</td></tr>
+                       </tb>
                     </div>
                   )}
                 </Modal>
@@ -293,9 +270,9 @@ const ExamSlots = () => {
                     Update
                   </Button>
                   <p>
-                    <span style={{marginRight: 20, color: "#52c41a" }}><strong>Approved</strong></span> 
-                    <span style={{marginRight: 20, color: "#d9363e" }}><strong>Rejected</strong></span> 
-                    <span style={{marginRight: 20, color: "rgb(249, 199, 79)" }}><strong>Pending</strong></span>
+                    <span style={{ color: "#52c41a" }}>&#9632; </span> <span style={{marginLeft: 10}}>Approved</span><br/>
+                    <span style={{ color: "#d9363e" }}>&#9632; </span> <span style={{marginLeft: 10}}>Rejected</span> <br/>
+                    <span style={{ color: "rgb(249, 199, 79)" }}>&#9632; </span> <span style={{marginLeft: 10}}>Pending</span>
                   </p>
                 </div>
               </div>

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import moment from 'moment';
 import './CustomToolbar.css';
+import { DatePicker } from 'antd';
 
 function getWeeksInYear(year) {
     const weeks = [];
@@ -119,21 +120,23 @@ const CustomToolbar = (toolbar) => {
         <div className="custom-toolbar">
             <div>
                 <button onClick={goToToday}>Today</button>
-                <select value={currentView === 'agenda' ? selectCurrentWeek : selectCurrentMonth}
-                    onChange={currentView === 'agenda' ? handleWeekSelect : handleMonthSelect}>
-                    <option value="">{currentView === 'agenda' ? "Select a week" : "Select a month"}</option>
-                    {currentView === 'agenda' ?
-                        weeks.map((week, index) => (
-                            <option key={index} value={index}>
-                                {`${moment(week.start).format('DD/MM')} - ${moment(week.end).format('DD/MM')}`}
-                            </option>
-                        )) :
-                        months.map((month, index) => (
-                            <option key={index} value={index}>
-                                {`${moment(month).format('MMMM')}`}
-                            </option>
-                        ))}
-                </select>
+               
+                    <select
+                        value={currentView === 'agenda' ? selectCurrentWeek : selectCurrentMonth}
+                        onChange={currentView === 'agenda' ? handleWeekSelect : handleMonthSelect}>
+                        <option value="">{currentView === 'agenda' ? "Select a week" : "Select a month"}</option>
+                        {currentView === 'agenda'
+                            ? weeks.map((week, index) => (
+                                <option key={index} value={index}>
+                                    {`${moment(week.start).format('DD/MM')} - ${moment(week.end).format('DD/MM')}`}
+                                </option>
+                            ))
+                            : months.map((month, index) => (
+                                <option key={index} value={index}>
+                                    {`${moment(month).format('MMMM')}`}
+                                </option>
+                            ))}
+                    </select>
             </div>
             <span>{label()}</span>
             <div>
@@ -143,5 +146,7 @@ const CustomToolbar = (toolbar) => {
         </div>
     );
 };
+
+
 
 export default CustomToolbar;
