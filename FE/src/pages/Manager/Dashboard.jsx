@@ -4,6 +4,7 @@ import Header from "../../components/Header/Header.jsx";
 import { Layout, Typography, Row, Col, Divider, Table, Button } from "antd";
 import moment from "moment";
 import examSlotApi from "../../services/ExamSlot.js";
+import attendanceApi from "../../services/InvigilatorAttendance.js";
 import { managerMapperUtil } from "../../utils/Mapper/ManagerMapperUtil.jsx";
 import { examTypeTag } from "../../design-systems/CustomTag.jsx";
 import { EyeFilled, EyeOutlined } from "@ant-design/icons";
@@ -17,18 +18,35 @@ const Dashboard = () => {
   const [todayInvigilators, setTodayInvigilators] = useState([]);
 
   const fetchExamSlotToday = async () => {
-    // Fetch exam slot today
-    const response = await examSlotApi.getExamSlotTodayManager();
-    const result = managerMapperUtil.mapTodayExamSlots(response);
-    // sort by startAt
-    result.sort((a, b) => {
-      return new Date(a.startAt) - new Date(b.startAt);
-    });
-    setTodayExamSlots(result || []);
+    try {
+      // Fetch exam slot today
+      const response = await examSlotApi.getExamSlotTodayManager();
+      const result = managerMapperUtil.mapTodayExamSlots(response);
+      // sort by startAt
+      result.sort((a, b) => {
+        return new Date(a.startAt) - new Date(b.startAt);
+      });
+      setTodayExamSlots(result || []);
+    } catch (error) {}
+  };
+
+  const fetchInvigilatorToday = async () => {
+    try {
+      // Fetch invigilator today
+      const response = await attendanceApi.getAllAttendanceToday();
+      const result = managerMapperUtil.mapTodayInvigilators(response);
+      // remove duplicate by fuId
+      const uniqueResult = result.filter(
+        (item, index, self) =>
+          index === self.findIndex((t) => t.fuId === item.fuId)
+      );
+      setTodayInvigilators(uniqueResult || []);
+    } catch (error) {}
   };
 
   useEffect(() => {
     fetchExamSlotToday();
+    fetchInvigilatorToday();
   }, []);
 
   const todayExamSlotColumns = [
@@ -78,6 +96,36 @@ const Dashboard = () => {
           </Button>
         );
       },
+    },
+  ];
+
+  const todayInvigilatorColumns = [
+    {
+      title: "#",
+      dataIndex: "no",
+      key: "no",
+      align: "center",
+      width: "10%",
+      render: (text, record, index) => index + 1,
+    },
+    {
+      title: "FuID",
+      dataIndex: "fuId",
+      key: "fuId",
+    },
+    {
+      title: "Full Name",
+      dataIndex: "fullName",
+      key: "fullName",
+      render: (text, record) => {
+        return `${record.lastName} ${record.firstName}`;
+      },
+    },
+
+    {
+      title: "Phone",
+      dataIndex: "phone",
+      key: "phone",
     },
   ];
   return (
@@ -130,7 +178,7 @@ const Dashboard = () => {
           <div style={{ height: "49%" }}>
             <Row style={{ height: "100%" }}>
               <Col
-                span={8}
+                span={9}
                 style={{
                   backgroundColor: "#f9f9f9",
                   padding: "5px",
@@ -149,16 +197,22 @@ const Dashboard = () => {
                 />
               </Col>
               <Col
-                span={8}
+                span={9}
                 style={{ backgroundColor: "#f9f9f9", padding: "5px" }}
               >
-                {/* Table for today's invigilators */}
-                <h3>Today's Invigilators</h3>
-                <p>Danh sách các giảng viên coi thi ngày hôm nay</p>
-                {/* Your table component here */}
+                <Table
+                  className="custom-table-today-invigilators"
+                  columns={todayInvigilatorColumns}
+                  dataSource={todayInvigilators}
+                  pagination={false}
+                  scroll={{
+                    y: 200, // Vertical scrolling if data exceeds 400px in height
+                    x: "100%", // Horizontal scrolling for wide tables
+                  }}
+                />
               </Col>
               <Col
-                span={8}
+                span={6}
                 style={{ backgroundColor: "#f9f9f9", padding: "20px" }}
               >
                 {/* Table for today's reports */}

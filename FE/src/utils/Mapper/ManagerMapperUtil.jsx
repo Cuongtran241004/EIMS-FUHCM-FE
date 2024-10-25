@@ -170,6 +170,19 @@ const managerMapperUtil = {
       };
     });
   },
+  mapTodayInvigilators: (invigilators) => {
+    return invigilators.map((invigilator) => {
+      return {
+        key: invigilator.id,
+        id: invigilator.id,
+        fuId: invigilator.invigilatorFuId,
+        firstName: invigilator.invigilatorFirstName,
+        lastName: invigilator.invigilatorLastName,
+        email: invigilator.invigilatorEmail,
+        phone: invigilator.invigilatorPhone,
+      };
+    });
+  },
 };
 
 export { managerMapperUtil };
