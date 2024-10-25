@@ -157,21 +157,7 @@ const Dashboard = () => {
               <Col
                 span={12}
                 style={{ backgroundColor: "#e6f7ff", padding: "20px" }}
-              >
-                {/* Content for the right part (30%) */}
-                <h2>Invigilation Summary</h2>
-                <p>
-                  Thống kê có bao nhiêu invigilator đã đăng ký, bao nhiêu
-                  invigilator được assign trong ngày A (bởi vì 1 ngày có nhiều
-                  exam slot nên hiển thị trong 1 ngày sẽ dễ nhìn hơn)
-                </p>
-                <p>
-                  API nhận vào date, và trả về json dạng:{" "}
-                  {`{"exam slot": {thông tin của exam slot},
-                  "registered": 10, "assigned": 8`}{" "}
-                </p>
-                {/* Your content here */}
-              </Col>
+              ></Col>
             </Row>
           </div>
           <Divider style={{ margin: "5px 0" }} />
@@ -181,10 +167,11 @@ const Dashboard = () => {
                 span={9}
                 style={{
                   backgroundColor: "#f9f9f9",
-                  padding: "5px",
+                  padding: "0",
                   overflow: "auto",
                 }}
               >
+                <h4 style={{ textAlign: "center" }}>Today's Exam Slots</h4>
                 <Table
                   className="custom-table-today-exam-slots"
                   columns={todayExamSlotColumns}
@@ -198,8 +185,9 @@ const Dashboard = () => {
               </Col>
               <Col
                 span={9}
-                style={{ backgroundColor: "#f9f9f9", padding: "5px" }}
+                style={{ backgroundColor: "#f9f9f9", padding: "0" }}
               >
+                <h4 style={{ textAlign: "center" }}>Today's Invigilators</h4>
                 <Table
                   className="custom-table-today-invigilators"
                   columns={todayInvigilatorColumns}
@@ -213,13 +201,9 @@ const Dashboard = () => {
               </Col>
               <Col
                 span={6}
-                style={{ backgroundColor: "#f9f9f9", padding: "20px" }}
+                style={{ backgroundColor: "#f9f9f9", padding: "0" }}
               >
-                {/* Table for today's reports */}
-                <h3>Today's Reports</h3>
-                <p>bao gồm exam slot report và attendance report</p>
-                <p>api trả về con số</p>
-                {/* Your table component here */}
+                <h4 style={{ textAlign: "center" }}>Today's Report</h4>
               </Col>
             </Row>
           </div>

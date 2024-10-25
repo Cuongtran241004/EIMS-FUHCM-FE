@@ -28,10 +28,9 @@ const InvigilatorFees = () => {
     try {
       const response =
         await attendanceApi.getAttendanceReportBySemesterIdManager(semesterId);
-      console.log(response);
       const result = managerMapperUtil.mapAttendanceReport(response);
-
       setData(result || []);
+      setFilteredData(result || []);
     } catch (error) {
       // Handle error
       message.error("Failed to fetch data");
@@ -141,7 +140,11 @@ const InvigilatorFees = () => {
       key: "action",
       align: "center",
       render: (text, record) => {
-        return <Button type="link">Send email</Button>;
+        return (
+          <Button type="link" style={{ color: "#F9844A" }}>
+            Send Email
+          </Button>
+        );
       },
     },
   ];

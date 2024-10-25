@@ -340,9 +340,13 @@ const Request = () => {
             style={{ ...detailButtonStyle, width: "50px" }}
             loading={detailLoading[record.requestId] || false} // Use loading state for the specific row
           >
-            <EyeOutlined style={{ fontSize: "20px", color: "#43AA8B" }} />
+            <EyeOutlined style={{ fontSize: "16px", color: "#277DA1" }} />
           </Button>
-          <Button style={buttonStyle} onClick={() => handleApprove(record)}>
+          <Button
+            type="link"
+            style={{ color: "#4D908E", borderColor: "#4D908E" }}
+            onClick={() => handleApprove(record)}
+          >
             <CheckOutlined />
           </Button>
           <Button danger onClick={() => handleReject(record)}>
@@ -407,12 +411,10 @@ const Request = () => {
               ]}
             >
               <p>
-                <strong>FuID:</strong> {selectedRequest.fuId}
-              </p>
-              <p>
                 <strong>Fullname:</strong> {selectedRequest.lastName}{" "}
-                {selectedRequest.firstName}
+                {selectedRequest.firstName} ({selectedRequest.fuId})
               </p>
+
               <p>
                 <strong>Phone: </strong> {selectedRequest.phoneNumber}
               </p>

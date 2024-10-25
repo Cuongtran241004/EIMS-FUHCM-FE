@@ -188,6 +188,7 @@ const AttendanceCheck = () => {
       title: "Date",
       dataIndex: "date",
       key: "date",
+      width: "15%",
       align: "center",
       render: (text, record) => moment(record.startAt).format("DD/MM/YYYY"),
     },
@@ -195,6 +196,7 @@ const AttendanceCheck = () => {
       title: "Time",
       dataIndex: "time",
       key: "time",
+      width: "15%",
       align: "center",
       render: (text, record) =>
         `${moment(record.startAt).format("HH:mm")} - ${moment(
@@ -205,6 +207,7 @@ const AttendanceCheck = () => {
       title: "Invigilator List",
       dataIndex: "invigilatorList",
       key: "invigilatorList",
+      width: "15%",
       align: "center",
       // a button to show the list of invigilators
       render: (text, record) => (
@@ -228,7 +231,7 @@ const AttendanceCheck = () => {
       render: (text, record) => (
         <Space size="middle">
           <Button type="link" style={{ color: "#F3722C" }}>
-            Approve
+            Confirm
           </Button>
         </Space>
       ),
