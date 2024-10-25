@@ -12,7 +12,15 @@ import {
   Modal,
   Checkbox,
 } from "antd";
-import { DownOutlined, EditOutlined, SaveOutlined } from "@ant-design/icons";
+import {
+  CloseOutlined,
+  DownOutlined,
+  EditFilled,
+  EditOutlined,
+  EyeInvisibleOutlined,
+  EyeOutlined,
+  SaveOutlined,
+} from "@ant-design/icons";
 import { useSemester } from "../../components/Context/SemesterContext.jsx";
 import dayjs from "dayjs";
 import moment from "moment";
@@ -134,8 +142,9 @@ const AttendanceCheck = () => {
     }
   };
 
-  const saveAttendance = async () => {
+  const handleSaveAttendance = async (record) => {
     try {
+      console.log(record);
       // const response = await attendanceApi.updateAttendance(attendances);
       // console.log(response);
     } catch (error) {
@@ -192,9 +201,13 @@ const AttendanceCheck = () => {
       render: (text, record) => (
         <Button
           type="link"
+          size="middle"
           onClick={() => showListAttendance(record.examSlotId)}
+          style={{ color: "#4D908E" }}
         >
-          Show
+          <strong>
+            <EyeOutlined />
+          </strong>
         </Button>
       ),
     },
@@ -205,7 +218,9 @@ const AttendanceCheck = () => {
       align: "center",
       render: (text, record) => (
         <Space size="middle">
-          <Button type="primary">Approve</Button>
+          <Button type="link" style={{ color: "#F3722C" }}>
+            Approve
+          </Button>
         </Space>
       ),
     },
@@ -289,7 +304,15 @@ const AttendanceCheck = () => {
           type="link"
           onClick={() => toggleEditMode(record)} // Pass the current row to toggle edit mode
         >
-          {editableRowId === record.fuId ? <SaveOutlined /> : <EditOutlined />}
+          {editableRowId === record.id ? (
+            <Button type="link" style={{ color: "#F9844A" }}>
+              <SaveOutlined onClick={() => handleSaveAttendance(record)} />
+            </Button>
+          ) : (
+            <Button type="link" style={{ color: "#4D908E" }}>
+              <EditFilled />
+            </Button>
+          )}
         </Button>
       ),
     },
@@ -342,10 +365,15 @@ const AttendanceCheck = () => {
           title="Attendance List"
           open={isModalVisible}
           onCancel={handleCancel}
-          cancelText="Close"
           width={650} // Adjust width as needed
-          footer={null}
+          footer={[
+            <Button key="back" danger onClick={handleCancel}>
+              <CloseOutlined />
+              Close
+            </Button>,
+          ]}
           bodyProps={{ maxHeight: "500px", overflowY: "auto" }} // Set custom height for content
+          loading={listLoading}
         >
           <p>Check Attendance By: </p>
           <Table
