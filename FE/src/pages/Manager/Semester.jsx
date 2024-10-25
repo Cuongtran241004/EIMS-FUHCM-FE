@@ -224,7 +224,7 @@ const Semester = ({ isLogin }) => {
         <Sider width={256} style={{ backgroundColor: "#4D908E" }}>
           <NavBar_Manager />
         </Sider>
-        <Layout style={{ padding: "16px" }}>
+        <Layout>
           <Content
             style={{
               padding: 12,

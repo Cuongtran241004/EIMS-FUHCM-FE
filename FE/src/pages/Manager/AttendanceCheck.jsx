@@ -19,6 +19,7 @@ import {
   EditFilled,
   EyeOutlined,
   SaveOutlined,
+  SearchOutlined,
 } from "@ant-design/icons";
 import { useSemester } from "../../components/Context/SemesterContext.jsx";
 import dayjs from "dayjs";
@@ -362,8 +363,9 @@ const AttendanceCheck = () => {
                 placeholder="Search by subject code"
                 onChange={handleSearch}
                 allowClear
+                suffix={<SearchOutlined style={{ color: "rgba(0,0,0,.45)" }} />}
                 style={{
-                  width: 200,
+                  width: 250,
                   marginLeft: "20px",
                   marginBottom: "10px",
                 }}

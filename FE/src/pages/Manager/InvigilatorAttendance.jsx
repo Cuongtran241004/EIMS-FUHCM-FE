@@ -3,7 +3,7 @@ import Header from "../../components/Header/Header.jsx";
 import NavBar_Manager from "../../components/NavBar/NavBar_Manager";
 import { useSemester } from "../../components/Context/SemesterContext.jsx";
 import { selectButtonStyle } from "../../design-systems/CSS/Button.js";
-import { DownOutlined, EyeOutlined } from "@ant-design/icons";
+import { DownOutlined, SearchOutlined } from "@ant-design/icons";
 import { Dropdown, Button, Space, Table, Spin, Layout, Input } from "antd";
 import attendanceApi from "../../services/InvigilatorAttendance.js";
 import { managerMapperUtil } from "../../utils/Mapper/ManagerMapperUtil.jsx";
@@ -54,10 +54,12 @@ const InvigilatorAttendance = () => {
 
   const handleSearch = (event) => {
     const { value } = event.target;
-    const filtered = data.filter((user) =>
-      `${user.firstName} ${user.lastName}`
-        .toLowerCase()
-        .includes(value.toLowerCase())
+    const filtered = data.filter(
+      (user) =>
+        `${user.firstName} ${user.lastName}`
+          .toLowerCase()
+          .includes(value.toLowerCase()) ||
+        `${user.fuId}`.toLowerCase().includes(value.toLowerCase())
     );
     setFilteredData(filtered); // Update the filtered data displayed in the table
   };
@@ -184,11 +186,12 @@ const InvigilatorAttendance = () => {
               </Button>
             </Dropdown>
             <Input
-              placeholder="Search by name"
+              placeholder="Search by ID or Name"
               onChange={handleSearch}
               allowClear
+              suffix={<SearchOutlined style={{ color: "rgba(0,0,0,.45)" }} />}
               style={{
-                width: 200,
+                width: 250,
                 marginLeft: "20px",
               }}
             />

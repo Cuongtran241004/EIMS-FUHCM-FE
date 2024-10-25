@@ -7,7 +7,7 @@ const MANAGER_SEMESTER_URL = "/semester";
 const MANAGER_REQUESTS_URL = "/requests";
 const MANAGER_CONFIGS_URL = "/configs";
 const MANAGER_INVIGILATOR_ATTENDANCE_URL = "/invigilator-attendance";
-const MANAGER_INVIGILATOR_FEES_URL = "/invigilation-fees";
+const MANAGER_INVIGILATOR_FEES_URL = "/invigilation-amounts";
 
 // STAFF
 const STAFF_SUBJECT_URL = "/subjects";

@@ -1,5 +1,5 @@
 .custom-table-invigilator-attendance .odd-row {
-  background-color: #ffdac6;
+  background-color: #f1f3f7;
 }
 
 .custom-table-invigilator-attendance .even-row {
@@ -20,6 +20,6 @@
 }
 
 .custom-table-invigilator-attendance-detail {
-  width: 90%;
+  width: 95%;
   margin: 0 auto;
 }

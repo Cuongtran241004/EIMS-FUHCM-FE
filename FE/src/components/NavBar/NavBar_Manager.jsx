@@ -54,8 +54,8 @@ const items = [
       {
         key: "4",
         label: (
-          <Link to="/invigilation-fees" style={{ color: "#fff" }}>
-            Invigilation Fees
+          <Link to="/invigilation-amounts" style={{ color: "#fff" }}>
+            Invigilation Amounts
           </Link>
         ),
       },

@@ -23,6 +23,7 @@ import {
   PlusOutlined,
   SendOutlined,
   CloseCircleFilled,
+  SearchOutlined,
 } from "@ant-design/icons";
 import {
   ADD_USER_SUCCESS,
@@ -81,10 +82,12 @@ const Users = ({ isLogin }) => {
 
   const handleSearch = (event) => {
     const { value } = event.target;
-    const filtered = data.filter((user) =>
-      `${user.firstName} ${user.lastName}`
-        .toLowerCase()
-        .includes(value.toLowerCase())
+    const filtered = data.filter(
+      (user) =>
+        `${user.firstName} ${user.lastName}`
+          .toLowerCase()
+          .includes(value.toLowerCase()) ||
+        `${user.fuId}`.toLowerCase().includes(value.toLowerCase())
     );
     setFilteredData(filtered); // Update the filtered data displayed in the table
   };
@@ -211,7 +214,7 @@ const Users = ({ isLogin }) => {
         <Sider width={256} style={{ backgroundColor: "#4D908E" }}>
           <NavBar_Manager isLogin={isLogin} />
         </Sider>
-        <Layout style={{ padding: "16px" }}>
+        <Layout>
           <Content
             style={{
               padding: 12,
@@ -233,11 +236,12 @@ const Users = ({ isLogin }) => {
                 Add New User
               </Button>
               <Input
-                placeholder="Search by name"
+                placeholder="Search by ID or Name"
                 onChange={handleSearch}
                 allowClear
+                suffix={<SearchOutlined style={{ color: "rgba(0,0,0,.45)" }} />}
                 style={{
-                  width: 200,
+                  width: 250,
                   marginLeft: "20px",
                 }}
               />
