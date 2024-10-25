@@ -4,6 +4,7 @@ import { DownOutlined } from "@ant-design/icons";
 import { selectButtonStyle } from "../../design-systems/CSS/Button";
 import { useSemester } from "../../components/SemesterContext";
 import moment from "moment";
+import { requestTag } from "../../design-systems/CustomTag.jsx";
 
 const InvigilatorAttend = () => {
     const {
@@ -94,15 +95,7 @@ const InvigilatorAttend = () => {
             title: "Status",
             dataIndex: "status",
             key: "status",
-            render: (status) => {
-                if (status === "APPROVED") {
-                    return <span style={{ color: "green" }}><strong>{status}</strong></span>;
-                } else if (status === "PENDING") {
-                    return <span style={{ color: "rgb(249, 199, 79)" }}><strong>{status}</strong></span>;
-                } else {
-                    return <span style={{ color: "#40a9ff" }}><strong>{status}</strong></span>;
-                }
-            },
+            render: (status) => requestTag(status),
         },
 
     ];
