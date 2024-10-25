@@ -9,3 +9,10 @@
 .custom-table-today-exam-slots {
   width: 100%;
 }
+
+.today-exam-slots-title,
+.today-invigilators-title {
+  padding: 0;
+  margin: 10px 0;
+  text-align: center;
+}

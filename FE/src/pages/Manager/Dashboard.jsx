@@ -1,7 +1,16 @@
 import React, { useState, useEffect } from "react";
 import NavBar_Manager from "../../components/NavBar/NavBar_Manager";
 import Header from "../../components/Header/Header.jsx";
-import { Layout, Typography, Row, Col, Divider, Table, Button } from "antd";
+import {
+  Layout,
+  Typography,
+  Row,
+  Col,
+  Divider,
+  Table,
+  Button,
+  Empty,
+} from "antd";
 import moment from "moment";
 import examSlotApi from "../../services/ExamSlot.js";
 import attendanceApi from "../../services/InvigilatorAttendance.js";
@@ -112,6 +121,7 @@ const Dashboard = () => {
       title: "FuID",
       dataIndex: "fuId",
       key: "fuId",
+      width: "20%",
     },
     {
       title: "Full Name",
@@ -126,6 +136,7 @@ const Dashboard = () => {
       title: "Phone",
       dataIndex: "phone",
       key: "phone",
+      width: "25%",
     },
   ];
   return (
@@ -168,36 +179,45 @@ const Dashboard = () => {
                 style={{
                   backgroundColor: "#f9f9f9",
                   padding: "0",
-                  overflow: "auto",
                 }}
               >
-                <h4 style={{ textAlign: "center" }}>Today's Exam Slots</h4>
-                <Table
-                  className="custom-table-today-exam-slots"
-                  columns={todayExamSlotColumns}
-                  dataSource={todayExamSlots}
-                  pagination={false}
-                  scroll={{
-                    y: 200, // Vertical scrolling if data exceeds 400px in height
-                    x: "100%", // Horizontal scrolling for wide tables
-                  }}
-                />
+                <h4 className="today-exam-slots-title">Today's Exam Slots</h4>
+                {todayExamSlots.length > 0 ? (
+                  <Table
+                    className="custom-table-today-exam-slots"
+                    columns={todayExamSlotColumns}
+                    dataSource={todayExamSlots}
+                    pagination={false}
+                    scroll={{
+                      y: 200, // Vertical scrolling if data exceeds 400px in height
+                      x: "100%", // Horizontal scrolling for wide tables
+                    }}
+                  />
+                ) : (
+                  <Empty />
+                )}
               </Col>
               <Col
                 span={9}
                 style={{ backgroundColor: "#f9f9f9", padding: "0" }}
               >
-                <h4 style={{ textAlign: "center" }}>Today's Invigilators</h4>
-                <Table
-                  className="custom-table-today-invigilators"
-                  columns={todayInvigilatorColumns}
-                  dataSource={todayInvigilators}
-                  pagination={false}
-                  scroll={{
-                    y: 200, // Vertical scrolling if data exceeds 400px in height
-                    x: "100%", // Horizontal scrolling for wide tables
-                  }}
-                />
+                <h4 className="today-invigilators-title">
+                  Today's Invigilators
+                </h4>
+                {todayInvigilators.length > 0 ? (
+                  <Table
+                    className="custom-table-today-invigilators"
+                    columns={todayInvigilatorColumns}
+                    dataSource={todayInvigilators}
+                    pagination={false}
+                    scroll={{
+                      y: 200, // Vertical scrolling if data exceeds 400px in height
+                      x: "100%", // Horizontal scrolling for wide tables
+                    }}
+                  />
+                ) : (
+                  <Empty />
+                )}
               </Col>
               <Col
                 span={6}
