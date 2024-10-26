@@ -7,6 +7,8 @@ import { useInviReport } from "./Hook/useInviReport";
 import { useFetchSchedules } from "./Hook/useFetchSchedules";
 import { useInviAttendance } from "./Hook/useInviAttendance";
 import { useRegisterSlots } from "./Hook/useRegisterSlots";
+import { useCancellableSlotList } from "./Hook/useCancellableSlotList";
+import { useAssignedSlot } from "./Hook/useAssignedSlot";
 
 
 const SemesterContext = createContext();
@@ -24,9 +26,13 @@ export const SemesterProviderInvigilator = ({ children }) => {
     selectedSemester?.id, reloadSlots);
   const { examSlotDetail, loading: loadingSchedules } = useFetchSchedules(
     selectedSemester?.id, reloadSlots);
-  const {attendance, loading: loadingAttendance} = useInviAttendance(
-      selectedSemester?.id, reloadSlots);
-  const {examSlotRegister, loading: loadingExamSlotRegister} = useRegisterSlots(
+  const { attendance, loading: loadingAttendance } = useInviAttendance(
+    selectedSemester?.id, reloadSlots);
+  const { examSlotRegister } = useRegisterSlots(
+    selectedSemester?.id, reloadSlots);
+  const { cancellableSlot } = useCancellableSlotList(
+    selectedSemester?.id, reloadSlots);
+  const { assignedSlotDetail } = useAssignedSlot(
     selectedSemester?.id, reloadSlots);
 
   const { semesterConfig, getConfigValue } = useSemesterConfig(lastestSemester?.id);
@@ -56,7 +62,7 @@ export const SemesterProviderInvigilator = ({ children }) => {
           return moment(current.startAt).isSameOrAfter(last.startAt) ? current : last;
         }, validSemesters[0]);
 
-        setLasestSemester(lastestSemester); 
+        setLasestSemester(lastestSemester);
       }
     }
   }, [semesters])
@@ -87,6 +93,8 @@ export const SemesterProviderInvigilator = ({ children }) => {
         inviFee,
         attendance,
         examSlotRegister,
+        cancellableSlot,
+        assignedSlotDetail,
       }}
     >
       {children}

@@ -44,7 +44,7 @@ const ExamSlots = () => {
   const [modalState, setModalState] = useState({ show: false, action: "" });
   const [selectedAction, setSelectedAction] = useState("");
   const [view, setView] = useState('month');
-  
+
 
 
   const handleMenuClick = (e) => {
@@ -177,8 +177,8 @@ const ExamSlots = () => {
     },
   ];
 
- 
-  
+
+
 
   return (
     <Layout style={{ height: "100vh", overflowY: "hidden" }}>
@@ -195,17 +195,20 @@ const ExamSlots = () => {
             ) : (
               <div style={{ display: "flex", alignItems: "flex-start", marginTop: -20 }}>
                 <BigCalendar
-                  views={['month', 'agenda']}
+                  views={['month', 'agenda', 'day']}
                   localizer={localizer}
                   events={examSlotBySemester.filter((slot) => slot.status !== "NEEDS_ROOM_ASSIGNMENT")}
                   length={6}
                   onView={setView}
                   view={view}
+                  dayLayoutAlgorithm='no-overlap'
+                  step={30}
+                  timeslots={1}
                   onSelectEvent={handleSelectEvent}
                   startAccessor={(event) => new Date(event.startAt)}
                   endAccessor={(event) => new Date(event.endAt)}
                   style={{ height: 500, margin: "50px", width: "70%" }}
-                  components={{ event: EventComponent, toolbar:  CustomToolbar }}
+                  components={{ event: EventComponent, toolbar: CustomToolbar }}
                   messages={{ event: "Time" }}
                   formats={{
                     agendaDateFormat: (date) => moment(date).format("DD/MM/YYYY")
@@ -248,7 +251,7 @@ const ExamSlots = () => {
                         <tr><th className="table-head"><strong>Status:</strong></th><td>{requestTag(selectedEvent.status)}</td></tr>
                         <tr><th className="table-head"><strong>Exam Type:</strong></th><td>{selectedEvent.subjectExamDTO.examType}</td></tr>
                         <tr><th className="table-head"><strong>Duration:</strong></th><td>{selectedEvent.subjectExamDTO.duration} minutes</td></tr>
-                       </tb>
+                      </tb>
                     </div>
                   )}
                 </Modal>
@@ -270,9 +273,9 @@ const ExamSlots = () => {
                     Update
                   </Button>
                   <p>
-                    <span style={{ color: "#52c41a" }}>&#9632; </span> <span style={{marginLeft: 10}}>Approved</span><br/>
-                    <span style={{ color: "#d9363e" }}>&#9632; </span> <span style={{marginLeft: 10}}>Rejected</span> <br/>
-                    <span style={{ color: "rgb(249, 199, 79)" }}>&#9632; </span> <span style={{marginLeft: 10}}>Pending</span>
+                    <span style={{ color: "#52c41a" }}>&#9632; </span> <span style={{ marginLeft: 10 }}>Approved</span><br />
+                    <span style={{ color: "#d9363e" }}>&#9632; </span> <span style={{ marginLeft: 10 }}>Rejected</span> <br />
+                    <span style={{ color: "rgb(249, 199, 79)" }}>&#9632; </span> <span style={{ marginLeft: 10 }}>Pending</span>
                   </p>
                 </div>
               </div>

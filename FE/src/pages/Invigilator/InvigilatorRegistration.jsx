@@ -39,6 +39,7 @@ function InvigilatorRegistration() {
     reloadAvailableSlots,
     lastestSemester,
     getConfigValue,
+    cancellableSlot,
   } = useSemester();
   const [events, setEvents] = useState([]);
   const [selectedSlots, setSelectedSlots] = useState([]);
@@ -94,7 +95,6 @@ function InvigilatorRegistration() {
       });
       return;
     }
-    console.log("examSlotRegister", examSlotRegister);
 
     if (status === "REGISTERED" || status === "FULL") {
       return;
@@ -167,7 +167,7 @@ function InvigilatorRegistration() {
 
   const handleSelectAll = (checked) => {
     if (checked) {
-      const allSlotIds = examSlotRegister.map((slot) => slot.examSlotId);
+      const allSlotIds = cancellableSlot.map((slot) => slot.examSlotId);
       setSelectedCancelSlots(allSlotIds);
     } else {
       setSelectedCancelSlots([]);
@@ -201,7 +201,7 @@ function InvigilatorRegistration() {
       <p style={{ margin: 0, fontWeight: 500, fontSize: 13.33333 }}>
         {moment(event.startAt).format("HH:mm")} -{" "}
         {moment(event.endAt).format("HH:mm")}
-        <span style={{ fontSize: "0.625rem" }}>
+        <span style={{ fontSize: "0.625rem"}}>
           {" "}
           (R: {event.numberOfRegistered}/T: {event.requiredInvigilators})
         </span>
@@ -228,9 +228,12 @@ function InvigilatorRegistration() {
           <Calendar
             localizer={localizer}
             events={events}
-            views={['month', 'agenda']}
+            views={['month', 'agenda', 'day']}
             length={6}
             onView={setView}
+            dayLayoutAlgorithm="no-overlap"
+            step={30}
+            timeslots={1}   
             view={view}
             startAccessor={(event) => {
               return new Date(event.startAt);
@@ -284,7 +287,7 @@ function InvigilatorRegistration() {
                   default:
                     backgroundColor = isSelected
                       ? "#1890ff"
-                      : "rgba(83, 41, 236, 0.2)";
+                      : "rgba(83, 41, 236, 0.5)";
                     isSelectable = false;
                     break;
                 }
@@ -327,11 +330,25 @@ function InvigilatorRegistration() {
               {lastestSemester.name}
             </Button>
 
+            <p style={{ fontStyle: "italic" }}>
+              *Note: Arrive {getConfigValue(ConfigType.TIME_BEFORE_EXAM)}{" "}
+              minutes before exam time in room{" "}
+              <span style={{ fontWeight: "bolder" }}>
+                {getConfigValue(ConfigType.INVIGILATOR_ROOM)}
+              </span>
+              .
+            </p>
+
+            <p style={{margin: 0}}>
+              <span style={{ marginRight: 10, fontSize: 13 }}>R: Registered</span>
+              <span style={{ marginRight: 10, fontSize: 13 }}>T: Total</span>
+            </p>
+
             <Button
               type="primary"
               loading={registerLoading}
               onClick={handleRegister}
-              style={{ marginTop: 60, width: "100%", height: 40 }}
+              style={{ marginTop: 30, width: "100%", height: 40 }}
             >
               Register
               <ReloadOutlined />
@@ -357,24 +374,12 @@ function InvigilatorRegistration() {
               <span style={{marginRight: 10,fontSize: 20,color: "rgb(221, 221, 221)"}}>
                 &#9632;
               </span>Not full<br />
-              <span style={{marginRight: 10,fontSize: 20,color: "rgb(83, 41, 236)",}}>
+              <span style={{marginRight: 10,fontSize: 20,color: "rgba(83, 41, 236, 0.5)",}}>
                 &#9632;
               </span>Not open
             </p>
-            <p>
-              <span style={{ marginRight: 10, fontSize: 13 }}>
-                R: Registered
-              </span>
-              <span style={{ marginRight: 10, fontSize: 13 }}>T: Total</span>
-            </p>
-            <p style={{ fontStyle: "italic" }}>
-              *Note: Arrive {getConfigValue(ConfigType.TIME_BEFORE_EXAM)}{" "}
-              minutes before exam time in room{" "}
-              <span style={{ fontWeight: "bolder" }}>
-                {getConfigValue(ConfigType.INVIGILATOR_ROOM)}
-              </span>
-              .
-            </p>
+            
+            
           </div>
         </div>
 
@@ -399,11 +404,11 @@ function InvigilatorRegistration() {
               checked={isAllSelected}
             />
           </div>
-          {examSlotRegister.length === 0 ? (
+          {cancellableSlot.length === 0 ? (
             <p>No registered slots available to cancel.</p>
           ) : (
             <div>
-              {examSlotRegister.map((slot) => {
+              {cancellableSlot.map((slot) => {
                 const currentDate = moment();
                 const openAt = moment(slot.startAt).subtract(
                   getConfigValue(ConfigType.TIME_BEFORE_OPEN_REGISTRATION),
@@ -427,7 +432,7 @@ function InvigilatorRegistration() {
                   >
                     <span>
                       {moment(slot.startAt).format("HH:mm")} -{" "}
-                      {moment(slot.endAt).format("HH:mm")},
+                      {moment(slot.endAt).format("HH:mm")}{" "}|{" "}
                       {moment(slot.startAt).format("DD/MM/YYYY")}
                     </span>
 
@@ -443,7 +448,7 @@ function InvigilatorRegistration() {
                   </div>
                 ) : null;
               })}
-              {examSlotRegister.every((slot) => {
+              {cancellableSlot.every((slot) => {
                 const currentDate = moment();
                 const openAt = moment(slot.startAt).subtract(
                   getConfigValue(ConfigType.TIME_BEFORE_OPEN_REGISTRATION),

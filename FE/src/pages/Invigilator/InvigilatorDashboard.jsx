@@ -14,7 +14,7 @@ import { titleStyle } from "../../design-systems/CSS/Title";
 const localizer = momentLocalizer(moment);
 
 function InvigilatorDashboard() {
-  const { semesters, selectedSemester, setSelectedSemester, examSlotDetail, getConfigValue } =
+  const { semesters, selectedSemester, setSelectedSemester, examSlotDetail, getConfigValue, assignedSlotDetail } =
     useSemester();
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState(null);
@@ -60,11 +60,6 @@ function InvigilatorDashboard() {
     </span>
   );
 
-  const handleDrillDown = () => {
-    if (view === 'month') {
-      setView('agenda');
-    }
-  };
 
 
   return (
@@ -84,12 +79,14 @@ function InvigilatorDashboard() {
           localizer={localizer}
           events={examSlotDetail}
           defaultView='month'
-          views={['month', 'agenda']}
+          views={['month', 'agenda', 'day']}
           length={6}
           onView={setView}
           view={view}
-          onDrillDown={handleDrillDown}
           onSelectEvent={handleSelectEvent}
+          dayLayoutAlgorithm='no-overlap'
+          step={30}
+          timeslots={1}
           startAccessor="startAt"
           endAccessor="endAt"
           style={{ height: 500, margin: "50px", width: "70%" }}
@@ -103,7 +100,7 @@ function InvigilatorDashboard() {
           }}
         />
         <Modal
-          title="Details"
+          title="Details of Exam Slot"
           open={isModalVisible}
           onOk={handleOk}
           onClose={handleCancel}
@@ -149,12 +146,24 @@ function InvigilatorDashboard() {
             *Note: Arrive {getConfigValue(ConfigType.TIME_BEFORE_EXAM)}{" "}
             minutes before exam time in room{" "}
             <span style={{ fontWeight: "bolder" }}>
-              {getConfigValue(ConfigType.INVIGILATOR_ROOM)} 
+              {getConfigValue(ConfigType.INVIGILATOR_ROOM)}
             </span>
             .
           </p>
+        <div>
+          <p>
+            <table className="table-assign" style={{textAlign: 'left', fontSize: 13}}>
+              <tr style={{color: 'green'}}><th>Hours of invigilation completed:</th><td>{assignedSlotDetail.totalInvigilatedHours}</td></tr>
+              <tr style={{color: 'orange'}}><th>Hours of invigilation remaining:</th><td>{assignedSlotDetail.totalRequiredInvigilationHours}</td></tr>
+              <tr><th>Total hours of invigilation:</th><td>{assignedSlotDetail.totalAssignedHours}</td></tr> <br/><br/>
+              <tr style={{color: 'green'}}><th>Invigilation slots completed:</th><td>{assignedSlotDetail.totalInvigilatedSlots}</td></tr>
+              <tr style={{color: 'orange'}}><th>Invigilation slots remaining:</th><td>{assignedSlotDetail.totalRequiredInvigilationSlots}</td></tr>
+              <tr style={{color: 'red'}}><th>Slots not attended:</th><td>{assignedSlotDetail.totalNonInvigilatedSlots}</td></tr>
+              <tr><th><span style={{marginRight: 10,fontSize: 20,color: "#1890ff",}}>&#9632;</span>Assigned slots:</th><td>{assignedSlotDetail.totalAssigned}</td></tr>
+            </table>
+          </p>
         </div>
-
+        </div>
 
       </div>
     </div>
