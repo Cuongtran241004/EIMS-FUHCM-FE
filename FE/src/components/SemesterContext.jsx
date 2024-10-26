@@ -34,7 +34,7 @@ export const SemesterProviderInvigilator = ({ children }) => {
   useEffect(() => {
     if (semesters.length > 0) {
       const currentDate = moment();
-      const currentSemester = semesters.find((semester) => moment(currentDate).isBetween(moment(semester.startAt), moment(semester.endAt)));
+      const currentSemester = semesters.find((semester) => moment(currentDate).isBetween(moment(semester.startAt), moment(semester.endAt)), null, '[]');
       if (currentSemester) {
         setSelectedSemester(currentSemester);
       } else {
@@ -56,7 +56,7 @@ export const SemesterProviderInvigilator = ({ children }) => {
           return moment(current.startAt).isSameOrAfter(last.startAt) ? current : last;
         }, validSemesters[0]);
 
-        setLasestSemester(lastestSemester);
+        setLasestSemester(lastestSemester); 
       }
     }
   }, [semesters])

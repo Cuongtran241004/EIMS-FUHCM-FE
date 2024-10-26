@@ -113,8 +113,7 @@ function InvigilatorRequest() {
                     getConfigValue(ConfigType.TIME_BEFORE_CLOSE_REQUEST),
                     "days"
                   );
-                  const closeAt = moment(slot.startAt);
-                  if (currentDate.isBetween(openAt, closeAt)) {
+                  if (currentDate.isAfter(openAt)) {
                     return (
                       <Option key={slot.examSlotId} value={slot.examSlotId}>
                         {moment(slot.startAt).format("DD/MM/YYYY")} |{" "}

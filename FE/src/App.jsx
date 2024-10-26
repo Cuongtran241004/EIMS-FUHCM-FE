@@ -152,7 +152,6 @@ function App() {
         {/* Common Routes */}
         <Route path="profile" element={<ProfilePage user={user} />} />
         <Route path="add" element={<HandlePassword />} />
-        <Route path="*" element={<Navigate to="/add" replace />} />{" "}
         {/* Catch-all route */}
       </Routes>
     );
