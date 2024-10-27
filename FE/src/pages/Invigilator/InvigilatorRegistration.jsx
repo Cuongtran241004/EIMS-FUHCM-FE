@@ -25,6 +25,7 @@ import "react-big-calendar/lib/css/react-big-calendar.css";
 import "./invigilatorRegistration.css";
 import { ConfigType } from "../../configs/enum";
 import { titleStyle } from "../../design-systems/CSS/Title";
+import "./calendar.css";
 const { confirm } = Modal;
 const localizer = momentLocalizer(moment);
 
