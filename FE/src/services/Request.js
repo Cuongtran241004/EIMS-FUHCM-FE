@@ -58,6 +58,23 @@ const requestApi = {
       handleError(error);
     }
   },
+  getRequestTypes: async () => {
+    try {
+      const response = await axios.get(
+        `${REQUEST_API_BASE_URL}/request-types`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+          withCredentials: true,
+        }
+      );
+      return response.data;
+    } catch (error) {
+      handleError(error);
+    }
+  },
   addRequest: async (request) => {
     try {
       const response = await axios.post(`${REQUEST_API_BASE_URL}`, request, {
@@ -72,10 +89,28 @@ const requestApi = {
       handleError(error);
     }
   },
-  updateRequestStatus: async (request) => {
+  updateAttendanceStatus: async (request) => {
     try {
       const response = await axios.put(
         `${REQUEST_API_BASE_URL}/requestid=${request.id}`,
+        request,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+          withCredentials: true,
+        }
+      );
+      return response.data;
+    } catch (error) {
+      handleError(error);
+    }
+  },
+  updateRequestStatus: async (request) => {
+    try {
+      const response = await axios.put(
+        `${REQUEST_API_BASE_URL}/update-attendance/status`,
         request,
         {
           headers: {

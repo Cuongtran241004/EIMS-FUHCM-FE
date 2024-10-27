@@ -272,37 +272,41 @@ const Dashboard = () => {
                   style={{ marginBottom: "5px" }}
                   format={"DD/MM/YYYY"}
                 />
-                <ResponsiveContainer width="100%" height={270}>
-                  <LineChart data={invigilationSummary}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="exam_slot" hide={true} />
-                    <YAxis />
-                    <Tooltip />
-                    <Legend />
-                    <Line
-                      type="monotone"
-                      dataKey="registered"
-                      stroke="#8884d8"
-                      name="Registered"
-                    />
-                    <Line
-                      type="monotone"
-                      dataKey="assigned"
-                      stroke="#82ca9d"
-                      name="Assigned"
-                    />
-                    <text
-                      x="50%" // Adjust x position based on your chart width
-                      y={20} // Adjust y position for desired height from the top
-                      textAnchor="middle"
-                      dominantBaseline="middle"
-                      fontSize={14}
-                      fontWeight="bold"
-                    >
-                      Invigilation Summary
-                    </text>
-                  </LineChart>
-                </ResponsiveContainer>
+                {invigilationSummary.length > 0 ? (
+                  <ResponsiveContainer width="100%" height={270}>
+                    <LineChart data={invigilationSummary}>
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis dataKey="exam_slot" hide={true} />
+                      <YAxis />
+                      <Tooltip />
+                      <Legend />
+                      <Line
+                        type="monotone"
+                        dataKey="registered"
+                        stroke="#8884d8"
+                        name="Registered"
+                      />
+                      <Line
+                        type="monotone"
+                        dataKey="assigned"
+                        stroke="#82ca9d"
+                        name="Assigned"
+                      />
+                      <text
+                        x="50%" // Adjust x position based on your chart width
+                        y={20} // Adjust y position for desired height from the top
+                        textAnchor="middle"
+                        dominantBaseline="middle"
+                        fontSize={14}
+                        fontWeight="bold"
+                      >
+                        Invigilation Summary
+                      </text>
+                    </LineChart>
+                  </ResponsiveContainer>
+                ) : (
+                  <Empty />
+                )}
               </Col>
             </Row>
           </div>

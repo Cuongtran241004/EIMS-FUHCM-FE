@@ -9,7 +9,7 @@ import {
   Spin,
   Tag,
   Modal,
-  Popover,
+  Radio,
   Input,
   notification,
   Select,
@@ -42,18 +42,22 @@ const { Content, Sider } = Layout;
 const Request = () => {
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(false);
-  const { selectedSemester, setSelectedSemester, semesters } = useSemester();
+  const { selectedSemester, setSelectedSemester, semesters, requestTypes } =
+    useSemester();
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 8;
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedRequest, setSelectedRequest] = useState(null);
   const [detailLoading, setDetailLoading] = useState({});
+  const [filteredRequests, setFilteredRequests] = useState([]);
+  const [selectedRequestType, setSelectedRequestType] = useState(null);
 
   const fetchData = async (semesterId) => {
     setLoading(true);
     try {
       const response = await requestApi.getAllRequestsBySemesterId(semesterId);
-      const result = managerMapperUtil.mapRequest(response);
+      let result = managerMapperUtil.mapRequest(response);
+
       // Sort by status, with priority: PENDING -> APPROVED -> REJECTED
       result.sort((a, b) => {
         const statusPriority = { PENDING: 1, APPROVED: 2, REJECTED: 3 };
@@ -64,9 +68,11 @@ const Request = () => {
         }
 
         // If statuses are the same, sort by requestId in descending order
-        return new Date(b.requestId) - new Date(a.requestId);
+        return b.requestId - a.requestId; // Assuming requestId is numeric
       });
+
       setRequests(result || []);
+      setFilteredRequests(result || []);
     } catch (error) {
       message.error("Failed to fetch requests");
     } finally {
@@ -116,6 +122,23 @@ const Request = () => {
     setIsModalVisible(false);
     setSelectedRequest(null);
   };
+  // Handle radio button change
+  const handleChangeRequestType = (type) => {
+    setSelectedRequestType(type);
+  };
+
+  useEffect(() => {
+    if (selectedRequestType) {
+      setFilteredRequests(
+        requests.filter(
+          (request) => request.requestType === selectedRequestType
+        )
+      );
+    } else {
+      // Show all requests if no type is selected
+      setFilteredRequests(requests);
+    }
+  }, [selectedRequestType, requests]);
 
   const handleApprove = async (record) => {
     if (record.status === "PENDING") {
@@ -280,6 +303,115 @@ const Request = () => {
     }
   };
 
+  const handleApproveAttendance = async (record) => {
+    if (record.status === "PENDING") {
+      let approveComfirm = "";
+
+      const handleApproveConfirm = async () => {
+        if (!approveComfirm) {
+          notification.warning({
+            message: "Warning",
+            description: "Please enter a message",
+          });
+          return;
+        }
+
+        try {
+          setDetailLoading((prev) => ({ ...prev, [record.requestId]: true }));
+          // Call API to reject the request with the provided reason
+          const requestData = {
+            requestId: record.requestId,
+            status: "APPROVED",
+            note: approveComfirm,
+          };
+
+          await requestApi.updateRequestStatus(requestData);
+          message.success("Request rejected successfully");
+          // Optionally refetch the updated requests
+          fetchData(selectedSemester.id);
+        } catch (error) {
+          message.error("Failed to reject the request");
+        } finally {
+          setDetailLoading((prev) => ({ ...prev, [record.requestId]: false }));
+        }
+      };
+
+      Modal.confirm({
+        title: "Confirmation Message",
+        content: (
+          <div style={{ paddingBottom: "20px" }}>
+            {" "}
+            {/* Add padding to avoid overlap */}
+            <Input.TextArea
+              onChange={(e) => (approveComfirm = e.target.value)}
+              rows={4}
+              maxLength={1000}
+              showCount
+              placeholder="Enter confirmation message"
+            />
+          </div>
+        ),
+        onOk: handleApproveConfirm,
+        onCancel: () => (approveComfirm = ""), // Reset reason if canceled
+      });
+    } else {
+      requestNotification();
+    }
+  };
+  const handleRejectAttendance = (record) => {
+    if (record.status === "PENDING") {
+      let rejectionReason = "";
+
+      const handleRejectConfirm = async () => {
+        if (!rejectionReason) {
+          notification.warning({
+            message: "Warning",
+            description: "Please enter a reason for rejection",
+          });
+          return;
+        }
+
+        try {
+          setDetailLoading((prev) => ({ ...prev, [record.requestId]: true }));
+          // Call API to reject the request with the provided reason
+          const requestData = {
+            requestId: record.requestId,
+            status: "REJECTED",
+            note: rejectionReason,
+          };
+          await requestApi.updateRequestStatus(requestData);
+          message.success("Request rejected successfully");
+          // Optionally refetch the updated requests
+          fetchData(selectedSemester.id);
+        } catch (error) {
+          message.error("Failed to reject the request");
+        } finally {
+          setDetailLoading((prev) => ({ ...prev, [record.requestId]: false }));
+        }
+      };
+
+      Modal.confirm({
+        title: "Reject Attendance Reason",
+        content: (
+          <div style={{ paddingBottom: "20px" }}>
+            {" "}
+            {/* Add padding to avoid overlap */}
+            <Input.TextArea
+              onChange={(e) => (rejectionReason = e.target.value)}
+              rows={4}
+              maxLength={1000}
+              showCount
+              placeholder="Enter rejection reason"
+            />
+          </div>
+        ),
+        onOk: handleRejectConfirm,
+        onCancel: () => (rejectionReason = ""), // Reset reason if canceled
+      });
+    } else {
+      requestNotification();
+    }
+  };
   const columns = [
     {
       title: "No",
@@ -328,32 +460,66 @@ const Request = () => {
       render: (text, record) => requestTag(record.status),
     },
     {
+      title: "Type",
+      dataIndex: "requestType",
+      key: "requestType",
+      render: (text, record) =>
+        record.requestType == "CANCEL" ? "Cancel" : "Attendance",
+    },
+    {
       title: "Action",
       dataIndex: "action",
       key: "action",
       align: "center",
-      render: (text, record) => (
-        <Space size="large">
-          <Button
-            type="text"
-            onClick={() => handleDetailClick(record)}
-            style={{ ...detailButtonStyle, width: "50px" }}
-            loading={detailLoading[record.requestId] || false} // Use loading state for the specific row
-          >
-            <EyeOutlined style={{ fontSize: "16px", color: "#277DA1" }} />
-          </Button>
-          <Button
-            type="link"
-            style={{ color: "#4D908E", borderColor: "#4D908E" }}
-            onClick={() => handleApprove(record)}
-          >
-            <CheckOutlined />
-          </Button>
-          <Button danger onClick={() => handleReject(record)}>
-            <CloseOutlined />
-          </Button>
-        </Space>
-      ),
+      render: (text, record) => {
+        if (record.requestType == "UPDATE_ATTENDANCE") {
+          return (
+            <Space size="large">
+              <Button
+                type="text"
+                onClick={() => handleDetailClick(record)}
+                style={{ ...detailButtonStyle, width: "50px" }}
+                loading={detailLoading[record.requestId] || false} // Use loading state for the specific row
+              >
+                <EyeOutlined style={{ fontSize: "16px", color: "#277DA1" }} />
+              </Button>
+              <Button
+                type="link"
+                style={{ color: "#4D908E", borderColor: "#4D908E" }}
+                onClick={() => handleApproveAttendance(record)}
+              >
+                <CheckOutlined />
+              </Button>
+              <Button danger onClick={() => handleRejectAttendance(record)}>
+                <CloseOutlined />
+              </Button>
+            </Space>
+          );
+        } else {
+          return (
+            <Space size="large">
+              <Button
+                type="text"
+                onClick={() => handleDetailClick(record)}
+                style={{ ...detailButtonStyle, width: "50px" }}
+                loading={detailLoading[record.requestId] || false} // Use loading state for the specific row
+              >
+                <EyeOutlined style={{ fontSize: "16px", color: "#277DA1" }} />
+              </Button>
+              <Button
+                type="link"
+                style={{ color: "#4D908E", borderColor: "#4D908E" }}
+                onClick={() => handleApprove(record)}
+              >
+                <CheckOutlined />
+              </Button>
+              <Button danger onClick={() => handleReject(record)}>
+                <CloseOutlined />
+              </Button>
+            </Space>
+          );
+        }
+      },
     },
   ];
 
@@ -388,11 +554,22 @@ const Request = () => {
                 </Space>
               </Button>
             </Dropdown>
+
+            <Radio.Group
+              onChange={(e) => handleChangeRequestType(e.target.value)}
+              style={{ marginBottom: "10px", marginLeft: "10px" }}
+            >
+              {requestTypes.map((type) => (
+                <Radio.Button key={type} value={type}>
+                  {type === "CANCEL" ? "Cancel" : "Attendance"}
+                </Radio.Button>
+              ))}
+            </Radio.Group>
           </div>
 
           <Spin spinning={loading}>
             <Table
-              dataSource={requests}
+              dataSource={filteredRequests}
               columns={columns}
               pagination={{ pageSize: pageSize }}
               rowClassName="table-row"

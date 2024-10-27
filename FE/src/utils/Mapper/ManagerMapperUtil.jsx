@@ -16,6 +16,7 @@ const managerMapperUtil = {
         subjectCode: request.subject?.code,
         examType: request.examSlotDetail?.examType,
         status: request.status,
+        requestType: request.requestType,
         note: request.note,
       };
     });
