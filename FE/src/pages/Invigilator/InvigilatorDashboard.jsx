@@ -75,7 +75,7 @@ function InvigilatorDashboard() {
       >
         OFFICIAL EXAM SCHEDULES
       </h2>
-      <div style={{ display: "flex", alignItems: "flex-start" }}>
+      <div style={{ display: "flex", alignItems: "flex-start", marginRight: 40 }}>
         <BigCalendar
           localizer={localizer}
           events={examSlotDetail}
@@ -90,7 +90,7 @@ function InvigilatorDashboard() {
           timeslots={1}
           startAccessor="startAt"
           endAccessor="endAt"
-          style={{ height: 500, margin: "50px", width: "65%" }}
+          style={{ height: 500, margin: "50px", width: "70%" }}
           components={{
             event: EventComponent, toolbar: CustomToolbar
           }}
@@ -127,13 +127,12 @@ function InvigilatorDashboard() {
         </Modal>
         <div
           style={{
-            marginLeft: 30,
             marginTop: 40,
             display: "grid",
-            width: "20%",
+            width: "25%",
           }}
         >
-          <Dropdown menu={menu} trigger={["click"]}>
+          <Dropdown menu={menu} trigger={["click"]} >
             <Button size="large" style={selectButtonStyle}>
               <Space>
                 {selectedSemester
@@ -154,7 +153,7 @@ function InvigilatorDashboard() {
           </p>
           <div>
             <p style={{ textAlign: 'center', fontSize: 20, fontWeight: 'bold' }}>Invigilation Summary</p>
-            <table className="table-assign" style={{ textAlign: 'left', fontSize: 13 }}>
+            <table className="table-assign" style={{ textAlign: 'left', fontSize: 13, marginLeft: 30 }}>
               <tbody>
                 <tr><th>Hours of invigilation completed:</th><td><span style={{ color: 'green' }}>{assignedSlotDetail.totalInvigilatedHours}</span> Hour(s)</td></tr>
                 <tr><th>Hours of invigilation remaining:</th><td><span style={{ color: 'orange' }}>{assignedSlotDetail.totalRequiredInvigilationHours}</span> Hour(s)</td></tr>
