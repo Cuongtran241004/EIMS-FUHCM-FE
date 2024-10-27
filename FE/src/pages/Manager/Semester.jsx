@@ -29,11 +29,14 @@ import {
   CloseCircleFilled,
   CloseOutlined,
   EditOutlined,
+  EyeOutlined,
   PlusOutlined,
   SendOutlined,
 } from "@ant-design/icons";
 import { selectButtonStyle } from "../../design-systems/CSS/Button.js";
 import { titleStyle } from "../../design-systems/CSS/Title.js";
+import configApi from "../../services/Config.js";
+import { managerMapperUtil } from "../../utils/Mapper/ManagerMapperUtil.jsx";
 
 const { Content, Sider } = Layout;
 const { RangePicker } = DatePicker;
@@ -45,17 +48,18 @@ const Semester = ({ isLogin }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editingSemester, setEditingSemester] = useState(null);
   const [loadingSubmit, setLoadingSubmit] = useState(false);
+  const [viewModalVisible, setViewModalVisible] = useState(false); // View Detail Modal state
+  const [selectedSemester, setSelectedSemester] = useState(null); // Selected semester for view detail
+  const [configData, setConfigData] = useState([]);
   const [form] = Form.useForm();
 
   const fetchData = async () => {
     setLoading(true);
     try {
       const result = await semesterApi.getAllSemesters();
-      // Sort the semesters by endAt date in ascending order
       const sortedSemesters = result.sort(
         (a, b) => new Date(b.endAt) - new Date(a.endAt)
       );
-
       setData(sortedSemesters);
     } catch (error) {
       message.error(FETCH_SEMESTERS_FAILED);
@@ -112,62 +116,102 @@ const Semester = ({ isLogin }) => {
     });
   };
 
+  // Handle View Detail
+  const handleViewDetail = async (semesterId) => {
+    setSelectedSemester(semesterId);
+    setLoading(true);
+    try {
+      const response = await configApi.getAllConfigsBySemesterId(semesterId);
+      const result = managerMapperUtil.mapConfigs(response);
+      setConfigData(result);
+      setViewModalVisible(true);
+    } catch (error) {
+      message.error("Failed to fetch semester details");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Close the view detail modal
+  const handleCloseViewDetail = () => {
+    setViewModalVisible(false);
+    setSelectedSemester(null);
+  };
+
   const handleEdit = (semester) => {
     setIsEditing(true);
     setEditingSemester(semester);
     form.setFieldsValue({
       name: semester.name,
       dateRange: [moment(semester.startAt), moment(semester.endAt)],
-      hourlyConfig: semester.hourlyConfig,
-      allowedSlotConfig: semester.allowedSlotConfig,
     });
     setIsModalVisible(true);
   };
-
+  const columnConfig = [
+    {
+      title: "No",
+      dataIndex: "no",
+      key: "no",
+      align: "center",
+      render: (text, record, index) => index + 1,
+    },
+    {
+      title: "Config Type",
+      dataIndex: "configType",
+      key: "configType",
+    },
+    {
+      title: "Value",
+      dataIndex: "value",
+      key: "value",
+      align: "center",
+      render: (text) => {
+        return new Intl.NumberFormat("vi-VN", {
+          maximumFractionDigits: 0, // No decimal places
+        }).format(text);
+      },
+    },
+    {
+      title: "Unit",
+      dataIndex: "unit",
+      key: "unit",
+      align: "center",
+    },
+  ];
   const columns = [
     {
       title: "Name",
       dataIndex: "name",
       key: "name",
+      align: "center",
     },
     {
       title: "Start Date",
       dataIndex: "startAt",
       key: "startAt",
       align: "center",
-      render: (text) => moment(text).format("YYYY-MM-DD"),
+      render: (text) => moment(text).format("DD/MM/YYYY"),
     },
     {
       title: "End Date",
       dataIndex: "endAt",
       key: "endAt",
       align: "center",
-      render: (text) => moment(text).format("YYYY-MM-DD"),
-    },
-    {
-      title: "Hour Rate",
-      dataIndex: "hourlyConfig",
-      key: "hourlyConfig",
-      align: "center",
-      render: (text) => {
-        // Format the value as Vietnamese currency
-        return `${text.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")} ₫`;
-      },
-    },
-    {
-      title: "Max Slot",
-      dataIndex: "allowedSlotConfig",
-      key: "allowedSlotConfig",
+      render: (text) => moment(text).format("DD/MM/YYYY"),
     },
     {
       title: "Action",
       key: "action",
+      align: "center",
       render: (text, record) => (
         <Space size="middle">
           <EditOutlined
             onClick={() => handleEdit(record)}
             style={{ color: "blue", cursor: "pointer" }}
           />
+          <Button type="link" onClick={() => handleViewDetail(record.id)}>
+            <EyeOutlined />
+          </Button>
         </Space>
       ),
     },
@@ -180,7 +224,7 @@ const Semester = ({ isLogin }) => {
         <Sider width={256} style={{ backgroundColor: "#4D908E" }}>
           <NavBar_Manager />
         </Sider>
-        <Layout style={{ padding: "16px" }}>
+        <Layout>
           <Content
             style={{
               padding: 12,
@@ -193,7 +237,6 @@ const Semester = ({ isLogin }) => {
               <h2 style={titleStyle}>Semester Management</h2>
             </div>
             <div style={{ display: "flex", alignItems: "center" }}>
-              {" "}
               <Button
                 type="primary"
                 onClick={showModal}
@@ -208,7 +251,7 @@ const Semester = ({ isLogin }) => {
               <Table
                 dataSource={data}
                 columns={columns}
-                rowKey="id" // Use a unique key, assuming semester objects have an id property
+                rowKey="id"
                 pagination={{ pageSize: 8 }}
               />
             </Spin>
@@ -229,7 +272,12 @@ const Semester = ({ isLogin }) => {
             Cancel
             <CloseOutlined />
           </Button>,
-          <Button key="submit" type="primary" onClick={handleOk}>
+          <Button
+            key="submit"
+            type="primary"
+            onClick={handleOk}
+            loading={loadingSubmit}
+          >
             Submit
             <SendOutlined />
           </Button>,
@@ -261,57 +309,40 @@ const Semester = ({ isLogin }) => {
                 >
                   <RangePicker
                     style={{ width: "100%" }}
-                    disabledDate={(current) => {
-                      return current && current < moment().startOf("day");
-                    }}
-                    onChange={(dates) => {
-                      if (dates) {
-                        form.setFieldsValue({
-                          startAt: dates[0],
-                          endAt: dates[1],
-                        });
-                      }
-                    }}
+                    disabledDate={(current) =>
+                      current && current < moment().startOf("day")
+                    }
+                    format="DD/MM/YYYY"
                   />
                 </Form.Item>
               </Form.Item>
             </Col>
           </Row>
-
-          <Form.Item style={{ marginBottom: 0 }}>
-            <Form.Item
-              label="Hour rate"
-              name="hourlyConfig"
-              initialValue={100000}
-              rules={[{ required: true, message: "Please input hour rate!" }]}
-              style={{
-                display: "inline-block",
-                width: "calc(50% - 8px)",
-                marginRight: "8px",
-              }}
-            >
-              <InputNumber
-                min={1}
-                placeholder="Enter hour rate"
-                style={{ width: "100%" }}
-                formatter={(value) =>
-                  `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",") + " ₫"
-                }
-                parser={(value) => value.replace(/\s?₫|(,*)/g, "")}
-              />
-            </Form.Item>
-            <Form.Item
-              label="Max slot"
-              name="allowedSlotConfig"
-              initialValue={15}
-              rules={[{ required: true, message: "Please input max slot!" }]}
-              style={{ display: "inline-block", width: "calc(50% - 8px)" }}
-            >
-              <Input placeholder="Enter max slot" type="number" />
-            </Form.Item>
-          </Form.Item>
         </Form>
       </Modal>
+
+      {/* View Detail Modal */}
+      {selectedSemester && (
+        <Modal
+          title="Semester Configuration"
+          open={viewModalVisible}
+          onOk={handleCloseViewDetail}
+          onCancel={handleCloseViewDetail}
+          footer={[
+            <Button key="close" onClick={handleCloseViewDetail}>
+              Close
+            </Button>,
+          ]}
+        >
+          <Table
+            className="custom-table-config"
+            columns={columnConfig}
+            dataSource={configData}
+            rowKey={(record) => record.id}
+            pagination={false}
+          />
+        </Modal>
+      )}
     </Layout>
   );
 };

@@ -45,7 +45,42 @@ const invigilatorAssignmentApi = {
       handleError(error);
     }
   },
+  getUnassignedInvigilatorByExamSlotId: async (examSlotId) => {
+    try {
+      const response = await axios.get(
+        `${INVIGILATOR_ASSIGNMENT_API_BASE_URL}/unassigned/invigilators/examslotid=${examSlotId}`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+          withCredentials: true,
+        }
+      );
 
+      return response.data;
+    } catch (error) {
+      handleError(error);
+    }
+  },
+  getAssignedInvigilatorByExamSlotId: async (examSlotId) => {
+    try {
+      const response = await axios.get(
+        `${INVIGILATOR_ASSIGNMENT_API_BASE_URL}/assigned/invigilators/examslotid=${examSlotId}`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+          withCredentials: true,
+        }
+      );
+
+      return response.data;
+    } catch (error) {
+      handleError(error);
+    }
+  },
   updateAssignment: async (data) => {
     try {
       const response = await axios.put(
@@ -59,6 +94,25 @@ const invigilatorAssignmentApi = {
           withCredentials: true,
         }
       );
+      return response.data;
+    } catch (error) {
+      handleError(error);
+    }
+  },
+
+  getExamSlotWithStatus: async (semesterid) => {
+    try {
+      const response = await axios.get(
+        `${INVIGILATOR_ASSIGNMENT_API_BASE_URL}/examslots/semesterid=${semesterid}`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+          withCredentials: true,
+        }
+      );
+
       return response.data;
     } catch (error) {
       handleError(error);

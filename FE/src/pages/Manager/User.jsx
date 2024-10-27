@@ -9,8 +9,6 @@ import {
   Modal,
   Input,
   message,
-  Space,
-  Popconfirm,
   Upload,
   Radio,
   Col,
@@ -25,6 +23,7 @@ import {
   PlusOutlined,
   SendOutlined,
   CloseCircleFilled,
+  SearchOutlined,
 } from "@ant-design/icons";
 import {
   ADD_USER_SUCCESS,
@@ -45,11 +44,11 @@ import { departments, roleOptions } from "../../configs/data.js";
 import { userTable } from "../../design-systems/CustomTable.jsx";
 import { selectButtonStyle } from "../../design-systems/CSS/Button.js";
 import { titleStyle } from "../../design-systems/CSS/Title.js";
-
 const { Content, Sider } = Layout;
 
 const Users = ({ isLogin }) => {
   const [data, setData] = useState([]);
+  const [filteredData, setFilteredData] = useState([]); // To store filtered users
   const [loading, setLoading] = useState(false);
   const [fileLoading, setFileLoading] = useState(false);
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -61,14 +60,15 @@ const Users = ({ isLogin }) => {
   const fetchData = async () => {
     setLoading(true);
     try {
-      const result = await userApi.getAllUsers();
-
+      const response = await userApi.getAllUsers();
+      // only return if role != 1
+      const result = response.filter((user) => user.role !== 1);
       result.sort((a, b) => {
         // sort by createAt
         return new Date(b.createdAt) - new Date(a.createdAt);
       });
-
       setData(result);
+      setFilteredData(result); // Initialize filteredData with all users
     } catch (error) {
       message.error(FETCH_USERS_FAILED);
     } finally {
@@ -79,6 +79,18 @@ const Users = ({ isLogin }) => {
   useEffect(() => {
     fetchData();
   }, []);
+
+  const handleSearch = (event) => {
+    const { value } = event.target;
+    const filtered = data.filter(
+      (user) =>
+        `${user.firstName} ${user.lastName}`
+          .toLowerCase()
+          .includes(value.toLowerCase()) ||
+        `${user.fuId}`.toLowerCase().includes(value.toLowerCase())
+    );
+    setFilteredData(filtered); // Update the filtered data displayed in the table
+  };
 
   const showModal = () => {
     setIsModalVisible(true);
@@ -202,7 +214,7 @@ const Users = ({ isLogin }) => {
         <Sider width={256} style={{ backgroundColor: "#4D908E" }}>
           <NavBar_Manager isLogin={isLogin} />
         </Sider>
-        <Layout style={{ padding: "16px" }}>
+        <Layout>
           <Content
             style={{
               padding: 12,
@@ -223,7 +235,16 @@ const Users = ({ isLogin }) => {
               >
                 Add New User
               </Button>
-
+              <Input
+                placeholder="Search by ID or Name"
+                onChange={handleSearch}
+                allowClear
+                suffix={<SearchOutlined style={{ color: "rgba(0,0,0,.45)" }} />}
+                style={{
+                  width: 250,
+                  marginLeft: "20px",
+                }}
+              />
               <div style={{ float: "right" }}>
                 <Upload
                   beforeUpload={(file) => {
@@ -258,12 +279,13 @@ const Users = ({ isLogin }) => {
 
             <Spin spinning={loading}>
               <Table
-                dataSource={data}
+                dataSource={filteredData}
                 columns={userTable(handleEdit, handleDelete)}
                 rowKey={(record) => record.fuId}
                 pagination={{
                   pageSize: 7,
-                  showSizeChanger: true,
+                  showSizeChanger: false,
+                  showQuickJumper: false,
                   pageSizeOptions: ["8", "16", "24"],
                 }}
               />

@@ -71,5 +71,58 @@ const staffMapperUtil = {
       };
     });
   },
+  mapAllAttendanceByDate: (attendances) => {
+    // check if attendance is an array
+    if (!Array.isArray(attendances)) {
+      return [];
+    }
+    return attendances.map((item) => {
+      return {
+        key: item.id,
+        id: item.id,
+        startAt: item.startAt,
+        endAt: item.endAt,
+        examSlotId: item.examSlotId,
+        status: item.status,
+      };
+    });
+  },
+  mapAttendance: (attendances) => {
+    // check if attendance is an array
+    if (!Array.isArray(attendances)) {
+      return [];
+    }
+    return attendances.map((item) => {
+      return {
+        key: item.id,
+        id: item.id,
+        checkIn: item.checkIn,
+        checkOut: item.checkOut,
+        firstName: item.invigilatorFirstName,
+        lastName: item.invigilatorLastName,
+        fuId: item.invigilatorFuId,
+        status: item.status,
+      };
+    });
+  },
+  mapExamSlotWithStatus: (examSchedule) => {
+    // check if examSchedule is an array
+    if (!Array.isArray(examSchedule)) {
+      return [];
+    }
+    return examSchedule.map((item) => {
+      return {
+        key: item.examSlotId,
+        id: item.examSlotId,
+        subjectCode: item.subjectCode,
+        examType: item.examType,
+        numberOfRegistered: item.numberOfRegistered,
+        requiredInvigilators: item.requiredInvigilators,
+        startAt: item.startAt,
+        endAt: item.endAt,
+        status: item.status,
+      };
+    });
+  },
 };
 export { staffMapperUtil };

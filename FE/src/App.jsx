@@ -7,6 +7,9 @@ import Request from "./pages/Manager/Request";
 import Semester from "./pages/Manager/Semester";
 import ExamSlots from "./pages/Manager/ExamSlots";
 import AttendanceCheck from "./pages/Manager/AttendanceCheck";
+import Configs from "./pages/Manager/Configs";
+import InvigilatorAttendance from "./pages/Manager/InvigilatorAttendance";
+import InvigilatorFees from "./pages/Manager/InvigilatorFees";
 import Subject from "./pages/Staff/Subject";
 import Exam from "./pages/Staff/Exam";
 import RoomSelectionPage from "./pages/Staff/Room";
@@ -32,19 +35,24 @@ import {
   STAFF_ROOM_SELECTION_URL,
   STAFF_SUBJECT_URL,
   STAFF_ASSIGNMENT_URL,
+  MANAGER_INVIGILATOR_ATTENDANCE_URL,
+  MANAGER_INVIGILATOR_FEES_URL,
+  MANAGER_CONFIGS_URL,
 } from "./configs/urlWeb.js";
 import "./App.css";
 import ProfilePage from "./pages/Home/Profile.jsx";
 import Header from "./components/Header/Header.jsx";
 import HandlePassword from "./pages/Login/HandlePassword.jsx";
 import AssignmentInvigilator from "./pages/Staff/Assignment.jsx";
+import InvigilatorReport from "./pages/Invigilator/InvigilatorReport.jsx";
+import InvigilatorAttend from "./pages/Invigilator/InvigilatorAttend.jsx";
 
 function App() {
   const [isLogin, setIsLogin] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [user, setUser] = useState(null);
   const [role, setRole] = useState(null);
-  const [passwordSet, setPasswordSet] = useState(null);
+  const [passwordSet, setPasswordSet] = useState(null); // Track password status
   const navigate = useNavigate();
 
   const initLogin = async () => {
@@ -55,25 +63,27 @@ function App() {
         setRole(userRole);
         setUser(user);
         setIsLogin(true);
-        setPasswordSet(user.passwordSet);
+        setPasswordSet(user.passwordSet); // Fetch password set status from API
       }
     } catch (error) {
-      console.error("Failed to get user info:", error);
+      // Handle error
     } finally {
       setIsLoading(false);
     }
   };
+
   useEffect(() => {
     initLogin();
   }, []);
 
   useEffect(() => {
-    // Kiểm tra nếu passwordSet === false thì chuyển đến /add
+    // Redirect to /add only if passwordSet === false
     if (isLogin && passwordSet === false) {
       navigate("/add");
     }
   }, [isLogin, passwordSet, navigate]);
 
+  // Remove duplicate NotFound route
   const renderRoutes = () => {
     if (!isLogin) {
       return (
@@ -89,6 +99,7 @@ function App() {
         {/* Manager Routes */}
         {role === 1 && (
           <>
+            <Route path="/" element={<Dashboard />} />
             <Route path={MANAGER_DASHBOARD_URL} element={<Dashboard />} />
             <Route path={MANAGER_SEMESTER_URL} element={<Semester />} />
             <Route path={MANAGER_USERS_URL} element={<User />} />
@@ -98,16 +109,21 @@ function App() {
               path={MANAGER_ATTENDENCE_CHECK_URL}
               element={<AttendanceCheck />}
             />
+            <Route path={MANAGER_CONFIGS_URL} element={<Configs />} />
             <Route
-              path="*"
-              element={<Navigate to={MANAGER_DASHBOARD_URL} replace />}
+              path={MANAGER_INVIGILATOR_ATTENDANCE_URL}
+              element={<InvigilatorAttendance />}
+            />
+            <Route
+              path={MANAGER_INVIGILATOR_FEES_URL}
+              element={<InvigilatorFees />}
             />
           </>
         )}
-
         {/* Staff Routes */}
         {role === 2 && (
           <>
+            <Route path="/" element={<Subject />} />
             <Route path={STAFF_SUBJECT_URL} element={<Subject />} />
             <Route path={STAFF_EXAM_URL} element={<Exam />} />
             <Route path={STAFF_EXAM_SCHEDULE_URL} element={<Exam_Schedule />} />
@@ -120,13 +136,8 @@ function App() {
               path={STAFF_ASSIGNMENT_URL}
               element={<AssignmentInvigilator />}
             />
-            <Route
-              path="*"
-              element={<Navigate to={STAFF_SUBJECT_URL} replace />}
-            />
           </>
         )}
-
         {/* Invigilator Routes */}
         {role === 3 && (
           <>
@@ -134,18 +145,21 @@ function App() {
             <Route path="/register" element={<InvigilatorRegistration />} />
             <Route path="/request/send" element={<InvigilatorRequest />} />
             <Route path="/request/view" element={<InvigilatorRequestsList />} />
+            <Route path="/report" element={<InvigilatorReport />} />
+            <Route path="/attendance" element={<InvigilatorAttend />} />
           </>
         )}
+        {/* Common Routes */}
         <Route path="profile" element={<ProfilePage user={user} />} />
         <Route path="add" element={<HandlePassword />} />
-        <Route path="*" element={<Navigate to="/add" replace />} />
+        {/* Catch-all route */}
       </Routes>
     );
   };
 
   return (
     <div className="container">
-      {role === 1 || role === 2? (
+      {role === 1 || role === 2 ? (
         <SemesterProvider>{renderRoutes()}</SemesterProvider>
       ) : (
         <>

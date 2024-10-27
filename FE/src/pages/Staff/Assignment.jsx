@@ -1,153 +1,283 @@
 import React, { useState, useEffect } from "react";
-import { Layout, Button, message, Table, Spin, Space, Tag } from "antd";
+import {
+  Layout,
+  Button,
+  message,
+  Table,
+  Spin,
+  Input,
+  Dropdown,
+  Modal,
+} from "antd";
 import {
   titleAssignmentStyle,
   titleStyle,
 } from "../../design-systems/CSS/Title";
-import { EditOutlined } from "@ant-design/icons";
+import {
+  PlusCircleOutlined,
+  DownOutlined,
+  SearchOutlined,
+} from "@ant-design/icons";
 import invigilatorAssignmentApi from "../../services/InvigilatorAssignment";
 import examSlotApi from "../../services/ExamSlot";
-import { useParams } from "react-router-dom";
 import { staffMapperUtil } from "../../utils/Mapper/StaffMapperUtil";
 import moment from "moment";
+import Header from "../../components/Header/Header.jsx";
+import { useSemester } from "../../components/Context/SemesterContext.jsx";
+import { selectButtonStyle } from "../../design-systems/CSS/Button.js";
+import { FETCH_EXAM_SCHEDULE_FAILED } from "../../configs/messages";
+import { assignmentTag } from "../../design-systems/CustomTag.jsx";
+import { examTypeTag } from "../../design-systems/CustomTag.jsx";
+import { assignmentNotification } from "../../design-systems/CustomNotification.jsx";
 const { Content } = Layout;
 
 const AssignmentInvigilator = () => {
-  const { examSlotId } = useParams(); // Destructure directly from useParams
-  const [examSlot, setExamSlot] = useState({});
+  const [examSchedule, setExamSchedule] = useState([]);
+  const [filteredExamSchedule, setFilteredExamSchedule] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [data, setData] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const pageSize = 7;
+  const [selectedAssignment, setSelectedAssignment] = useState([]);
+  const [modalVisible, setModalVisible] = useState(false);
+  const { selectedSemester, setSelectedSemester, semesters } = useSemester(); // Access shared semester state
+  const pageSize = 6;
 
-  const fetchExamSlot = async () => {
-    try {
-      const response = await examSlotApi.getExamSlotById(examSlotId);
-
-      const result = staffMapperUtil.mapExamSlot(response);
-
-      setExamSlot(result || {});
-    } catch (error) {
-      message.error("Failed to fetch exam slot data.");
-    }
-  };
-
-  const fetchInvigilatorAssignment = async () => {
+  const fetchExamSchedule = async (semesterId, page) => {
     setLoading(true);
     try {
-      await fetchExamSlot(); // Await the fetchExamSlot
       const response =
-        await invigilatorAssignmentApi.getAllAssignmentByExamSlotId(examSlotId);
-      const result = staffMapperUtil.mapAssignment(response);
-      setData(result || []);
+        await invigilatorAssignmentApi.getExamSlotWithStatus(semesterId);
+
+      const mapResponse = staffMapperUtil.mapExamSlotWithStatus(response);
+
+      const result = mapResponse.sort((a, b) => {
+        const statusPriority = { UNASSIGNED: 1, ASSIGNED: 2 };
+
+        // Compare status first
+        if (statusPriority[a.status] !== statusPriority[b.status]) {
+          return statusPriority[a.status] - statusPriority[b.status];
+        }
+
+        // If statuses are the same, compare by date
+        return moment(a.startAt).valueOf() - moment(b.startAt).valueOf();
+      });
+
+      setExamSchedule(result || []);
+      setFilteredExamSchedule(result || []);
     } catch (error) {
-      message.error("Failed to fetch invigilator assignments.");
+      console.error("Error fetching exam schedule:", error);
+      message.error(FETCH_EXAM_SCHEDULE_FAILED);
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchInvigilatorAssignment();
-  }, [examSlotId]); // Added examSlotId as a dependency
+    if (selectedSemester) {
+      fetchExamSchedule(selectedSemester.id, currentPage);
+    }
+  }, [selectedSemester]);
+
+  const fetchInvigilatorAssignment = async (examSlotId) => {
+    const response =
+      await invigilatorAssignmentApi.getAllAssignmentByExamSlotId(examSlotId);
+    return staffMapperUtil.mapAssignment(response);
+  };
+
+  const handleAssignmentClick = async (examSlotId) => {
+    // getAssignmentById from examSchedule
+    const examSlot = examSchedule.find((slot) => slot.id === examSlotId);
+
+    if (examSlot.requiredInvigilators <= examSlot.numberOfRegistered) {
+      setLoading(true);
+      try {
+        // Assign invigilators
+        const assignmentResult = await fetchInvigilatorAssignment(examSlotId);
+        // Here, you can implement the logic to assign invigilators
+        // For demonstration, let's assume assignment was successful and set the selected assignment
+        setSelectedAssignment(assignmentResult);
+        setModalVisible(true);
+      } catch (error) {
+        message.error("Failed to assign invigilators.");
+      } finally {
+        setLoading(false);
+        fetchExamSchedule(selectedSemester.id);
+      }
+    } else {
+      assignmentNotification();
+    }
+  };
+  const handleSearch = (event) => {
+    const { value } = event.target;
+    const filtered = examSchedule.filter((subject) =>
+      `${subject.subjectCode}`.toLowerCase().includes(value.toLowerCase())
+    );
+    setFilteredExamSchedule(filtered); // Update the filtered data displayed in the table
+  };
+
+  const handleMenuClick = (e) => {
+    const selected = semesters.find((semester) => semester.id == e.key);
+    if (selected) {
+      setSelectedSemester({
+        id: selected.id,
+        name: selected.name,
+      });
+    }
+  };
 
   const columns = [
     {
-      title: "No",
-      dataIndex: "no",
-      key: "no",
-      align: "center",
-      render: (_, __, index) => (currentPage - 1) * pageSize + index + 1,
-    },
-    {
-      title: "FuID",
-      dataIndex: "roomFuId",
-      key: "roomFuId",
+      title: "Code",
+      dataIndex: "subjectCode",
+      key: "subjectCode",
       align: "center",
     },
     {
-      title: "Room Invigilator",
-      dataIndex: "roomFullName",
-      key: "roomFullName",
+      title: "Exam Type",
+      dataIndex: "examType",
+      key: "examType",
+      align: "center",
+      render: (text) => examTypeTag(text),
+    },
+    {
+      title: "Date",
+      dataIndex: "startAt",
+      key: "date",
+      align: "center",
+      render: (text) => moment(text).format("DD/MM/YYYY"),
+    },
+    {
+      title: "Time",
+      key: "time",
+      align: "center",
       render: (text, record) => {
-        return `${record.roomLastName} ${record.roomFirstName}`;
+        const startTime = new Date(record.startAt).toLocaleTimeString([], {
+          hour: "2-digit",
+          minute: "2-digit",
+        });
+        const endTime = new Date(record.endAt).toLocaleTimeString([], {
+          hour: "2-digit",
+          minute: "2-digit",
+        });
+        return `${startTime} - ${endTime}`;
       },
     },
+    {
+      title: "Registration",
+      dataIndex: "registration",
+      key: "registration",
+      align: "center",
+      render: (text, record) =>
+        ` ${record.numberOfRegistered}/${record.requiredInvigilators}`,
+    },
+    {
+      title: "Invigilator",
+      key: "invigilator",
+      align: "center",
+      render: (text, record) => (
+        <Button type="text" onClick={() => handleAssignmentClick(record.id)}>
+          <PlusCircleOutlined style={{ fontSize: "20px", color: "#43AA8B" }} />
+        </Button>
+      ),
+    },
+    {
+      title: "Status",
+      dataIndex: "status",
+      key: "status",
+      render: (text) => assignmentTag(text),
+    },
+  ];
+
+  const assignmentColumns = [
     {
       title: "Room Name",
       dataIndex: "roomName",
       key: "roomName",
-      align: "center",
-      width: "10%",
+    },
+    {
+      title: "FuId Room",
+      dataIndex: "roomFuId",
+      key: "roomFuId",
+    },
+    {
+      title: "Room Invigilator",
+      key: "roomInvigilator",
+      render: (text, record) => (
+        <span>{`${record.roomLastName} ${record.roomFirstName}`}</span>
+      ),
+    },
+    {
+      title: "FuId Hall",
+      dataIndex: "hallFuId",
+      key: "hallFuId",
     },
     {
       title: "Hall Invigilator",
-      dataIndex: "hallFullName",
-      key: "hallFullName",
-      render: (text, record) => {
-        return `${record.hallLastName} ${record.hallFirstName}`;
-      },
-    },
-    {
-      title: "Action",
-      key: "action",
-      align: "center",
+      key: "hallInvigilator",
       render: (text, record) => (
-        <Space size="middle">
-          <EditOutlined
-            style={{ color: "blue", cursor: "pointer" }}
-            onClick={() => handleEdit(record)} // Make sure handleEdit is defined
-          />
-        </Space>
+        <span>{`${record.hallLastName} ${record.hallFirstName}`}</span>
       ),
     },
   ];
 
   return (
-    <Layout
-      style={{ maxWidth: "80%", margin: "0 auto", backgroundColor: "#fff" }}
-    >
-      <div
-        style={{
-          margin: "5px",
-          textAlign: "center",
-          backgroundColor: "#4D908E",
-        }}
-      >
-        <h2 style={titleAssignmentStyle}>INVIGILATOR ASSIGNMENT</h2>
-
-        <Tag
-          color="green"
-          style={{
-            fontSize: "18px",
-            marginBottom: "10px",
-            textAlign: "center",
-            boxShadow: "0 4px 4px 0 rgba(0,0,0,0.4)",
-          }}
-        >
-          <strong>
-            {" "}
-            {examSlot.subjectCode} - {examSlot.examType}
-          </strong>
-          <br></br>
-          {moment(examSlot.startAt).format("DD-MM-YYYY")} ({" "}
-          {moment(examSlot.endAt).format("HH:MM")} -{" "}
-          {moment(examSlot.startAt).format("HH:MM")})
-        </Tag>
-      </div>
-      <Content style={{ padding: "24px", background: "#fff" }}>
+    <Layout style={{ height: "100vh" }}>
+      <Header />
+      <Layout style={{ backgroundColor: "#fff" }}>
         <Spin spinning={loading}>
-          <Table
-            dataSource={data}
-            columns={columns}
-            pagination={{
-              pageSize,
-              current: currentPage,
-              onChange: (page) => setCurrentPage(page),
-            }}
-          />
+          <Content style={{ padding: "0 50px" }}>
+            <div style={{ marginBottom: "20px", textAlign: "center" }}>
+              <h2 style={titleStyle}>ASSIGNMENT INVIGILATORS</h2>
+            </div>
+            <Dropdown
+              menu={{
+                items: semesters.map((sem) => ({
+                  key: sem.id,
+                  label: sem.name,
+                })),
+                onClick: handleMenuClick,
+              }}
+            >
+              <Button style={{ width: "150px", ...selectButtonStyle }}>
+                {selectedSemester?.name || "Select Semester"}
+                <DownOutlined />
+              </Button>
+            </Dropdown>
+            <Input
+              placeholder="Search by Code"
+              onChange={handleSearch}
+              allowClear
+              suffix={<SearchOutlined style={{ color: "rgba(0,0,0,.45)" }} />}
+              style={{
+                width: 250,
+                marginLeft: "20px",
+                marginBottom: "10px",
+              }}
+            />
+            <Table
+              columns={columns}
+              dataSource={filteredExamSchedule}
+              pagination={{
+                pageSize: pageSize,
+                current: currentPage,
+                onChange: (page) => setCurrentPage(page),
+              }}
+            />
+            <Modal
+              title="Invigilator Assignment Details"
+              open={modalVisible}
+              onCancel={() => setModalVisible(false)}
+              footer={null}
+            >
+              <Table
+                columns={assignmentColumns}
+                dataSource={selectedAssignment} // Use the selected assignment data
+                pagination={false} // Disable pagination for simplicity
+                rowKey="id" // Ensure each row has a unique key
+              />
+            </Modal>
+          </Content>
         </Spin>
-      </Content>
+      </Layout>
     </Layout>
   );
 };

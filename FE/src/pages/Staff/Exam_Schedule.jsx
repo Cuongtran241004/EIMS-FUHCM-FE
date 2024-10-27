@@ -12,6 +12,9 @@ import {
   Space,
   Dropdown,
   Spin,
+  notification,
+  Input,
+  Radio,
 } from "antd";
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
@@ -23,6 +26,7 @@ import {
   CaretRightFilled,
   CloseOutlined,
   DownOutlined,
+  SearchOutlined,
 } from "@ant-design/icons";
 import moment from "moment";
 import { useSemester } from "../../components/Context/SemesterContext.jsx";
@@ -38,13 +42,29 @@ import {
   deleteNotification,
   editNotification,
 } from "../../design-systems/CustomNotification.jsx";
+import {
+  ADD_EXAM_SCHEDULE_FAILED,
+  ADD_EXAM_SCHEDULE_SUCCESS,
+  DELETE_EXAM_SCHEDULE_FAILED,
+  DELETE_EXAM_SCHEDULE_SUCCESS,
+  EDIT_EXAM_SCHEDULE_FAILED,
+  EDIT_EXAM_SCHEDULE_SUCCESS,
+  FETCH_EXAM_SCHEDULE_FAILED,
+} from "../../configs/messages.js";
 const { Option } = Select;
 const { Content } = Layout;
 const PAGE_SIZE = 6;
 
+const examSlotStatus = [
+  "NEEDS_ROOM_ASSIGNMENT",
+  "PENDING",
+  "APPROVED",
+  "REJECTED",
+];
 const Exam_Schedule = () => {
   const [form] = Form.useForm();
   const [examSchedule, setExamSchedule] = useState([]);
+  const [filteredExamSchedule, setFilteredExamSchedule] = useState([]);
   const [loading, setLoading] = useState(true);
   const [exams, setExams] = useState([]);
   const [filteredExams, setFilteredExams] = useState([]);
@@ -60,6 +80,10 @@ const Exam_Schedule = () => {
   const [totalItems, setTotalItems] = useState(1);
   const [examId, setExamId] = useState(null);
   const [loadingSubmit, setLoadingSubmit] = useState(false);
+  const [selectedExamSlotStatus, setSelectedExamSlotStatus] = useState(
+    "NEEDS_ROOM_ASSIGNMENT"
+  );
+  const [filteredExamSlotByStatus, setFilteredExamSlotByStatus] = useState([]);
   const navigate = useNavigate();
 
   const fetchExamSchedule = async (semesterId, page) => {
@@ -77,16 +101,27 @@ const Exam_Schedule = () => {
           moment(a.startAt).format("YYYYMMDDHHmm")
         );
       });
+
       setExamSchedule(result || []);
+      setFilteredExamSchedule(result || []);
+      setFilteredExamSlotByStatus(result || []);
       setTotalItems(result.length || 0);
     } catch (error) {
       console.error("Error fetching exam schedule:", error); // Log the error
-      message.error("Failed to load exam schedule. Please try again.");
+      message.error(FETCH_EXAM_SCHEDULE_FAILED);
     } finally {
       setLoading(false);
     }
   };
 
+  const fetchExamScheduleById = async (id) => {
+    try {
+      const response = await examSlotApi.getExamSlotById(id);
+      return response;
+    } catch (error) {
+      console.error("Error fetching exam schedule by ID:", error);
+    }
+  };
   const fetchExams = async (semesterId) => {
     try {
       const result = await examApi.getExamBySemesterId(semesterId);
@@ -104,6 +139,24 @@ const Exam_Schedule = () => {
     }
   }, [selectedSemester, currentPage]);
 
+  const handleSearch = (event) => {
+    const { value } = event.target;
+    if (value) {
+      const filtered = examSchedule.filter(
+        (subject) =>
+          `${subject.subjectCode}`
+            .toLowerCase()
+            .includes(value.toLowerCase()) ||
+          `${subject.subjectName}`.toLowerCase().includes(value.toLowerCase())
+      );
+      setFilteredExamSchedule(filtered); // Update the filtered data displayed in the table
+      setFilteredExamSlotByStatus(filtered);
+    } else {
+      setFilteredExamSchedule(examSchedule);
+      setFilteredExamSlotByStatus(filteredExamSlotByStatus);
+    }
+  };
+
   const handleExamSearch = (value) => {
     if (value) {
       const filtered = exams.filter((exam) =>
@@ -115,16 +168,29 @@ const Exam_Schedule = () => {
     }
   };
 
+  const isAvailable = async (id) => {
+    const examSlot = await fetchExamScheduleById(id);
+    const result =
+      availableSemesters.find(
+        (semester) => semester.id === selectedSemester.id
+      ) &&
+      examSlot.status != "APPROVED" &&
+      examSlot.status != "REJECTED";
+    console.log("isAvailable", result);
+    return result;
+  };
+
   const handleDelete = async (id) => {
-    if (
-      availableSemesters.find((semester) => semester.id === selectedSemester.id)
-    ) {
+    if (isAvailable(id)) {
       try {
         await examSlotApi.deleteExamSlot(id);
-        message.success("Exam slot deleted successfully");
+        message.success(DELETE_EXAM_SCHEDULE_SUCCESS);
         fetchExamSchedule(selectedSemester.id); // Refresh schedule
       } catch (error) {
-        message.error("Failed to delete exam");
+        notification.warning({
+          message: "Warning",
+          description: DELETE_EXAM_SCHEDULE_FAILED,
+        });
       }
     } else {
       deleteNotification();
@@ -132,10 +198,7 @@ const Exam_Schedule = () => {
   };
 
   const handleEdit = async (record) => {
-    console.log("Editing exam slot:", record);
-    if (
-      availableSemesters.find((semester) => semester.id === selectedSemester.id)
-    ) {
+    if (await isAvailable(record.id)) {
       setIsEditing(true);
       setEditingExamSlot(record);
       setExamId(record.examId);
@@ -147,7 +210,7 @@ const Exam_Schedule = () => {
         startTime: moment(record.startAt),
         endTime: moment(record.endAt),
       });
-      await fetchExams(selectedSemester.id);
+      //  await fetchExams(selectedSemester.id);
     } else {
       editNotification();
     }
@@ -179,11 +242,11 @@ const Exam_Schedule = () => {
       setLoadingSubmit(true); // Start loading
       try {
         if (isEditing) {
-          await examSlotApi.updateExamSlot(examSlotDataUpdate);
-          message.success("Exam slot updated successfully.");
+          await examSlotApi.updateExamSlotByStaff(examSlotDataUpdate);
+          message.success(EDIT_EXAM_SCHEDULE_SUCCESS);
         } else {
           await examSlotApi.addExamSlot(examSlotDataAdd); // Assuming API returns the new slot
-          message.success("Exam slot added successfully.");
+          message.success(ADD_EXAM_SCHEDULE_SUCCESS);
         }
 
         if (values.semesterId === selectedSemester.id) {
@@ -191,7 +254,9 @@ const Exam_Schedule = () => {
         }
       } catch (error) {
         console.error("Error saving exam slot:", error);
-        message.error("Failed to save exam slot.");
+        message.error(
+          isEditing ? EDIT_EXAM_SCHEDULE_FAILED : ADD_EXAM_SCHEDULE_FAILED
+        );
       } finally {
         setLoadingSubmit(false); // Stop loading
         handleCancel(); // Reset form
@@ -225,9 +290,6 @@ const Exam_Schedule = () => {
     navigate(`/exam-schedule/${examSlotId}/room`);
   };
 
-  const handleAssignmentClick = (examSlotId) => {
-    navigate(`/exam-schedule/${examSlotId}/assignment`);
-  };
   // Handle semester selection in the form
   const handleSemesterChange = async (value) => {
     console.log("Selected semester:", value);
@@ -240,6 +302,36 @@ const Exam_Schedule = () => {
       fetchExams(selectedSemesterForm.id); // Fetch subjects for the selected semester
     }
   };
+  const renderExamStatus = (status) => {
+    switch (status) {
+      case "NEEDS_ROOM_ASSIGNMENT":
+        return "Needs room";
+      case "PENDING":
+        return "Pending";
+      case "APPROVED":
+        return "Approved";
+      case "REJECTED":
+        return "Rejected";
+      default:
+        return "Unknown";
+    }
+  };
+  const handleExamSlotStatusChange = (status) => {
+    setSelectedExamSlotStatus(status);
+  };
+
+  useEffect(() => {
+    if (selectedExamSlotStatus) {
+      setFilteredExamSlotByStatus(
+        filteredExamSchedule.filter(
+          (examSlot) => examSlot.status === selectedExamSlotStatus
+        )
+      );
+    } else {
+      // Show all requests if no type is selected
+      setFilteredExamSlotByStatus(filteredExamSchedule);
+    }
+  }, [selectedExamSlotStatus, examSchedule]);
 
   const validateTime = (rule, value) => {
     const startTime = form.getFieldValue("startTime");
@@ -416,13 +508,37 @@ const Exam_Schedule = () => {
                 </Space>
               </Button>
             </Dropdown>
+            <Input
+              placeholder="Search by Code or Name"
+              onChange={handleSearch}
+              allowClear
+              suffix={<SearchOutlined style={{ color: "rgba(0,0,0,.45)" }} />}
+              style={{
+                width: 250,
+                marginLeft: "20px",
+                marginBottom: "10px",
+              }}
+            />
+            <Radio.Group
+              onChange={(e) => handleExamSlotStatusChange(e.target.value)}
+              style={{
+                marginBottom: "10px",
+                marginLeft: "auto",
+              }}
+            >
+              {examSlotStatus.map((type) => (
+                <Radio.Button key={type} value={type}>
+                  {renderExamStatus(type)}
+                </Radio.Button>
+              ))}
+            </Radio.Group>
           </div>
           <Spin spinning={loading}>
             <Table
-              dataSource={examSchedule}
+              className="custom-table-exam-schedule"
+              dataSource={filteredExamSlotByStatus}
               columns={examScheduleTable(
                 handleRoomClick,
-                handleAssignmentClick,
                 handleEdit,
                 handleDelete
               )}

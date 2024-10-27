@@ -1,3 +1,8 @@
 .ant-modal-content {
     width: 700px;
 }
+
+.table-head{
+    display: flex;
+    margin-right: 30px;
+}

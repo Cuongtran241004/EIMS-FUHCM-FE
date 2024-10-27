@@ -34,10 +34,11 @@ const RoomSelectionPage = () => {
   const [loading, setLoading] = useState(true);
   const [examSlot, setExamSlot] = useState(null);
   const [groupedRooms, setGroupedRooms] = useState([]);
-  const [unvailableRooms, setUnvailableRooms] = useState([]);
+  const [unavailableRooms, setUnavailableRooms] = useState([]);
   const [usingRoom, setUsingRoom] = useState([]);
   const [loadingSubmit, setLoadingSubmit] = useState(false);
 
+  // Fetch exam slot data
   const fetchExamSlot = async () => {
     try {
       const response = await examSlotApi.getExamSlotById(examSlotId);
@@ -47,65 +48,70 @@ const RoomSelectionPage = () => {
     }
   };
 
+  // Fetch all rooms
   const fetchRooms = async () => {
     try {
       const response = await roomApi.getAllRooms();
-      console.log("Rooms:", response);
       setRooms(response || []);
     } catch (error) {
       message.error("Failed to fetch rooms");
-    } finally {
-      setLoading(false);
     }
   };
 
+  // Fetch rooms being used for the current exam slot
+  const fetchUsingRoom = async () => {
+    try {
+      const response = await examSlotApi.getUsingRoom(examSlotId);
+      setUsingRoom(response || []);
+      if (response.length > 0) {
+        setSelectedRooms(response.flat()); // Flatten the response array
+        setGroupedRooms(response); // Directly set grouped rooms
+      }
+    } catch (error) {
+      message.error("Failed to fetch using room");
+    }
+  };
+
+  // Fetch unavailable rooms excluding rooms already in use by the exam slot
   const fetchUnavailableRooms = async () => {
-    console.log(examSlot);
-    if (!examSlot?.startAt || !examSlot?.endAt) return; // Ensure startAt and endAt are available
+    // Ensure startAt and endAt are available in the exam slot data
+    if (!examSlot?.startAt || !examSlot?.endAt) return;
 
     try {
       const resUnRooms = await examSlotRoomApi.getUnavailableRooms(
         examSlot.startAt,
         examSlot.endAt
       );
+      // Get the IDs of rooms being used
+      const usingRoomIds = usingRoom.flat().map((room) => String(room.id)); // Convert usingRoom IDs to strings
+      // Filter unavailable rooms to exclude rooms that are already being used
+      const result = resUnRooms.filter(
+        (unRoom) => !usingRoomIds.includes(String(unRoom)) // Convert unRoom to string
+      );
 
-      console.log("Unavailable Rooms:", resUnRooms);
-      setUnvailableRooms(resUnRooms || []);
+      setUnavailableRooms(result || []);
     } catch (error) {
       console.log("Error fetching unavailable rooms:", error);
       message.error("Failed to fetch unavailable rooms");
     }
   };
 
+  // Sequentially fetch exam slot, rooms, using rooms, and unavailable rooms
   useEffect(() => {
-    fetchExamSlot();
-    fetchRooms();
+    setLoading(true);
+    try {
+      fetchExamSlot();
+      fetchRooms();
+      fetchUsingRoom();
+    } catch (error) {
+    } finally {
+      setLoading(false);
+    }
   }, [examSlotId]);
 
   useEffect(() => {
-    const fetchUsingRoom = async () => {
-      try {
-        const response = await examSlotApi.getUsingRoom(examSlotId);
-        setUsingRoom(response || []);
-
-        // Check if usingRoom is empty
-        if (response.length > 0) {
-          // User is updating, so populate selectedRooms and groupedRooms
-          setSelectedRooms(response.flat()); // Flatten the response into a single array
-
-          // Directly set groupedRooms from response
-          setGroupedRooms(response);
-        }
-      } catch (error) {
-        message.error("Failed to fetch using room");
-      }
-    };
-
-    if (examSlot) {
-      fetchUsingRoom();
-      fetchUnavailableRooms();
-    }
-  }, [examSlot]);
+    fetchUnavailableRooms();
+  }, [usingRoom]);
 
   // Additional logic for visualizing the groups
 
@@ -121,6 +127,14 @@ const RoomSelectionPage = () => {
   };
 
   const groupRooms = () => {
+    //eliminate duplicated roomName in all selectedRooms
+    const selectedRoomIds = selectedRooms.map((room) => room.id);
+    //eliminate duplicated roomName in all selectedRooms
+    const filteredSelectedRooms = selectedRooms.filter(
+      (room, index) => selectedRoomIds.indexOf(room.id) === index
+    );
+    setSelectedRooms(filteredSelectedRooms);
+
     const groupedByFloor = selectedRooms.reduce((acc, room) => {
       if (!acc[room.floor]) {
         acc[room.floor] = [];
@@ -177,8 +191,13 @@ const RoomSelectionPage = () => {
     console.log("Grouped Rooms:", groupedRooms);
     setLoadingSubmit(true);
     try {
-      // only return roomName
-      const roomIds = groupedRooms.map((group) =>
+      // eliminate groupedRooms with length = 0
+      const filteredGroupedRooms = groupedRooms.filter(
+        (group) => group.length > 0
+      );
+
+      // only return roomName and
+      const roomIds = filteredGroupedRooms.map((group) =>
         group.map((room) => room.roomName)
       );
 
@@ -187,7 +206,13 @@ const RoomSelectionPage = () => {
         roomIds: roomIds,
       };
 
-      await examSlotHallApi.addExamSlotHall(data);
+      if (usingRoom.length > 0) {
+        // Update using room
+        await examSlotHallApi.updateExamSlotHall(data);
+      } else {
+        // Add using room
+        await examSlotHallApi.addExamSlotHall(data);
+      }
 
       message.success("Rooms grouped successfully");
       // return history to previous page
@@ -231,13 +256,12 @@ const RoomSelectionPage = () => {
   };
 
   const handleCancel = () => {
-    setSelectedRooms([]);
-    setGroupedRooms([]);
+    setSelectedRooms(usingRoom.flat());
+    setGroupedRooms(usingRoom);
   };
 
   const isAvailable = () => {
-    // if startAt < today, disable save button
-    return moment(examSlot?.startAt).isBefore(moment());
+    return examSlot?.status == "APPROVED" || examSlot?.status == "REJECTED";
   };
   // Define groupedRoomsByFloor to use in the render
   const groupedRoomsByFloor = rooms.reduce((acc, room) => {
@@ -296,7 +320,7 @@ const RoomSelectionPage = () => {
                           key={room.id}
                           size="small"
                           onClick={() => handleRoomSelect(room)}
-                          disabled={unvailableRooms.some(
+                          disabled={unavailableRooms.some(
                             // Disable if room is unavailable
                             (unavailableRoom) => unavailableRoom == room.id
                           )}
@@ -349,6 +373,7 @@ const RoomSelectionPage = () => {
                       border: "1px dashed #ccc",
                       padding: "5px",
                       width: "calc(50% - 10px)",
+                      overflow: "auto",
                     }}
                     onDragOver={handleDragOver}
                     onDrop={(event) => handleDrop(event, groupIndex)}

@@ -2,31 +2,24 @@ import { Button, Popconfirm, Space } from "antd";
 import {
   DeleteOutlined,
   EditOutlined,
-  EyeOutlined,
-  PlusCircleOutlined,
   PlusSquareOutlined,
 } from "@ant-design/icons";
 import moment from "moment";
 import { examScheduleTag, examTypeTag, userRoleTag } from "./CustomTag.jsx";
 import { roleOptions } from "../configs/data.js";
 
-const examScheduleTable = (
-  handleRoomClick,
-  handleAssignmentClick,
-  handleEdit,
-  handleDelete
-) => [
+const examScheduleTable = (handleRoomClick, handleEdit, handleDelete) => [
   {
     title: "Code",
     dataIndex: "subjectCode",
     key: "subjectCode",
     align: "center",
   },
-  // {
-  //   title: "Subject",
-  //   dataIndex: "subjectName",
-  //   key: "subjectName",
-  // },
+  {
+    title: "Subject",
+    dataIndex: "subjectName",
+    key: "subjectName",
+  },
   {
     title: "Exam Type",
     dataIndex: "examType",
@@ -35,12 +28,12 @@ const examScheduleTable = (
     render: (text) => examTypeTag(text),
   },
   {
-    title: "Date (DD-MM-YYYY)",
+    title: "Date",
     dataIndex: "startAt", // Use startAt to extract date
     key: "date",
     align: "center",
     width: "15%",
-    render: (text) => moment(text).format("DD-MM-YYYY"), // Format as DD-MM-YYYY
+    render: (text) => moment(text).format("DD/MM/YYYY"), // Format as DD-MM-YYYY
   },
   {
     title: "Time",
@@ -69,20 +62,21 @@ const examScheduleTable = (
       </Button>
     ),
   },
-  {
-    title: "Invigilator",
-    key: "invigilator",
-    align: "center",
-    render: (text, record) => (
-      <Button type="text" onClick={() => handleAssignmentClick(record.id)}>
-        <PlusCircleOutlined style={{ fontSize: "20px", color: "#43AA8B" }} />
-      </Button>
-    ),
-  },
+  // {
+  //   title: "Invigilator",
+  //   key: "invigilator",
+  //   align: "center",
+  //   render: (text, record) => (
+  //     <Button type="text" onClick={() => handleAssignmentClick(record.id)}>
+  //       <PlusCircleOutlined style={{ fontSize: "20px", color: "#43AA8B" }} />
+  //     </Button>
+  //   ),
+  // },
   {
     title: "Status",
     dataIndex: "status",
     key: "status",
+    width: "10%",
     render: (status) => examScheduleTag(status),
   },
   {
@@ -182,8 +176,9 @@ const userTable = (handleEdit, handleDelete) => [
     key: "role",
     // using tag of ant design to display role
     render: (text, record) => {
-      const role = roleOptions.find((role) => role.value === record.role);
-      userRoleTag(role.label);
+      const role = roleOptions.find((role) => role.value == record.role);
+
+      return userRoleTag(role.label);
     },
   },
   {

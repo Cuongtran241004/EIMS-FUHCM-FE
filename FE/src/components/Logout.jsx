@@ -31,9 +31,8 @@ function Logout() {
   };
 
   return (
-    <Button type="text" onClick={handleLogout} style={{ color: "#F3722C" }}>
-      Logout
-      <LogoutOutlined />
+    <Button type="link" onClick={handleLogout} style={{ color: "#F3722C" }}>
+      Logout <LogoutOutlined />
     </Button>
   );
 }

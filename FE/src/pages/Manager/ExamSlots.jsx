@@ -1,27 +1,51 @@
-import React, { useState, useContext } from "react";
-import { Dropdown, Modal, Button, Space, Layout, Spin, Table, Checkbox, message } from "antd";
+import React, { useState, useContext, useCallback } from "react";
+import {
+  Dropdown,
+  Modal,
+  Button,
+  Space,
+  Layout,
+  Spin,
+  Table,
+  Checkbox,
+  message,
+  Radio,
+} from "antd";
 import { DownOutlined, ExclamationCircleOutlined } from "@ant-design/icons";
 import NavBar_Manager from "../../components/NavBar/NavBar_Manager";
 import Header from "../../components/Header/Header.jsx";
 import { useSemester } from "../../components/Context/SemesterContext.jsx";
-import { Calendar as BigCalendar, momentLocalizer } from 'react-big-calendar';
-import moment from 'moment';
-import 'react-big-calendar/lib/css/react-big-calendar.css';
+import { Calendar as BigCalendar, momentLocalizer } from "react-big-calendar";
+import CustomToolbar from "../../components/CustomCalendar/CustomToolbar";
+import moment from "moment";
+import "react-big-calendar/lib/css/react-big-calendar.css";
 import examSlotApi from "../../services/ExamSlot.js";
-import './ExamSlots.css';
+import "./ExamSlots.css";
+import { selectButtonStyle } from "../../design-systems/CSS/Button.js";
+import { requestTag } from "../../design-systems/CustomTag.jsx";
 
 const localizer = momentLocalizer(moment);
 const { Content, Sider } = Layout;
 const { confirm } = Modal;
 
+
 const ExamSlots = () => {
-  const { semesters, selectedSemester, setSelectedSemester, loading, examSlotBySemester } = useSemester();
+  const {
+    semesters,
+    selectedSemester,
+    setSelectedSemester,
+    loading,
+    examSlotBySemester,
+  } = useSemester();
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [pendingSlots, setPendingSlots] = useState([]);
-  const [showPending, setShowPending] = useState(false);
-  const [showRejected, setShowRejected] = useState(false);
   const [checkedSlots, setCheckedSlots] = useState([]);
+  const [modalState, setModalState] = useState({ show: false, action: "" });
+  const [selectedAction, setSelectedAction] = useState("");
+  const [view, setView] = useState('month');
+
+
 
   const handleMenuClick = (e) => {
     const selected = semesters.find((semester) => semester.id === parseInt(e.key));
@@ -38,149 +62,126 @@ const ExamSlots = () => {
     onClick: handleMenuClick,
   };
 
+
   const handleSelectEvent = (event) => {
     setSelectedEvent(event);
     setIsModalVisible(true);
   };
 
-  const handleOk = () => {
+  const handleCloseEventModal = () => {
     setIsModalVisible(false);
-  };
-
-  const handleCancel = () => {
-    setIsModalVisible(false);
-  };
-
-  const handleApprove = () => {
-    const pending = examSlotBySemester.filter(slot => slot.status === "PENDING");
-    setPendingSlots(pending);
-    setShowPending(true);
-  };
-
-  const handleReject = () => {
-    const pending = examSlotBySemester.filter(slot => slot.status === "PENDING");
-    setPendingSlots(pending);
-    setShowRejected(true);
   };
 
 
   const handleCheckboxChange = (slotId) => {
     setCheckedSlots((prev) =>
-      prev.includes(slotId) ? prev.filter(id => id !== slotId) : [...prev, slotId]
+      prev.includes(slotId)
+        ? prev.filter((id) => id !== slotId)
+        : [...prev, slotId]
     );
   };
 
-  const handleConfirm = async () => {
+  const handleConfirmSlots = async () => {
+    if (!selectedAction) {
+      message.error("Please select an action (Approve or Reject)");
+      return;
+    }
+
+    const status = selectedAction === "approve" ? "APPROVED" : "REJECTED";
     confirm({
-      title: 'Do you want to approve these slots?',
+      title: `Do you want to ${status.toLowerCase()} these slots?`,
       icon: <ExclamationCircleOutlined />,
       onOk: async () => {
-
         const updatedSlots = checkedSlots.map((slot) => ({
           subjectExamId: slot.id,
           startAt: slot.startAt,
           endAt: slot.endAt,
           requiredInvigilators: slot.requiredInvigilators,
-          status: "APPROVED"
+          status,
         }));
 
         try {
-          const success = await examSlotApi.updateExamSlot(updatedSlots);
+          const success = await examSlotApi.updateExamSlotByManager(updatedSlots);
           if (success) {
-            message.success('Approved successfully!');
+            message.success(`${status} successfully!`);
             setCheckedSlots([]);
-            setShowPending(false);
+            setModalState({ show: false, action: "" });
           }
         } catch (error) {
-          message.error('There was an error approving the slots!');
+          message.error(`There was an error ${status.toLowerCase()} the slots!`);
           console.error(error);
         }
       },
     });
   };
 
-  const handleConfirmReject = async () => {
-    confirm({
-      title: 'Do you want to reject these slots?',
-      icon: <ExclamationCircleOutlined />,
-      onOk: async () => {
-        const updatedSlots = checkedSlots.map((slot) => ({
-          subjectExamId: slot.id,
-          startAt: slot.startAt,
-          endAt: slot.endAt,
-          requiredInvigilators: slot.requiredInvigilators,
-          status: "REJECTED"
-        }));
-
-        try {
-          const success = await examSlotApi.updateExamSlot(updatedSlots);
-          if (success) {
-            message.success('Rejected successfully!');
-            setCheckedSlots([]);
-            setShowRejected(false);
-          }
-        } catch (error) {
-          message.error('There was an error rejecting the slots!');
-          console.error(error);
-        }
-      },
-    });
+  const openModalForAction = () => {
+    const pending = examSlotBySemester.filter((slot) => slot.status === "PENDING");
+    setPendingSlots(pending);
+    setModalState({ show: true, action: "" });
   };
 
   const EventComponent = ({ event }) => (
     <span>
       <p style={{ margin: 0, fontWeight: 500, fontSize: 13.33333 }}>
-        {new Date(event.startAt).toLocaleTimeString([], {
-          hour: "2-digit",
-          minute: "2-digit",
-        })} -
-        {new Date(event.endAt).toLocaleTimeString([], {
-          hour: "2-digit",
-          minute: "2-digit",
-        })}
+        {moment(event.startAt).format("HH:mm")} - {moment(event.endAt).format("HH:mm")}
       </p>
     </span>
   );
 
   const columns = [
     {
-      title: 'Select',
-      dataIndex: 'select',
-      key: 'select',
+      title: "Select",
+      dataIndex: "select",
+      key: "select",
       render: (_, record) => (
         <Checkbox
+          style={{ display: "flex", justifyContent: "left", width: "100%" }}
           checked={checkedSlots.includes(record)}
           onChange={() => handleCheckboxChange(record)}
         />
       ),
     },
     {
-      title: 'Subject',
-      dataIndex: 'subjectName',
-      key: 'subjectName',
-      render: (text, record) => `${record.subjectExamDTO.subjectName} (${record.subjectExamDTO.subjectCode})`,
+      title: "Subject",
+      dataIndex: "subjectName",
+      key: "subjectName",
+      render: (text, record) =>
+        `${record.subjectExamDTO.subjectName} (${record.subjectExamDTO.subjectCode})`,
     },
     {
-      title: 'Start Time',
-      dataIndex: 'startAt',
-      key: 'startAt',
-      render: (text) => new Date(text).toLocaleString(),
+      title: "Invigilators",
+      dataIndex: "requiredInvigilators",
+      key: "requiredInvigilators",
+      render: (text, record) => (
+        <span style={{ display: 'flex', justifyContent: 'center' }}>{`${record.requiredInvigilators}`}</span>
+      ),
     },
     {
-      title: 'End Time',
-      dataIndex: 'endAt',
-      key: 'endAt',
-      render: (text) => new Date(text).toLocaleString(),
+      title: "Date",
+      dataIndex: "startAt",
+      key: "startAt",
+      render: (text) => moment(text).format("DD/MM/YYYY"),
     },
     {
-      title: 'Status',
-      dataIndex: 'status',
-      key: 'status',
+      title: "Start Time",
+      dataIndex: "startAt",
+      key: "startAt",
+      render: (text) => moment(text).format("HH:mm"),
+    },
+    {
+      title: "End Time",
+      dataIndex: "endAt",
+      key: "endAt",
+      render: (text) => moment(text).format("HH:mm"),
     },
   ];
 
+
+
+
   return (
-    <Layout style={{ height: "100vh", overflowY: 'hidden' }}>
+    <Layout style={{ height: "100vh", overflowY: "hidden" }}>
       <Header />
       <Layout>
         <Sider width={256} style={{ backgroundColor: "#4D908E" }}>
@@ -188,84 +189,94 @@ const ExamSlots = () => {
         </Sider>
         <Layout>
           <Content style={{ padding: "24px", minHeight: "100vh" }}>
+            <h1 style={{ color: "red", display: "flex", justifyContent: "center", marginTop: 0, marginBottom: 0 }}> EXAM SLOTS </h1>
             {loading ? (
               <Spin tip="Loading..." size="large" />
             ) : (
-              <div style={{ display: "flex", alignItems: "flex-start" }}>
+              <div style={{ display: "flex", alignItems: "flex-start", marginTop: -20 }}>
                 <BigCalendar
-                  views={{ day: true, week: true, month: true }}
+                  views={['month', 'agenda', 'day']}
                   localizer={localizer}
-                  events={examSlotBySemester}
+                  events={examSlotBySemester.filter((slot) => slot.status !== "NEEDS_ROOM_ASSIGNMENT")}
+                  length={6}
+                  onView={setView}
+                  view={view}
+                  dayLayoutAlgorithm='no-overlap'
+                  step={30}
+                  timeslots={1}
                   onSelectEvent={handleSelectEvent}
-                  startAccessor={(event) => { return new Date(event.startAt) }}
-                  endAccessor={(event) => { return new Date(event.endAt) }}
+                  startAccessor={(event) => new Date(event.startAt)}
+                  endAccessor={(event) => new Date(event.endAt)}
                   style={{ height: 500, margin: "50px", width: "70%" }}
-                  components={{
-                    event: EventComponent,
+                  components={{ event: EventComponent, toolbar: CustomToolbar }}
+                  messages={{ event: "Time" }}
+                  formats={{
+                    agendaDateFormat: (date) => moment(date).format("DD/MM/YYYY")
                   }}
-
                   eventPropGetter={(event) => {
                     let backgroundColor;
                     switch (event.status) {
-                      case 'APPROVED':
-                        backgroundColor = '#52c41a';
+                      case "APPROVED":
+                        backgroundColor = "#52c41a";
                         break;
-                      case 'REJECTED':
-                        backgroundColor = '#d9363e';
+                      case "REJECTED":
+                        backgroundColor = "#d9363e";
                         break;
                       default:
-                        backgroundColor = '#1890ff';
+                        backgroundColor = "rgb(249, 199, 79)";
                         break;
                     }
                     return {
                       style: {
                         backgroundColor,
-                        border: '1px solid #ddd',
-                        color: backgroundColor === '#ddd' ? 'black' : 'white',
-
+                        border: "1px solid #ddd",
+                        color: backgroundColor === "#ddd" ? "black" : "white",
                       },
                     };
                   }}
                 />
                 <Modal
-                  title="Details"
+                  title="Details of exam slot"
                   open={isModalVisible}
-                  onOk={handleOk}
-                  onCancel={handleCancel}
+                  onCancel={handleCloseEventModal}
+                  footer={[<Button key="close" onClick={handleCloseEventModal}>Close</Button>]}
                 >
                   {selectedEvent && (
                     <div>
-                      <p><strong>Date:</strong> {new Date(selectedEvent.startAt).toLocaleDateString()}</p>
-                      <p><strong>Start Time:</strong> {new Date(selectedEvent.startAt).toLocaleTimeString()}</p>
-                      <p><strong>End Time:</strong> {new Date(selectedEvent.endAt).toLocaleTimeString()}</p>
-                      <p><strong>Created At:</strong> {new Date(selectedEvent.createdAt).toLocaleString()}</p>
-                      <p><strong>Created By:</strong> {selectedEvent.createdBy}</p>
-                      <p><strong>Required Invigilators:</strong> {selectedEvent.requiredInvigilators}</p>
-                      <p><strong>Status:</strong> {selectedEvent.status}</p>
-                      <p><strong>Subject:</strong> {selectedEvent.subjectExamDTO.subjectName} ({selectedEvent.subjectExamDTO.subjectCode})</p>
-                      <p><strong>Exam Type:</strong> {selectedEvent.subjectExamDTO.examType}</p>
-                      <p><strong>Duration:</strong> {selectedEvent.subjectExamDTO.duration} minutes</p>
+                      <tb>
+                        <tr><th className="table-head"><strong>Date:</strong></th><td>{moment(selectedEvent.startAt).format("DD/MM/YYYY")}</td></tr>
+                        <tr><th className="table-head"><strong>Time:</strong></th><td>{moment(selectedEvent.startAt).format("HH:MM")} -{" "} {moment(selectedEvent.endAt).format("HH:MM")}</td></tr>
+                        <tr><th className="table-head"><strong>Subject:</strong></th><td>{selectedEvent.subjectExamDTO.subjectName} ({selectedEvent.subjectExamDTO.subjectCode})</td></tr>
+                        <tr><th className="table-head"><strong>Required Invigilators:</strong></th><td>{selectedEvent.requiredInvigilators}</td></tr>
+                        <tr><th className="table-head"><strong>Status:</strong></th><td>{requestTag(selectedEvent.status)}</td></tr>
+                        <tr><th className="table-head"><strong>Exam Type:</strong></th><td>{selectedEvent.subjectExamDTO.examType}</td></tr>
+                        <tr><th className="table-head"><strong>Duration:</strong></th><td>{selectedEvent.subjectExamDTO.duration} minutes</td></tr>
+                      </tb>
                     </div>
                   )}
                 </Modal>
-                <div style={{ marginRight: 30, marginTop: 40, display: 'grid', width: '15%' }}>
-                  <Dropdown menu={menu} trigger={["click"]}>
-                    <Button size="large">
-                      <Space>
-                        {selectedSemester ? selectedSemester.name : "No Semesters Available"}
-                        <DownOutlined />
-                      </Space>
+                <div style={{ display: 'grid', paddingTop: 50, paddingLeft: 40, paddingRight: 60, width: "30%" }}>
+                  <Dropdown menu={menu} >
+                    <Button style={selectButtonStyle}>
+                      {selectedSemester ? selectedSemester.name : "Select a Semester"}{" "}
+                      <DownOutlined />
                     </Button>
                   </Dropdown>
-                  <div style={{marginTop: 10}}>
-                    <Button style={{width: 100, marginLeft: 20}} onClick={handleApprove}>Approve</Button>
-                    <Button style={{width: 100, marginLeft: 20}} onClick={handleReject}>Reject</Button>
-                    <p style={{ fontWeight: 'bold' }}>
-                      <span style={{ marginRight: 20, color: '#52c41a' }}>APPROVED</span>
-                      <span style={{ marginRight: 20, color: '#d9363e' }}>REJECTED</span>
-                      <span style={{ marginRight: 20, color: '#1890ff' }}>PENDING</span>
-                    </p>
-                  </div>
+                  <Button
+                    style={{
+                      backgroundColor: "#1890ff",
+                      color: "white",
+                      width: "100%",
+                    }}
+                    onClick={openModalForAction}
+                  >
+                    Update
+                  </Button>
+                  <p>
+                    <span style={{ color: "#52c41a" }}>&#9632; </span> <span style={{ marginLeft: 10 }}>Approved</span><br />
+                    <span style={{ color: "#d9363e" }}>&#9632; </span> <span style={{ marginLeft: 10 }}>Rejected</span> <br />
+                    <span style={{ color: "rgb(249, 199, 79)" }}>&#9632; </span> <span style={{ marginLeft: 10 }}>Pending</span>
+                  </p>
                 </div>
               </div>
             )}
@@ -273,47 +284,37 @@ const ExamSlots = () => {
         </Layout>
       </Layout>
 
-      {showPending && (
+      {modalState.show && (
         <Modal
-          title="Pending Slots"
-          open={showPending}
-          onOk={handleConfirm}
-          onCancel={() => setShowPending(false)}
+          title="Handle Pending Slots"
+          open={modalState.show}
+          onCancel={() => setModalState({ show: false, action: "" })}
           footer={[
-            <Button key="back" onClick={() => setShowPending(false)}>
+            <Button key="back" onClick={() => setModalState({ show: false, action: "" })}>
               Cancel
             </Button>,
-            <Button key="submit" type="primary" onClick={handleConfirm}>
+            <Button
+              key="approve"
+              type="primary"
+              style={{ backgroundColor: "#52c41a", borderColor: "#52c41a" }}
+              onClick={() => {
+                setSelectedAction("approve");
+                handleConfirmSlots();
+              }}
+            >
               Approve
-            </Button>
-          ]}
-        >
-          <Table
-            columns={columns}
-            dataSource={pendingSlots}
-            rowKey="id"
-            pagination={{
-              pageSize: 4,
-              showSizeChanger: false,
-              showQuickJumper: false,
-              position: ["bottomCenter"],
-            }}
-          />
-        </Modal>
-      )}
-      {showRejected && (
-        <Modal
-          title="Pending Slots"
-          open={showRejected}
-          onOk={handleConfirmReject}
-          onCancel={() => setShowRejected(false)}
-          footer={[
-            <Button key="back" onClick={() => setShowRejected(false)}>
-              Cancel
             </Button>,
-            <Button key="submit" type="primary" onClick={handleConfirmReject}>
+            <Button
+              key="reject"
+              type="primary"
+              style={{ backgroundColor: "#d9363e", borderColor: "#d9363e" }}
+              onClick={() => {
+                setSelectedAction("reject");
+                handleConfirmSlots();
+              }}
+            >
               Reject
-            </Button>
+            </Button>,
           ]}
         >
           <Table
@@ -328,6 +329,8 @@ const ExamSlots = () => {
             }}
           />
         </Modal>
+
+
       )}
     </Layout>
   );

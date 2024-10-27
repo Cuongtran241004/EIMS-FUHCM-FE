@@ -28,6 +28,7 @@ import {
   CaretRightFilled,
   CloseOutlined,
   DownOutlined,
+  SearchOutlined,
 } from "@ant-design/icons";
 import Header from "../../components/Header/Header.jsx";
 import { useSemester } from "../../components/Context/SemesterContext.jsx";
@@ -48,6 +49,7 @@ const { Content, Sider } = Layout;
 
 const Subject = () => {
   const [data, setData] = useState([]);
+  const [filteredData, setFilteredData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [editingSubject, setEditingSubject] = useState(null);
@@ -71,6 +73,7 @@ const Subject = () => {
       // sort by id
       const result = mapResponse.sort((a, b) => b.id - a.id);
       setData(result || []);
+      setFilteredData(result || []);
     } catch (error) {
       message.error(FETCH_SUBJECTS_FAILED);
     } finally {
@@ -89,6 +92,16 @@ const Subject = () => {
     key: semester.id,
     label: semester.name,
   }));
+
+  const handleSearch = (event) => {
+    const { value } = event.target;
+    const filtered = data.filter(
+      (subject) =>
+        `${subject.code}`.toLowerCase().includes(value.toLowerCase()) ||
+        `${subject.name}`.toLowerCase().includes(value.toLowerCase())
+    );
+    setFilteredData(filtered); // Update the filtered data displayed in the table
+  };
 
   const handleMenuClick = (e) => {
     const selected = items.find((item) => item.key == e.key);
@@ -115,7 +128,7 @@ const Subject = () => {
         message.success(DELETE_SUBJECT_SUCCESS);
         fetchData(selectedSemester.id);
       } catch (error) {
-        message.error(DELETE_SUBJECT_FAILED);
+        notification.error({ message: DELETE_SUBJECT_FAILED });
       }
     } else {
       deleteNotification();
@@ -269,10 +282,21 @@ const Subject = () => {
                 </Space>
               </Button>
             </Dropdown>
+            <Input
+              placeholder="Search by Code or Name"
+              onChange={handleSearch}
+              allowClear
+              suffix={<SearchOutlined style={{ color: "rgba(0,0,0,.45)" }} />}
+              style={{
+                width: 250,
+                marginLeft: "20px",
+                marginBottom: "10px",
+              }}
+            />
           </div>
           <Spin spinning={loading}>
             <Table
-              dataSource={data}
+              dataSource={filteredData}
               columns={subjectTable(
                 currentPage,
                 pageSize,

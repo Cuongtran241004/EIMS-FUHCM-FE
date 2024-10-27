@@ -7,4 +7,11 @@
   justify-content: center;
 }
 
+.rbc-agenda-time-cell {
+  display: none; 
+}
+
+.rbc-agenda-view .rbc-header:nth-child(2) {
+  display: none; 
+}
 

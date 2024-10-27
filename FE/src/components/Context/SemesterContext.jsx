@@ -2,7 +2,11 @@ import React, { createContext, useState, useContext, useEffect } from "react";
 import { message } from "antd"; // Ensure to import message
 import semesterApi from "../../services/Semester.js";
 import examSlotApi from "../../services/ExamSlot.js";
-
+import attendanceApi from "../../services/InvigilatorAttendance.js";
+import moment from "moment";
+import configApi from "../../services/Config.js";
+import requestApi from "../../services/Request.js";
+import { managerMapperUtil } from "../../utils/Mapper/ManagerMapperUtil.jsx";
 // Create a context for the semester
 const SemesterContext = createContext();
 
@@ -13,9 +17,10 @@ export const SemesterProvider = ({ children }) => {
     id: null,
     name: "Select semester",
   });
+  const [configSemester, setConfigSemester] = useState([]);
   const [availableSemesters, setAvailableSemesters] = useState([]);
   const [examSlotBySemester, setExamSlotBySemester] = useState([]);
-
+  const [requestTypes, setRequestTypes] = useState([]);
   const [loading, setLoading] = useState(true); // Loading state
 
   const fetchSemesters = async () => {
@@ -34,6 +39,8 @@ export const SemesterProvider = ({ children }) => {
         setSelectedSemester({
           id: sortedSemesters[0].id,
           name: sortedSemesters[0].name,
+          startAt: sortedSemesters[0].startAt.split("T")[0],
+          endAt: sortedSemesters[0].endAt.split("T")[0],
         });
       }
 
@@ -50,6 +57,26 @@ export const SemesterProvider = ({ children }) => {
     }
   };
 
+  const fetchRequestType = async () => {
+    try {
+      const result = await requestApi.getRequestTypes();
+
+      setRequestTypes(result.requestTypes);
+    } catch (error) {
+      message.error("Failed to fetch request types");
+    }
+  };
+
+  const addTodayAttendance = async () => {
+    try {
+      // Add today attendance, params is today (YYYY-MM-DD)
+      const today = moment().format("YYYY-MM-DD");
+      const result = await attendanceApi.addAllAttendanceByDate(today);
+    } catch (error) {
+      message.error("Failed to fetch today attendance");
+    }
+  };
+
   useEffect(() => {
     const fetchExamSlotBySemester = async () => {
       if (selectedSemester.id) {
@@ -57,19 +84,26 @@ export const SemesterProvider = ({ children }) => {
           const result = await examSlotApi.getExamSlotBySemesterId(
             selectedSemester.id
           );
-          setExamSlotBySemester(result);
           console.log(result);
+          const resconfig = await configApi.getAllConfigsBySemesterId(
+            selectedSemester.id
+          );
+
+          setExamSlotBySemester(result || []);
+          setConfigSemester(resconfig || []);
         } catch (error) {
           message.error("Failed to fetch exam slots");
         }
       }
-    }   
+    };
     fetchExamSlotBySemester();
   }, [selectedSemester]);
 
   // Fetch semesters and set the default selected semester
   useEffect(() => {
     fetchSemesters();
+    fetchRequestType();
+    addTodayAttendance();
   }, []);
 
   return (
@@ -81,6 +115,8 @@ export const SemesterProvider = ({ children }) => {
         availableSemesters,
         loading,
         examSlotBySemester,
+        requestTypes,
+        configSemester,
       }} // Expose loading state
     >
       {children}

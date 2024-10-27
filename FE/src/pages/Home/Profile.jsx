@@ -52,7 +52,7 @@ const ProfilePage = ({ user }) => {
       style={{
         maxWidth: "600px",
         margin: "0 auto",
-        marginTop: "10px",
+        marginTop: "5%",
         padding: "20px",
         backgroundColor: "#f7f9fc",
         borderRadius: "8px",
@@ -80,7 +80,7 @@ const ProfilePage = ({ user }) => {
         {/* Avatar Section */}
         <Row gutter={16} style={{ marginBottom: "20px", textAlign: "center" }}>
           <Col span={24}>
-            <Upload
+            {/* <Upload
               beforeUpload={beforeUpload}
               showUploadList={false}
               accept="image/*"
@@ -95,8 +95,8 @@ const ProfilePage = ({ user }) => {
                   border: "2px solid #4D908E",
                 }}
               />
-            </Upload>
-            <div style={{ marginTop: 10, color: "#4D908E" }}>
+            </Upload> */}
+            {/* <div style={{ marginTop: 10, color: "#4D908E" }}>
               <Button
                 icon={<PlusOutlined />}
                 style={{ borderRadius: "4px" }}
@@ -104,7 +104,7 @@ const ProfilePage = ({ user }) => {
               >
                 Change Avatar
               </Button>
-            </div>
+            </div> */}
           </Col>
         </Row>
 
@@ -138,57 +138,41 @@ const ProfilePage = ({ user }) => {
           </Col>
         </Row>
 
-        {/* Password */}
-        <Form.Item
-          label="Password"
-          name="password"
-          rules={[{ required: true, message: "Please enter a new password!" }]}
-        >
-          <Input
-            placeholder="Enter new password"
-            type={showPassword ? "text" : "password"} // Toggle between text and password
-            style={{ borderRadius: "4px" }}
-            suffix={
-              showPassword ? (
-                <EyeOutlined
-                  onClick={() => setShowPassword(false)}
-                  style={{ cursor: "pointer" }}
-                />
-              ) : (
-                <EyeInvisibleOutlined
-                  onClick={() => setShowPassword(true)}
-                  style={{ cursor: "pointer" }}
-                />
-              )
-            }
-          />
-        </Form.Item>
-
-        {/* Phone Number */}
-        <Form.Item
-          label="Phone"
-          name="phoneNumber"
-          rules={[
-            { required: true, message: "Please enter your phone number!" },
-          ]}
-        >
-          <Input
-            placeholder="Enter phone number"
-            style={{ borderRadius: "4px" }}
-          />
-        </Form.Item>
-
-        {/* Submit Button */}
-        <Form.Item>
-          <Button
-            danger
-            onClick={() => navigate(MANAGER_DASHBOARD_URL)}
-            style={{ marginRight: 10, borderRadius: "4px" }}
-          >
-            <BackwardOutlined />
-            Return to Dashboard
-          </Button>
-          <Button
+        <Row gutter={16}>
+          <Col span={8}>
+            {" "}
+            {/* Phone Number */}
+            <Form.Item
+              label="Phone"
+              name="phoneNumber"
+              // rules={[
+              //   { required: true, message: "Please enter your phone number!" },
+              // ]}
+            >
+              <Input
+                readOnly
+                placeholder="Enter phone number"
+                style={{ borderRadius: "4px" }}
+              />
+            </Form.Item>
+            {/* Password */}
+          </Col>
+          <Col span={8}>
+            <Form.Item label="Password">
+              <Button onClick={() => navigate("/add")}>Change Password</Button>
+            </Form.Item>
+          </Col>
+          <Col span={8}>
+            <Form.Item label=" ">
+              <Button
+                danger
+                onClick={() => navigate("/")}
+                style={{ marginRight: 10, borderRadius: "4px", width: "100%" }}
+              >
+                <BackwardOutlined />
+                Return to Dashboard
+              </Button>
+              {/* <Button
             type="primary"
             htmlType="submit"
             style={{
@@ -200,8 +184,11 @@ const ProfilePage = ({ user }) => {
           >
             Update
             <ReloadOutlined />
-          </Button>
-        </Form.Item>
+          </Button> */}
+            </Form.Item>
+          </Col>
+        </Row>
+        {/* Submit Button */}
       </Form>
     </div>
   );

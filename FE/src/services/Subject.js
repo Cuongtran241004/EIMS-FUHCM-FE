@@ -2,6 +2,11 @@ import axios from "axios";
 import { API_BASE_URL } from "../configs/urlApi.js";
 const SUBJECT_API_BASE_URL = `${API_BASE_URL}/subjects`;
 
+const handleError = (error) => {
+  console.error("Error fetching data:", error);
+  throw error;
+};
+
 const subjectApi = {
   getAllSubjects: async () => {
     try {
@@ -14,8 +19,7 @@ const subjectApi = {
       });
       return response.data;
     } catch (error) {
-      console.error("Error fetching data:", error);
-      throw error;
+      handleError(error);
     }
   },
   getSubjectBySemester: async (semesterId) => {
@@ -32,8 +36,7 @@ const subjectApi = {
       );
       return response.data;
     } catch (error) {
-      console.error("Error fetching data:", error);
-      throw error;
+      handleError(error);
     }
   },
   addSubject: async (subject) => {
@@ -47,8 +50,7 @@ const subjectApi = {
       });
       return response.data;
     } catch (error) {
-      console.error("Error fetching data:", error);
-      throw error;
+      handleError(error);
     }
   },
   updateSubject: async (subject) => {
@@ -66,13 +68,12 @@ const subjectApi = {
       );
       return response.data;
     } catch (error) {
-      console.error("Error fetching data:", error);
-      throw error;
+      handleError(error);
     }
   },
-  deleteSubject: async (code) => {
+  deleteSubject: async (id) => {
     try {
-      const response = await axios.delete(`${SUBJECT_API_BASE_URL}/${code}`, {
+      const response = await axios.delete(`${SUBJECT_API_BASE_URL}/${id}`, {
         headers: {
           "Content-Type": "application/json",
           Accept: "application/json",
@@ -81,8 +82,7 @@ const subjectApi = {
       });
       return response.data;
     } catch (error) {
-      console.error("Error fetching data:", error);
-      throw error;
+      handleError(error);
     }
   },
 };
