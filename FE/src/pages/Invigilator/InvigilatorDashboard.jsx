@@ -89,7 +89,7 @@ function InvigilatorDashboard() {
           timeslots={1}
           startAccessor="startAt"
           endAccessor="endAt"
-          style={{ height: 500, margin: "50px", width: "70%" }}
+          style={{ height: 500, margin: "50px", width: "65%" }}
           components={{
             event: EventComponent, toolbar: CustomToolbar
           }}
@@ -128,7 +128,7 @@ function InvigilatorDashboard() {
             marginLeft: 30,
             marginTop: 40,
             display: "grid",
-            width: "15%",
+            width: "20%",
           }}
         >
           <Dropdown menu={menu} trigger={["click"]}>
@@ -151,17 +151,18 @@ function InvigilatorDashboard() {
             .
           </p>
         <div>
-          <p>
+            <p style={{textAlign: 'center', fontSize: 20, fontWeight: 'bold'}}>Invigilation Summary</p>
             <table className="table-assign" style={{textAlign: 'left', fontSize: 13}}>
-              <tr style={{color: 'green'}}><th>Hours of invigilation completed:</th><td>{assignedSlotDetail.totalInvigilatedHours}</td></tr>
-              <tr style={{color: 'orange'}}><th>Hours of invigilation remaining:</th><td>{assignedSlotDetail.totalRequiredInvigilationHours}</td></tr>
-              <tr><th>Total hours of invigilation:</th><td>{assignedSlotDetail.totalAssignedHours}</td></tr> <br/><br/>
-              <tr style={{color: 'green'}}><th>Invigilation slots completed:</th><td>{assignedSlotDetail.totalInvigilatedSlots}</td></tr>
-              <tr style={{color: 'orange'}}><th>Invigilation slots remaining:</th><td>{assignedSlotDetail.totalRequiredInvigilationSlots}</td></tr>
-              <tr style={{color: 'red'}}><th>Slots not attended:</th><td>{assignedSlotDetail.totalNonInvigilatedSlots}</td></tr>
-              <tr><th><span style={{marginRight: 10,fontSize: 20,color: "#1890ff",}}>&#9632;</span>Assigned slots:</th><td>{assignedSlotDetail.totalAssigned}</td></tr>
+              <tbody>
+              <tr><th>Hours of invigilation completed:</th><td><span style={{color: 'green'}}>{assignedSlotDetail.totalInvigilatedHours}</span> Hour(s)</td></tr>
+              <tr><th>Hours of invigilation remaining:</th><td><span style={{color: 'orange'}}>{assignedSlotDetail.totalRequiredInvigilationHours}</span> Hour(s)</td></tr>
+              <tr><th>Total hours of invigilation:</th><td><span>{assignedSlotDetail.totalAssignedHours}</span> Hour(s)</td></tr>
+              <tr><th>Invigilation slots completed:</th><td><span style={{color: 'green'}}>{assignedSlotDetail.totalInvigilatedSlots}</span> Slot(s)</td></tr>
+              <tr><th>Invigilation slots remaining:</th><td><span style={{color: 'orange'}}>{assignedSlotDetail.totalRequiredInvigilationSlots}</span> Slot(s)</td></tr>
+              <tr><th>Slots not attended:</th><td><span style={{color: 'red'}}>{assignedSlotDetail.totalNonInvigilatedSlots}</span> Slot(s)</td></tr>
+              <tr><th><span style={{marginRight: 10,fontSize: 20,color: "#1890ff",}}>&#9632;</span>Assigned slots:</th><td><span>{assignedSlotDetail.totalAssigned}</span> Slot(s)</td></tr>
+              </tbody>
             </table>
-          </p>
         </div>
         </div>
 

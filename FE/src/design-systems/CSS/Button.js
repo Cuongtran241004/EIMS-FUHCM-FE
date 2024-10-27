@@ -12,6 +12,7 @@ const selectButtonStyle = {
   borderRadius: "5px",
   boxShadow: "0 0 5px rgba(0, 0, 0, 0.5)",
   marginBottom: "10px",
+  
 };
 
 const detailButtonStyle = {
