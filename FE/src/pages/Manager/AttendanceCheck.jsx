@@ -49,12 +49,16 @@ const AttendanceCheck = () => {
     try {
       const response =
         await attendanceApi.getExamSlotBySemesterIdManager(semesterId);
-
       const result = managerMapperUtil.mapExamSlotforAttendance(response);
+
+      // sort by startAt
+      result.sort((a, b) => new Date(a.startAt) - new Date(b.startAt));
+
       setExamSlots(result || []);
       setFilteredExamSlots(result || []);
     } catch (error) {
       // Handle error
+      message.error("Failed to fetch attendance data");
     } finally {
       setLoading(false);
     }
