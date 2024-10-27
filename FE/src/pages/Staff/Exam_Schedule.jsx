@@ -13,6 +13,7 @@ import {
   Dropdown,
   Spin,
   notification,
+  Input,
 } from "antd";
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
@@ -24,6 +25,7 @@ import {
   CaretRightFilled,
   CloseOutlined,
   DownOutlined,
+  SearchOutlined,
 } from "@ant-design/icons";
 import moment from "moment";
 import { useSemester } from "../../components/Context/SemesterContext.jsx";
@@ -55,6 +57,7 @@ const PAGE_SIZE = 6;
 const Exam_Schedule = () => {
   const [form] = Form.useForm();
   const [examSchedule, setExamSchedule] = useState([]);
+  const [filteredExamSchedule, setFilteredExamSchedule] = useState([]);
   const [loading, setLoading] = useState(true);
   const [exams, setExams] = useState([]);
   const [filteredExams, setFilteredExams] = useState([]);
@@ -88,6 +91,7 @@ const Exam_Schedule = () => {
         );
       });
       setExamSchedule(result || []);
+      setFilteredExamSchedule(result || []);
       setTotalItems(result.length || 0);
     } catch (error) {
       console.error("Error fetching exam schedule:", error); // Log the error
@@ -121,6 +125,16 @@ const Exam_Schedule = () => {
       fetchExamSchedule(semesterId, currentPage);
     }
   }, [selectedSemester, currentPage]);
+
+  const handleSearch = (event) => {
+    const { value } = event.target;
+    const filtered = examSchedule.filter(
+      (subject) =>
+        `${subject.subjectCode}`.toLowerCase().includes(value.toLowerCase()) ||
+        `${subject.subjectName}`.toLowerCase().includes(value.toLowerCase())
+    );
+    setFilteredExamSchedule(filtered); // Update the filtered data displayed in the table
+  };
 
   const handleExamSearch = (value) => {
     if (value) {
@@ -443,10 +457,22 @@ const Exam_Schedule = () => {
                 </Space>
               </Button>
             </Dropdown>
+            <Input
+              placeholder="Search by Code or Name"
+              onChange={handleSearch}
+              allowClear
+              suffix={<SearchOutlined style={{ color: "rgba(0,0,0,.45)" }} />}
+              style={{
+                width: 250,
+                marginLeft: "20px",
+                marginBottom: "10px",
+              }}
+            />
           </div>
           <Spin spinning={loading}>
             <Table
-              dataSource={examSchedule}
+              className="custom-table-exam-schedule"
+              dataSource={filteredExamSchedule}
               columns={examScheduleTable(
                 handleRoomClick,
                 handleEdit,

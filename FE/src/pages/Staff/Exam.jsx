@@ -23,6 +23,7 @@ import {
   DeleteOutlined,
   DownOutlined,
   EditOutlined,
+  SearchOutlined,
 } from "@ant-design/icons";
 import Header from "../../components/Header/Header.jsx";
 import { useSemester } from "../../components/Context/SemesterContext.jsx";
@@ -44,6 +45,7 @@ const { Option } = Select;
 
 const Exam = () => {
   const [data, setData] = useState([]); // For exam data
+  const [filteredData, setFilteredData] = useState([]); // For filtered exam data
   const [loading, setLoading] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [loadingSubmit, setLoadingSubmit] = useState(false);
@@ -65,8 +67,9 @@ const Exam = () => {
     setLoading(true);
     try {
       const result = await examApi.getExamBySemesterId(semesterId);
-      console.log(result);
-      setData(result);
+
+      setData(result || []);
+      setFilteredData(result || []);
     } catch (error) {
       message.error("Failed to fetch exams");
     } finally {
@@ -102,11 +105,20 @@ const Exam = () => {
     setFilteredSubjects(filtered);
   };
 
+  const handleSearchExam = (event) => {
+    const { value } = event.target;
+    const filtered = data.filter(
+      (subject) =>
+        `${subject.subjectCode}`.toLowerCase().includes(value.toLowerCase()) ||
+        `${subject.subjectName}`.toLowerCase().includes(value.toLowerCase())
+    );
+    setFilteredData(filtered); // Update the filtered data displayed in the table
+  };
+
   // Handle semester selection change
   const handleMenuClick = (e) => {
-    console.log(semesters);
     const selected = semesters.find((semester) => semester.id == e.key);
-    console.log(selected);
+
     if (selected) {
       setSelectedSemester({
         id: selected.id,
@@ -379,11 +391,25 @@ const Exam = () => {
                 </Space>
               </Button>
             </Dropdown>
+            <Input
+              placeholder="Search by Code or Name"
+              onChange={handleSearchExam}
+              allowClear
+              suffix={<SearchOutlined style={{ color: "rgba(0,0,0,.45)" }} />}
+              style={{
+                width: 250,
+                marginLeft: "20px",
+                marginBottom: "10px",
+              }}
+            />
           </div>
 
           <Spin spinning={loading}>
             <Table
-              dataSource={data.map((item) => ({ ...item, key: item.id }))}
+              dataSource={filteredData.map((item) => ({
+                ...item,
+                key: item.id,
+              }))}
               columns={columns}
               pagination={{
                 pageSize,

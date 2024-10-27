@@ -15,11 +15,11 @@ const examScheduleTable = (handleRoomClick, handleEdit, handleDelete) => [
     key: "subjectCode",
     align: "center",
   },
-  // {
-  //   title: "Subject",
-  //   dataIndex: "subjectName",
-  //   key: "subjectName",
-  // },
+  {
+    title: "Subject",
+    dataIndex: "subjectName",
+    key: "subjectName",
+  },
   {
     title: "Exam Type",
     dataIndex: "examType",
