@@ -573,7 +573,11 @@ const Request = () => {
 
             <Radio.Group
               onChange={(e) => handleChangeRequestType(e.target.value)}
-              style={{ marginBottom: "10px", marginLeft: "10px" }}
+              style={{
+                marginBottom: "10px",
+                marginLeft: "10px",
+                marginLeft: "auto",
+              }}
             >
               {requestTypes.map((type) => (
                 <Radio.Button key={type} value={type}>

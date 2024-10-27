@@ -241,13 +241,11 @@ const Dashboard = () => {
                     moment().endOf("month"),
                   ]}
                 />
+                <p style={{ padding: "0", margin: "0", textAlign: "center" }}>
+                  <strong>Exam Slots Summary</strong>
+                </p>
                 {examSlotSummary.length > 0 ? (
                   <ResponsiveContainer width="100%" height={250}>
-                    <p
-                      style={{ padding: "0", margin: "0", textAlign: "center" }}
-                    >
-                      <strong>Exam Slots Summary</strong>
-                    </p>
                     <BarChart data={examSlotSummary}>
                       <CartesianGrid strokeDasharray="3 3" />
                       <XAxis dataKey="date" tickFormatter={formatXAxis} />
@@ -258,7 +256,7 @@ const Dashboard = () => {
                     </BarChart>
                   </ResponsiveContainer>
                 ) : (
-                  <Empty />
+                  <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
                 )}
               </Col>
               <Col
@@ -274,13 +272,11 @@ const Dashboard = () => {
                     moment().endOf("month"),
                   ]}
                 />
+                <p style={{ padding: "0", margin: "0", textAlign: "center" }}>
+                  <strong> Invigilation Summary</strong>
+                </p>
                 {invigilationSummary.length > 0 ? (
                   <ResponsiveContainer width="100%" height={250}>
-                    <p
-                      style={{ padding: "0", margin: "0", textAlign: "center" }}
-                    >
-                      <strong> Invigilation Summary</strong>
-                    </p>
                     <LineChart data={invigilationSummary}>
                       <CartesianGrid strokeDasharray="3 3" />
                       <XAxis dataKey="exam_slot" hide={true} />
@@ -302,7 +298,7 @@ const Dashboard = () => {
                     </LineChart>
                   </ResponsiveContainer>
                 ) : (
-                  <Empty />
+                  <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
                 )}
               </Col>
             </Row>
@@ -311,7 +307,7 @@ const Dashboard = () => {
           <div style={{ height: "49%" }}>
             <Row style={{ height: "100%" }}>
               <Col
-                span={9}
+                span={12}
                 style={{
                   backgroundColor: "#f9f9f9",
                   padding: "0",
@@ -330,11 +326,11 @@ const Dashboard = () => {
                     }}
                   />
                 ) : (
-                  <Empty />
+                  <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
                 )}
               </Col>
               <Col
-                span={9}
+                span={12}
                 style={{ backgroundColor: "#f9f9f9", padding: "0" }}
               >
                 <h4 className="today-invigilators-title">
@@ -352,15 +348,15 @@ const Dashboard = () => {
                     }}
                   />
                 ) : (
-                  <Empty />
+                  <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
                 )}
               </Col>
-              <Col
+              {/* <Col
                 span={6}
                 style={{ backgroundColor: "#f9f9f9", padding: "0" }}
               >
                 <h4 style={{ textAlign: "center" }}>Today's Report</h4>
-              </Col>
+              </Col> */}
             </Row>
           </div>
         </Content>

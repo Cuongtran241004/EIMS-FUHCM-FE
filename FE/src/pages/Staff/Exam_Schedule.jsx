@@ -521,7 +521,10 @@ const Exam_Schedule = () => {
             />
             <Radio.Group
               onChange={(e) => handleExamSlotStatusChange(e.target.value)}
-              style={{ marginBottom: "10px", marginLeft: "10px" }}
+              style={{
+                marginBottom: "10px",
+                marginLeft: "auto",
+              }}
             >
               {examSlotStatus.map((type) => (
                 <Radio.Button key={type} value={type}>
