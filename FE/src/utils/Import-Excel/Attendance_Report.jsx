@@ -7,16 +7,16 @@ const exportToExcel = (data) => {
   // Flatten the data to have each exam slot on a new row
   const formattedData = data.flatMap((invigilator) =>
     invigilator.detail.map((detail) => ({
-      "Invigilator ID": invigilator.fuId,
+      FuID: invigilator.fuId,
       Name: `${invigilator.lastName} ${invigilator.firstName}`,
       Email: invigilator.email,
       Phone: invigilator.phone,
       "Total Exam Slots": invigilator.totalSlots,
       "Total Hours": invigilator.totalHours,
       "Hourly Rate": invigilator.hourlyRate,
-      "Calculated Fee": invigilator.fee,
-      "Exam Slot Subject Code": detail.subjectCode,
-      "Exam Slot Subject Name": detail.subjectName,
+      "Calculated Amounts": invigilator.fee,
+      "Subject Code": detail.subjectCode,
+      "Subject Name": detail.subjectName,
       "Exam Type": detail.examType,
       "Exam Date": detail.date,
       "Start Time": detail.startAt,
