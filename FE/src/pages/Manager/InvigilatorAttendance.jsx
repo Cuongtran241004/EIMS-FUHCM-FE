@@ -8,6 +8,7 @@ import { Dropdown, Button, Space, Table, Spin, Layout, Input } from "antd";
 import attendanceApi from "../../services/InvigilatorAttendance.js";
 import { managerMapperUtil } from "../../utils/Mapper/ManagerMapperUtil.jsx";
 import "./InvigilatorAttendance.css";
+import ReportExportButton from "../../utils/Import-Excel/Attendance_Report.jsx";
 const InvigilatorAttendance = () => {
   const { Sider, Content } = Layout;
   const [loading, setLoading] = useState(false);
@@ -62,10 +63,6 @@ const InvigilatorAttendance = () => {
         `${user.fuId}`.toLowerCase().includes(value.toLowerCase())
     );
     setFilteredData(filtered); // Update the filtered data displayed in the table
-  };
-
-  const handleCancel = () => {
-    setIsModalVisible(false);
   };
 
   const columns = [
@@ -195,6 +192,8 @@ const InvigilatorAttendance = () => {
                 marginLeft: "20px",
               }}
             />
+
+            <ReportExportButton data={data} />
           </div>
 
           <Spin spinning={loading}>

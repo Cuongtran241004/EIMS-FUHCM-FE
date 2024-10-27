@@ -238,7 +238,14 @@ const AttendanceCheck = () => {
         </Button>
       ),
     },
-
+    {
+      title: "Check Attendance By",
+      dataIndex: "checkAttendanceBy",
+      key: "checkAttendanceBy",
+      align: "center",
+      render: (text, record) =>
+        `${record.updatedByLastName} ${record.updatedByFirstName}`,
+    },
     {
       title: "Action",
       dataIndex: "action",
@@ -276,12 +283,7 @@ const AttendanceCheck = () => {
       width: "30%",
       render: (text, record) => `${record.lastName} ${record.firstName}`,
     },
-    // {
-    //   title: "Email",
-    //   dataIndex: "email",
-    //   key: "email",
-    //   width: "30%",
-    // },
+
     {
       title: "Check In",
       dataIndex: "checkIn",
@@ -427,7 +429,6 @@ const AttendanceCheck = () => {
           bodyProps={{ maxHeight: "500px", overflowY: "auto" }} // Set custom height for content
           loading={listLoading}
         >
-          <p>Check Attendance By: </p>
           <Table
             className="custom-table-attendance-list"
             dataSource={attendances}
