@@ -150,15 +150,30 @@ const Request = () => {
 
       try {
         // Fetch the list of available invigilators
-        const response =
+        const responseUnassign =
           await invigilatorAssignmentApi.getUnassignedInvigilatorByExamSlotId(
             record.examSlotId
           );
+        const responseAssign =
+          await invigilatorAssignmentApi.getAssignedInvigilatorByExamSlotId(
+            record.examSlotId
+          );
+
         const unassignedInvigilators =
-          managerMapperUtil.mapUnassignedInvigilator(response);
+          managerMapperUtil.mapUnassignedInvigilator(responseUnassign);
+        const assignedInvigilators =
+          managerMapperUtil.mapUnassignedInvigilator(responseAssign);
 
         const userResponse = await userApi.getAllUsers();
-        const allInvigilators = userResponse
+        // exclude assigned invigilators
+        const filteredInvigilators = userResponse.filter(
+          (user) =>
+            !assignedInvigilators.some(
+              (assigned) => assigned.fuId === user.fuId
+            )
+        );
+
+        const allInvigilators = filteredInvigilators
           .filter((user) => user.role === 3) // Assuming role 3 is for invigilators
           .map((invigilator) => ({
             fuId: invigilator.fuId,
@@ -250,7 +265,6 @@ const Request = () => {
       requestNotification();
     }
   };
-
   // Reject the request (with reason)
   const handleReject = (record) => {
     if (record.status === "PENDING") {
@@ -306,7 +320,6 @@ const Request = () => {
       requestNotification();
     }
   };
-
   const handleApproveAttendance = async (record) => {
     if (record.status === "PENDING") {
       let approveComfirm = "";
