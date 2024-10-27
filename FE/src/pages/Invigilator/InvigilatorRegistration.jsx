@@ -256,6 +256,7 @@ function InvigilatorRegistration() {
             formats={{
               agendaDateFormat: (date) =>
                 moment(date).format('DD/MM/YYYY'),
+              timeGutterFormat: (date) => moment(date).format('HH:mm'),
             }}
             onSelectEvent={handleSelectEvent}
             eventPropGetter={(event) => {
