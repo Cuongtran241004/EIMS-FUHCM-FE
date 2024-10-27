@@ -13,9 +13,11 @@ import {
   Layout,
   Input,
   message,
+  Popconfirm,
 } from "antd";
 import attendanceApi from "../../services/InvigilatorAttendance.js";
 import { managerMapperUtil } from "../../utils/Mapper/ManagerMapperUtil.jsx";
+import emailApi from "../../services/Email.js";
 
 const { Sider, Content } = Layout;
 const InvigilatorFees = () => {
@@ -59,6 +61,7 @@ const InvigilatorFees = () => {
       });
     }
   };
+
   const handleSearch = (event) => {
     const { value } = event.target;
     const filtered = data.filter(
@@ -69,6 +72,15 @@ const InvigilatorFees = () => {
         `${user.fuId}`.toLowerCase().includes(value.toLowerCase())
     );
     setFilteredData(filtered); // Update the filtered data displayed in the table
+  };
+
+  const handleSendEmail = (email) => async () => {
+    try {
+      await emailApi.sendEmailToInvigilators(selectedSemester.id, email);
+      message.success("Email sent successfully");
+    } catch (error) {
+      message.error("Failed to send email");
+    }
   };
   const columns = [
     {
@@ -96,12 +108,12 @@ const InvigilatorFees = () => {
       key: "phone",
       align: "center",
     },
-    // {
-    //   title: "Total Slots",
-    //   dataIndex: "totalSlots",
-    //   key: "totalSlots",
-    //   align: "center",
-    // },
+    {
+      title: "Total Slots",
+      dataIndex: "totalSlots",
+      key: "totalSlots",
+      align: "center",
+    },
     {
       title: "Total Hours",
       dataIndex: "totalHours",
@@ -141,9 +153,17 @@ const InvigilatorFees = () => {
       align: "center",
       render: (text, record) => {
         return (
-          <Button type="link" style={{ color: "#F9844A" }}>
-            Send Email
-          </Button>
+          //popupconfirm to send email
+          <Popconfirm
+            title="Are you sure to send email to this invigilator?"
+            onConfirm={handleSendEmail(record.email)}
+            okText="Yes"
+            cancelText="No"
+          >
+            <Button type="link" style={{ color: "#F3722C" }}>
+              Send Email
+            </Button>
+          </Popconfirm>
         );
       },
     },
