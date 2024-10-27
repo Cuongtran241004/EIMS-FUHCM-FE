@@ -95,13 +95,16 @@ const examSlotApi = {
 
   getExamSlotTodayManager: async () => {
     try {
-      const response = await axios.get(`${EXAM_SLOT_API_BASE_URL}/to-day`, {
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-        },
-        withCredentials: true,
-      });
+      const response = await axios.get(
+        `${EXAM_SLOT_API_BASE_URL}/dashboard/to-day`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+          withCredentials: true,
+        }
+      );
       return response.data;
     } catch (error) {
       handleError(error);

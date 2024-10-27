@@ -39,6 +39,7 @@ import {
   checkInNotificationEnd,
   checkInNotificationStart,
   checkOutNotificationEnd,
+  checkOutNotificationStart,
 } from "../../design-systems/CustomNotification.jsx";
 const Attendance = () => {
   const [data, setData] = useState([]);
@@ -182,7 +183,7 @@ const Attendance = () => {
     setIsCheckIn(false);
     try {
       const afterCheckoutTime = configSemester.find((item) => {
-        return item.configType === "check_in_time_before_exam_slot";
+        return item.configType === "check_out_time_after_exam_slot";
       });
       const examSlot = await examSlotApi.getExamSlotById(examSlotId);
       const checkOutTimeEnd = moment(examSlot.endAt).add(
@@ -193,7 +194,7 @@ const Attendance = () => {
       // check-out time is after the exam end time
       const checkOutTime = moment(examSlot.endAt);
       if (moment().isBefore(checkOutTime)) {
-        checkInNotificationStart();
+        checkOutNotificationStart();
         return;
       }
       if (moment().isAfter(checkOutTimeEnd)) {
@@ -222,6 +223,7 @@ const Attendance = () => {
 
   const handleSave = async () => {
     setSaveLoading(true);
+    console.log(isCheckIn);
     try {
       // Call the API to save the attendance
       const response = isCheckIn
@@ -372,6 +374,7 @@ const Attendance = () => {
           value={record.fuId}
           checked={selectedRowKeys.includes(record.id)}
           onChange={() => handleCheckboxChange(record.id)}
+          disabled={isCheckIn ? record.checkIn : record.checkOut}
         />
       ),
     },

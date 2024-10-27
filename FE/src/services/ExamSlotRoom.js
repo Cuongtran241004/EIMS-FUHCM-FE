@@ -59,7 +59,23 @@ const examSlotRoomApi = {
       handleError(error);
     }
   },
-
+  getRoomTodayByExamSlotId: async (examSlotId) => {
+    try {
+      const response = await axios.get(
+        `${EXAM_SLOT_ROOM_API_BASE_URL}/dashboard/exam-slot/${examSlotId}`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+          withCredentials: true,
+        }
+      );
+      return response.data;
+    } catch (error) {
+      handleError(error);
+    }
+  },
   addExamSlotRoom: async (examSlotRoom) => {
     try {
       const response = await axios.post(

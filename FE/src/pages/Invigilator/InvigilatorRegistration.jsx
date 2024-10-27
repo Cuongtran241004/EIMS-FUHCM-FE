@@ -1,17 +1,13 @@
 import { UserContext } from "../../components/UserContext";
 import React, { useState, useEffect, useContext } from "react";
 import {
-  Dropdown,
   message,
   Button,
-  Space,
   Modal,
   Checkbox,
-  Skeleton,
   notification,
 } from "antd";
 import {
-  DownOutlined,
   ExclamationCircleOutlined,
   ReloadOutlined,
 } from "@ant-design/icons";
@@ -25,13 +21,13 @@ import "react-big-calendar/lib/css/react-big-calendar.css";
 import "./invigilatorRegistration.css";
 import { ConfigType } from "../../configs/enum";
 import { titleStyle } from "../../design-systems/CSS/Title";
+import "./calendar.css";
 const { confirm } = Modal;
 const localizer = momentLocalizer(moment);
 
 function InvigilatorRegistration() {
   const { user } = useContext(UserContext);
   const {
-    semesters = [],
     selectedSemester,
     setSelectedSemester,
     examSlotRegister,
@@ -47,7 +43,6 @@ function InvigilatorRegistration() {
   const [cancelModalVisible, setCancelModalVisible] = useState(false);
   const [selectedCancelSlots, setSelectedCancelSlots] = useState([]);
   const [isAllSelected, setIsAllSelected] = useState(false);
-  const [loading, setLoading] = useState(true);
   const [registerLoading, setRegisterLoading] = useState(false);
   const allowedSlots = getConfigValue(ConfigType.ALLOWED_SLOT) || 0;
   const [view, setView] = useState('month');
@@ -56,22 +51,11 @@ function InvigilatorRegistration() {
     setSelectedSemester(lastestSemester);
   }
   
-  const fetchAndSetData = async () => {
-    try {
-      setLoading(true);
-      await semesters;
-      await availableSlotsData;
-      setLoading(false);
-    } catch (error) {
-      setLoading(false);
-      message.error("Error fetching data.");
-    }
-  };
+  
   useEffect(() => {
     if (lastestSemester && availableSlotsData) {
       setSlots({ ...slots, examSlotId: [] });
       setEvents(availableSlotsData);
-      fetchAndSetData();
     }
   }, [lastestSemester, availableSlotsData]);
 
@@ -209,9 +193,7 @@ function InvigilatorRegistration() {
     </div>
   );
 
-  if (loading) {
-    return <Skeleton />;
-  } else {
+ 
     return (
       <div>
         <h2
@@ -255,6 +237,7 @@ function InvigilatorRegistration() {
             formats={{
               agendaDateFormat: (date) =>
                 moment(date).format('DD/MM/YYYY'),
+              timeGutterFormat: (date) => moment(date).format('HH:mm'),
             }}
             onSelectEvent={handleSelectEvent}
             eventPropGetter={(event) => {
@@ -467,6 +450,5 @@ function InvigilatorRegistration() {
       </div>
     );
   }
-}
 
 export default InvigilatorRegistration;

@@ -28,7 +28,10 @@ import { titleStyle } from "../../design-systems/CSS/Title.js";
 import { selectButtonStyle } from "../../design-systems/CSS/Button.js";
 import attendanceApi from "../../services/InvigilatorAttendance.js";
 import { managerMapperUtil } from "../../utils/Mapper/ManagerMapperUtil.jsx";
-import { examTypeTag } from "../../design-systems/CustomTag.jsx";
+import {
+  attendanceStatusTag,
+  examTypeTag,
+} from "../../design-systems/CustomTag.jsx";
 import "./AttendanceCheck.css";
 const { Content, Sider } = Layout;
 const AttendanceCheck = () => {
@@ -49,12 +52,16 @@ const AttendanceCheck = () => {
     try {
       const response =
         await attendanceApi.getExamSlotBySemesterIdManager(semesterId);
-
       const result = managerMapperUtil.mapExamSlotforAttendance(response);
+
+      // sort by startAt
+      result.sort((a, b) => new Date(a.startAt) - new Date(b.startAt));
+
       setExamSlots(result || []);
       setFilteredExamSlots(result || []);
     } catch (error) {
       // Handle error
+      message.error("Failed to fetch attendance data");
     } finally {
       setLoading(false);
     }
@@ -246,6 +253,7 @@ const AttendanceCheck = () => {
       render: (text, record) =>
         `${record.updatedByLastName} ${record.updatedByFirstName}`,
     },
+
     {
       title: "Action",
       dataIndex: "action",
@@ -334,7 +342,12 @@ const AttendanceCheck = () => {
         );
       },
     },
-
+    {
+      title: "Status",
+      dataIndex: "status",
+      key: "status",
+      render: (text, record) => attendanceStatusTag(record.status),
+    },
     {
       title: "Action",
       dataIndex: "action",

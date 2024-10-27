@@ -11,6 +11,7 @@ import {
   Button,
   Empty,
   DatePicker,
+  Modal,
 } from "antd";
 import moment from "moment";
 import examSlotApi from "../../services/ExamSlot.js";
@@ -31,6 +32,7 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import "./Dashboard.css";
+import examSlotRoomApi from "../../services/ExamSlotRoom.js";
 
 const { Content, Sider } = Layout;
 const { RangePicker } = DatePicker;
@@ -40,7 +42,9 @@ const Dashboard = () => {
   const [todayInvigilators, setTodayInvigilators] = useState([]);
   const [examSlotSummary, setExamSlotSummary] = useState([]);
   const [invigilationSummary, setInvigilationSummary] = useState([]);
-
+  const [todayRooms, setTodayRooms] = useState([]);
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [roomLoading, setRoomLoading] = useState(false);
   const fetchExamSlotToday = async () => {
     try {
       // Fetch exam slot today
@@ -67,6 +71,7 @@ const Dashboard = () => {
       setTodayInvigilators(uniqueResult || []);
     } catch (error) {}
   };
+
   const fetchExamSlotSummary = async (startTime, endTime) => {
     try {
       const response = await examSlotApi.getExamSlotsSummary(
@@ -108,6 +113,20 @@ const Dashboard = () => {
       setInvigilationSummary(combinedData || []);
     } catch (error) {}
   };
+
+  const fetchRoomTodayByExamSlotId = async (examSlotId) => {
+    setTodayRooms([]);
+    setRoomLoading(true);
+    try {
+      // Fetch exam slot today
+      const response =
+        await examSlotRoomApi.getRoomTodayByExamSlotId(examSlotId);
+      setTodayRooms(response || []);
+    } catch (error) {
+    } finally {
+      setRoomLoading(false);
+    }
+  };
   useEffect(() => {
     fetchExamSlotToday();
     fetchInvigilatorToday();
@@ -132,6 +151,11 @@ const Dashboard = () => {
       const endTime = selectedDates[1].endOf("day").toISOString();
       fetchInvigilationSummary(startTime, endTime);
     }
+  };
+
+  const handleTodayRoomDetails = (record) => {
+    fetchRoomTodayByExamSlotId(record.examSlotId);
+    setIsModalVisible(true);
   };
   const todayExamSlotColumns = [
     {
@@ -175,7 +199,11 @@ const Dashboard = () => {
       align: "center",
       render: (text, record) => {
         return (
-          <Button type="link" size="small">
+          <Button
+            type="link"
+            size="small"
+            onClick={() => handleTodayRoomDetails(record)}
+          >
             <EyeOutlined />
           </Button>
         );
@@ -359,6 +387,27 @@ const Dashboard = () => {
               </Col> */}
             </Row>
           </div>
+          <Modal
+            title="Today Rooms Details"
+            open={isModalVisible}
+            onCancel={() => setIsModalVisible(false)}
+            footer={[
+              <Button key="close" onClick={() => setIsModalVisible(false)}>
+                Close
+              </Button>,
+            ]}
+            loading={roomLoading}
+          >
+            {todayRooms.length > 0 ? (
+              todayRooms.map((room) => (
+                <span key={room} style={{ marginRight: "1em" }}>
+                  {room}
+                </span>
+              ))
+            ) : (
+              <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
+            )}
+          </Modal>
         </Content>
       </Layout>
     </Layout>

@@ -118,10 +118,13 @@ const managerMapperUtil = {
         updateBy: attendance.updateBy,
         checkIn: attendance.checkIn,
         checkOut: attendance.checkOut,
+        status: attendance.status,
       };
     });
   },
   mapAttendanceReport: (list) => {
+    // check list is an array or not,
+    if (!Array.isArray(list)) return [];
     return list.map((item) => {
       // detail is an array of attendance
       let attendance = [];
@@ -159,6 +162,8 @@ const managerMapperUtil = {
     });
   },
   mapTodayExamSlots: (examSlots) => {
+    // check examSlots is an array or not,
+    if (!Array.isArray(examSlots)) return [];
     return examSlots.map((examSlot) => {
       return {
         key: examSlot.id,
@@ -174,6 +179,8 @@ const managerMapperUtil = {
     });
   },
   mapTodayInvigilators: (invigilators) => {
+    // check invigilators is an array or not,
+    if (!Array.isArray(invigilators)) return [];
     return invigilators.map((invigilator) => {
       return {
         key: invigilator.id,
@@ -187,6 +194,8 @@ const managerMapperUtil = {
     });
   },
   mapExamSlotSummary: (examSlots) => {
+    // check examSlots is an array or not,
+    if (!Array.isArray(examSlots)) return [];
     return examSlots.map((examSlot) => {
       return {
         date: examSlot.date,
@@ -195,6 +204,8 @@ const managerMapperUtil = {
     });
   },
   mapInvigilatorSummary: (invigilators) => {
+    // check invigilators is an array or not,
+    if (!Array.isArray(invigilators)) return [];
     return invigilators.map((invigilator) => {
       return {
         subjectCode: invigilator.examSlot?.subjectExamDTO?.subjectCode,
