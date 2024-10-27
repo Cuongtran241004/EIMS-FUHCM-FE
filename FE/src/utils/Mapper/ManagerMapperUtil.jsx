@@ -183,6 +183,27 @@ const managerMapperUtil = {
       };
     });
   },
+  mapExamSlotSummary: (examSlots) => {
+    return examSlots.map((examSlot) => {
+      return {
+        date: examSlot.date,
+        total: examSlot.totalExamSlots,
+      };
+    });
+  },
+  mapInvigilatorSummary: (invigilators) => {
+    return invigilators.map((invigilator) => {
+      return {
+        subjectCode: invigilator.examSlot?.subjectExamDTO?.subjectCode,
+        subjectName: invigilator.examSlot?.subjectExamDTO?.subjectName,
+        examType: invigilator.examSlot?.subjectExamDTO?.examType,
+        registered: invigilator.totalInvigilatorsRegistered,
+        assigned: invigilator.totalInvigilatorsAssigned,
+        startAt: invigilator.startAt,
+        endAt: invigilator.endAt,
+      };
+    });
+  },
 };
 
 export { managerMapperUtil };

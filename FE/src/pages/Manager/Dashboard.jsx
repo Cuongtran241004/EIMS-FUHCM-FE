@@ -10,21 +10,25 @@ import {
   Table,
   Button,
   Empty,
+  DatePicker,
 } from "antd";
 import moment from "moment";
 import examSlotApi from "../../services/ExamSlot.js";
 import attendanceApi from "../../services/InvigilatorAttendance.js";
 import { managerMapperUtil } from "../../utils/Mapper/ManagerMapperUtil.jsx";
 import { examTypeTag } from "../../design-systems/CustomTag.jsx";
-import { EyeFilled, EyeOutlined } from "@ant-design/icons";
+import { EyeOutlined } from "@ant-design/icons";
 import "./Dashboard.css";
 
 const { Content, Sider } = Layout;
 const { Title } = Typography;
+const { RangePicker } = DatePicker;
 
 const Dashboard = () => {
   const [todayExamSlots, setTodayExamSlots] = useState([]);
   const [todayInvigilators, setTodayInvigilators] = useState([]);
+  const [examSlotSummary, setExamSlotSummary] = useState([]);
+  const [invigilatorSummary, setInvigilatorSummary] = useState([]);
 
   const fetchExamSlotToday = async () => {
     try {
@@ -52,10 +56,35 @@ const Dashboard = () => {
       setTodayInvigilators(uniqueResult || []);
     } catch (error) {}
   };
+  const fetchExamSlotSummary = async (startTime, endTime) => {
+    try {
+      const response = await examSlotApi.getExamSlotsSummary(
+        startTime,
+        endTime
+      );
+      const result = managerMapperUtil.mapExamSlotSummary(response);
+      setExamSlotSummary(result || []);
+    } catch (error) {}
+  };
 
+  const fetchInvigilatorSummary = async (startTime, endTime) => {
+    try {
+      const response = await examSlotApi.getInvigilatorsSummary(
+        startTime,
+        endTime
+      );
+      const result = managerMapperUtil.mapInvigilatorSummary(response);
+      setInvigilatorSummary(result || []);
+    } catch (error) {}
+  };
   useEffect(() => {
     fetchExamSlotToday();
     fetchInvigilatorToday();
+    // startAt and endAt is a week contains today
+    const startTime = moment().startOf("week").format("YYYY-MM-DD");
+    const endTime = moment().endOf("week").format("YYYY-MM-DD");
+    fetchExamSlotSummary(startTime, endTime);
+    fetchInvigilatorSummary(startTime, endTime);
   }, []);
 
   const todayExamSlotColumns = [
@@ -153,17 +182,7 @@ const Dashboard = () => {
                 span={12}
                 style={{ backgroundColor: "#f0f2f5", padding: "20px" }}
               >
-                {/* Content for the left part (70%) */}
-                <h2>Exam Slot Summary</h2>
-                <p>
-                  Thống kê có bao nhiêu exam slot diễn ra từ ngày A đến ngày B
-                </p>
-                <p>
-                  API nhận start date, end date, và trả về json dạng:{" "}
-                  {`{"date": "2021-09-01",
-                  "total_exam_slot": 10}`}{" "}
-                </p>
-                {/* Your content here */}
+                <RangePicker />
               </Col>
               <Col
                 span={12}
