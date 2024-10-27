@@ -131,7 +131,7 @@ const examSlotApi = {
   getInvigilatorsSummary: async (startTime, endTime) => {
     try {
       const response = await axios.get(
-        `${EXAM_SLOT_API_BASE_URL}/dashboard/invigilator-summary`,
+        `${EXAM_SLOT_API_BASE_URL}/dashboard/invigilation-summary`,
         {
           params: {
             startTime,

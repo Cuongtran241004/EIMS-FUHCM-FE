@@ -18,6 +18,18 @@ import attendanceApi from "../../services/InvigilatorAttendance.js";
 import { managerMapperUtil } from "../../utils/Mapper/ManagerMapperUtil.jsx";
 import { examTypeTag } from "../../design-systems/CustomTag.jsx";
 import { EyeOutlined } from "@ant-design/icons";
+import {
+  LineChart,
+  Line,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+} from "recharts";
 import "./Dashboard.css";
 
 const { Content, Sider } = Layout;
@@ -28,7 +40,7 @@ const Dashboard = () => {
   const [todayExamSlots, setTodayExamSlots] = useState([]);
   const [todayInvigilators, setTodayInvigilators] = useState([]);
   const [examSlotSummary, setExamSlotSummary] = useState([]);
-  const [invigilatorSummary, setInvigilatorSummary] = useState([]);
+  const [invigilationSummary, setInvigilationSummary] = useState([]);
 
   const fetchExamSlotToday = async () => {
     try {
@@ -63,30 +75,66 @@ const Dashboard = () => {
         endTime
       );
       const result = managerMapperUtil.mapExamSlotSummary(response);
+      // sort by date
+      result.sort((a, b) => {
+        return new Date(a.date) - new Date(b.date);
+      });
       setExamSlotSummary(result || []);
     } catch (error) {}
   };
 
-  const fetchInvigilatorSummary = async (startTime, endTime) => {
+  const fetchInvigilationSummary = async (startTime, endTime) => {
     try {
       const response = await examSlotApi.getInvigilatorsSummary(
         startTime,
         endTime
       );
       const result = managerMapperUtil.mapInvigilatorSummary(response);
-      setInvigilatorSummary(result || []);
+      // sort by startAt
+      result.sort((a, b) => {
+        return new Date(a.startAt) - new Date(b.startAt);
+      });
+      const combinedData = result.map((item) => {
+        return {
+          ...item,
+          exam_slot: `${item.subjectCode} - ${item.examType} 
+          (${moment(item.startAt).format(
+            "HH:MM"
+          )} - ${moment(item.endtAt).format("HH:MM")} ${moment(
+            item.startAt
+          ).format("DD/MM/YYYY")})`,
+        };
+      });
+      console.log(combinedData);
+      setInvigilationSummary(combinedData || []);
     } catch (error) {}
   };
   useEffect(() => {
     fetchExamSlotToday();
     fetchInvigilatorToday();
     // startAt and endAt is a week contains today
-    const startTime = moment().startOf("week").format("YYYY-MM-DD");
-    const endTime = moment().endOf("week").format("YYYY-MM-DD");
+    const startTime = moment().startOf("week").toISOString();
+    const endTime = moment().endOf("week").toISOString();
     fetchExamSlotSummary(startTime, endTime);
-    fetchInvigilatorSummary(startTime, endTime);
+    fetchInvigilationSummary(startTime, endTime);
   }, []);
 
+  const handleDateChangeExamSlots = (selectedDates) => {
+    console.log(selectedDates);
+    if (selectedDates && selectedDates.length === 2) {
+      const startTime = selectedDates[0].startOf("day").toISOString();
+      const endTime = selectedDates[1].endOf("day").toISOString();
+
+      fetchExamSlotSummary(startTime, endTime);
+    }
+  };
+  const handleDateChangeInvigilators = (selectedDates) => {
+    if (selectedDates && selectedDates.length === 2) {
+      const startTime = selectedDates[0].startOf("day").toISOString();
+      const endTime = selectedDates[1].endOf("day").toISOString();
+      fetchInvigilationSummary(startTime, endTime);
+    }
+  };
   const todayExamSlotColumns = [
     {
       title: "#",
@@ -168,6 +216,9 @@ const Dashboard = () => {
       width: "25%",
     },
   ];
+  const formatXAxis = (tickItem) => {
+    return moment(tickItem).format("DD/MM/YYYY");
+  };
   return (
     <Layout style={{ height: "100vh" }}>
       <Header />
@@ -180,14 +231,79 @@ const Dashboard = () => {
             <Row style={{ height: "100%" }}>
               <Col
                 span={12}
-                style={{ backgroundColor: "#f0f2f5", padding: "20px" }}
+                style={{ backgroundColor: "#f0f2f5", padding: "10px" }}
               >
-                <RangePicker />
+                <RangePicker
+                  onChange={handleDateChangeExamSlots}
+                  style={{ marginBottom: "5px" }}
+                  format={"DD/MM/YYYY"}
+                />
+                {examSlotSummary.length > 0 ? (
+                  <ResponsiveContainer width="100%" height={270}>
+                    <BarChart data={examSlotSummary}>
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis dataKey="date" tickFormatter={formatXAxis} />
+                      <YAxis dataKey="total" />
+                      <Tooltip />
+                      <Legend />
+                      <Bar dataKey="total" fill="#8884d8" />
+                      <text
+                        x="50%" // Adjust x position based on your chart width
+                        y={20} // Adjust y position for desired height from the top
+                        textAnchor="middle"
+                        dominantBaseline="middle"
+                        fontSize={14}
+                        fontWeight="bold"
+                      >
+                        Exam Slots Summary
+                      </text>
+                    </BarChart>
+                  </ResponsiveContainer>
+                ) : (
+                  <Empty />
+                )}
               </Col>
               <Col
                 span={12}
-                style={{ backgroundColor: "#e6f7ff", padding: "20px" }}
-              ></Col>
+                style={{ backgroundColor: "#e6f7ff", padding: "10px" }}
+              >
+                <RangePicker
+                  onChange={handleDateChangeInvigilators}
+                  style={{ marginBottom: "5px" }}
+                  format={"DD/MM/YYYY"}
+                />
+                <ResponsiveContainer width="100%" height={270}>
+                  <LineChart data={invigilationSummary}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="exam_slot" hide={true} />
+                    <YAxis />
+                    <Tooltip />
+                    <Legend />
+                    <Line
+                      type="monotone"
+                      dataKey="registered"
+                      stroke="#8884d8"
+                      name="Registered"
+                    />
+                    <Line
+                      type="monotone"
+                      dataKey="assigned"
+                      stroke="#82ca9d"
+                      name="Assigned"
+                    />
+                    <text
+                      x="50%" // Adjust x position based on your chart width
+                      y={20} // Adjust y position for desired height from the top
+                      textAnchor="middle"
+                      dominantBaseline="middle"
+                      fontSize={14}
+                      fontWeight="bold"
+                    >
+                      Invigilation Summary
+                    </text>
+                  </LineChart>
+                </ResponsiveContainer>
+              </Col>
             </Row>
           </div>
           <Divider style={{ margin: "5px 0" }} />
