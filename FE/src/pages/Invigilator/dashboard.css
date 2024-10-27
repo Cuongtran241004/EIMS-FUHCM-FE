@@ -70,11 +70,23 @@
 
 
 .table-assign td {
-  padding-left: 20px;
   text-align: center;
   font-weight: 600;
 }
 
 .table-assign th {
   font-weight: 600;
+}
+
+.table-assign {
+  border: 2px solid black;
+  border-collapse: collapse;
+}
+
+th, td {
+  padding: 10px;
+}
+
+.table-assign tr:nth-child(even) {
+  background-color: #d6eee0;
 }

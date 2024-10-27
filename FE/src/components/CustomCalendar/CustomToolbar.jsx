@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import moment from 'moment';
 import './CustomToolbar.css';
-import { DatePicker } from 'antd';
 
 function getWeeksInYear(year) {
     const weeks = [];
@@ -54,7 +53,7 @@ const CustomToolbar = (toolbar) => {
         setWeeks(getWeeksInYear(year));
         setMonths(getMonthInYear(year));
 
-        const today = moment();
+        const today = moment().startOf('day');
         const currentWeek = getWeeksInYear(year).findIndex(week => today.isBetween(week.start, week.end, null, '[]'));
         setSelectCurrentWeek(currentWeek);
         const currentMonth = getMonthInYear(year).findIndex(month => today.isSame(month, 'month'));
@@ -83,7 +82,7 @@ const CustomToolbar = (toolbar) => {
 
 
     const goToToday = () => {
-        const today = new Date();
+        const today = moment().startOf('day');
         toolbar.onNavigate('date', today);
         const currentWeek = weeks.findIndex(week => moment(today).isBetween(week.start, week.end, null, '[]'));
         const currentMonth = months.findIndex(month => moment(today).isSame(month, 'month'));
@@ -101,7 +100,7 @@ const CustomToolbar = (toolbar) => {
     };
 
     const handleWeekView = () => {
-        if (selectCurrentWeek !== null) {
+        if (selectCurrentWeek !== null ) {
             const selectedWeek = weeks[selectCurrentWeek];
             toolbar.onNavigate('date', selectedWeek.start);
         }
