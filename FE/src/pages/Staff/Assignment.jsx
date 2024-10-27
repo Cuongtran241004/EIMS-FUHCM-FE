@@ -50,10 +50,15 @@ const AssignmentInvigilator = () => {
       const mapResponse = staffMapperUtil.mapExamSlotWithStatus(response);
 
       const result = mapResponse.sort((a, b) => {
-        return (
-          moment(a.startAt).format("YYYYMMDDHHmm") -
-          moment(b.startAt).format("YYYYMMDDHHmm")
-        );
+        const statusPriority = { UNASSIGNED: 1, ASSIGNED: 2 };
+
+        // Compare status first
+        if (statusPriority[a.status] !== statusPriority[b.status]) {
+          return statusPriority[a.status] - statusPriority[b.status];
+        }
+
+        // If statuses are the same, compare by date
+        return moment(a.startAt).valueOf() - moment(b.startAt).valueOf();
       });
 
       setExamSchedule(result || []);
@@ -95,6 +100,7 @@ const AssignmentInvigilator = () => {
         message.error("Failed to assign invigilators.");
       } finally {
         setLoading(false);
+        fetchExamSchedule(selectedSemester.id);
       }
     } else {
       assignmentNotification();
@@ -188,11 +194,21 @@ const AssignmentInvigilator = () => {
       key: "roomName",
     },
     {
+      title: "FuId Room",
+      dataIndex: "roomFuId",
+      key: "roomFuId",
+    },
+    {
       title: "Room Invigilator",
       key: "roomInvigilator",
       render: (text, record) => (
         <span>{`${record.roomLastName} ${record.roomFirstName}`}</span>
       ),
+    },
+    {
+      title: "FuId Hall",
+      dataIndex: "hallFuId",
+      key: "hallFuId",
     },
     {
       title: "Hall Invigilator",

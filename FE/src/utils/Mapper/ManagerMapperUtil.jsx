@@ -200,7 +200,9 @@ const managerMapperUtil = {
         subjectCode: invigilator.examSlot?.subjectExamDTO?.subjectCode,
         subjectName: invigilator.examSlot?.subjectExamDTO?.subjectName,
         examType: invigilator.examSlot?.subjectExamDTO?.examType,
-        registered: invigilator.totalInvigilatorsRegistered,
+        registered:
+          invigilator.totalInvigilatorsRegistered +
+          invigilator.totalInvigilatorsAssigned,
         assigned: invigilator.totalInvigilatorsAssigned,
         startAt: invigilator.startAt,
         endAt: invigilator.endAt,
