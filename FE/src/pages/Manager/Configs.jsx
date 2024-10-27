@@ -143,12 +143,12 @@ const Configs = ({ isLogin }) => {
       align: "center",
       width: "15%",
     },
-    {
-      title: <strong>Lastest Update</strong>,
-      dataIndex: "update",
-      width: "15%",
-      align: "center",
-    },
+    // {
+    //   title: <strong>Lastest Update</strong>,
+    //   dataIndex: "update",
+    //   width: "15%",
+    //   align: "center",
+    // },
     {
       title: <strong>Action</strong>,
       dataIndex: "action",

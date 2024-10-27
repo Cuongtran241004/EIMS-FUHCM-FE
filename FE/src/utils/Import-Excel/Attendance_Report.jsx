@@ -26,7 +26,7 @@ const exportToExcel = (data) => {
   // Create a new workbook and add the data
   const worksheet = XLSX.utils.json_to_sheet(formattedData);
   const workbook = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(workbook, worksheet, "Exam Slots Report");
+  XLSX.utils.book_append_sheet(workbook, worksheet, "Invigilation Report");
 
   // Generate Excel file and trigger download
   const excelBuffer = XLSX.write(workbook, { bookType: "xlsx", type: "array" });
