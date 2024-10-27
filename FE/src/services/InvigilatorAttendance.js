@@ -206,7 +206,42 @@ const attendanceApi = {
       handleError(error);
     }
   },
-
+  updateAttendanceByManager: async (attendance) => {
+    try {
+      const response = await axios.put(
+        `${MANAGER_ATTENDANCE_API_BASE_URL}/update/${attendance.id}`,
+        attendance,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+          withCredentials: true,
+        }
+      );
+      return response.data;
+    } catch (error) {
+      handleError(error);
+    }
+  },
+  updateConfirmAttendanceByManager: async (examSlotId) => {
+    try {
+      const response = await axios.put(
+        `${MANAGER_ATTENDANCE_API_BASE_URL}/approve/${examSlotId}`,
+        {},
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+          withCredentials: true,
+        }
+      );
+      return response.data;
+    } catch (error) {
+      handleError(error);
+    }
+  },
   getAttendanceByExamSlotIdManager: async (examSlotId) => {
     try {
       const response = await axios.get(

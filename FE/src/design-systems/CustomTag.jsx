@@ -135,4 +135,36 @@ const assignmentTag = (status) => {
     </Tag>
   );
 };
-export { examScheduleTag, userRoleTag, examTypeTag, requestTag, assignmentTag };
+
+const requestTypeTag = (type) => {
+  let color = "";
+  let text = "";
+  // Define color based on the type value
+  switch (type) {
+    case "CANCEL":
+      color = "#6d6a75";
+      text = "Cancel";
+      break;
+    case "UPDATE_ATTENDANCE":
+      color = "#96897b";
+      text = "Attendance";
+      break;
+
+    default:
+      color = "red";
+  }
+
+  return (
+    <Tag color={color}>
+      <strong>{text}</strong>
+    </Tag>
+  );
+};
+export {
+  examScheduleTag,
+  userRoleTag,
+  examTypeTag,
+  requestTag,
+  assignmentTag,
+  requestTypeTag,
+};

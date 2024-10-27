@@ -26,7 +26,11 @@ import Header from "../../components/Header/Header.jsx";
 import { useSemester } from "../../components/Context/SemesterContext.jsx";
 import requestApi from "../../services/Request.js";
 import moment from "moment";
-import { examTypeTag, requestTag } from "../../design-systems/CustomTag.jsx";
+import {
+  examTypeTag,
+  requestTag,
+  requestTypeTag,
+} from "../../design-systems/CustomTag.jsx";
 import { managerMapperUtil } from "../../utils/Mapper/ManagerMapperUtil.jsx";
 import {
   buttonStyle,
@@ -463,8 +467,7 @@ const Request = () => {
       title: "Type",
       dataIndex: "requestType",
       key: "requestType",
-      render: (text, record) =>
-        record.requestType == "CANCEL" ? "Cancel" : "Attendance",
+      render: (text, record) => requestTypeTag(record.requestType),
     },
     {
       title: "Action",

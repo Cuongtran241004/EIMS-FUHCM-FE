@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Layout } from "antd";
+import { Layout, Popconfirm, message } from "antd";
 import NavBar_Manager from "../../components/NavBar/NavBar_Manager";
 import Header from "../../components/Header/Header.jsx";
 import {
@@ -39,6 +39,7 @@ const AttendanceCheck = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [editableRowId, setEditableRowId] = useState(null);
   const [filteredExamSlots, setFilteredExamSlots] = useState([]);
+  const [isEditing, setIsEditing] = useState(false);
   const { selectedSemester, setSelectedSemester, semesters } = useSemester(); // Access shared semester state
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 8;
@@ -153,16 +154,30 @@ const AttendanceCheck = () => {
 
   const handleSaveAttendance = async (record) => {
     try {
-      console.log(record);
-      // const response = await attendanceApi.updateAttendance(attendances);
-      // console.log(response);
+      const updateAttendance = {
+        id: record.id,
+        checkIn: record.checkIn ? true : false,
+        checkOut: record.checkOut ? true : false,
+      };
+      await attendanceApi.updateAttendanceByManager(updateAttendance);
+      message.success("Attendance updated successfully");
     } catch (error) {
       // Handle error
+      message.error("Failed to update attendance");
     } finally {
       setIsEditing(false);
     }
   };
-
+  const handleConfirmAttendance = async (record) => {
+    try {
+      console.log(record.examSlotId);
+      await attendanceApi.updateConfirmAttendanceByManager(record.examSlotId);
+      message.success("Attendance confirmed successfully");
+    } catch (error) {
+      // Handle error
+      message.error("Failed to confirm attendance");
+    }
+  };
   const columns = [
     {
       title: "No",
@@ -223,6 +238,7 @@ const AttendanceCheck = () => {
         </Button>
       ),
     },
+
     {
       title: "Action",
       dataIndex: "action",
@@ -230,9 +246,16 @@ const AttendanceCheck = () => {
       align: "center",
       render: (text, record) => (
         <Space size="middle">
-          <Button type="link" style={{ color: "#F3722C" }}>
-            Confirm
-          </Button>
+          <Popconfirm
+            title="Are you sure to confirm this attendance?"
+            onConfirm={() => handleConfirmAttendance(record)}
+            okText="Yes"
+            cancelText="No"
+          >
+            <Button type="link" style={{ color: "#F3722C" }}>
+              Confirm
+            </Button>
+          </Popconfirm>
         </Space>
       ),
     },
@@ -250,13 +273,15 @@ const AttendanceCheck = () => {
       title: "Invigilator Name",
       dataIndex: "invigilatorName",
       key: "invigilatorName",
+      width: "30%",
       render: (text, record) => `${record.lastName} ${record.firstName}`,
     },
-    {
-      title: "Email",
-      dataIndex: "email",
-      key: "email",
-    },
+    // {
+    //   title: "Email",
+    //   dataIndex: "email",
+    //   key: "email",
+    //   width: "30%",
+    // },
     {
       title: "Check In",
       dataIndex: "checkIn",
@@ -291,6 +316,7 @@ const AttendanceCheck = () => {
         if (record.checkOut !== null) {
           return (
             <Checkbox
+              style={{ margin: "0", padding: "0" }}
               checked={record.checkOut}
               disabled={editableRowId !== record.id} // Only allow editing if this row is being edited
               onChange={(e) => handleCheckOutChange(e, record)}
@@ -299,6 +325,7 @@ const AttendanceCheck = () => {
         }
         return (
           <Checkbox
+            style={{ margin: "0", padding: "0" }}
             disabled={editableRowId !== record.id} // Only allow editing if this row is being edited
             onChange={(e) => handleCheckOutChange(e, record)}
           />
@@ -311,6 +338,7 @@ const AttendanceCheck = () => {
       dataIndex: "action",
       key: "action",
       align: "center",
+      width: "10%",
       render: (text, record) => (
         <Button
           type="link"
@@ -401,7 +429,7 @@ const AttendanceCheck = () => {
         >
           <p>Check Attendance By: </p>
           <Table
-            className="custom-table-attendance"
+            className="custom-table-attendance-list"
             dataSource={attendances}
             columns={columnsAttendance}
             pagination={{ pageSize: 8 }}
