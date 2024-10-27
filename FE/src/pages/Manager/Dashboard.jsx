@@ -104,7 +104,7 @@ const Dashboard = () => {
           ).format("DD/MM/YYYY")})`,
         };
       });
-      console.log(combinedData);
+
       setInvigilationSummary(combinedData || []);
     } catch (error) {}
   };
@@ -112,14 +112,13 @@ const Dashboard = () => {
     fetchExamSlotToday();
     fetchInvigilatorToday();
     // startAt and endAt is a week contains today
-    const startTime = moment().startOf("week").toISOString();
-    const endTime = moment().endOf("week").toISOString();
+    const startTime = moment().startOf("month").toISOString();
+    const endTime = moment().endOf("month").toISOString();
     fetchExamSlotSummary(startTime, endTime);
     fetchInvigilationSummary(startTime, endTime);
   }, []);
 
   const handleDateChangeExamSlots = (selectedDates) => {
-    console.log(selectedDates);
     if (selectedDates && selectedDates.length === 2) {
       const startTime = selectedDates[0].startOf("day").toISOString();
       const endTime = selectedDates[1].endOf("day").toISOString();
@@ -230,15 +229,25 @@ const Dashboard = () => {
             <Row style={{ height: "100%" }}>
               <Col
                 span={12}
-                style={{ backgroundColor: "#f0f2f5", padding: "10px" }}
+                style={{ backgroundColor: "#f0f2f5", padding: "5px" }}
               >
                 <RangePicker
                   onChange={handleDateChangeExamSlots}
                   style={{ marginBottom: "5px" }}
                   format={"DD/MM/YYYY"}
+                  // a week contains today
+                  defaultValue={[
+                    moment().startOf("month"),
+                    moment().endOf("month"),
+                  ]}
                 />
                 {examSlotSummary.length > 0 ? (
-                  <ResponsiveContainer width="100%" height={270}>
+                  <ResponsiveContainer width="100%" height={250}>
+                    <p
+                      style={{ padding: "0", margin: "0", textAlign: "center" }}
+                    >
+                      <strong>Exam Slots Summary</strong>
+                    </p>
                     <BarChart data={examSlotSummary}>
                       <CartesianGrid strokeDasharray="3 3" />
                       <XAxis dataKey="date" tickFormatter={formatXAxis} />
@@ -246,16 +255,6 @@ const Dashboard = () => {
                       <Tooltip />
                       <Legend />
                       <Bar dataKey="total" fill="#8884d8" />
-                      <text
-                        x="50%" // Adjust x position based on your chart width
-                        y={20} // Adjust y position for desired height from the top
-                        textAnchor="middle"
-                        dominantBaseline="middle"
-                        fontSize={14}
-                        fontWeight="bold"
-                      >
-                        Exam Slots Summary
-                      </text>
                     </BarChart>
                   </ResponsiveContainer>
                 ) : (
@@ -264,15 +263,24 @@ const Dashboard = () => {
               </Col>
               <Col
                 span={12}
-                style={{ backgroundColor: "#e6f7ff", padding: "10px" }}
+                style={{ backgroundColor: "#e6f7ff", padding: "5px" }}
               >
                 <RangePicker
                   onChange={handleDateChangeInvigilators}
                   style={{ marginBottom: "5px" }}
                   format={"DD/MM/YYYY"}
+                  defaultValue={[
+                    moment().startOf("month"),
+                    moment().endOf("month"),
+                  ]}
                 />
                 {invigilationSummary.length > 0 ? (
-                  <ResponsiveContainer width="100%" height={270}>
+                  <ResponsiveContainer width="100%" height={250}>
+                    <p
+                      style={{ padding: "0", margin: "0", textAlign: "center" }}
+                    >
+                      <strong> Invigilation Summary</strong>
+                    </p>
                     <LineChart data={invigilationSummary}>
                       <CartesianGrid strokeDasharray="3 3" />
                       <XAxis dataKey="exam_slot" hide={true} />
@@ -291,16 +299,6 @@ const Dashboard = () => {
                         stroke="#82ca9d"
                         name="Assigned"
                       />
-                      <text
-                        x="50%" // Adjust x position based on your chart width
-                        y={20} // Adjust y position for desired height from the top
-                        textAnchor="middle"
-                        dominantBaseline="middle"
-                        fontSize={14}
-                        fontWeight="bold"
-                      >
-                        Invigilation Summary
-                      </text>
                     </LineChart>
                   </ResponsiveContainer>
                 ) : (
