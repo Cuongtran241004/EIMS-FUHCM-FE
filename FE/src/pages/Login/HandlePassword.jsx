@@ -3,7 +3,7 @@ import { Input, Form, Button, message } from "antd";
 import { ENTER_PASSWORD } from "../../configs/messages";
 import "./HandlePassword.css";
 import { postHandlePassword } from "../../components/API/postHandlePassword";
-import Header from "../../components/Header/Header";
+import Header from "../../components/Header/Header.jsx";
 
 function HandlePassword() {
   const [form] = Form.useForm();
@@ -19,7 +19,7 @@ function HandlePassword() {
 
     const success = postHandlePassword(data);
     if (success) {
-      window.location.href = "/login";
+      window.location.href = "/";
     } else {
       message.error("Error setting password.");
       setLoading(false);
@@ -38,8 +38,9 @@ function HandlePassword() {
   };
 
   return (
+    <div>
+        <Header />
     <div className="password-container">
-      <Header />
       <h2>Set Your Password</h2>
       <Form
         form={form}
@@ -92,6 +93,7 @@ function HandlePassword() {
           </Button>
         </Form.Item>
       </Form>
+    </div>
     </div>
   );
 }

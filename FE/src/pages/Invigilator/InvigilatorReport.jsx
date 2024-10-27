@@ -19,7 +19,7 @@ const InvigilatorReport = () => {
     const [slotData, setSlotData] = useState([]);
     const [feeData, setFeeData] = useState([]);
     const [loading, setLoading] = useState(false);
-    const formatNumber  = new Intl.NumberFormat('en-US');
+    const formatNumber  = new Intl.NumberFormat('vi-VN');
 
 
     useEffect(() => {
@@ -154,11 +154,11 @@ const InvigilatorReport = () => {
                             <h3 style={{ display: 'flex', justifyContent: 'center', marginBottom: 70 }}>Amount Summary</h3>
                             <div style={{ border: '2px solid #f0f0f0', padding: '30px', borderRadius: '8px' }}>
                                 <div>
-                                    <strong>Total hours:</strong> {feeData.totalHours || 0} hours
+                                    <strong>Total hours:</strong> {feeData.totalHours || 0} hour(s)
                                 </div>
                                 <br />
                                 <div>
-                                    <strong>Hour rate:</strong> {formatNumber.format(feeData.hourlyRate)} / hour
+                                    <strong>Hour rate:</strong> {formatNumber.format(feeData.hourlyRate)} VND/hour
                                 </div>
                                 <br />
                                 <div>
