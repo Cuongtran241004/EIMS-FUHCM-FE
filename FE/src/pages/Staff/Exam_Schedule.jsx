@@ -14,6 +14,7 @@ import {
   Spin,
   notification,
   Input,
+  Radio,
 } from "antd";
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
@@ -54,6 +55,12 @@ const { Option } = Select;
 const { Content } = Layout;
 const PAGE_SIZE = 6;
 
+const examSlotStatus = [
+  "NEEDS_ROOM_ASSIGNMENT",
+  "PENDING",
+  "APPROVED",
+  "REJECTED",
+];
 const Exam_Schedule = () => {
   const [form] = Form.useForm();
   const [examSchedule, setExamSchedule] = useState([]);
@@ -73,6 +80,10 @@ const Exam_Schedule = () => {
   const [totalItems, setTotalItems] = useState(1);
   const [examId, setExamId] = useState(null);
   const [loadingSubmit, setLoadingSubmit] = useState(false);
+  const [selectedExamSlotStatus, setSelectedExamSlotStatus] = useState(
+    "NEEDS_ROOM_ASSIGNMENT"
+  );
+  const [filteredExamSlotByStatus, setFilteredExamSlotByStatus] = useState([]);
   const navigate = useNavigate();
 
   const fetchExamSchedule = async (semesterId, page) => {
@@ -90,8 +101,10 @@ const Exam_Schedule = () => {
           moment(a.startAt).format("YYYYMMDDHHmm")
         );
       });
+
       setExamSchedule(result || []);
       setFilteredExamSchedule(result || []);
+      setFilteredExamSlotByStatus(result || []);
       setTotalItems(result.length || 0);
     } catch (error) {
       console.error("Error fetching exam schedule:", error); // Log the error
@@ -128,12 +141,20 @@ const Exam_Schedule = () => {
 
   const handleSearch = (event) => {
     const { value } = event.target;
-    const filtered = examSchedule.filter(
-      (subject) =>
-        `${subject.subjectCode}`.toLowerCase().includes(value.toLowerCase()) ||
-        `${subject.subjectName}`.toLowerCase().includes(value.toLowerCase())
-    );
-    setFilteredExamSchedule(filtered); // Update the filtered data displayed in the table
+    if (value) {
+      const filtered = examSchedule.filter(
+        (subject) =>
+          `${subject.subjectCode}`
+            .toLowerCase()
+            .includes(value.toLowerCase()) ||
+          `${subject.subjectName}`.toLowerCase().includes(value.toLowerCase())
+      );
+      setFilteredExamSchedule(filtered); // Update the filtered data displayed in the table
+      setFilteredExamSlotByStatus(filtered);
+    } else {
+      setFilteredExamSchedule(examSchedule);
+      setFilteredExamSlotByStatus(filteredExamSlotByStatus);
+    }
   };
 
   const handleExamSearch = (value) => {
@@ -281,6 +302,36 @@ const Exam_Schedule = () => {
       fetchExams(selectedSemesterForm.id); // Fetch subjects for the selected semester
     }
   };
+  const renderExamStatus = (status) => {
+    switch (status) {
+      case "NEEDS_ROOM_ASSIGNMENT":
+        return "Needs room";
+      case "PENDING":
+        return "Pending";
+      case "APPROVED":
+        return "Approved";
+      case "REJECTED":
+        return "Rejected";
+      default:
+        return "Unknown";
+    }
+  };
+  const handleExamSlotStatusChange = (status) => {
+    setSelectedExamSlotStatus(status);
+  };
+
+  useEffect(() => {
+    if (selectedExamSlotStatus) {
+      setFilteredExamSlotByStatus(
+        filteredExamSchedule.filter(
+          (examSlot) => examSlot.status === selectedExamSlotStatus
+        )
+      );
+    } else {
+      // Show all requests if no type is selected
+      setFilteredExamSlotByStatus(filteredExamSchedule);
+    }
+  }, [selectedExamSlotStatus, examSchedule]);
 
   const validateTime = (rule, value) => {
     const startTime = form.getFieldValue("startTime");
@@ -468,11 +519,21 @@ const Exam_Schedule = () => {
                 marginBottom: "10px",
               }}
             />
+            <Radio.Group
+              onChange={(e) => handleExamSlotStatusChange(e.target.value)}
+              style={{ marginBottom: "10px", marginLeft: "10px" }}
+            >
+              {examSlotStatus.map((type) => (
+                <Radio.Button key={type} value={type}>
+                  {renderExamStatus(type)}
+                </Radio.Button>
+              ))}
+            </Radio.Group>
           </div>
           <Spin spinning={loading}>
             <Table
               className="custom-table-exam-schedule"
-              dataSource={filteredExamSchedule}
+              dataSource={filteredExamSlotByStatus}
               columns={examScheduleTable(
                 handleRoomClick,
                 handleEdit,
