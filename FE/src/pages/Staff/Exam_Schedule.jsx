@@ -351,10 +351,6 @@ const Exam_Schedule = () => {
 
   const handleChooseExam = (value) => {
     setExamId(value);
-    console.log("Selected exam:", value);
-    // Reset time fields when a new exam is selected
-    setStartTime(null);
-    setEndTime(null);
   };
   return (
     <Layout style={{ height: "100vh" }}>
