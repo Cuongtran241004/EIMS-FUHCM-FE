@@ -1,13 +1,14 @@
 import * as XLSX from "xlsx";
 import { Button } from "antd";
 import { saveAs } from "file-saver";
+import { DownloadOutlined } from "@ant-design/icons";
 
 const exportToExcel = (data) => {
   // Flatten the data to have each exam slot on a new row
   const formattedData = data.flatMap((invigilator) =>
     invigilator.detail.map((detail) => ({
       "Invigilator ID": invigilator.fuId,
-      Name: `${invigilator.firstName} ${invigilator.lastName}`,
+      Name: `${invigilator.lastName} ${invigilator.firstName}`,
       Email: invigilator.email,
       Phone: invigilator.phone,
       "Total Exam Slots": invigilator.totalSlots,
@@ -46,6 +47,7 @@ const ReportExportButton = ({ data }) => (
     style={{ float: "right", backgroundColor: "#F9844A", color: "white" }}
     onClick={() => exportToExcel(data)}
   >
+    <DownloadOutlined />
     Export Report
   </Button>
 );
