@@ -33,7 +33,6 @@ import {
 import "./Dashboard.css";
 
 const { Content, Sider } = Layout;
-const { Title } = Typography;
 const { RangePicker } = DatePicker;
 
 const Dashboard = () => {
