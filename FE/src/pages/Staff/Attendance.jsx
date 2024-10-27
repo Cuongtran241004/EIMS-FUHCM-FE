@@ -13,6 +13,7 @@ import {
   Calendar,
   theme,
   Modal,
+  Input,
 } from "antd";
 import examSlotApi from "../../services/ExamSlot.js";
 import { useSemester } from "../../components/Context/SemesterContext.jsx";
@@ -22,6 +23,7 @@ import {
   DownOutlined,
   ForwardOutlined,
   ReloadOutlined,
+  SearchOutlined,
 } from "@ant-design/icons";
 import "./CustomModal.css";
 const { Content, Sider } = Layout;
@@ -39,6 +41,7 @@ import {
 } from "../../design-systems/CustomNotification.jsx";
 const Attendance = () => {
   const [data, setData] = useState([]);
+  const [filteredData, setFilteredData] = useState([]);
   const [loadingData, setLoadingData] = useState(false);
   const [loading, setLoading] = useState(false);
   const [saveLoading, setSaveLoading] = useState(false);
@@ -72,6 +75,7 @@ const Attendance = () => {
       const response = await attendanceApi.getExamSlotByDate(date);
       const result = staffMapperUtil.mapExamSchedule(response);
       setData(result || []);
+      setFilteredData(result || []);
     } catch (error) {
       message.error("Failed to fetch exam schedule");
     } finally {
@@ -228,6 +232,13 @@ const Attendance = () => {
       setCheckAll(newSelected.length === attendance.length);
       return newSelected;
     });
+  };
+  const handleSearch = (event) => {
+    const { value } = event.target;
+    const filtered = data.filter((subject) =>
+      `${subject.subjectCode}`.toLowerCase().includes(value.toLowerCase())
+    );
+    setFilteredData(filtered); // Update the filtered data displayed in the table
   };
   // Define columns for the Table
   const columns = [
@@ -464,11 +475,23 @@ const Attendance = () => {
                 </Space>
               </Button>
             </Dropdown>
+
+            <Input
+              placeholder="Search by Code"
+              onChange={handleSearch}
+              allowClear
+              suffix={<SearchOutlined style={{ color: "rgba(0,0,0,.45)" }} />}
+              style={{
+                width: 250,
+                marginLeft: "20px",
+                marginBottom: "10px",
+              }}
+            />
           </div>
 
           <Spin spinning={loadingData}>
             <Table
-              dataSource={data}
+              dataSource={filteredData}
               columns={columns}
               rowKey={(record) => record.id}
               pagination={{

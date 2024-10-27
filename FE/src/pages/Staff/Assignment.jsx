@@ -5,7 +5,7 @@ import {
   message,
   Table,
   Spin,
-  Space,
+  Input,
   Dropdown,
   Modal,
 } from "antd";
@@ -13,7 +13,11 @@ import {
   titleAssignmentStyle,
   titleStyle,
 } from "../../design-systems/CSS/Title";
-import { PlusCircleOutlined, DownOutlined } from "@ant-design/icons";
+import {
+  PlusCircleOutlined,
+  DownOutlined,
+  SearchOutlined,
+} from "@ant-design/icons";
 import invigilatorAssignmentApi from "../../services/InvigilatorAssignment";
 import examSlotApi from "../../services/ExamSlot";
 import { staffMapperUtil } from "../../utils/Mapper/StaffMapperUtil";
@@ -29,6 +33,7 @@ const { Content } = Layout;
 
 const AssignmentInvigilator = () => {
   const [examSchedule, setExamSchedule] = useState([]);
+  const [filteredExamSchedule, setFilteredExamSchedule] = useState([]);
   const [loading, setLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedAssignment, setSelectedAssignment] = useState([]);
@@ -42,7 +47,6 @@ const AssignmentInvigilator = () => {
       const response =
         await invigilatorAssignmentApi.getExamSlotWithStatus(semesterId);
 
-      console.log(response);
       const mapResponse = staffMapperUtil.mapExamSlotWithStatus(response);
 
       const result = mapResponse.sort((a, b) => {
@@ -53,6 +57,7 @@ const AssignmentInvigilator = () => {
       });
 
       setExamSchedule(result || []);
+      setFilteredExamSchedule(result || []);
     } catch (error) {
       console.error("Error fetching exam schedule:", error);
       message.error(FETCH_EXAM_SCHEDULE_FAILED);
@@ -94,6 +99,13 @@ const AssignmentInvigilator = () => {
     } else {
       assignmentNotification();
     }
+  };
+  const handleSearch = (event) => {
+    const { value } = event.target;
+    const filtered = examSchedule.filter((subject) =>
+      `${subject.subjectCode}`.toLowerCase().includes(value.toLowerCase())
+    );
+    setFilteredExamSchedule(filtered); // Update the filtered data displayed in the table
   };
 
   const handleMenuClick = (e) => {
@@ -214,9 +226,20 @@ const AssignmentInvigilator = () => {
                 <DownOutlined />
               </Button>
             </Dropdown>
+            <Input
+              placeholder="Search by Code"
+              onChange={handleSearch}
+              allowClear
+              suffix={<SearchOutlined style={{ color: "rgba(0,0,0,.45)" }} />}
+              style={{
+                width: 250,
+                marginLeft: "20px",
+                marginBottom: "10px",
+              }}
+            />
             <Table
               columns={columns}
-              dataSource={examSchedule}
+              dataSource={filteredExamSchedule}
               pagination={{
                 pageSize: pageSize,
                 current: currentPage,
