@@ -83,10 +83,10 @@ const ExamSlots = () => {
   };
 
   const handleConfirmSlots = async () => {
-    // if (!selectedAction) {
-    //   message.error("Please select an action (Approve or Reject)");
-    //   return;
-    // }
+    if (!selectedAction) {
+      message.error("Please select an action (Approve or Reject)");
+      return;
+    }
 
     const status = selectedAction === "approve" ? "APPROVED" : "REJECTED";
     confirm({
