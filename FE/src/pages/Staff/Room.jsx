@@ -63,6 +63,7 @@ const RoomSelectionPage = () => {
     try {
       const response = await examSlotApi.getUsingRoom(examSlotId);
       setUsingRoom(response || []);
+
       if (response.length > 0) {
         setSelectedRooms(response.flat()); // Flatten the response array
         setGroupedRooms(response); // Directly set grouped rooms
@@ -82,16 +83,21 @@ const RoomSelectionPage = () => {
         examSlot.startAt,
         examSlot.endAt
       );
-      // Get the IDs of rooms being used
-      const usingRoomIds = usingRoom.flat().map((room) => String(room.id)); // Convert usingRoom IDs to strings
-      // Filter unavailable rooms to exclude rooms that are already being used
-      const result = resUnRooms.filter(
-        (unRoom) => !usingRoomIds.includes(String(unRoom)) // Convert unRoom to string
-      );
 
-      setUnavailableRooms(result || []);
+      // Get the IDs of rooms being used
+      if (usingRoom.length > 0) {
+        const usingRoomIds = usingRoom.flat().map((room) => String(room.id));
+
+        // Filter unavailable rooms to exclude rooms that are already being used
+        const result = resUnRooms.filter(
+          (unRoom) => !usingRoomIds.includes(String(unRoom)) // Convert unRoom to string
+        );
+
+        setUnavailableRooms(result || []);
+      } else {
+        setUnavailableRooms(resUnRooms || []);
+      }
     } catch (error) {
-      console.log("Error fetching unavailable rooms:", error);
       message.error("Failed to fetch unavailable rooms");
     }
   };
@@ -111,7 +117,7 @@ const RoomSelectionPage = () => {
 
   useEffect(() => {
     fetchUnavailableRooms();
-  }, [usingRoom]);
+  }, [usingRoom, examSlot]);
 
   // Additional logic for visualizing the groups
 
@@ -187,8 +193,6 @@ const RoomSelectionPage = () => {
   };
 
   const handleSave = async () => {
-    console.log("Selected Rooms:", selectedRooms);
-    console.log("Grouped Rooms:", groupedRooms);
     setLoadingSubmit(true);
     try {
       // eliminate groupedRooms with length = 0
@@ -217,7 +221,7 @@ const RoomSelectionPage = () => {
       message.success("Rooms grouped successfully");
       // return history to previous page
       window.history.back();
-      console.log("Grouped Rooms:", data);
+
       // You can also implement additional save logic here if needed
     } catch (error) {
       message.error("Failed to group rooms");
