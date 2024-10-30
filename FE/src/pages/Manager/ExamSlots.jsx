@@ -1,4 +1,4 @@
-import React, { useState, useContext, useCallback } from "react";
+import React, { useState, useContext, useCallback, useEffect } from "react";
 import {
   Dropdown,
   Modal,
@@ -43,8 +43,9 @@ const ExamSlots = () => {
   const [pendingSlots, setPendingSlots] = useState([]);
   const [checkedSlots, setCheckedSlots] = useState([]);
   const [modalState, setModalState] = useState({ show: false, action: "" });
-  const [selectedAction, setSelectedAction] = useState("");
+  const [status, setStatus] = useState("");
   const [view, setView] = useState('month');
+  const [count, setCount] = useState(0);
 
 
 
@@ -81,40 +82,42 @@ const ExamSlots = () => {
         : [...prev, slotId]
     );
   };
-
+  
+  useEffect(() => {
   const handleConfirmSlots = async () => {
-    if (!selectedAction) {
-      message.error("Please select an action (Approve or Reject)");
+    if (!status) {
       return;
     }
-
-    const status = selectedAction === "approve" ? "APPROVED" : "REJECTED";
-    confirm({
-      title: `Do you want to ${status.toLowerCase()} these slots?`,
-      icon: <ExclamationCircleOutlined />,
-      onOk: async () => {
-        const updatedSlots = checkedSlots.map((slot) => ({
-          subjectExamId: slot.id,
-          startAt: slot.startAt,
-          endAt: slot.endAt,
-          requiredInvigilators: slot.requiredInvigilators,
-          status,
-        }));
-
-        try {
-          const success = await examSlotApi.updateExamSlotByManager(updatedSlots);
-          if (success) {
-            message.success(`${status} successfully!`);
-            setCheckedSlots([]);
-            setModalState({ show: false, action: "" });
+      confirm({
+        title: `Do you want to ${status.toLowerCase()} these slots?`,
+        icon: <ExclamationCircleOutlined />,
+        onOk: async () => {
+          const updatedSlots = checkedSlots.map((slot) => ({
+            subjectExamId: slot.id,
+            startAt: slot.startAt,
+            endAt: slot.endAt,
+            requiredInvigilators: slot.requiredInvigilators,
+            status,
+          }));
+          try {
+            const success = await examSlotApi.updateExamSlotByManager(updatedSlots);
+            if (success && updatedSlots.length > 0) {
+              message.success(`${status} successfully!`);
+              setCheckedSlots([]);
+              setModalState({ show: false, action: "" });
+            } else {
+              message.error(`Exam slots must be selected at least one!`);
+            }
+          } catch (error) {
+            message.error(`${status.toLowerCase()} unsuccessfully!`);
+            console.error(error);
           }
-        } catch (error) {
-          message.error(`There was an error ${status.toLowerCase()} the slots!`);
-          console.error(error);
-        }
-      },
-    });
-  };
+        },
+      });
+    };
+    handleConfirmSlots();
+  }, [count]);
+  
 
   const openModalForAction = () => {
     const pending = examSlotBySemester.filter((slot) => slot.status === "PENDING");
@@ -182,7 +185,7 @@ const ExamSlots = () => {
 
 
   return (
-    <Layout style={{ height: "100vh", overflowY: 'hidden'}}>
+    <Layout style={{ height: "100vh", overflowY: 'hidden' }}>
       <Header />
       <Layout>
         <Sider width={256} style={{ backgroundColor: "#4D908E" }}>
@@ -245,7 +248,8 @@ const ExamSlots = () => {
                 >
                   {selectedEvent && (
                     <div>
-                      <tb>
+                      <table>
+                        <tbody>
                         <tr><th className="table-head"><strong>Date:</strong></th><td>{moment(selectedEvent.startAt).format("DD/MM/YYYY")}</td></tr>
                         <tr><th className="table-head"><strong>Time:</strong></th><td>{moment(selectedEvent.startAt).format("HH:MM")} -{" "} {moment(selectedEvent.endAt).format("HH:MM")}</td></tr>
                         <tr><th className="table-head"><strong>Subject:</strong></th><td>{selectedEvent.subjectExamDTO.subjectName} ({selectedEvent.subjectExamDTO.subjectCode})</td></tr>
@@ -253,7 +257,8 @@ const ExamSlots = () => {
                         <tr><th className="table-head"><strong>Status:</strong></th><td>{requestTag(selectedEvent.status)}</td></tr>
                         <tr><th className="table-head"><strong>Exam Type:</strong></th><td>{selectedEvent.subjectExamDTO.examType}</td></tr>
                         <tr><th className="table-head"><strong>Duration:</strong></th><td>{selectedEvent.subjectExamDTO.duration} minutes</td></tr>
-                      </tb>
+                        </tbody>
+                      </table>
                     </div>
                   )}
                 </Modal>
@@ -300,8 +305,8 @@ const ExamSlots = () => {
               type="primary"
               style={{ backgroundColor: "#52c41a", borderColor: "#52c41a" }}
               onClick={() => {
-                setSelectedAction("approve");
-                handleConfirmSlots();
+                setStatus("APPROVED");
+                setCount(count + 1);
               }}
             >
               Approve
@@ -311,8 +316,8 @@ const ExamSlots = () => {
               type="primary"
               style={{ backgroundColor: "#d9363e", borderColor: "#d9363e" }}
               onClick={() => {
-                setSelectedAction("reject");
-                handleConfirmSlots();
+                setStatus("REJECTED");
+                setCount(count + 1);
               }}
             >
               Reject

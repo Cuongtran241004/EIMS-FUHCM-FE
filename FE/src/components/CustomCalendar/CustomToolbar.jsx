@@ -49,6 +49,7 @@ const CustomToolbar = (toolbar) => {
     const [weeks, setWeeks] = useState([]);
     const [months, setMonths] = useState([]);
     const [days, setDays] = useState([]);
+    const [year, setYear] = useState(new Date().getFullYear());
     const [selectCurrentWeek, setSelectCurrentWeek] = useState("");
     const [selectCurrentMonth, setSelectCurrentMonth] = useState("");
     const [selectCurrentDay, setSelectCurrentDay] = useState("");
@@ -59,23 +60,43 @@ const CustomToolbar = (toolbar) => {
     }, [toolbar.view]);
 
     useEffect(() => {
-        const year = new Date().getFullYear();
-        setWeeks(getWeeksInYear(year));
-        setMonths(getMonthInYear(year));
-        setDays(getDayInYear(year));
+        const updateYearSlect = (year) => {
+            setWeeks(getWeeksInYear(year));
+            setMonths(getMonthInYear(year));
+            setDays(getDayInYear(year));
 
-        const today = moment().startOf('day');
-        const currentWeek = getWeeksInYear(year).findIndex(week => today.isBetween(week.start, week.end, null, '[]'));
-        setSelectCurrentWeek(currentWeek);
-        const currentMonth = getMonthInYear(year).findIndex(month => today.isSame(month, 'month'));
-        setSelectCurrentMonth(currentMonth);
-        const currentDay = getDayInYear(year).findIndex(day => today.isSame(day, 'day'));
-        setSelectCurrentDay(currentDay);
+            const today = moment().startOf('day');
+            const currentWeek = getWeeksInYear(year).findIndex(week => today.isBetween(week.start, week.end, null, '[]'));
+            setSelectCurrentWeek(currentWeek);
+            const currentMonth = getMonthInYear(year).findIndex(month => today.isSame(month, 'month'));
+            setSelectCurrentMonth(currentMonth);
+            const currentDay = getDayInYear(year).findIndex(day => today.isSame(day, 'day'));
+            setSelectCurrentDay(currentDay);
+            toolbar.onNavigate('date', today.toDate());
+            if (year !== new Date().getFullYear()) {
+                const newWeeks = getWeeksInYear(year);
+                const newMonths = getMonthInYear(year);
+                const newDays = getDayInYear(year);
 
-    }, []);
+                setWeeks(newWeeks);
+                setMonths(newMonths);
+                setDays(newDays);
+                setSelectCurrentWeek(0);
+                setSelectCurrentMonth(0);
+                setSelectCurrentDay(0);
+                toolbar.onNavigate('date', newWeeks[0].start);
+            }
+        }
+        updateYearSlect(year);
+    }, [year]);
+
+    const handleYearSelect = (e) => {
+        const selectedYear = parseInt(e.target.value, 10);
+        setYear(selectedYear);
+    };
 
     const handleWeekSelect = (e) => {
-        const selectedWeekIndex = e.target.value;
+        const selectedWeekIndex = parseInt(e.target.value, 10);
         const selectedWeek = weeks[selectedWeekIndex];
 
         if (selectedWeek) {
@@ -85,7 +106,7 @@ const CustomToolbar = (toolbar) => {
     };
 
     const handleMonthSelect = (e) => {
-        const selectedMonthIndex = e.target.value;
+        const selectedMonthIndex = parseInt(e.target.value, 10);
         const selectedMonth = months[selectedMonthIndex];
 
         if (selectedMonth) {
@@ -96,21 +117,21 @@ const CustomToolbar = (toolbar) => {
 
     const goToToday = () => {
         const today = moment().startOf('day');
-        toolbar.onNavigate('date', today);
-        const currentWeek = weeks.findIndex(week => moment(today).isBetween(week.start, week.end, null, '[]'));
-        const currentMonth = months.findIndex(month => moment(today).isSame(month, 'month'));
-        const currentDay = days.findIndex(day => moment(today).isSame(day, 'day'));
+        const currentWeek = weeks.findIndex(week => today.isBetween(week.start, week.end, null, '[]'));
+        const currentMonth = months.findIndex(month => today.isSame(month, 'month'));
+        const currentYear = today.year();
+    
         if (currentWeek !== -1) {
             const selectedWeek = weeks[currentWeek];
             toolbar.onNavigate('date', selectedWeek.start);
+            setSelectCurrentWeek(currentWeek);
+        } else {
+            toolbar.onNavigate('date', today);
         }
-        if (currentDay !== -1) {
-            toolbar.onNavigate('date', today.toDate());
-            setSelectCurrentMonth(currentMonth);
-        }
-        setSelectCurrentWeek(currentWeek);
         setSelectCurrentMonth(currentMonth);
-    }
+        setYear(currentYear);
+    };
+    
 
     const label = () => {
         const date = toolbar.date;
@@ -118,7 +139,7 @@ const CustomToolbar = (toolbar) => {
     };
 
     const handleWeekView = () => {
-        if (selectCurrentWeek !== null) {
+        if (selectCurrentWeek !== null && selectCurrentWeek >= 0 && selectCurrentWeek < weeks.length) {
             const selectedWeek = weeks[selectCurrentWeek];
             toolbar.onNavigate('date', selectedWeek.start);
         }
@@ -153,6 +174,14 @@ const CustomToolbar = (toolbar) => {
                             </option>
                         ))}
                 </select>
+                <select value={year} onChange={handleYearSelect}>
+                    {[new Date().getFullYear() - 1, new Date().getFullYear(), new Date().getFullYear() + 1].map((year) => (
+                        <option key={year} value={year}>
+                            {year}
+                        </option>
+                    ))}
+                </select>
+
             </div>
             <span>{label()}</span>
             <div>
