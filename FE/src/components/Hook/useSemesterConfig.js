@@ -7,6 +7,7 @@ export function useSemesterConfig(semesterId) {
 
   useEffect(() => {
     const fetchSemesterConfig = async () => {
+      if(!semesterId) return;
       try {
         const response = await getSemesterConfig(semesterId);
         setSemesterConfig(response);

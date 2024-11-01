@@ -3,13 +3,14 @@ import { Calendar, Dropdown, Modal, Button, Space } from "antd";
 import { DownOutlined } from "@ant-design/icons";
 import moment from "moment";
 import "react-big-calendar/lib/css/react-big-calendar.css";
-import { Calendar as BigCalendar, momentLocalizer } from "react-big-calendar";
+import { Calendar as BigCalendar, momentLocalizer, Views } from "react-big-calendar";
 import CustomToolbar from "../../components/CustomCalendar/CustomToolbar";
 import { ConfigType } from "../../configs/enum";
 import { useSemester } from "../../components/SemesterContext";
 import "./dashboard.css";
 import { selectButtonStyle } from "../../design-systems/CSS/Button";
 import { titleStyle } from "../../design-systems/CSS/Title";
+import "./calendar.css"
 
 const localizer = momentLocalizer(moment);
 
@@ -79,7 +80,7 @@ function InvigilatorDashboard() {
           localizer={localizer}
           events={examSlotDetail}
           defaultView='month'
-          views={['month', 'agenda', 'day']}
+          views={[Views.MONTH, Views.AGENDA, Views.DAY]}
           length={6}
           onView={setView}
           view={view}
@@ -96,7 +97,8 @@ function InvigilatorDashboard() {
           messages={{ event: 'Time' }}
           formats={{
             agendaDateFormat: (date) =>
-              moment(date).format('DD/MM/YYYY'),
+            moment(date).format('DD/MM/YYYY'),
+            timeGutterFormat: (date) => moment(date).format('HH:mm'),
           }}
         />
         <Modal
@@ -150,20 +152,20 @@ function InvigilatorDashboard() {
             </span>
             .
           </p>
-        <div>
-            <p style={{textAlign: 'center', fontSize: 20, fontWeight: 'bold'}}>Invigilation Summary</p>
-            <table className="table-assign" style={{textAlign: 'left', fontSize: 13}}>
+          <div>
+            <p style={{ textAlign: 'center', fontSize: 20, fontWeight: 'bold' }}>Invigilation Summary</p>
+            <table className="table-assign" style={{ textAlign: 'left', fontSize: 13 }}>
               <tbody>
-              <tr><th>Hours of invigilation completed:</th><td><span style={{color: 'green'}}>{assignedSlotDetail.totalInvigilatedHours}</span> Hour(s)</td></tr>
-              <tr><th>Hours of invigilation remaining:</th><td><span style={{color: 'orange'}}>{assignedSlotDetail.totalRequiredInvigilationHours}</span> Hour(s)</td></tr>
-              <tr><th>Total hours of invigilation:</th><td><span>{assignedSlotDetail.totalAssignedHours}</span> Hour(s)</td></tr>
-              <tr><th>Invigilation slots completed:</th><td><span style={{color: 'green'}}>{assignedSlotDetail.totalInvigilatedSlots}</span> Slot(s)</td></tr>
-              <tr><th>Invigilation slots remaining:</th><td><span style={{color: 'orange'}}>{assignedSlotDetail.totalRequiredInvigilationSlots}</span> Slot(s)</td></tr>
-              <tr><th>Slots not attended:</th><td><span style={{color: 'red'}}>{assignedSlotDetail.totalNonInvigilatedSlots}</span> Slot(s)</td></tr>
-              <tr><th><span style={{marginRight: 10,fontSize: 20,color: "#1890ff",}}>&#9632;</span>Assigned slots:</th><td><span>{assignedSlotDetail.totalAssigned}</span> Slot(s)</td></tr>
+                <tr><th>Hours of invigilation completed:</th><td><span style={{ color: 'green' }}>{assignedSlotDetail.totalInvigilatedHours}</span> Hour(s)</td></tr>
+                <tr><th>Hours of invigilation remaining:</th><td><span style={{ color: 'orange' }}>{assignedSlotDetail.totalRequiredInvigilationHours}</span> Hour(s)</td></tr>
+                <tr><th>Total hours of invigilation:</th><td><span>{assignedSlotDetail.totalAssignedHours}</span> Hour(s)</td></tr>
+                <tr><th>Invigilation slots completed:</th><td><span style={{ color: 'green' }}>{assignedSlotDetail.totalInvigilatedSlots}</span> Slot(s)</td></tr>
+                <tr><th>Invigilation slots remaining:</th><td><span style={{ color: 'orange' }}>{assignedSlotDetail.totalRequiredInvigilationSlots}</span> Slot(s)</td></tr>
+                <tr><th>Slots not attended:</th><td><span style={{ color: 'red' }}>{assignedSlotDetail.totalNonInvigilatedSlots}</span> Slot(s)</td></tr>
+                <tr><th><span style={{ marginRight: 10, fontSize: 20, color: "#1890ff", }}>&#9632;</span>Assigned slots:</th><td><span>{assignedSlotDetail.totalAssigned}</span> Slot(s)</td></tr>
               </tbody>
             </table>
-        </div>
+          </div>
         </div>
 
       </div>

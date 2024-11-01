@@ -23,6 +23,7 @@ import examSlotApi from "../../services/ExamSlot.js";
 import "./ExamSlots.css";
 import { selectButtonStyle } from "../../design-systems/CSS/Button.js";
 import { requestTag } from "../../design-systems/CustomTag.jsx";
+import "./calendar.css"
 
 const localizer = momentLocalizer(moment);
 const { Content, Sider } = Layout;
@@ -82,10 +83,10 @@ const ExamSlots = () => {
   };
 
   const handleConfirmSlots = async () => {
-    if (!selectedAction) {
-      message.error("Please select an action (Approve or Reject)");
-      return;
-    }
+    // if (!selectedAction) {
+    //   message.error("Please select an action (Approve or Reject)");
+    //   return;
+    // }
 
     const status = selectedAction === "approve" ? "APPROVED" : "REJECTED";
     confirm({
@@ -181,7 +182,7 @@ const ExamSlots = () => {
 
 
   return (
-    <Layout style={{ height: "100vh", overflowY: "hidden" }}>
+    <Layout style={{ height: "100vh", overflowY: 'hidden'}}>
       <Header />
       <Layout>
         <Sider width={256} style={{ backgroundColor: "#4D908E" }}>
@@ -207,11 +208,12 @@ const ExamSlots = () => {
                   onSelectEvent={handleSelectEvent}
                   startAccessor={(event) => new Date(event.startAt)}
                   endAccessor={(event) => new Date(event.endAt)}
-                  style={{ height: 500, margin: "50px", width: "70%" }}
+                  style={{ height: 450, margin: "50px", width: "100%" }}
                   components={{ event: EventComponent, toolbar: CustomToolbar }}
                   messages={{ event: "Time" }}
                   formats={{
-                    agendaDateFormat: (date) => moment(date).format("DD/MM/YYYY")
+                    agendaDateFormat: (date) => moment(date).format("DD/MM/YYYY"),
+                    timeGutterFormat: (date) => moment(date).format("HH:mm"),
                   }}
                   eventPropGetter={(event) => {
                     let backgroundColor;

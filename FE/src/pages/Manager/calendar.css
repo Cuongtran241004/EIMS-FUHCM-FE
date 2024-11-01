@@ -1,0 +1,29 @@
+
+.rbc-time-gutter .rbc-timeslot-group {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 0 8px;
+  }
+  
+  .rbc-time-gutter .rbc-timeslot-group span {
+    font-size: 12px;
+    color: #333; 
+    width: 100%;
+  }
+
+
+.rbc-time-header-content .rbc-header {
+    font-size: 20px;
+  }
+
+.rbc-time-header-content .rbc-allday-cell {
+    display: none;
+  }
+  
+  .rbc-time-header-content .rbc-row  {
+    color: #000000;
+    display: block; 
+  }
+
+  

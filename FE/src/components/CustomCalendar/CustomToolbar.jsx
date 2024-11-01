@@ -34,14 +34,24 @@ function getMonthInYear(year) {
         months.push(monthStart);
     }
     return months;
+}
 
+function getDayInYear(year) {
+    const days = [];
+    for (let i = 0; i < 365; i++) {
+        const day = new Date(year, 0, i);
+        days.push(day);
+    }
+    return days;
 }
 
 const CustomToolbar = (toolbar) => {
     const [weeks, setWeeks] = useState([]);
     const [months, setMonths] = useState([]);
+    const [days, setDays] = useState([]);
     const [selectCurrentWeek, setSelectCurrentWeek] = useState("");
     const [selectCurrentMonth, setSelectCurrentMonth] = useState("");
+    const [selectCurrentDay, setSelectCurrentDay] = useState("");
     const [currentView, setCurrentView] = useState('month');
 
     useEffect(() => {
@@ -52,12 +62,16 @@ const CustomToolbar = (toolbar) => {
         const year = new Date().getFullYear();
         setWeeks(getWeeksInYear(year));
         setMonths(getMonthInYear(year));
+        setDays(getDayInYear(year));
 
         const today = moment().startOf('day');
         const currentWeek = getWeeksInYear(year).findIndex(week => today.isBetween(week.start, week.end, null, '[]'));
         setSelectCurrentWeek(currentWeek);
         const currentMonth = getMonthInYear(year).findIndex(month => today.isSame(month, 'month'));
         setSelectCurrentMonth(currentMonth);
+        const currentDay = getDayInYear(year).findIndex(day => today.isSame(day, 'day'));
+        setSelectCurrentDay(currentDay);
+
     }, []);
 
     const handleWeekSelect = (e) => {
@@ -80,15 +94,19 @@ const CustomToolbar = (toolbar) => {
         }
     }
 
-
     const goToToday = () => {
         const today = moment().startOf('day');
         toolbar.onNavigate('date', today);
         const currentWeek = weeks.findIndex(week => moment(today).isBetween(week.start, week.end, null, '[]'));
         const currentMonth = months.findIndex(month => moment(today).isSame(month, 'month'));
+        const currentDay = days.findIndex(day => moment(today).isSame(day, 'day'));
         if (currentWeek !== -1) {
             const selectedWeek = weeks[currentWeek];
             toolbar.onNavigate('date', selectedWeek.start);
+        }
+        if (currentDay !== -1) {
+            toolbar.onNavigate('date', today.toDate());
+            setSelectCurrentMonth(currentMonth);
         }
         setSelectCurrentWeek(currentWeek);
         setSelectCurrentMonth(currentMonth);
@@ -100,7 +118,7 @@ const CustomToolbar = (toolbar) => {
     };
 
     const handleWeekView = () => {
-        if (selectCurrentWeek !== null ) {
+        if (selectCurrentWeek !== null) {
             const selectedWeek = weeks[selectCurrentWeek];
             toolbar.onNavigate('date', selectedWeek.start);
         }
@@ -119,23 +137,22 @@ const CustomToolbar = (toolbar) => {
         <div className="custom-toolbar">
             <div>
                 <button onClick={goToToday}>Today</button>
-               
-                    <select
-                        value={currentView === 'agenda' ? selectCurrentWeek : selectCurrentMonth}
-                        onChange={currentView === 'agenda' ? handleWeekSelect : handleMonthSelect}>
-                        <option value="">{currentView === 'agenda' ? "Select a week" : "Select a month"}</option>
-                        {currentView === 'agenda'
-                            ? weeks.map((week, index) => (
-                                <option key={index} value={index}>
-                                    {`${moment(week.start).format('DD/MM')} - ${moment(week.end).format('DD/MM')}`}
-                                </option>
-                            ))
-                            : months.map((month, index) => (
-                                <option key={index} value={index}>
-                                    {`${moment(month).format('MMMM')}`}
-                                </option>
-                            ))}
-                    </select>
+                <select
+                    value={currentView === 'agenda' ? selectCurrentWeek : selectCurrentMonth}
+                    onChange={currentView === 'agenda' ? handleWeekSelect : handleMonthSelect}>
+                    <option value="">{currentView === 'agenda' ? "Select a week" : "Select a month"}</option>
+                    {currentView === 'agenda'
+                        ? weeks.map((week, index) => (
+                            <option key={index} value={index}>
+                                {`${moment(week.start).format('DD/MM')} - ${moment(week.end).format('DD/MM')}`}
+                            </option>
+                        ))
+                        : months.map((month, index) => (
+                            <option key={index} value={index}>
+                                {`${moment(month).format('MMMM')}`}
+                            </option>
+                        ))}
+                </select>
             </div>
             <span>{label()}</span>
             <div>
