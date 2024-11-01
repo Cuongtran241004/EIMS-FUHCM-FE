@@ -1,6 +1,7 @@
 import * as XLSX from "xlsx";
 import { Button } from "antd";
 import { saveAs } from "file-saver";
+import { DownloadOutlined } from "@ant-design/icons";
 
 const exportToExcel = (data) => {
   // Flatten the data to have each exam slot on a new row
@@ -46,6 +47,7 @@ const ReportExportButton = ({ data }) => (
     style={{ float: "right", backgroundColor: "#F9844A", color: "white" }}
     onClick={() => exportToExcel(data)}
   >
+    <DownloadOutlined />
     Export Report
   </Button>
 );

@@ -84,7 +84,7 @@ export const SemesterProvider = ({ children }) => {
           const result = await examSlotApi.getExamSlotBySemesterId(
             selectedSemester.id
           );
-          console.log(result);
+
           const resconfig = await configApi.getAllConfigsBySemesterId(
             selectedSemester.id
           );
