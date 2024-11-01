@@ -580,7 +580,6 @@ const Request = () => {
               style={{
                 marginBottom: "10px",
                 marginLeft: "10px",
-                marginLeft: "auto",
               }}
             >
               {requestTypes.map((type) => (

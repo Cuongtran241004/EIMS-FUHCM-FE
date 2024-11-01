@@ -20,9 +20,10 @@ const InvigilatorAttend = () => {
 
 
     useEffect(() => {
-        if (attendance) {
+        if (attendance && attendance.length > 0) {
             setSlotData(attendance);
-        }
+        } else 
+            setSlotData([]);
     }, [attendance]);
 
 
@@ -53,7 +54,7 @@ const InvigilatorAttend = () => {
                 setLoading(false);
             }
         } else {
-            const filteredData = attendance.filter((slot) =>
+            const filteredData = slotData.filter((slot) =>
                 moment(slot.startAt).format("DD/MM/YYYY") === string
         );
             setSlotData(filteredData); 

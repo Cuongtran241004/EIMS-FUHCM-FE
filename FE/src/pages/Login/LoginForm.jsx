@@ -3,14 +3,12 @@ import { Button, Form, Input } from "antd";
 import "./Form.css";
 import { ENTER_EMAIL, ENTER_PASSWORD } from "../../configs/messages";
 import HandleEmail from "../../components/Handle/HandleEmail";
-import { postEmail } from "../../components/API/postEmail";
 
 function LoginForm({ onLoginForm }) {
   const [email, setEmail] = useState("");
   const [isValid, setIsValid] = useState(true);
 
   const onFinish = (values) => {
-    console.log("Success:", values);
     onLoginForm(values);
   };
 

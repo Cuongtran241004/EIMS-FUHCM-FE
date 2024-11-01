@@ -22,6 +22,7 @@ export const SemesterProvider = ({ children }) => {
   const [examSlotBySemester, setExamSlotBySemester] = useState([]);
   const [requestTypes, setRequestTypes] = useState([]);
   const [loading, setLoading] = useState(true); // Loading state
+  const [count, setCount] = useState(0); //count flag
 
   const fetchSemesters = async () => {
     setLoading(true); // Start loading
@@ -97,7 +98,7 @@ export const SemesterProvider = ({ children }) => {
       }
     };
     fetchExamSlotBySemester();
-  }, [selectedSemester]);
+  }, [selectedSemester, count]);
 
   // Fetch semesters and set the default selected semester
   useEffect(() => {
@@ -105,6 +106,10 @@ export const SemesterProvider = ({ children }) => {
     fetchRequestType();
     addTodayAttendance();
   }, []);
+
+  const reloadSlots = () => {
+    setCount(count + 1);
+  };
 
   return (
     <SemesterContext.Provider
@@ -117,6 +122,7 @@ export const SemesterProvider = ({ children }) => {
         examSlotBySemester,
         requestTypes,
         configSemester,
+        reloadSlots,
       }} // Expose loading state
     >
       {children}

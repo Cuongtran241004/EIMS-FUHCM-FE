@@ -37,6 +37,7 @@ const ExamSlots = () => {
     setSelectedSemester,
     loading,
     examSlotBySemester,
+    reloadSlots,
   } = useSemester();
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState(null);
@@ -103,6 +104,7 @@ const ExamSlots = () => {
             const success = await examSlotApi.updateExamSlotByManager(updatedSlots);
             if (success && updatedSlots.length > 0) {
               message.success(`${status} successfully!`);
+              reloadSlots();
               setCheckedSlots([]);
               setModalState({ show: false, action: "" });
             } else {
@@ -211,7 +213,7 @@ const ExamSlots = () => {
                   onSelectEvent={handleSelectEvent}
                   startAccessor={(event) => new Date(event.startAt)}
                   endAccessor={(event) => new Date(event.endAt)}
-                  style={{ height: 450, margin: "50px", width: "100%" }}
+                  style={{ height: 500, margin: "50px", width: "100%" }}
                   components={{ event: EventComponent, toolbar: CustomToolbar }}
                   messages={{ event: "Time" }}
                   formats={{
