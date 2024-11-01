@@ -28,7 +28,10 @@ import { selectButtonStyle } from "../../design-systems/CSS/Button.js";
 import { FETCH_EXAM_SCHEDULE_FAILED } from "../../configs/messages";
 import { assignmentTag } from "../../design-systems/CustomTag.jsx";
 import { examTypeTag } from "../../design-systems/CustomTag.jsx";
-import { assignmentNotification } from "../../design-systems/CustomNotification.jsx";
+import {
+  alreadyAssignmentNotification,
+  assignmentNotification,
+} from "../../design-systems/CustomNotification.jsx";
 const { Content } = Layout;
 
 const AssignmentInvigilator = () => {
@@ -83,15 +86,19 @@ const AssignmentInvigilator = () => {
     return staffMapperUtil.mapAssignment(response);
   };
 
-  const handleAssignmentClick = async (examSlotId) => {
+  const handleAssignmentClick = async (record) => {
+    if (record.status === "ASSIGNED") {
+      alreadyAssignmentNotification();
+      return;
+    }
     // getAssignmentById from examSchedule
-    const examSlot = examSchedule.find((slot) => slot.id === examSlotId);
+    const examSlot = examSchedule.find((slot) => slot.id === record.id);
 
     if (examSlot.requiredInvigilators <= examSlot.numberOfRegistered) {
       setLoading(true);
       try {
         // Assign invigilators
-        const assignmentResult = await fetchInvigilatorAssignment(examSlotId);
+        const assignmentResult = await fetchInvigilatorAssignment(record.id);
         // Here, you can implement the logic to assign invigilators
         // For demonstration, let's assume assignment was successful and set the selected assignment
         setSelectedAssignment(assignmentResult);
@@ -174,7 +181,7 @@ const AssignmentInvigilator = () => {
       key: "invigilator",
       align: "center",
       render: (text, record) => (
-        <Button type="text" onClick={() => handleAssignmentClick(record.id)}>
+        <Button type="text" onClick={() => handleAssignmentClick(record)}>
           <PlusCircleOutlined style={{ fontSize: "20px", color: "#43AA8B" }} />
         </Button>
       ),

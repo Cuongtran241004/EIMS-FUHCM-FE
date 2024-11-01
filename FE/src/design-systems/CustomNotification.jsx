@@ -53,6 +53,14 @@ const requestNotification = () => {
     description: "This request has been processed",
   });
 };
+
+const alreadyAssignmentNotification = () => {
+  notification.warning({
+    message: "Warning",
+    description: `This exam slot has already been assigned!`,
+    placement: "topRight",
+  });
+};
 export {
   editNotification,
   deleteNotification,
@@ -62,4 +70,5 @@ export {
   checkOutNotificationEnd,
   assignmentNotification,
   requestNotification,
+  alreadyAssignmentNotification,
 };
