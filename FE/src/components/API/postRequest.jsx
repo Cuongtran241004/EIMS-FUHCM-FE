@@ -1,3 +1,4 @@
+
 import axios from "axios";
 
 export const postRequest = async (data) => {
@@ -19,4 +20,5 @@ export const postRequest = async (data) => {
       e.response?.data?.message || "Error registering for slots."
     );
   }
+
 };

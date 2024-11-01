@@ -1,6 +1,7 @@
 import axios from "axios";
 
 export const getRequests = async () => {
+
   const API_URL = import.meta.env.VITE_APP_API_URL;
   const path = "/requests/myinfo";
   try {

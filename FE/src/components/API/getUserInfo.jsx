@@ -13,6 +13,7 @@ export const getUserInfo = async () => {
       withCredentials: true, 
     });
 
+
     return response.data;
   } catch (e) {
     console.error("getUserInfo Error: ", e.response?.data || e.message);

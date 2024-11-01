@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { Calendar, Dropdown, Modal, Button, Space } from "antd";
 import { DownOutlined } from "@ant-design/icons";
@@ -12,9 +13,11 @@ import { selectButtonStyle } from "../../design-systems/CSS/Button";
 import { titleStyle } from "../../design-systems/CSS/Title";
 import "./calendar.css"
 
+
 const localizer = momentLocalizer(moment);
 
 function InvigilatorDashboard() {
+
   const { semesters, selectedSemester, setSelectedSemester, examSlotDetail, getConfigValue, assignedSlotDetail } =
     useSemester();
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -26,6 +29,7 @@ function InvigilatorDashboard() {
     const selected = semesters.find(
       (semester) => semester.id === parseInt(e.key)
     );
+
     setSelectedSemester(selected);
   };
 
@@ -53,6 +57,7 @@ function InvigilatorDashboard() {
   };
 
   const EventComponent = ({ event }) => (
+
     <span>
       <p style={{ margin: 0, fontWeight: 500, fontSize: 13.33333 }}>
         {new moment(event.startAt).format("HH:mm")} -{" "}
@@ -103,6 +108,7 @@ function InvigilatorDashboard() {
         />
         <Modal
           title="Details of Exam Slot"
+
           open={isModalVisible}
           onOk={handleOk}
           onClose={handleCancel}
@@ -110,6 +116,7 @@ function InvigilatorDashboard() {
         >
           {selectedEvent && (
             <div>
+
               <p>
                 <strong>Date:</strong>{" "}
                 {new moment(selectedEvent.startAt).format("DD/MM/YYYY")}
@@ -138,10 +145,12 @@ function InvigilatorDashboard() {
                 {selectedSemester
                   ? selectedSemester.name
                   : "No Semesters Available"}
+
                 <DownOutlined />
               </Space>
             </Button>
           </Dropdown>
+
 
           <p style={{ fontStyle: "italic" }}>
             *Note: Arrive {getConfigValue(ConfigType.TIME_BEFORE_EXAM)}{" "}
@@ -166,6 +175,7 @@ function InvigilatorDashboard() {
             </table>
           </div>
         </div>
+
 
       </div>
     </div>

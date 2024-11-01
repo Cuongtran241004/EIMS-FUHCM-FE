@@ -101,4 +101,3 @@ export const SemesterProviderInvigilator = ({ children }) => {
     </SemesterContext.Provider>
   );
 };
-
