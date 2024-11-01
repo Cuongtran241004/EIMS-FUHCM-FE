@@ -8,7 +8,7 @@ const exportToExcel = (data) => {
   const formattedData = data.flatMap((invigilator) =>
     invigilator.detail.map((detail) => ({
       "Invigilator ID": invigilator.fuId,
-      Name: `${invigilator.firstName} ${invigilator.lastName}`,
+      Name: `${invigilator.lastName} ${invigilator.firstName}`,
       Email: invigilator.email,
       Phone: invigilator.phone,
       "Total Exam Slots": invigilator.totalSlots,
