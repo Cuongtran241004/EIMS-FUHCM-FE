@@ -23,7 +23,7 @@ const InvigilatorReport = () => {
 
 
     useEffect(() => {
-        if (examSlotApproved) {
+        if (examSlotApproved && examSlotApproved.length > 0) {
             setSlotData(examSlotApproved);
         }
     }, [examSlotApproved]);
