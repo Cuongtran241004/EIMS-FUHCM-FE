@@ -25,10 +25,9 @@ export default function Login({ setIsLogin }) {
         localStorage.setItem("role", userInfo.role);
         localStorage.setItem("firstName", userInfo.firstName);
         localStorage.setItem("lastName", userInfo.lastName);
-
         setUser(userInfo);
         setIsLogin(true);
-        window.location.reload();
+        // window.location.reload();
       }
     } else {
       setErrorMessage1("Wrong email or password.");
@@ -53,7 +52,7 @@ export default function Login({ setIsLogin }) {
 
         setUser(userInfo);
         setIsLogin(true);
-        window.location.reload();
+        // window.location.reload();
       }
     } else {
       setErrorMessage("You don't have permission to access.");
