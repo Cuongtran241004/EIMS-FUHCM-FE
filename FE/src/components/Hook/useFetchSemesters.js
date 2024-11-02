@@ -6,6 +6,8 @@ export function useFetchSemesters() {
 
   useEffect(() => {
     const fetchSemester = async () => {
+     const role = localStorage.getItem("role");
+      if (role !== null) {
       try {
         const response = await getSemester();
         setSemesters(response);
@@ -14,6 +16,7 @@ export function useFetchSemesters() {
       }
     };
     fetchSemester();
+  }
   }, []);
 
   return { semesters };

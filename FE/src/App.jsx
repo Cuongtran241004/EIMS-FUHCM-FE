@@ -52,109 +52,105 @@ function App() {
   const [isLoading, setIsLoading] = useState(true);
   const [user, setUser] = useState(null);
   const [role, setRole] = useState(null);
-  const [passwordSet, setPasswordSet] = useState(null); // Track password status
+  const [passwordSet, setPasswordSet] = useState(null); 
   const navigate = useNavigate();
 
   const initLogin = async () => {
-    try {
-      const user = await getUserInfo();
-      if (user) {
-        const userRole = user.role || null;
-        setRole(userRole);
-        setUser(user);
-        setIsLogin(true);
-        setPasswordSet(user.passwordSet); // Fetch password set status from API
+      try {
+        const user = await getUserInfo();
+        if (user) {
+          const userRole = user.role || null;
+          setRole(userRole);
+          setUser(user);
+          setIsLogin(true);
+          setPasswordSet(user.passwordSet); 
+        }
+      } finally {
+        setIsLoading(false);
       }
-    } catch (error) {
-      // Handle error
-    } finally {
-      setIsLoading(false);
-    }
   };
 
   useEffect(() => {
     initLogin();
-  }, []);
+  }, [isLogin]);
 
   useEffect(() => {
-    // Redirect to /add only if passwordSet === false
     if (isLogin && passwordSet === false) {
       navigate("/add");
     }
   }, [isLogin, passwordSet, navigate]);
 
-  // Remove duplicate NotFound route
   const renderRoutes = () => {
-    if (!isLogin) {
+    if (isLogin) {
       return (
         <Routes>
-          <Route path="/" element={<Login setIsLogin={setIsLogin} />} />
-          <Route path="*" element={<Navigate to="/" replace />} />
+          {/* Manager Routes */}
+          {role === 1 && (
+            <>
+              <Route path="/" element={<Dashboard />} />
+              <Route path={MANAGER_DASHBOARD_URL} element={<Dashboard />} />
+              <Route path={MANAGER_SEMESTER_URL} element={<Semester />} />
+              <Route path={MANAGER_USERS_URL} element={<User />} />
+              <Route path={MANAGER_REQUESTS_URL} element={<Request />} />
+              <Route path={MANAGER_EXAM_SCHEDULE_URL} element={<ExamSlots />} />
+              <Route
+                path={MANAGER_ATTENDENCE_CHECK_URL}
+                element={<AttendanceCheck />}
+              />
+              <Route path={MANAGER_CONFIGS_URL} element={<Configs />} />
+              <Route
+                path={MANAGER_INVIGILATOR_ATTENDANCE_URL}
+                element={<InvigilatorAttendance />}
+              />
+              <Route
+                path={MANAGER_INVIGILATOR_FEES_URL}
+                element={<InvigilatorFees />}
+              />
+            </>
+          )}
+          {/* Staff Routes */}
+          {role === 2 && (
+            <>
+              <Route path="/" element={<Subject />} />
+              <Route path={STAFF_SUBJECT_URL} element={<Subject />} />
+              <Route path={STAFF_EXAM_URL} element={<Exam />} />
+              <Route path={STAFF_EXAM_SCHEDULE_URL} element={<Exam_Schedule />} />
+              <Route path={STAFF_ATTENDANCE_URL} element={<Attendance />} />
+              <Route
+                path={STAFF_ROOM_SELECTION_URL}
+                element={<RoomSelectionPage />}
+              />
+              <Route
+                path={STAFF_ASSIGNMENT_URL}
+                element={<AssignmentInvigilator />}
+              />
+            </>
+          )}
+          {/* Invigilator Routes */}
+          {role === 3 && (
+            <>
+              <Route path="/" element={<InvigilatorDashboard />} />
+              <Route path="/register" element={<InvigilatorRegistration />} />
+              <Route path="/request/send" element={<InvigilatorRequest />} />
+              <Route path="/request/view" element={<InvigilatorRequestsList />} />
+              <Route path="/report" element={<InvigilatorReport />} />
+              <Route path="/attendance" element={<InvigilatorAttend />} />
+            </>
+          )}
+          {/* Common Routes */}
+          <Route path="profile" element={<ProfilePage user={user} />} />
+          <Route path="add" element={<HandlePassword />} />
+          {/* Catch-all route */}
         </Routes>
       );
-    }
-
-    return (
-      <Routes>
-        {/* Manager Routes */}
-        {role === 1 && (
-          <>
-            <Route path="/" element={<Dashboard />} />
-            <Route path={MANAGER_DASHBOARD_URL} element={<Dashboard />} />
-            <Route path={MANAGER_SEMESTER_URL} element={<Semester />} />
-            <Route path={MANAGER_USERS_URL} element={<User />} />
-            <Route path={MANAGER_REQUESTS_URL} element={<Request />} />
-            <Route path={MANAGER_EXAM_SCHEDULE_URL} element={<ExamSlots />} />
-            <Route
-              path={MANAGER_ATTENDENCE_CHECK_URL}
-              element={<AttendanceCheck />}
-            />
-            <Route path={MANAGER_CONFIGS_URL} element={<Configs />} />
-            <Route
-              path={MANAGER_INVIGILATOR_ATTENDANCE_URL}
-              element={<InvigilatorAttendance />}
-            />
-            <Route
-              path={MANAGER_INVIGILATOR_FEES_URL}
-              element={<InvigilatorFees />}
-            />
-          </>
-        )}
-        {/* Staff Routes */}
-        {role === 2 && (
-          <>
-            <Route path="/" element={<Subject />} />
-            <Route path={STAFF_SUBJECT_URL} element={<Subject />} />
-            <Route path={STAFF_EXAM_URL} element={<Exam />} />
-            <Route path={STAFF_EXAM_SCHEDULE_URL} element={<Exam_Schedule />} />
-            <Route path={STAFF_ATTENDANCE_URL} element={<Attendance />} />
-            <Route
-              path={STAFF_ROOM_SELECTION_URL}
-              element={<RoomSelectionPage />}
-            />
-            <Route
-              path={STAFF_ASSIGNMENT_URL}
-              element={<AssignmentInvigilator />}
-            />
-          </>
-        )}
-        {/* Invigilator Routes */}
-        {role === 3 && (
-          <>
-            <Route path="/" element={<InvigilatorDashboard />} />
-            <Route path="/register" element={<InvigilatorRegistration />} />
-            <Route path="/request/send" element={<InvigilatorRequest />} />
-            <Route path="/request/view" element={<InvigilatorRequestsList />} />
-            <Route path="/report" element={<InvigilatorReport />} />
-            <Route path="/attendance" element={<InvigilatorAttend />} />
-          </>
-        )}
-        {/* Common Routes */}
-        <Route path="profile" element={<ProfilePage user={user} />} />
-        <Route path="add" element={<HandlePassword />} />
-        {/* Catch-all route */}
-      </Routes>
-    );
+    } else {
+        return (
+          <Routes>
+            <Route path="/" element={<Login setIsLogin={setIsLogin} />} />
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        );
+  }
   };
 
   return (
