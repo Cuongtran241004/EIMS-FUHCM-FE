@@ -37,6 +37,10 @@ function HandlePassword() {
     return Promise.reject(new Error("Passwords do not match!"));
   };
 
+  const handleEmailChange = (e) => {
+    setEmail(e.target.value);
+};
+
   return (
     <div>
         <Header />
@@ -57,10 +61,18 @@ function HandlePassword() {
               required: true,
               message: ENTER_PASSWORD,
             },
+            {
+              min: 7,
+              message: "Password must be at least 6 characters!",
+            },
+            {
+              max: 25,
+              message: "Password must be at most 25 characters!",
+            }
           ]}
           hasFeedback
         >
-          <Input.Password size="large" placeholder="Enter your password" />
+          <Input.Password size="large" placeholder="Enter your password" onChange={handleEmailChange}/>
         </Form.Item>
 
         <Form.Item

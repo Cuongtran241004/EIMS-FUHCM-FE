@@ -1,3 +1,4 @@
+
 import axios from "axios";
 
 export const postRegisterSlots = async (slots) => {
@@ -10,6 +11,7 @@ export const postRegisterSlots = async (slots) => {
       headers: {
         Accept: "application/json",
         "Content-Type": "application/json",
+
       },
     });
 
@@ -18,5 +20,6 @@ export const postRegisterSlots = async (slots) => {
     throw new Error(
       e.response?.data?.message || "Error registering for slots."
     );
+
   }
 };

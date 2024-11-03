@@ -13,9 +13,10 @@ export const getUserInfo = async () => {
       withCredentials: true, 
     });
 
+    if(response.status === 200) {
     return response.data;
+    }
   } catch (e) {
-    console.error("getUserInfo Error: ", e.response?.data || e.message);
     return false;
   }
 };

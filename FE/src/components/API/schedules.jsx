@@ -1,6 +1,7 @@
 import axios from "axios";
 
 export const schedules = async (semesterId) => {
+
   const API_URL = import.meta.env.VITE_APP_API_URL;
   const path = "/assignment/myinfo/scheduled?semesterId=";
   const response = await axios.get(`${API_URL}${path}${semesterId}`, {
@@ -12,3 +13,4 @@ export const schedules = async (semesterId) => {
   });
   return response.data;
 };
+

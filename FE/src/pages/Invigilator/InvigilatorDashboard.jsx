@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { Calendar, Dropdown, Modal, Button, Space } from "antd";
 import { DownOutlined } from "@ant-design/icons";
@@ -12,9 +13,11 @@ import { selectButtonStyle } from "../../design-systems/CSS/Button";
 import { titleStyle } from "../../design-systems/CSS/Title";
 import "./calendar.css"
 
+
 const localizer = momentLocalizer(moment);
 
 function InvigilatorDashboard() {
+
   const { semesters, selectedSemester, setSelectedSemester, examSlotDetail, getConfigValue, assignedSlotDetail } =
     useSemester();
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -26,6 +29,7 @@ function InvigilatorDashboard() {
     const selected = semesters.find(
       (semester) => semester.id === parseInt(e.key)
     );
+
     setSelectedSemester(selected);
   };
 
@@ -53,6 +57,7 @@ function InvigilatorDashboard() {
   };
 
   const EventComponent = ({ event }) => (
+
     <span>
       <p style={{ margin: 0, fontWeight: 500, fontSize: 13.33333 }}>
         {new moment(event.startAt).format("HH:mm")} -{" "}
@@ -75,7 +80,7 @@ function InvigilatorDashboard() {
       >
         OFFICIAL EXAM SCHEDULES
       </h2>
-      <div style={{ display: "flex", alignItems: "flex-start" }}>
+      <div style={{ display: "flex", alignItems: "flex-start", marginRight: 40 }}>
         <BigCalendar
           localizer={localizer}
           events={examSlotDetail}
@@ -90,7 +95,7 @@ function InvigilatorDashboard() {
           timeslots={1}
           startAccessor="startAt"
           endAccessor="endAt"
-          style={{ height: 500, margin: "50px", width: "65%" }}
+          style={{ height: 500, margin: "50px", width: "70%" }}
           components={{
             event: EventComponent, toolbar: CustomToolbar
           }}
@@ -103,6 +108,7 @@ function InvigilatorDashboard() {
         />
         <Modal
           title="Details of Exam Slot"
+
           open={isModalVisible}
           onOk={handleOk}
           onClose={handleCancel}
@@ -110,6 +116,7 @@ function InvigilatorDashboard() {
         >
           {selectedEvent && (
             <div>
+
               <p>
                 <strong>Date:</strong>{" "}
                 {new moment(selectedEvent.startAt).format("DD/MM/YYYY")}
@@ -127,22 +134,23 @@ function InvigilatorDashboard() {
         </Modal>
         <div
           style={{
-            marginLeft: 30,
             marginTop: 40,
             display: "grid",
-            width: "20%",
+            width: "25%",
           }}
         >
-          <Dropdown menu={menu} trigger={["click"]}>
+          <Dropdown menu={menu} trigger={["click"]} >
             <Button size="large" style={selectButtonStyle}>
               <Space>
                 {selectedSemester
                   ? selectedSemester.name
                   : "No Semesters Available"}
+
                 <DownOutlined />
               </Space>
             </Button>
           </Dropdown>
+
 
           <p style={{ fontStyle: "italic" }}>
             *Note: Arrive {getConfigValue(ConfigType.TIME_BEFORE_EXAM)}{" "}
@@ -154,7 +162,7 @@ function InvigilatorDashboard() {
           </p>
           <div>
             <p style={{ textAlign: 'center', fontSize: 20, fontWeight: 'bold' }}>Invigilation Summary</p>
-            <table className="table-assign" style={{ textAlign: 'left', fontSize: 13 }}>
+            <table className="table-assign" style={{ textAlign: 'left', fontSize: 13, marginLeft: 30 }}>
               <tbody>
                 <tr><th>Hours of invigilation completed:</th><td><span style={{ color: 'green' }}>{assignedSlotDetail.totalInvigilatedHours}</span> Hour(s)</td></tr>
                 <tr><th>Hours of invigilation remaining:</th><td><span style={{ color: 'orange' }}>{assignedSlotDetail.totalRequiredInvigilationHours}</span> Hour(s)</td></tr>
@@ -167,6 +175,7 @@ function InvigilatorDashboard() {
             </table>
           </div>
         </div>
+
 
       </div>
     </div>

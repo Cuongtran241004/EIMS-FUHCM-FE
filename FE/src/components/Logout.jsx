@@ -28,6 +28,7 @@ function Logout() {
       console.error("Logout error:", error.message);
       message.error("Logout failed. Please try again.");
     }
+    localStorage.clear();
   };
 
   return (

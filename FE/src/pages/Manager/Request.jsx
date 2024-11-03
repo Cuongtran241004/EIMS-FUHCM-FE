@@ -201,7 +201,6 @@ const Request = () => {
               optionFilterProp="children"
               onChange={(value) => {
                 selectedInvigilator = value; // Update local variable
-                console.log("Selected invigilator:", value);
               }}
             >
               {unassignedInvigilatorsFirst.map((invigilator) => (
@@ -228,10 +227,15 @@ const Request = () => {
             }
 
             try {
+              const alternativeIngivilator =
+                await userApi.getUserByFuId(selectedInvigilator);
+              const noteRes = `${alternativeIngivilator.fuId} - ${alternativeIngivilator.lastName} ${alternativeIngivilator.firstName}`;
+
               const requestData = {
                 newInvigilatorFuId: selectedInvigilator,
                 requestId: record.requestId,
                 status: "APPROVED",
+                note: noteRes,
               };
               // Call API to approve the request with the selected invigilator
               await requestApi.updateRequest(requestData);
@@ -576,7 +580,6 @@ const Request = () => {
               style={{
                 marginBottom: "10px",
                 marginLeft: "10px",
-                marginLeft: "auto",
               }}
             >
               {requestTypes.map((type) => (

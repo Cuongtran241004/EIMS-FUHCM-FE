@@ -1,3 +1,4 @@
+
 import axios from "axios";
 
 export const cancelRegisteredSlot = async (slotId) => {
