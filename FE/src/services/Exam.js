@@ -1,5 +1,5 @@
 import axios from "axios";
-import { API_BASE_URL } from "../configs/urlApi.js";
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 const EXAM_API_BASE_URL = `${API_BASE_URL}/subjectexams`;
 
 const handleError = (error) => {
@@ -22,6 +22,7 @@ const examApi = {
       handleError(error);
     }
   },
+
   getExamById: async (id) => {
     try {
       const response = await axios.get(`${EXAM_API_BASE_URL}/${id}`, {
@@ -36,6 +37,7 @@ const examApi = {
       handleError(error);
     }
   },
+
   getExamBySemesterId: async (semesterId) => {
     try {
       const response = await axios.get(
@@ -53,6 +55,7 @@ const examApi = {
       handleError(error);
     }
   },
+
   addExam: async (exam) => {
     try {
       const response = await axios.post(`${EXAM_API_BASE_URL}`, exam, {
@@ -67,6 +70,7 @@ const examApi = {
       handleError(error);
     }
   },
+
   updateExam: async (exam) => {
     try {
       const response = await axios.put(
@@ -85,6 +89,7 @@ const examApi = {
       handleError(error);
     }
   },
+
   deleteExam: async (id) => {
     try {
       const response = await axios.delete(`${EXAM_API_BASE_URL}/${id}`, {

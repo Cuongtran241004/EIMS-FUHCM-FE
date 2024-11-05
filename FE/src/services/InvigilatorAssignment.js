@@ -1,5 +1,6 @@
 import axios from "axios";
-import { API_BASE_URL } from "../configs/urlApi.js";
+
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 const INVIGILATOR_ASSIGNMENT_API_BASE_URL = `${API_BASE_URL}/assignment`;
 
 const handleError = (error) => {
@@ -99,7 +100,6 @@ const invigilatorAssignmentApi = {
       handleError(error);
     }
   },
-
   getExamSlotWithStatus: async (semesterid) => {
     try {
       const response = await axios.get(

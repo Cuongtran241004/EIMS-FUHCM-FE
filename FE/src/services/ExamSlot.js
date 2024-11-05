@@ -1,5 +1,6 @@
 import axios from "axios";
-import { API_BASE_URL } from "../configs/urlApi.js";
+
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 const EXAM_SLOT_API_BASE_URL = `${API_BASE_URL}/examslots`;
 
 const handleError = (error) => {
@@ -92,7 +93,6 @@ const examSlotApi = {
       handleError(error);
     }
   },
-
   getExamSlotTodayManager: async () => {
     try {
       const response = await axios.get(

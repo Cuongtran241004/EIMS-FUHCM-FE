@@ -1,5 +1,6 @@
 import axios from "axios";
-import { API_BASE_URL } from "../configs/urlApi.js";
+
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 const SEMESTER_API_BASE_URL = `${API_BASE_URL}/semesters`;
 
 const handleError = (error) => {
@@ -22,6 +23,7 @@ const semesterApi = {
       handleError(error);
     }
   },
+
   getSemesterByName: async (name) => {
     try {
       const response = await axios.get(`${SEMESTER_API_BASE_URL}/${name}`, {
@@ -36,6 +38,7 @@ const semesterApi = {
       handleError(error);
     }
   },
+
   addSemester: async (semester) => {
     try {
       const response = await axios.post(`${SEMESTER_API_BASE_URL}`, semester, {
@@ -50,6 +53,7 @@ const semesterApi = {
       handleError(error);
     }
   },
+
   updateSemester: async (semester) => {
     try {
       console.log(semester);
