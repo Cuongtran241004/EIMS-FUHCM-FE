@@ -261,7 +261,6 @@ const Request = () => {
         });
       } catch (error) {
         message.warning("No available invigilators");
-        console.error(error); // Log the error for debugging
       } finally {
         setDetailLoading((prev) => ({ ...prev, [record.requestId]: false }));
       }

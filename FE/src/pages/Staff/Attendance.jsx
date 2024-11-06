@@ -134,7 +134,6 @@ const Attendance = () => {
   // };
 
   const handleCheckIn = async (examSlotId) => {
-    console.log("config", configSemester);
     setLoading(true);
     setIsCheckIn(true);
     try {
@@ -223,7 +222,7 @@ const Attendance = () => {
 
   const handleSave = async () => {
     setSaveLoading(true);
-    console.log(isCheckIn);
+
     try {
       // Call the API to save the attendance
       const response = isCheckIn

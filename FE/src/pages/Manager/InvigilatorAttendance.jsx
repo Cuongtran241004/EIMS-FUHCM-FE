@@ -4,7 +4,16 @@ import NavBar_Manager from "../../components/NavBar/NavBar_Manager";
 import { useSemester } from "../../components/Context/SemesterContextManager.jsx";
 import { selectButtonStyle } from "../../design-systems/CSS/Button.js";
 import { DownOutlined, SearchOutlined } from "@ant-design/icons";
-import { Dropdown, Button, Space, Table, Spin, Layout, Input } from "antd";
+import {
+  Dropdown,
+  Button,
+  Space,
+  Table,
+  Spin,
+  Layout,
+  Input,
+  message,
+} from "antd";
 import attendanceApi from "../../services/InvigilatorAttendance.js";
 import { managerMapperUtil } from "../../utils/Mapper/ManagerMapperUtil.jsx";
 import "./InvigilatorAttendance.css";
@@ -28,6 +37,7 @@ const InvigilatorAttendance = () => {
       setData(result || []);
       setFilteredData(result || []);
     } catch (error) {
+      message.error("Failed to fetch data");
       // Handle error
     } finally {
       setLoading(false);

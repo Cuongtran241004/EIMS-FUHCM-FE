@@ -34,7 +34,6 @@ const InvigilatorFees = () => {
       setData(result || []);
       setFilteredData(result || []);
     } catch (error) {
-      console.log(error);
       // Handle error
       message.error("Failed to fetch data");
     } finally {

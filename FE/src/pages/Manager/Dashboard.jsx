@@ -12,6 +12,7 @@ import {
   Empty,
   DatePicker,
   Modal,
+  message,
 } from "antd";
 import moment from "moment";
 import examSlotApi from "../../services/ExamSlot.js";
@@ -57,7 +58,9 @@ const Dashboard = () => {
         return new Date(a.startAt) - new Date(b.startAt);
       });
       setTodayExamSlots(result || []);
-    } catch (error) {}
+    } catch (error) {
+      message.error("Failed to fetch today's exam slots");
+    }
   };
 
   const fetchInvigilatorToday = async () => {
@@ -71,7 +74,9 @@ const Dashboard = () => {
           index === self.findIndex((t) => t.fuId === item.fuId)
       );
       setTodayInvigilators(uniqueResult || []);
-    } catch (error) {}
+    } catch (error) {
+      message.error("Failed to fetch today's invigilators");
+    }
   };
 
   const fetchExamSlotSummary = async (startTime, endTime) => {
@@ -88,6 +93,7 @@ const Dashboard = () => {
       });
       setExamSlotSummary(result || []);
     } catch (error) {
+      message.error("Failed to fetch exam slot summary");
     } finally {
       setExamSlotLoading(false);
     }
@@ -119,6 +125,7 @@ const Dashboard = () => {
 
       setInvigilationSummary(combinedData || []);
     } catch (error) {
+      message.error("Failed to fetch invigilation summary");
     } finally {
       setInvigilationLoading(false);
     }
@@ -133,6 +140,7 @@ const Dashboard = () => {
         await examSlotRoomApi.getRoomTodayByExamSlotId(examSlotId);
       setTodayRooms(response || []);
     } catch (error) {
+      message.error("Failed to fetch today's rooms");
     } finally {
       setRoomLoading(false);
     }

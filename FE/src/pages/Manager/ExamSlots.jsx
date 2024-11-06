@@ -110,7 +110,6 @@ const ExamSlots = () => {
             }
           } catch (error) {
             message.error(`${status.toLowerCase()} unsuccessfully!`);
-            console.error(error);
           }
         },
       });
