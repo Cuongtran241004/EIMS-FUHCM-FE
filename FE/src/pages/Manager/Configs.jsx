@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import NavBar_Manager from "../../components/NavBar/NavBar_Manager";
-import moment from "moment";
 import {
   Layout,
   Form,
@@ -9,7 +8,6 @@ import {
   message,
   Button,
   Spin,
-  Typography,
   InputNumber,
 } from "antd";
 import configApi from "../../services/Config.js";
@@ -19,7 +17,9 @@ import { titleStyle } from "../../design-systems/CSS/Title.js";
 import { managerMapperUtil } from "../../utils/Mapper/ManagerMapperUtil.jsx";
 import "./Configs.css";
 import { EditOutlined } from "@ant-design/icons";
+
 const { Content, Sider } = Layout;
+
 const EditableCell = ({
   editing,
   dataIndex,
@@ -30,21 +30,92 @@ const EditableCell = ({
   children,
   ...restProps
 }) => {
-  const inputNode = inputType === "number" ? <InputNumber /> : <Input />;
+  const getValidationRules = (configType) => {
+    switch (configType) {
+      case "hourly_rate":
+        return [
+          { required: true, message: "Required" },
+          {
+            type: "number",
+            min: 0,
+            max: 1000000,
+            message: "Must be a positive number",
+          },
+        ];
+      case "allowed_slot":
+        return [
+          { required: true, message: "Required" },
+          {
+            type: "number",
+            min: 1,
+            max: 30,
+            message: "Invalid number of slots",
+          },
+        ];
+      case "time_before_exam":
+      case "time_before_open_registration":
+      case "time_before_close_registration":
+        return [
+          { required: true, message: "Required" },
+          {
+            type: "number",
+            min: 1,
+            max: 30,
+            message: "Invalid number of days",
+          },
+        ];
+      case "time_before_close_request":
+        return [
+          { required: true, message: "Required" },
+          {
+            type: "number",
+            min: 1,
+            max: 30,
+            message: "Invalid number of days",
+          },
+        ];
+      case "invigilator_room":
+        return [{ required: true, message: "Required" }];
+      case "check_in_time_before_exam_slot":
+      case "check_out_time_after_exam_slot":
+        return [
+          { required: true, message: "Required" },
+          {
+            type: "number",
+            min: 1,
+            max: 60,
+            message: "Invalid number of minutes",
+          },
+        ];
+      case "extra_invigilator":
+        return [
+          { required: true, message: "Required" },
+          {
+            type: "number",
+            min: 0,
+            max: 10,
+            message: "Invalid number of people",
+          },
+        ];
+      default:
+        return [{ required: true, message: "Required" }];
+    }
+  };
+  const inputNode =
+    record?.configType === "invigilator_room" ? (
+      <Input maxLength={10} /> // Text input for invigilator_room
+    ) : inputType === "number" ? (
+      <InputNumber />
+    ) : (
+      <Input />
+    );
   return (
     <td {...restProps}>
       {editing ? (
         <Form.Item
           name={dataIndex}
-          style={{
-            margin: 0,
-          }}
-          rules={[
-            {
-              required: true,
-              message: "Required",
-            },
-          ]}
+          style={{ margin: 0 }}
+          rules={getValidationRules(record.configType)} // Use dynamic validation rules
         >
           {inputNode}
         </Form.Item>
@@ -68,7 +139,6 @@ const Configs = ({ isLogin }) => {
     try {
       const response = await configApi.getAllConfigsLatestSemester();
       const result = managerMapperUtil.mapConfigs(response);
-
       setConfigs(result);
     } catch (error) {
       message.error("Failed to fetch configs");
@@ -122,7 +192,7 @@ const Configs = ({ isLogin }) => {
     },
     {
       title: <strong>Config Type</strong>,
-      dataIndex: "configType",
+      dataIndex: "displayType",
       width: "30%",
     },
     {
@@ -143,12 +213,7 @@ const Configs = ({ isLogin }) => {
       align: "center",
       width: "15%",
     },
-    // {
-    //   title: <strong>Lastest Update</strong>,
-    //   dataIndex: "update",
-    //   width: "15%",
-    //   align: "center",
-    // },
+
     {
       title: <strong>Action</strong>,
       dataIndex: "action",

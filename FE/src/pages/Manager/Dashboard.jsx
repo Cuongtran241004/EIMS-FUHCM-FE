@@ -3,7 +3,7 @@ import NavBar_Manager from "../../components/NavBar/NavBar_Manager";
 import Header from "../../components/Header/Header.jsx";
 import {
   Layout,
-  Typography,
+  Spin,
   Row,
   Col,
   Divider,
@@ -45,6 +45,8 @@ const Dashboard = () => {
   const [todayRooms, setTodayRooms] = useState([]);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [roomLoading, setRoomLoading] = useState(false);
+  const [invigilationLoading, setInvigilationLoading] = useState(false);
+  const [examSlotLoading, setExamSlotLoading] = useState(false);
   const fetchExamSlotToday = async () => {
     try {
       // Fetch exam slot today
@@ -73,6 +75,7 @@ const Dashboard = () => {
   };
 
   const fetchExamSlotSummary = async (startTime, endTime) => {
+    setExamSlotLoading(true);
     try {
       const response = await examSlotApi.getExamSlotsSummary(
         startTime,
@@ -84,10 +87,14 @@ const Dashboard = () => {
         return new Date(a.date) - new Date(b.date);
       });
       setExamSlotSummary(result || []);
-    } catch (error) {}
+    } catch (error) {
+    } finally {
+      setExamSlotLoading(false);
+    }
   };
 
   const fetchInvigilationSummary = async (startTime, endTime) => {
+    setInvigilationLoading(true);
     try {
       const response = await examSlotApi.getInvigilatorsSummary(
         startTime,
@@ -111,7 +118,10 @@ const Dashboard = () => {
       });
 
       setInvigilationSummary(combinedData || []);
-    } catch (error) {}
+    } catch (error) {
+    } finally {
+      setInvigilationLoading(false);
+    }
   };
 
   const fetchRoomTodayByExamSlotId = async (examSlotId) => {
@@ -137,18 +147,11 @@ const Dashboard = () => {
     fetchInvigilationSummary(startTime, endTime);
   }, []);
 
-  const handleDateChangeExamSlots = (selectedDates) => {
+  const handleDateChange = (selectedDates) => {
     if (selectedDates && selectedDates.length === 2) {
       const startTime = selectedDates[0].startOf("day").toISOString();
       const endTime = selectedDates[1].endOf("day").toISOString();
-
       fetchExamSlotSummary(startTime, endTime);
-    }
-  };
-  const handleDateChangeInvigilators = (selectedDates) => {
-    if (selectedDates && selectedDates.length === 2) {
-      const startTime = selectedDates[0].startOf("day").toISOString();
-      const endTime = selectedDates[1].endOf("day").toISOString();
       fetchInvigilationSummary(startTime, endTime);
     }
   };
@@ -254,25 +257,43 @@ const Dashboard = () => {
         </Sider>
         <Content style={{ padding: "0 5px", width: "100%" }}>
           <div style={{ height: "49%" }}>
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "center",
+                width: "100%",
+              }}
+            >
+              <RangePicker
+                onChange={handleDateChange}
+                style={{ margin: "2px auto", width: "30%" }} // Set the width to control the RangePicker's size
+                format={"DD/MM/YYYY"}
+                defaultValue={[
+                  moment().startOf("month"),
+                  moment().endOf("month"),
+                ]}
+              />
+            </div>
+
             <Row style={{ height: "100%" }}>
               <Col
                 span={12}
                 style={{ backgroundColor: "#f0f2f5", padding: "5px" }}
               >
-                <RangePicker
-                  onChange={handleDateChangeExamSlots}
-                  style={{ marginBottom: "5px" }}
-                  format={"DD/MM/YYYY"}
-                  // a week contains today
-                  defaultValue={[
-                    moment().startOf("month"),
-                    moment().endOf("month"),
-                  ]}
-                />
                 <p style={{ padding: "0", margin: "0", textAlign: "center" }}>
                   <strong>Exam Slots Summary</strong>
                 </p>
-                {examSlotSummary.length > 0 ? (
+                {examSlotLoading ? (
+                  <Spin
+                    size="large"
+                    style={{
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      height: "50%",
+                    }}
+                  />
+                ) : examSlotSummary.length > 0 ? (
                   <ResponsiveContainer width="100%" height={250}>
                     <BarChart data={examSlotSummary}>
                       <CartesianGrid strokeDasharray="3 3" />
@@ -287,23 +308,26 @@ const Dashboard = () => {
                   <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
                 )}
               </Col>
+              {/* RangePicker between the two columns */}
+
               <Col
                 span={12}
                 style={{ backgroundColor: "#e6f7ff", padding: "5px" }}
               >
-                <RangePicker
-                  onChange={handleDateChangeInvigilators}
-                  style={{ marginBottom: "5px" }}
-                  format={"DD/MM/YYYY"}
-                  defaultValue={[
-                    moment().startOf("month"),
-                    moment().endOf("month"),
-                  ]}
-                />
                 <p style={{ padding: "0", margin: "0", textAlign: "center" }}>
                   <strong> Invigilation Summary</strong>
                 </p>
-                {invigilationSummary.length > 0 ? (
+                {invigilationLoading ? (
+                  <Spin
+                    size="large"
+                    style={{
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      height: "50%",
+                    }}
+                  />
+                ) : invigilationSummary.length > 0 ? (
                   <ResponsiveContainer width="100%" height={250}>
                     <LineChart data={invigilationSummary}>
                       <CartesianGrid strokeDasharray="3 3" />

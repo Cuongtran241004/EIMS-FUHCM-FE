@@ -68,16 +68,6 @@ export const SemesterProvider = ({ children }) => {
     }
   };
 
-  const addTodayAttendance = async () => {
-    try {
-      // Add today attendance, params is today (YYYY-MM-DD)
-      const today = moment().format("YYYY-MM-DD");
-      const result = await attendanceApi.addAllAttendanceByDate(today);
-    } catch (error) {
-      message.error("Failed to fetch today attendance");
-    }
-  };
-
   useEffect(() => {
     const fetchExamSlotBySemester = async () => {
       if (selectedSemester.id) {
@@ -104,7 +94,6 @@ export const SemesterProvider = ({ children }) => {
   useEffect(() => {
     fetchSemesters();
     fetchRequestType();
-    addTodayAttendance();
   }, []);
 
   const reloadSlots = () => {
