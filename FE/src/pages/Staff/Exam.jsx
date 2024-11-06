@@ -14,6 +14,7 @@ import {
   Row,
   Select,
   notification,
+  InputNumber,
 } from "antd";
 import subjectApi from "../../services/Subject.js";
 import examApi from "../../services/Exam.js";
@@ -336,9 +337,23 @@ const Exam = () => {
                 <Form.Item
                   name="duration"
                   label={<span className="custom-label">Duration</span>}
-                  rules={[{ required: true, message: "Required" }]}
+                  rules={[
+                    {
+                      required: true,
+                      message: "Please input the duration!",
+                    },
+                    {
+                      type: "number",
+                      min: 0,
+                      max: 240,
+                      message: "Invalid duration",
+                    },
+                  ]}
                 >
-                  <Input type="number" placeholder="Duration" />
+                  <InputNumber
+                    placeholder="Duration"
+                    style={{ width: "100%" }}
+                  />
                 </Form.Item>
               </Col>
             </Row>

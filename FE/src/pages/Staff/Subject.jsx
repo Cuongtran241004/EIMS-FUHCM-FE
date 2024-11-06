@@ -222,7 +222,7 @@ const Subject = () => {
                 },
               ]}
             >
-              <Input placeholder="Enter subject code" />
+              <Input placeholder="Enter subject code" maxLength={10} />
             </Form.Item>
 
             <Form.Item
@@ -235,7 +235,7 @@ const Subject = () => {
                 },
               ]}
             >
-              <Input placeholder="Enter subject name" />
+              <Input placeholder="Enter subject name" maxLength={50} />
             </Form.Item>
             <Row justify="space-between">
               <Col>

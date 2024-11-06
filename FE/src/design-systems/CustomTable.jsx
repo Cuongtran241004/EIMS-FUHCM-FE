@@ -53,6 +53,12 @@ const examScheduleTable = (handleRoomClick, handleEdit, handleDelete) => [
     },
   },
   {
+    title: "Number of Students",
+    dataIndex: "numberOfStudents",
+    key: "numberOfStudents",
+    align: "center",
+  },
+  {
     title: "Room",
     key: "room",
     align: "center",

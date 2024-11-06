@@ -15,6 +15,8 @@ import {
   notification,
   Input,
   Radio,
+  Tag,
+  InputNumber,
 } from "antd";
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
@@ -38,6 +40,7 @@ import { staffMapperUtil } from "../../utils/Mapper/StaffMapperUtil.jsx";
 import { examScheduleTable } from "../../design-systems/CustomTable.jsx";
 import { titleStyle } from "../../design-systems/CSS/Title.js";
 import "./CustomForm.css";
+import "./Exam_Schedule.css";
 import {
   deleteNotification,
   editNotification,
@@ -84,6 +87,7 @@ const Exam_Schedule = () => {
     "NEEDS_ROOM_ASSIGNMENT"
   );
   const [filteredExamSlotByStatus, setFilteredExamSlotByStatus] = useState([]);
+  const [selectedSemesterForm, setSelectedSemesterForm] = useState(null);
   const navigate = useNavigate();
 
   const fetchExamSchedule = async (semesterId, page) => {
@@ -233,11 +237,11 @@ const Exam_Schedule = () => {
       };
 
       const examSlotDataAdd = {
-        examSlotId: isEditing ? editingExamSlot.id : null,
         subjectExamId: examId,
         startAt: `${selectedDate}T${startTime}:00+07:00`,
         endAt: `${selectedDate}T${endTime}:00+07:00`,
-        requiredInvigilators: 15,
+        numberOfStudents: values.numberOfStudents,
+        requiredInvigilators: 5,
       };
       setLoadingSubmit(true); // Start loading
       try {
@@ -292,11 +296,10 @@ const Exam_Schedule = () => {
 
   // Handle semester selection in the form
   const handleSemesterChange = async (value) => {
-    console.log("Selected semester:", value);
     const selectedSemesterForm = availableSemesters.find(
       (sem) => sem.id === value
     );
-
+    setSelectedSemesterForm(selectedSemesterForm);
     if (selectedSemesterForm) {
       form.setFieldsValue({ semesterId: selectedSemesterForm.id }); // Update semesterId in the form
       fetchExams(selectedSemesterForm.id); // Fetch subjects for the selected semester
@@ -412,7 +415,22 @@ const Exam_Schedule = () => {
               label={<span className="custom-label">Date</span>}
               rules={[{ required: true, message: "Required" }]}
             >
-              <DatePicker format="DD-MM-YYYY" style={{ width: "100%" }} />
+              <DatePicker
+                format="DD-MM-YYYY"
+                style={{ width: "100%" }}
+                disabledDate={(current) => {
+                  // Disable dates before the start of the semester
+                  // and after the end of the semester
+                  return (
+                    current.isBefore(
+                      moment(selectedSemesterForm?.startAt).startOf("day")
+                    ) ||
+                    current.isAfter(
+                      moment(selectedSemesterForm?.endAt).endOf("day")
+                    )
+                  );
+                }}
+              />
             </Form.Item>
             <Row gutter={16}>
               <Col span={12}>
@@ -429,6 +447,13 @@ const Exam_Schedule = () => {
                     }}
                     onChange={handleChooseTime}
                     disabled={!examId}
+                    minuteStep={5}
+                    disabledTime={(current) => {
+                      return {
+                        disabledHours: () => [0, 1, 2, 3, 4, 5, 6, 21, 22, 23],
+                      };
+                    }}
+                    hideDisabledOptions={true}
                   />
                 </Form.Item>
               </Col>
@@ -450,6 +475,24 @@ const Exam_Schedule = () => {
                 </Form.Item>
               </Col>
             </Row>
+            <Form.Item
+              name="numberOfStudents"
+              label={<span className="custom-label">Students</span>}
+              rules={[
+                { required: true, message: "Required" },
+                {
+                  type: "number",
+                  min: 1,
+                  max: 5000,
+                  message: "Invalid number of students",
+                },
+              ]}
+            >
+              <InputNumber
+                placeholder="Enter number of students"
+                style={{ width: "100%" }}
+              ></InputNumber>
+            </Form.Item>
             <Row justify="space-between">
               <Col>
                 <Button
@@ -523,8 +566,12 @@ const Exam_Schedule = () => {
               }}
             >
               {examSlotStatus.map((type) => (
-                <Radio.Button key={type} value={type}>
-                  {renderExamStatus(type)}
+                <Radio.Button
+                  key={type}
+                  value={type}
+                  style={{ margin: "0", textAlign: "center", color: "#277DA1" }}
+                >
+                  <strong>{renderExamStatus(type)}</strong>
                 </Radio.Button>
               ))}
             </Radio.Group>
