@@ -1,7 +1,6 @@
 import React, { createContext, useState, useContext, useEffect } from "react";
 import { message } from "antd"; // Ensure to import message
 import semesterApi from "../../services/Semester.js";
-import examSlotApi from "../../services/ExamSlot.js";
 import configApi from "../../services/Config.js";
 
 // Create a context for the semester
@@ -16,9 +15,7 @@ export const SemesterProviderStaff = ({ children }) => {
   });
   const [configSemester, setConfigSemester] = useState([]);
   const [availableSemesters, setAvailableSemesters] = useState([]);
-  const [examSlotBySemester, setExamSlotBySemester] = useState([]);
   const [loading, setLoading] = useState(true); // Loading state
-  const [count, setCount] = useState(0); //count flag
 
   const fetchSemesters = async () => {
     setLoading(true); // Start loading
@@ -53,36 +50,24 @@ export const SemesterProviderStaff = ({ children }) => {
       setLoading(false); // Stop loading
     }
   };
-
+  const fetchConfigSemester = async () => {
+    try {
+      const resconfig = await configApi.getAllConfigsBySemesterId(
+        selectedSemester.id
+      );
+      setConfigSemester(resconfig || []);
+    } catch (error) {}
+  };
   useEffect(() => {
-    const fetchExamSlotBySemester = async () => {
-      if (selectedSemester.id) {
-        try {
-          const result = await examSlotApi.getExamSlotBySemesterId(
-            selectedSemester.id
-          );
-          const resconfig = await configApi.getAllConfigsBySemesterId(
-            selectedSemester.id
-          );
-
-          setExamSlotBySemester(result || []);
-          setConfigSemester(resconfig || []);
-        } catch (error) {
-          message.error("Failed to fetch exam slots");
-        }
-      }
-    };
-    fetchExamSlotBySemester();
-  }, [selectedSemester, count]);
+    if (selectedSemester.id) {
+      fetchConfigSemester();
+    }
+  }, [selectedSemester]);
 
   // Fetch semesters and set the default selected semester
   useEffect(() => {
     fetchSemesters();
   }, []);
-
-  const reloadSlots = () => {
-    setCount(count + 1);
-  };
 
   return (
     <SemesterContext.Provider
@@ -92,8 +77,6 @@ export const SemesterProviderStaff = ({ children }) => {
         semesters,
         availableSemesters,
         loading,
-        examSlotBySemester,
-        reloadSlots,
         configSemester,
       }} // Expose loading state
     >
