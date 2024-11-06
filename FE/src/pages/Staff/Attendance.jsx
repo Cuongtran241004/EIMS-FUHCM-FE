@@ -113,26 +113,6 @@ const Attendance = () => {
     }
   };
 
-  // const getHistoryAttendance = async () => {
-  //   setLoading(true);
-  //   try {
-  //     const today = moment().startOf("day"); // Get today's date without time
-  //     // Filter attendance for dates before today
-  //     const history = allAttendance.filter((item) => {
-  //       return moment(item.startAt).isBefore(today);
-  //     });
-  //     // Sort by `startAt` in descending order (most recent first)
-  //     history.sort((a, b) => {
-  //       return moment(b.startAt).diff(moment(a.startAt));
-  //     });
-  //     setData(history || []);
-  //   } catch (error) {
-  //     message.error("Failed to fetch history attendance");
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
-
   const handleCheckIn = async (examSlotId) => {
     setLoading(true);
     setIsCheckIn(true);
@@ -171,7 +151,7 @@ const Attendance = () => {
       setSelectedRowKeys(check);
       setAttendance(result || []);
     } catch (error) {
-      message.error("Failed to assign invigilators.");
+      message.error("Failed to fetch attendance");
     } finally {
       setLoading(false);
     }
@@ -214,7 +194,7 @@ const Attendance = () => {
       setSelectedRowKeys(check);
       setAttendance(result || []);
     } catch (error) {
-      message.error("Failed to assign invigilators.");
+      message.error("Failed to fetch attendance");
     } finally {
       setLoading(false);
     }

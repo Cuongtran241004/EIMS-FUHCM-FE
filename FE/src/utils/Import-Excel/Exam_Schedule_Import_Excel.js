@@ -26,7 +26,6 @@ export const Exam_Schedule_Import_Excel = (file) => {
 
       // Convert sheet to JSON
       const data = XLSX.utils.sheet_to_json(sheet);
-      console.log(data);
 
       // Map the data and combine the `date` and `startTime` to create `startAt`
       const examScheduleData = data

@@ -4,7 +4,6 @@ import semesterApi from "../../services/Semester.js";
 import examSlotApi from "../../services/ExamSlot.js";
 import configApi from "../../services/Config.js";
 import requestApi from "../../services/Request.js";
-import { getUserInfo } from "../API/getUserInfo.jsx";
 
 // Create a context for the semester
 const SemesterContext = createContext();
