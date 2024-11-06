@@ -1,5 +1,6 @@
 import axios from "axios";
-import { API_BASE_URL } from "../configs/urlApi.js";
+
+const API_BASE_URL = import.meta.env.VITE_APP_API_URL;
 const EXAM_SLOT_ROOM_API_BASE_URL = `${API_BASE_URL}/examslotrooms`;
 
 const handleError = (error) => {
