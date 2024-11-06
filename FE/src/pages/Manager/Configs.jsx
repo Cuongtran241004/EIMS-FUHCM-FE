@@ -152,7 +152,6 @@ const Configs = ({ isLogin }) => {
   }, []);
 
   const handleEdit = (record) => {
-    console.log(record);
     form.setFieldsValue({ value: "", ...record });
     setEditingKey(record.key);
   };
