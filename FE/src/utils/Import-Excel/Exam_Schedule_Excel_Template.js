@@ -18,19 +18,19 @@ export const Exam_Schedule_Excel_Template = (listOfExam) => {
 
   // Define columns for the "Exam Schedule" sheet (user input)
   examScheduleSheet.columns = [
-    { header: "Exam ID", key: "subjectExamId", width: 15 },
-    { header: "Date", key: "date", width: 25 },
-    { header: "Start Time", key: "startTime", width: 20 },
-    { header: "End Time", key: "endTime", width: 20 },
-    { header: "Number of Students", key: "numberOfStudents", width: 20 },
+    { header: "subjectExamId", key: "subjectExamId", width: 15 },
+    { header: "date", key: "date", width: 25 },
+    { header: "startTime", key: "startTime", width: 20 },
+    { header: "endTime", key: "endTime", width: 20 },
+    { header: "numberOfStudents", key: "numberOfStudents", width: 20 },
   ];
 
   // Add an example row for user input (blank row)
   examScheduleSheet.addRow({
     subjectExamId: "", // Empty cell to show dropdown
-    date: "",
-    startTime: "",
-    endTime: "",
+    date: "DD/MM/YYYY", // Placeholder for date format
+    startTime: "HH:MM",
+    endTime: "HH:MM",
     numberOfStudents: "",
   });
 

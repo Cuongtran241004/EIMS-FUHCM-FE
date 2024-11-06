@@ -386,13 +386,13 @@ const Exam_Schedule = () => {
     setFileLoading(true);
     try {
       const data = await Exam_Schedule_Import_Excel(file);
-
-      examSlotApi.addMultipleExamSlots(data);
-      message.success("Users imported successfully!");
-      fetchData(); // Refresh data after import
+      await examSlotApi.addMultipleExamSlots(data);
+      message.success("Exam schedules imported successfully!");
+      if (selectedSemester.id == selectedSemesterForm.id) {
+        fetchExamSchedule(selectedSemester.id, currentPage);
+      }
     } catch (error) {
-      console.error("Import error:", error);
-      message.error(IMPORT_USERS_FAILED);
+      message.error("Failed to import exam schedules");
     } finally {
       setFileLoading(false);
     }
@@ -458,7 +458,7 @@ const Exam_Schedule = () => {
               rules={[{ required: true, message: "Required" }]}
             >
               <DatePicker
-                format="DD-MM-YYYY"
+                format="DD/MM/YYYY"
                 style={{ width: "100%" }}
                 disabledDate={(current) => {
                   // Disable dates before the start of the semester
