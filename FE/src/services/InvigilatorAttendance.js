@@ -1,5 +1,6 @@
 import axios from "axios";
-import { API_BASE_URL } from "../configs/urlApi.js";
+
+const API_BASE_URL = import.meta.env.VITE_APP_API_URL;
 const STAFF_ATTENDANCE_API_BASE_URL = `${API_BASE_URL}/invigilator-attendance/staff`;
 const MANAGER_ATTENDANCE_API_BASE_URL = `${API_BASE_URL}/invigilator-attendance/manager`;
 
@@ -296,7 +297,6 @@ const attendanceApi = {
       handleError(error);
     }
   },
-
   getAttendanceReportBySemesterIdManager: async (semesterId) => {
     try {
       const response = await axios.get(

@@ -12,6 +12,9 @@ import {
   Empty,
   Tag,
   Divider,
+  Slider,
+  Table,
+  InputNumber,
 } from "antd";
 import moment from "moment";
 import examSlotHallApi from "../../services/ExamSlotHall";
@@ -37,12 +40,23 @@ const RoomSelectionPage = () => {
   const [unavailableRooms, setUnavailableRooms] = useState([]);
   const [usingRoom, setUsingRoom] = useState([]);
   const [loadingSubmit, setLoadingSubmit] = useState(false);
+  const [maxStudents, setMaxStudents] = useState(25); // Default max students per room
+  const [numberOfStudents, setNumberOfStudents] = useState(0); // Total number of students
+  const [choosenRooms, setChoosenRooms] = useState(0); // Total number of students
+  const [totalCapacity, setTotalCapacity] = useState(0); // Total number of students
+  // Calculate number of rooms dynamically based on the total number of students and max students per room
+  const calculateNumberOfRooms = (students, max) => {
+    return Math.ceil(students / max); // Round up to ensure enough rooms
+  };
+
+  const numberOfRooms = calculateNumberOfRooms(numberOfStudents, maxStudents);
 
   // Fetch exam slot data
   const fetchExamSlot = async () => {
     try {
       const response = await examSlotApi.getExamSlotById(examSlotId);
       setExamSlot(response);
+      setNumberOfStudents(response?.numberOfStudents || 0);
     } catch (error) {
       message.error("Failed to fetch exam slot");
     }
@@ -126,9 +140,13 @@ const RoomSelectionPage = () => {
       setSelectedRooms(
         selectedRooms.filter((selectedRoom) => selectedRoom.id !== room.id)
       );
+      setChoosenRooms(choosenRooms - 1);
+      setTotalCapacity(totalCapacity - room.capacity);
     } else {
       const updatedRooms = [...selectedRooms, room].sort((a, b) => a.id - b.id);
       setSelectedRooms(updatedRooms);
+      setChoosenRooms(choosenRooms + 1);
+      setTotalCapacity(totalCapacity + room.capacity);
     }
   };
 
@@ -262,6 +280,8 @@ const RoomSelectionPage = () => {
   const handleCancel = () => {
     setSelectedRooms(usingRoom.flat());
     setGroupedRooms(usingRoom);
+    setChoosenRooms(0);
+    setTotalCapacity(0);
   };
 
   const isAvailable = () => {
@@ -282,7 +302,11 @@ const RoomSelectionPage = () => {
         <Row style={{ height: "100%" }}>
           <Col
             span={12}
-            style={{ borderRight: "1px solid #f0f0f0", padding: "12px" }}
+            style={{
+              borderRight: "1px solid #f0f0f0",
+              padding: "12px",
+              backgroundColor: "#D6EEE0",
+            }}
           >
             <h1 style={titleRoomStyle}>
               {examSlot?.subjectExamDTO?.subjectCode}-
@@ -342,7 +366,10 @@ const RoomSelectionPage = () => {
                               : "",
                           }}
                         >
-                          {room.roomName}
+                          <strong style={{ color: "#F9C74F" }}>
+                            {room.roomName}
+                          </strong>{" "}
+                          | {room.capacity}
                         </Button>
                       ))}
                     </div>
@@ -352,11 +379,63 @@ const RoomSelectionPage = () => {
             </Spin>
           </Col>
 
-          <Col span={12} style={{ padding: "12px" }}>
-            <h1 style={{ ...titleRoomStyle, marginBottom: "55px" }}>
-              SELECTED ROOMS
-            </h1>
+          <Col
+            span={12}
+            style={{
+              padding: "12px",
+              backgroundColor: "",
+            }}
+          >
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <h3 style={{ color: "#F94144" }}>Max students in a room:</h3>
+              <Slider
+                min={15}
+                max={30}
+                value={maxStudents}
+                onChange={(value) => setMaxStudents(value)} // Update max students when slider changes
+                style={{ width: "40%", marginLeft: "20px" }}
+              />
+            </div>
+            <div style={{ display: "flex", justifyContent: "center" }}>
+              <table
+                className="table-assign"
+                style={{ textAlign: "left", fontSize: 13, marginLeft: 30 }}
+              >
+                <tbody>
+                  <tr>
+                    <th>Number of students:</th>
+                    <td> {numberOfStudents}</td>
+                  </tr>
+                  <tr>
+                    <th>Number of rooms:</th>
+                    <td> {numberOfRooms}</td>{" "}
+                    {/* Display the calculated number of rooms */}
+                  </tr>
+                </tbody>
+              </table>
 
+              <table
+                className="table-assign"
+                style={{ textAlign: "left", fontSize: 13, marginLeft: 30 }}
+              >
+                <tbody>
+                  <tr>
+                    <th>Choosen Rooms: </th>
+                    <td>{choosenRooms}</td>
+                  </tr>
+                  <tr>
+                    <th>Total Capacity: </th>
+                    <td>{totalCapacity}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
             {selectedRooms.length === 0 ? (
               <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
             ) : (
@@ -365,6 +444,7 @@ const RoomSelectionPage = () => {
                   display: "flex",
                   flexDirection: "row",
                   gap: "10px",
+                  marginTop: "5px",
                   flexWrap: "wrap",
                 }}
               >
@@ -375,7 +455,8 @@ const RoomSelectionPage = () => {
                       display: "flex",
                       gap: "8px",
                       border: "1px dashed #ccc",
-                      padding: "5px",
+                      padding: "3px",
+
                       width: "calc(50% - 10px)",
                       overflow: "auto",
                     }}

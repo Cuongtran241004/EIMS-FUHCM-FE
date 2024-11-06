@@ -1,5 +1,5 @@
 import axios from "axios";
-import { API_BASE_URL } from "../configs/urlApi.js";
+const API_BASE_URL = import.meta.env.VITE_APP_API_URL;
 const USER_API_BASE_URL = `${API_BASE_URL}/users`;
 
 const handleError = (error) => {
@@ -22,6 +22,7 @@ const userApi = {
       handleError(error);
     }
   },
+
   getUserByFuId: async (fuId) => {
     try {
       const response = await axios.get(`${USER_API_BASE_URL}/${fuId}`, {
@@ -51,6 +52,7 @@ const userApi = {
       handleError(error);
     }
   },
+
   addMultipleUsers: async (users) => {
     try {
       const response = await axios.post(`${USER_API_BASE_URL}/bulk`, users, {
@@ -85,6 +87,7 @@ const userApi = {
       handleError(error);
     }
   },
+
   deleteUser: async (fuId) => {
     try {
       const response = await axios.delete(`${USER_API_BASE_URL}/${fuId}`, {

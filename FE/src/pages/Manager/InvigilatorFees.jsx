@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import Header from "../../components/Header/Header.jsx";
 import NavBar_Manager from "../../components/NavBar/NavBar_Manager";
-import { useSemester } from "../../components/Context/SemesterContext.jsx";
+import { useSemester } from "../../components/Context/SemesterContextManager.jsx";
 import { selectButtonStyle } from "../../design-systems/CSS/Button.js";
 import { DownOutlined, SearchOutlined } from "@ant-design/icons";
 import {

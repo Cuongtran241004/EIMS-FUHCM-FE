@@ -1,5 +1,6 @@
 import axios from "axios";
-import { API_BASE_URL } from "../configs/urlApi.js";
+
+const API_BASE_URL = import.meta.env.VITE_APP_API_URL;
 const REQUEST_API_BASE_URL = `${API_BASE_URL}/requests`;
 
 const handleError = (error) => {
@@ -89,24 +90,6 @@ const requestApi = {
       handleError(error);
     }
   },
-  updateAttendanceStatus: async (request) => {
-    try {
-      const response = await axios.put(
-        `${REQUEST_API_BASE_URL}/requestid=${request.id}`,
-        request,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Accept: "application/json",
-          },
-          withCredentials: true,
-        }
-      );
-      return response.data;
-    } catch (error) {
-      handleError(error);
-    }
-  },
   updateRequestStatus: async (request) => {
     try {
       const response = await axios.put(
@@ -125,7 +108,6 @@ const requestApi = {
       handleError(error);
     }
   },
-
   updateRequest: async (request) => {
     try {
       const response = await axios.put(`${REQUEST_API_BASE_URL}`, request, {

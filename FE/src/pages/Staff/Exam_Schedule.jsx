@@ -15,6 +15,9 @@ import {
   notification,
   Input,
   Radio,
+  InputNumber,
+  Upload,
+  Divider,
 } from "antd";
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
@@ -26,10 +29,12 @@ import {
   CaretRightFilled,
   CloseOutlined,
   DownOutlined,
+  DownloadOutlined,
   SearchOutlined,
+  UploadOutlined,
 } from "@ant-design/icons";
 import moment from "moment";
-import { useSemester } from "../../components/Context/SemesterContext.jsx";
+import { useSemester } from "../../components/Context/SemesterContextStaff.jsx";
 import {
   addButtonStyle,
   selectButtonStyle,
@@ -38,6 +43,7 @@ import { staffMapperUtil } from "../../utils/Mapper/StaffMapperUtil.jsx";
 import { examScheduleTable } from "../../design-systems/CustomTable.jsx";
 import { titleStyle } from "../../design-systems/CSS/Title.js";
 import "./CustomForm.css";
+import "./Exam_Schedule.css";
 import {
   deleteNotification,
   editNotification,
@@ -51,6 +57,8 @@ import {
   EDIT_EXAM_SCHEDULE_SUCCESS,
   FETCH_EXAM_SCHEDULE_FAILED,
 } from "../../configs/messages.js";
+import { Exam_Schedule_Import_Excel } from "../../utils/Import-Excel/Exam_Schedule_Import_Excel.js";
+import { Exam_Schedule_Excel_Template } from "../../utils/Import-Excel/Exam_Schedule_Excel_Template.js";
 const { Option } = Select;
 const { Content } = Layout;
 const PAGE_SIZE = 6;
@@ -78,12 +86,14 @@ const Exam_Schedule = () => {
   const [editingExamSlot, setEditingExamSlot] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalItems, setTotalItems] = useState(1);
+  const [fileLoading, setFileLoading] = useState(false);
   const [examId, setExamId] = useState(null);
   const [loadingSubmit, setLoadingSubmit] = useState(false);
   const [selectedExamSlotStatus, setSelectedExamSlotStatus] = useState(
     "NEEDS_ROOM_ASSIGNMENT"
   );
   const [filteredExamSlotByStatus, setFilteredExamSlotByStatus] = useState([]);
+  const [selectedSemesterForm, setSelectedSemesterForm] = useState(null);
   const navigate = useNavigate();
 
   const fetchExamSchedule = async (semesterId, page) => {
@@ -126,6 +136,7 @@ const Exam_Schedule = () => {
     try {
       const result = await examApi.getExamBySemesterId(semesterId);
       setExams(result || []);
+      console.log("exams", result);
       setFilteredExams(result);
     } catch (error) {
       message.error("Failed to load subjects. Please try again.");
@@ -233,11 +244,11 @@ const Exam_Schedule = () => {
       };
 
       const examSlotDataAdd = {
-        examSlotId: isEditing ? editingExamSlot.id : null,
         subjectExamId: examId,
         startAt: `${selectedDate}T${startTime}:00+07:00`,
         endAt: `${selectedDate}T${endTime}:00+07:00`,
-        requiredInvigilators: 15,
+        numberOfStudents: values.numberOfStudents,
+        requiredInvigilators: 5,
       };
       setLoadingSubmit(true); // Start loading
       try {
@@ -292,11 +303,10 @@ const Exam_Schedule = () => {
 
   // Handle semester selection in the form
   const handleSemesterChange = async (value) => {
-    console.log("Selected semester:", value);
     const selectedSemesterForm = availableSemesters.find(
       (sem) => sem.id === value
     );
-
+    setSelectedSemesterForm(selectedSemesterForm);
     if (selectedSemesterForm) {
       form.setFieldsValue({ semesterId: selectedSemesterForm.id }); // Update semesterId in the form
       fetchExams(selectedSemesterForm.id); // Fetch subjects for the selected semester
@@ -351,6 +361,41 @@ const Exam_Schedule = () => {
 
   const handleChooseExam = (value) => {
     setExamId(value);
+  };
+
+  const beforeUpload = (file) => {
+    const isXlsx =
+      file.type ===
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+    const isLt4M = file.size / 1024 / 1024 < 4;
+
+    if (!isXlsx) {
+      message.error("You can only upload .xlsx files!");
+      return false; // Prevent upload if file type is not .xlsx
+    }
+
+    if (!isLt4M) {
+      message.error("File must be smaller than 4MB!");
+      return false; // Prevent upload if file is larger than 4MB
+    }
+
+    return true; // Accept file if both conditions are met
+  };
+
+  const handleFileUpload = async ({ file }) => {
+    setFileLoading(true);
+    try {
+      const data = await Exam_Schedule_Import_Excel(file);
+      await examSlotApi.addMultipleExamSlots(data);
+      message.success("Exam schedules imported successfully!");
+      if (selectedSemester.id == selectedSemesterForm.id) {
+        fetchExamSchedule(selectedSemester.id, currentPage);
+      }
+    } catch (error) {
+      message.error("Failed to import exam schedules");
+    } finally {
+      setFileLoading(false);
+    }
   };
   return (
     <Layout style={{ height: "100vh" }}>
@@ -412,7 +457,22 @@ const Exam_Schedule = () => {
               label={<span className="custom-label">Date</span>}
               rules={[{ required: true, message: "Required" }]}
             >
-              <DatePicker format="DD-MM-YYYY" style={{ width: "100%" }} />
+              <DatePicker
+                format="DD/MM/YYYY"
+                style={{ width: "100%" }}
+                disabledDate={(current) => {
+                  // Disable dates before the start of the semester
+                  // and after the end of the semester
+                  return (
+                    current.isBefore(
+                      moment(selectedSemesterForm?.startAt).startOf("day")
+                    ) ||
+                    current.isAfter(
+                      moment(selectedSemesterForm?.endAt).endOf("day")
+                    )
+                  );
+                }}
+              />
             </Form.Item>
             <Row gutter={16}>
               <Col span={12}>
@@ -429,6 +489,13 @@ const Exam_Schedule = () => {
                     }}
                     onChange={handleChooseTime}
                     disabled={!examId}
+                    minuteStep={5}
+                    disabledTime={(current) => {
+                      return {
+                        disabledHours: () => [0, 1, 2, 3, 4, 5, 6, 21, 22, 23],
+                      };
+                    }}
+                    hideDisabledOptions={true}
                   />
                 </Form.Item>
               </Col>
@@ -450,6 +517,24 @@ const Exam_Schedule = () => {
                 </Form.Item>
               </Col>
             </Row>
+            <Form.Item
+              name="numberOfStudents"
+              label={<span className="custom-label">Students</span>}
+              rules={[
+                { required: true, message: "Required" },
+                {
+                  type: "number",
+                  min: 1,
+                  max: 5000,
+                  message: "Invalid number of students",
+                },
+              ]}
+            >
+              <InputNumber
+                placeholder="Enter number of students"
+                style={{ width: "100%" }}
+              ></InputNumber>
+            </Form.Item>
             <Row justify="space-between">
               <Col>
                 <Button
@@ -476,6 +561,44 @@ const Exam_Schedule = () => {
               </Col>
             </Row>
           </Form>
+          <Divider style={{ color: "#F9C74F" }}>Import Exam Schedules</Divider>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              marginTop: "10px",
+            }}
+          >
+            <Upload
+              beforeUpload={(file) => {
+                const isValid = beforeUpload(file);
+                if (isValid) {
+                  handleFileUpload({ file }); // Trigger file upload only if valid
+                }
+                return false; // Prevent default upload behavior
+              }}
+              showUploadList={false}
+              maxCount={1}
+              method="POST"
+            >
+              <Button
+                icon={<UploadOutlined />}
+                loading={fileLoading}
+                style={{ marginRight: "10px" }}
+              >
+                Import
+              </Button>
+            </Upload>
+
+            <Button
+              icon={<DownloadOutlined />}
+              onClick={() => Exam_Schedule_Excel_Template(exams)}
+              type="default"
+              disabled={exams.length === 0 || selectedSemesterForm === null}
+            >
+              Template
+            </Button>
+          </div>
         </Sider>
 
         <Content style={{ padding: "24px", background: "#fff" }}>
@@ -523,8 +646,12 @@ const Exam_Schedule = () => {
               }}
             >
               {examSlotStatus.map((type) => (
-                <Radio.Button key={type} value={type}>
-                  {renderExamStatus(type)}
+                <Radio.Button
+                  key={type}
+                  value={type}
+                  style={{ margin: "0", textAlign: "center", color: "#277DA1" }}
+                >
+                  <strong>{renderExamStatus(type)}</strong>
                 </Radio.Button>
               ))}
             </Radio.Group>
@@ -540,8 +667,8 @@ const Exam_Schedule = () => {
               )}
               pagination={{
                 pageSize: PAGE_SIZE,
-                total: totalItems,
-                current: currentPage,
+                // total: totalItems,
+                // current: currentPage,
                 onChange: handleTableChange,
               }}
             />

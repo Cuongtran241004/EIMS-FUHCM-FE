@@ -1,5 +1,6 @@
 import axios from "axios";
-import { API_BASE_URL } from "../configs/urlApi.js";
+
+const API_BASE_URL = import.meta.env.VITE_APP_API_URL;
 const ROOM_API_BASE_URL = `${API_BASE_URL}/rooms`;
 
 const handleError = (error) => {
@@ -21,9 +22,10 @@ const roomApi = {
       handleError(error);
     }
   },
-  getRoomById: async (id) => {
+
+  getRoomByName: async (name) => {
     try {
-      const response = await axios.get(`${ROOM_API_BASE_URL}/${id}`, {
+      const response = await axios.get(`${ROOM_API_BASE_URL}/${name}`, {
         headers: {
           "Content-Type": "application/json",
           Accept: "application/json",
@@ -35,6 +37,7 @@ const roomApi = {
       handleError(error);
     }
   },
+
   addRoom: async (room) => {
     try {
       const response = await axios.post(`${ROOM_API_BASE_URL}`, room, {
@@ -49,6 +52,7 @@ const roomApi = {
       handleError(error);
     }
   },
+
   updateRoom: async (room) => {
     try {
       const response = await axios.put(

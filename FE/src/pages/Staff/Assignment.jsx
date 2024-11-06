@@ -23,7 +23,7 @@ import examSlotApi from "../../services/ExamSlot";
 import { staffMapperUtil } from "../../utils/Mapper/StaffMapperUtil";
 import moment from "moment";
 import Header from "../../components/Header/Header.jsx";
-import { useSemester } from "../../components/Context/SemesterContext.jsx";
+import { useSemester } from "../../components/Context/SemesterContextStaff.jsx";
 import { selectButtonStyle } from "../../design-systems/CSS/Button.js";
 import { FETCH_EXAM_SCHEDULE_FAILED } from "../../configs/messages";
 import { assignmentTag } from "../../design-systems/CustomTag.jsx";

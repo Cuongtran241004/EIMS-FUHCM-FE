@@ -21,7 +21,7 @@ import {
   SaveOutlined,
   SearchOutlined,
 } from "@ant-design/icons";
-import { useSemester } from "../../components/Context/SemesterContext.jsx";
+import { useSemester } from "../../components/Context/SemesterContextManager.jsx";
 import dayjs from "dayjs";
 import moment from "moment";
 import { titleStyle } from "../../design-systems/CSS/Title.js";

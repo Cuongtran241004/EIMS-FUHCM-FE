@@ -31,7 +31,7 @@ import {
   SearchOutlined,
 } from "@ant-design/icons";
 import Header from "../../components/Header/Header.jsx";
-import { useSemester } from "../../components/Context/SemesterContext.jsx";
+import { useSemester } from "../../components/Context/SemesterContextStaff.jsx";
 import { subjectTable } from "../../design-systems/CustomTable.jsx";
 import { titleStyle } from "../../design-systems/CSS/Title.js";
 import {
@@ -222,7 +222,7 @@ const Subject = () => {
                 },
               ]}
             >
-              <Input placeholder="Enter subject code" />
+              <Input placeholder="Enter subject code" maxLength={10} />
             </Form.Item>
 
             <Form.Item
@@ -235,7 +235,7 @@ const Subject = () => {
                 },
               ]}
             >
-              <Input placeholder="Enter subject name" />
+              <Input placeholder="Enter subject name" maxLength={50} />
             </Form.Item>
             <Row justify="space-between">
               <Col>

@@ -1,5 +1,5 @@
 import axios from "axios";
-import { API_BASE_URL } from "../configs/urlApi.js";
+const API_BASE_URL = import.meta.env.VITE_APP_API_URL;
 const SUBJECT_API_BASE_URL = `${API_BASE_URL}/subjects`;
 
 const handleError = (error) => {
@@ -22,6 +22,7 @@ const subjectApi = {
       handleError(error);
     }
   },
+
   getSubjectBySemester: async (semesterId) => {
     try {
       const response = await axios.get(
@@ -39,6 +40,7 @@ const subjectApi = {
       handleError(error);
     }
   },
+
   addSubject: async (subject) => {
     try {
       const response = await axios.post(`${SUBJECT_API_BASE_URL}`, subject, {
@@ -53,6 +55,7 @@ const subjectApi = {
       handleError(error);
     }
   },
+
   updateSubject: async (subject) => {
     try {
       const response = await axios.put(
@@ -71,6 +74,7 @@ const subjectApi = {
       handleError(error);
     }
   },
+
   deleteSubject: async (id) => {
     try {
       const response = await axios.delete(`${SUBJECT_API_BASE_URL}/${id}`, {

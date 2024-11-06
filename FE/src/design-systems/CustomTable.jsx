@@ -14,17 +14,20 @@ const examScheduleTable = (handleRoomClick, handleEdit, handleDelete) => [
     dataIndex: "subjectCode",
     key: "subjectCode",
     align: "center",
+    width: "10%",
   },
   {
     title: "Subject",
     dataIndex: "subjectName",
     key: "subjectName",
+    width: "20%",
   },
   {
     title: "Exam Type",
     dataIndex: "examType",
     key: "examType",
     align: "center",
+    width: "10%",
     render: (text) => examTypeTag(text),
   },
   {
@@ -32,7 +35,7 @@ const examScheduleTable = (handleRoomClick, handleEdit, handleDelete) => [
     dataIndex: "startAt", // Use startAt to extract date
     key: "date",
     align: "center",
-    width: "15%",
+    width: "10%",
     render: (text) => moment(text).format("DD/MM/YYYY"), // Format as DD-MM-YYYY
   },
   {
@@ -53,6 +56,13 @@ const examScheduleTable = (handleRoomClick, handleEdit, handleDelete) => [
     },
   },
   {
+    title: "Number of Students",
+    dataIndex: "numberOfStudents",
+    key: "numberOfStudents",
+    align: "center",
+    width: "10%",
+  },
+  {
     title: "Room",
     key: "room",
     align: "center",
@@ -62,16 +72,7 @@ const examScheduleTable = (handleRoomClick, handleEdit, handleDelete) => [
       </Button>
     ),
   },
-  // {
-  //   title: "Invigilator",
-  //   key: "invigilator",
-  //   align: "center",
-  //   render: (text, record) => (
-  //     <Button type="text" onClick={() => handleAssignmentClick(record.id)}>
-  //       <PlusCircleOutlined style={{ fontSize: "20px", color: "#43AA8B" }} />
-  //     </Button>
-  //   ),
-  // },
+
   {
     title: "Status",
     dataIndex: "status",

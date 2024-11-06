@@ -1,43 +1,70 @@
-import * as XLSX from "xlsx";
+import ExcelJS from "exceljs";
 import { Button } from "antd";
 import { saveAs } from "file-saver";
 import { DownloadOutlined } from "@ant-design/icons";
 
 const exportToExcel = (data) => {
-  // Flatten the data to have each exam slot on a new row
-  const formattedData = data.flatMap((invigilator) =>
-    invigilator.detail.map((detail) => ({
-      FuID: invigilator.fuId,
-      Name: `${invigilator.lastName} ${invigilator.firstName}`,
-      Email: invigilator.email,
-      Phone: invigilator.phone,
-      "Total Exam Slots": invigilator.totalSlots,
-      "Total Hours": invigilator.totalHours,
-      "Hourly Rate": invigilator.hourlyRate,
-      "Calculated Amounts": invigilator.fee,
-      "Subject Code": detail.subjectCode,
-      "Subject Name": detail.subjectName,
-      "Exam Type": detail.examType,
-      "Exam Date": detail.date,
-      "Start Time": detail.startAt,
-      "End Time": detail.endAt,
-    }))
-  );
+  // Create a new workbook
+  const workbook = new ExcelJS.Workbook();
 
-  // Create a new workbook and add the data
-  const worksheet = XLSX.utils.json_to_sheet(formattedData);
-  const workbook = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(workbook, worksheet, "Invigilation Report");
+  // Create a worksheet for the invigilation report
+  const worksheet = workbook.addWorksheet("Invigilation Report");
+
+  // Define columns for the sheet (headers)
+  worksheet.columns = [
+    { header: "FuID", key: "fuId", width: 15 },
+    { header: "Name", key: "name", width: 25 },
+    { header: "Email", key: "email", width: 25 },
+    { header: "Phone", key: "phone", width: 15 },
+    { header: "Total Exam Slots", key: "totalSlots", width: 20 },
+    { header: "Total Hours", key: "totalHours", width: 20 },
+    { header: "Hourly Rate", key: "hourlyRate", width: 20 },
+    { header: "Calculated Amounts", key: "fee", width: 20 },
+    { header: "Subject Code", key: "subjectCode", width: 15 },
+    { header: "Subject Name", key: "subjectName", width: 40 },
+    { header: "Exam Type", key: "examType", width: 20 },
+    { header: "Exam Date", key: "examDate", width: 15 },
+    { header: "Start Time", key: "startTime", width: 15 },
+    { header: "End Time", key: "endTime", width: 15 },
+  ];
+
+  // Flatten the data to have each exam slot on a new row
+  const formattedData = data.flatMap((invigilator) => {
+    // Check if the invigilator details are available
+    if (invigilator.detail && invigilator.detail.length > 0) {
+      return invigilator.detail.map((detail) => ({
+        fuId: invigilator.fuId,
+        name: `${invigilator.lastName} ${invigilator.firstName}`,
+        email: invigilator.email,
+        phone: invigilator.phone,
+        totalSlots: invigilator.totalSlots,
+        totalHours: invigilator.totalHours,
+        hourlyRate: invigilator.hourlyRate,
+        fee: invigilator.fee,
+        subjectCode: detail.subjectCode,
+        subjectName: detail.subjectName,
+        examType: detail.examType,
+        examDate: detail.date,
+        startTime: detail.startAt,
+        endTime: detail.endAt,
+      }));
+    }
+    return []; // Return empty array if no details are present
+  });
+
+  // Add the formatted data rows to the worksheet
+  formattedData.forEach((row) => {
+    worksheet.addRow(row);
+  });
 
   // Generate Excel file and trigger download
-  const excelBuffer = XLSX.write(workbook, { bookType: "xlsx", type: "array" });
-  const dataBlob = new Blob([excelBuffer], {
-    type: "application/octet-stream",
+  workbook.xlsx.writeBuffer().then((buffer) => {
+    const dataBlob = new Blob([buffer], { type: "application/octet-stream" });
+    saveAs(
+      dataBlob,
+      `Invigilation_Report_${new Date().toISOString().split("T")[0]}.xlsx`
+    );
   });
-  saveAs(
-    dataBlob,
-    `Invigilation_Report_${new Date().toISOString().split("T")[0]}.xlsx`
-  );
 };
 
 // Render your export button

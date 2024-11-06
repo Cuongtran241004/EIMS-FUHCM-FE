@@ -327,7 +327,7 @@ const Users = ({ isLogin }) => {
                 label="FUID"
                 rules={[{ required: true, message: "Required" }]}
               >
-                <Input placeholder="Enter FUID" />
+                <Input placeholder="Enter FUID" maxLength={15} />
               </Form.Item>
             </Col>
             <Col span={8}>
@@ -338,7 +338,7 @@ const Users = ({ isLogin }) => {
                   { required: true, message: "Please input first name!" },
                 ]}
               >
-                <Input placeholder="Enter first name" />
+                <Input placeholder="Enter first name" maxLength={15} />
               </Form.Item>
             </Col>
             <Col span={10}>
@@ -347,7 +347,7 @@ const Users = ({ isLogin }) => {
                 label="Last Name"
                 rules={[{ required: true, message: "Please input last name!" }]}
               >
-                <Input placeholder="Enter last name" />
+                <Input placeholder="Enter last name" maxLength={50} />
               </Form.Item>
             </Col>
           </Row>
@@ -360,9 +360,13 @@ const Users = ({ isLogin }) => {
                 rules={[
                   { required: true, message: "Please input email!" },
                   { type: "email", message: "Please enter a valid email!" },
+                  {
+                    pattern: /^[\w.-]+@(fpt\.edu\.vn|fe\.edu\.vn)$/,
+                    message: "Email must be @fpt.edu.vn or @fe.edu.vn",
+                  },
                 ]}
               >
-                <Input placeholder="Enter email" />
+                <Input placeholder="Enter email" maxLength={50} />
               </Form.Item>
             </Col>
             <Col span={8}>
@@ -371,9 +375,13 @@ const Users = ({ isLogin }) => {
                 label="Phone"
                 rules={[
                   { required: true, message: "Please input phone number!" },
+                  {
+                    pattern: /^0\d{9,10}$/,
+                    message: "Invalid phone number",
+                  },
                 ]}
               >
-                <Input placeholder="Phone number" />
+                <Input placeholder="Phone number" maxLength={10} />
               </Form.Item>
             </Col>
           </Row>

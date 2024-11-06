@@ -16,7 +16,7 @@ import {
   Input,
 } from "antd";
 import examSlotApi from "../../services/ExamSlot.js";
-import { useSemester } from "../../components/Context/SemesterContext.jsx";
+import { useSemester } from "../../components/Context/SemesterContextStaff.jsx";
 import {
   BackwardOutlined,
   CloseOutlined,

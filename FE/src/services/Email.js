@@ -1,5 +1,5 @@
 import axios from "axios";
-import { API_BASE_URL } from "../configs/urlApi.js";
+const API_BASE_URL = import.meta.env.VITE_APP_API_URL;
 const EMAIL_API_BASE_URL = `${API_BASE_URL}/email`;
 
 const handleError = (error) => {

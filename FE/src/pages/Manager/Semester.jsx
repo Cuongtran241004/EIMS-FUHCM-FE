@@ -291,7 +291,7 @@ const Semester = ({ isLogin }) => {
                 label="Name"
                 rules={[{ required: true, message: "Required" }]}
               >
-                <Input placeholder="Semester name" />
+                <Input placeholder="Semester name" maxLength={15} />
               </Form.Item>
             </Col>
             <Col span={16}>
@@ -304,6 +304,21 @@ const Semester = ({ isLogin }) => {
                       required: true,
                       message: "Please select the date range!",
                     },
+                    {
+                      validator: (_, value) => {
+                        if (!value || value.length !== 2) {
+                          return Promise.reject();
+                        }
+                        const [startDate, endDate] = value;
+                        // Check if the end date is within 4 months of the start date
+                        if (endDate.diff(startDate, "months") > 4) {
+                          return Promise.reject(
+                            new Error("The date range cannot exceed 4 months")
+                          );
+                        }
+                        return Promise.resolve();
+                      },
+                    },
                   ]}
                   style={{ display: "inline-block", width: "calc(100% - 8px)" }}
                 >
@@ -313,6 +328,11 @@ const Semester = ({ isLogin }) => {
                       current && current < moment().startOf("day")
                     }
                     format="DD/MM/YYYY"
+                    onChange={(dates) => {
+                      if (dates && dates.length === 2) {
+                        form.validateFields(["dateRange"]);
+                      }
+                    }}
                   />
                 </Form.Item>
               </Form.Item>

@@ -14,7 +14,7 @@ import {
 import { DownOutlined, ExclamationCircleOutlined } from "@ant-design/icons";
 import NavBar_Manager from "../../components/NavBar/NavBar_Manager";
 import Header from "../../components/Header/Header.jsx";
-import { useSemester } from "../../components/Context/SemesterContext.jsx";
+import { useSemester } from "../../components/Context/SemesterContextManager.jsx";
 import { Calendar as BigCalendar, momentLocalizer } from "react-big-calendar";
 import CustomToolbar from "../../components/CustomCalendar/CustomToolbar";
 import moment from "moment";
@@ -23,12 +23,11 @@ import examSlotApi from "../../services/ExamSlot.js";
 import "./ExamSlots.css";
 import { selectButtonStyle } from "../../design-systems/CSS/Button.js";
 import { requestTag } from "../../design-systems/CustomTag.jsx";
-import "./calendar.css"
+import "./calendar.css";
 
 const localizer = momentLocalizer(moment);
 const { Content, Sider } = Layout;
 const { confirm } = Modal;
-
 
 const ExamSlots = () => {
   const {
@@ -45,13 +44,13 @@ const ExamSlots = () => {
   const [checkedSlots, setCheckedSlots] = useState([]);
   const [modalState, setModalState] = useState({ show: false, action: "" });
   const [status, setStatus] = useState("");
-  const [view, setView] = useState('month');
+  const [view, setView] = useState("month");
   const [count, setCount] = useState(0);
 
-
-
   const handleMenuClick = (e) => {
-    const selected = semesters.find((semester) => semester.id === parseInt(e.key));
+    const selected = semesters.find(
+      (semester) => semester.id === parseInt(e.key)
+    );
     setSelectedSemester(selected);
   };
 
@@ -65,7 +64,6 @@ const ExamSlots = () => {
     onClick: handleMenuClick,
   };
 
-
   const handleSelectEvent = (event) => {
     setSelectedEvent(event);
     setIsModalVisible(true);
@@ -75,7 +73,6 @@ const ExamSlots = () => {
     setIsModalVisible(false);
   };
 
-
   const handleCheckboxChange = (slotId) => {
     setCheckedSlots((prev) =>
       prev.includes(slotId)
@@ -83,12 +80,12 @@ const ExamSlots = () => {
         : [...prev, slotId]
     );
   };
-  
+
   useEffect(() => {
-  const handleConfirmSlots = async () => {
-    if (!status) {
-      return;
-    }
+    const handleConfirmSlots = async () => {
+      if (!status) {
+        return;
+      }
       confirm({
         title: `Do you want to ${status.toLowerCase()} these slots?`,
         icon: <ExclamationCircleOutlined />,
@@ -101,7 +98,8 @@ const ExamSlots = () => {
             status,
           }));
           try {
-            const success = await examSlotApi.updateExamSlotByManager(updatedSlots);
+            const success =
+              await examSlotApi.updateExamSlotByManager(updatedSlots);
             if (success && updatedSlots.length > 0) {
               message.success(`${status} successfully!`);
               reloadSlots();
@@ -119,10 +117,11 @@ const ExamSlots = () => {
     };
     handleConfirmSlots();
   }, [count]);
-  
 
   const openModalForAction = () => {
-    const pending = examSlotBySemester.filter((slot) => slot.status === "PENDING");
+    const pending = examSlotBySemester.filter(
+      (slot) => slot.status === "PENDING"
+    );
     setPendingSlots(pending);
     setModalState({ show: true, action: "" });
   };
@@ -130,7 +129,8 @@ const ExamSlots = () => {
   const EventComponent = ({ event }) => (
     <span>
       <p style={{ margin: 0, fontWeight: 500, fontSize: 13.33333 }}>
-        {moment(event.startAt).format("HH:mm")} - {moment(event.endAt).format("HH:mm")}
+        {moment(event.startAt).format("HH:mm")} -{" "}
+        {moment(event.endAt).format("HH:mm")}
       </p>
     </span>
   );
@@ -160,7 +160,9 @@ const ExamSlots = () => {
       dataIndex: "requiredInvigilators",
       key: "requiredInvigilators",
       render: (text, record) => (
-        <span style={{ display: 'flex', justifyContent: 'center' }}>{`${record.requiredInvigilators}`}</span>
+        <span
+          style={{ display: "flex", justifyContent: "center" }}
+        >{`${record.requiredInvigilators}`}</span>
       ),
     },
     {
@@ -183,11 +185,8 @@ const ExamSlots = () => {
     },
   ];
 
-
-
-
   return (
-    <Layout style={{ height: "100vh", overflowY: 'hidden' }}>
+    <Layout style={{ height: "100vh", overflowY: "hidden" }}>
       <Header />
       <Layout>
         <Sider width={256} style={{ backgroundColor: "#4D908E" }}>
@@ -195,19 +194,38 @@ const ExamSlots = () => {
         </Sider>
         <Layout>
           <Content style={{ padding: "24px", minHeight: "100vh" }}>
-            <h1 style={{ color: "red", display: "flex", justifyContent: "center", marginTop: 0, marginBottom: 0 }}> EXAM SLOTS </h1>
+            <h1
+              style={{
+                color: "red",
+                display: "flex",
+                justifyContent: "center",
+                marginTop: 0,
+                marginBottom: 0,
+              }}
+            >
+              {" "}
+              EXAM SLOTS{" "}
+            </h1>
             {loading ? (
               <Spin tip="Loading..." size="large" />
             ) : (
-              <div style={{ display: "flex", alignItems: "flex-start", marginTop: -20 }}>
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "flex-start",
+                  marginTop: -20,
+                }}
+              >
                 <BigCalendar
-                  views={['month', 'agenda', 'day']}
+                  views={["month", "agenda", "day"]}
                   localizer={localizer}
-                  events={examSlotBySemester.filter((slot) => slot.status !== "NEEDS_ROOM_ASSIGNMENT")}
+                  events={examSlotBySemester.filter(
+                    (slot) => slot.status !== "NEEDS_ROOM_ASSIGNMENT"
+                  )}
                   length={6}
                   onView={setView}
                   view={view}
-                  dayLayoutAlgorithm='no-overlap'
+                  dayLayoutAlgorithm="no-overlap"
                   step={30}
                   timeslots={1}
                   onSelectEvent={handleSelectEvent}
@@ -217,7 +235,8 @@ const ExamSlots = () => {
                   components={{ event: EventComponent, toolbar: CustomToolbar }}
                   messages={{ event: "Time" }}
                   formats={{
-                    agendaDateFormat: (date) => moment(date).format("DD/MM/YYYY"),
+                    agendaDateFormat: (date) =>
+                      moment(date).format("DD/MM/YYYY"),
                     timeGutterFormat: (date) => moment(date).format("HH:mm"),
                   }}
                   eventPropGetter={(event) => {
@@ -246,28 +265,89 @@ const ExamSlots = () => {
                   title="Details of exam slot"
                   open={isModalVisible}
                   onCancel={handleCloseEventModal}
-                  footer={[<Button key="close" onClick={handleCloseEventModal}>Close</Button>]}
+                  footer={[
+                    <Button key="close" onClick={handleCloseEventModal}>
+                      Close
+                    </Button>,
+                  ]}
                 >
                   {selectedEvent && (
                     <div>
                       <table>
                         <tbody>
-                        <tr><th className="table-head"><strong>Date:</strong></th><td>{moment(selectedEvent.startAt).format("DD/MM/YYYY")}</td></tr>
-                        <tr><th className="table-head"><strong>Time:</strong></th><td>{moment(selectedEvent.startAt).format("HH:MM")} -{" "} {moment(selectedEvent.endAt).format("HH:MM")}</td></tr>
-                        <tr><th className="table-head"><strong>Subject:</strong></th><td>{selectedEvent.subjectExamDTO.subjectName} ({selectedEvent.subjectExamDTO.subjectCode})</td></tr>
-                        <tr><th className="table-head"><strong>Required Invigilators:</strong></th><td>{selectedEvent.requiredInvigilators}</td></tr>
-                        <tr><th className="table-head"><strong>Status:</strong></th><td>{requestTag(selectedEvent.status)}</td></tr>
-                        <tr><th className="table-head"><strong>Exam Type:</strong></th><td>{selectedEvent.subjectExamDTO.examType}</td></tr>
-                        <tr><th className="table-head"><strong>Duration:</strong></th><td>{selectedEvent.subjectExamDTO.duration} minutes</td></tr>
+                          <tr>
+                            <th className="table-head">
+                              <strong>Date:</strong>
+                            </th>
+                            <td>
+                              {moment(selectedEvent.startAt).format(
+                                "DD/MM/YYYY"
+                              )}
+                            </td>
+                          </tr>
+                          <tr>
+                            <th className="table-head">
+                              <strong>Time:</strong>
+                            </th>
+                            <td>
+                              {moment(selectedEvent.startAt).format("HH:MM")} -{" "}
+                              {moment(selectedEvent.endAt).format("HH:MM")}
+                            </td>
+                          </tr>
+                          <tr>
+                            <th className="table-head">
+                              <strong>Subject:</strong>
+                            </th>
+                            <td>
+                              {selectedEvent.subjectExamDTO.subjectName} (
+                              {selectedEvent.subjectExamDTO.subjectCode})
+                            </td>
+                          </tr>
+                          <tr>
+                            <th className="table-head">
+                              <strong>Required Invigilators:</strong>
+                            </th>
+                            <td>{selectedEvent.requiredInvigilators}</td>
+                          </tr>
+                          <tr>
+                            <th className="table-head">
+                              <strong>Status:</strong>
+                            </th>
+                            <td>{requestTag(selectedEvent.status)}</td>
+                          </tr>
+                          <tr>
+                            <th className="table-head">
+                              <strong>Exam Type:</strong>
+                            </th>
+                            <td>{selectedEvent.subjectExamDTO.examType}</td>
+                          </tr>
+                          <tr>
+                            <th className="table-head">
+                              <strong>Duration:</strong>
+                            </th>
+                            <td>
+                              {selectedEvent.subjectExamDTO.duration} minutes
+                            </td>
+                          </tr>
                         </tbody>
                       </table>
                     </div>
                   )}
                 </Modal>
-                <div style={{ display: 'grid', paddingTop: 50, paddingLeft: 40, paddingRight: 60, width: "30%" }}>
-                  <Dropdown menu={menu} >
+                <div
+                  style={{
+                    display: "grid",
+                    paddingTop: 50,
+                    paddingLeft: 40,
+                    paddingRight: 60,
+                    width: "30%",
+                  }}
+                >
+                  <Dropdown menu={menu}>
                     <Button style={selectButtonStyle}>
-                      {selectedSemester ? selectedSemester.name : "Select a Semester"}{" "}
+                      {selectedSemester
+                        ? selectedSemester.name
+                        : "Select a Semester"}{" "}
                       <DownOutlined />
                     </Button>
                   </Dropdown>
@@ -282,9 +362,15 @@ const ExamSlots = () => {
                     Update
                   </Button>
                   <p>
-                    <span style={{ color: "#52c41a" }}>&#9632; </span> <span style={{ marginLeft: 10 }}>Approved</span><br />
-                    <span style={{ color: "#d9363e" }}>&#9632; </span> <span style={{ marginLeft: 10 }}>Rejected</span> <br />
-                    <span style={{ color: "rgb(249, 199, 79)" }}>&#9632; </span> <span style={{ marginLeft: 10 }}>Pending</span>
+                    <span style={{ color: "#52c41a" }}>&#9632; </span>{" "}
+                    <span style={{ marginLeft: 10 }}>Approved</span>
+                    <br />
+                    <span style={{ color: "#d9363e" }}>&#9632; </span>{" "}
+                    <span style={{ marginLeft: 10 }}>Rejected</span> <br />
+                    <span style={{ color: "rgb(249, 199, 79)" }}>
+                      &#9632;{" "}
+                    </span>{" "}
+                    <span style={{ marginLeft: 10 }}>Pending</span>
                   </p>
                 </div>
               </div>
@@ -299,7 +385,10 @@ const ExamSlots = () => {
           open={modalState.show}
           onCancel={() => setModalState({ show: false, action: "" })}
           footer={[
-            <Button key="back" onClick={() => setModalState({ show: false, action: "" })}>
+            <Button
+              key="back"
+              onClick={() => setModalState({ show: false, action: "" })}
+            >
               Cancel
             </Button>,
             <Button
@@ -338,8 +427,6 @@ const ExamSlots = () => {
             }}
           />
         </Modal>
-
-
       )}
     </Layout>
   );
