@@ -23,7 +23,7 @@ import {
 } from "@ant-design/icons";
 import NavBar_Manager from "../../components/NavBar/NavBar_Manager";
 import Header from "../../components/Header/Header.jsx";
-import { useSemester } from "../../components/Context/SemesterContext.jsx";
+import { useSemester } from "../../components/Context/SemesterContextManager.jsx";
 import requestApi from "../../services/Request.js";
 import moment from "moment";
 import {

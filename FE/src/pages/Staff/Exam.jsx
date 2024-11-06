@@ -26,7 +26,7 @@ import {
   SearchOutlined,
 } from "@ant-design/icons";
 import Header from "../../components/Header/Header.jsx";
-import { useSemester } from "../../components/Context/SemesterContext.jsx";
+import { useSemester } from "../../components/Context/SemesterContextStaff.jsx";
 import { examType } from "../../configs/data.js";
 import { examTypeTag } from "../../design-systems/CustomTag.jsx";
 import {

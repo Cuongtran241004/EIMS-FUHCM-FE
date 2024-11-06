@@ -31,7 +31,7 @@ import {
   SearchOutlined,
 } from "@ant-design/icons";
 import Header from "../../components/Header/Header.jsx";
-import { useSemester } from "../../components/Context/SemesterContext.jsx";
+import { useSemester } from "../../components/Context/SemesterContextStaff.jsx";
 import { subjectTable } from "../../design-systems/CustomTable.jsx";
 import { titleStyle } from "../../design-systems/CSS/Title.js";
 import {

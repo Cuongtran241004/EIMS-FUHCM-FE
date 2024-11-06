@@ -20,8 +20,9 @@ import InvigilatorRegistration from "./pages/Invigilator/InvigilatorRegistration
 import InvigilatorRequest from "./pages/Invigilator/InvigilatorRequest";
 import InvigilatorRequestsList from "./pages/Invigilator/InvigilatorRequestList";
 import { getUserInfo } from "./components/API/getUserInfo";
-import { SemesterProvider } from "./components/Context/SemesterContext.jsx";
+import { SemesterProviderManager } from "./components/Context/SemesterContextManager.jsx";
 import { SemesterProviderInvigilator } from "./components/SemesterContext.jsx";
+import { SemesterProviderStaff } from "./components/Context/SemesterContextStaff.jsx";
 import {
   MANAGER_ATTENDENCE_CHECK_URL,
   MANAGER_DASHBOARD_URL,
@@ -52,22 +53,22 @@ function App() {
   const [isLoading, setIsLoading] = useState(true);
   const [user, setUser] = useState(null);
   const [role, setRole] = useState(null);
-  const [passwordSet, setPasswordSet] = useState(null); 
+  const [passwordSet, setPasswordSet] = useState(null);
   const navigate = useNavigate();
 
   const initLogin = async () => {
-      try {
-        const user = await getUserInfo();
-        if (user) {
-          const userRole = user.role || null;
-          setRole(userRole);
-          setUser(user);
-          setIsLogin(true);
-          setPasswordSet(user.passwordSet); 
-        }
-      } finally {
-        setIsLoading(false);
+    try {
+      const user = await getUserInfo();
+      if (user) {
+        const userRole = user.role || null;
+        setRole(userRole);
+        setUser(user);
+        setIsLogin(true);
+        setPasswordSet(user.passwordSet);
       }
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -114,7 +115,10 @@ function App() {
               <Route path="/" element={<Subject />} />
               <Route path={STAFF_SUBJECT_URL} element={<Subject />} />
               <Route path={STAFF_EXAM_URL} element={<Exam />} />
-              <Route path={STAFF_EXAM_SCHEDULE_URL} element={<Exam_Schedule />} />
+              <Route
+                path={STAFF_EXAM_SCHEDULE_URL}
+                element={<Exam_Schedule />}
+              />
               <Route path={STAFF_ATTENDANCE_URL} element={<Attendance />} />
               <Route
                 path={STAFF_ROOM_SELECTION_URL}
@@ -132,7 +136,10 @@ function App() {
               <Route path="/" element={<InvigilatorDashboard />} />
               <Route path="/register" element={<InvigilatorRegistration />} />
               <Route path="/request/send" element={<InvigilatorRequest />} />
-              <Route path="/request/view" element={<InvigilatorRequestsList />} />
+              <Route
+                path="/request/view"
+                element={<InvigilatorRequestsList />}
+              />
               <Route path="/report" element={<InvigilatorReport />} />
               <Route path="/attendance" element={<InvigilatorAttend />} />
             </>
@@ -144,19 +151,21 @@ function App() {
         </Routes>
       );
     } else {
-        return (
-          <Routes>
-            <Route path="/" element={<Login setIsLogin={setIsLogin} />} />
-            <Route path="*" element={<Navigate to="/" replace />} />
-          </Routes>
-        );
-  }
+      return (
+        <Routes>
+          <Route path="/" element={<Login setIsLogin={setIsLogin} />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      );
+    }
   };
 
   return (
     <div className="container">
-      {role === 1 || role === 2 ? (
-        <SemesterProvider>{renderRoutes()}</SemesterProvider>
+      {role === 1 ? (
+        <SemesterProviderManager> {renderRoutes()}</SemesterProviderManager>
+      ) : role === 2 ? (
+        <SemesterProviderStaff>{renderRoutes()}</SemesterProviderStaff>
       ) : (
         <>
           {role === 3 && <Header />}

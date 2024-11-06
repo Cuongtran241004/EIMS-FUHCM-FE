@@ -2,16 +2,15 @@ import React, { createContext, useState, useContext, useEffect } from "react";
 import { message } from "antd"; // Ensure to import message
 import semesterApi from "../../services/Semester.js";
 import examSlotApi from "../../services/ExamSlot.js";
-import attendanceApi from "../../services/InvigilatorAttendance.js";
-import moment from "moment";
 import configApi from "../../services/Config.js";
 import requestApi from "../../services/Request.js";
-import { managerMapperUtil } from "../../utils/Mapper/ManagerMapperUtil.jsx";
+import { getUserInfo } from "../API/getUserInfo.jsx";
+
 // Create a context for the semester
 const SemesterContext = createContext();
 
 // Provider component to wrap around your app
-export const SemesterProvider = ({ children }) => {
+export const SemesterProviderManager = ({ children }) => {
   const [semesters, setSemesters] = useState([]);
   const [selectedSemester, setSelectedSemester] = useState({
     id: null,
