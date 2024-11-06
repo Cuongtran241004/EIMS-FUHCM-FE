@@ -1,3 +1,3 @@
-const API_BASE_URL = "http://54.221.190.47/eims-fuhcm-be";
+const API_BASE_URL = "https://eims-fuhcm.id.vn/eims-fuhcm-be";
 
 export { API_BASE_URL };
