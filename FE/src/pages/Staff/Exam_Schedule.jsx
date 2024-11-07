@@ -117,7 +117,6 @@ const Exam_Schedule = () => {
       setFilteredExamSlotByStatus(result || []);
       setTotalItems(result.length || 0);
     } catch (error) {
-      console.error("Error fetching exam schedule:", error); // Log the error
       message.error(FETCH_EXAM_SCHEDULE_FAILED);
     } finally {
       setLoading(false);
@@ -136,7 +135,7 @@ const Exam_Schedule = () => {
     try {
       const result = await examApi.getExamBySemesterId(semesterId);
       setExams(result || []);
-      console.log("exams", result);
+
       setFilteredExams(result);
     } catch (error) {
       message.error("Failed to load subjects. Please try again.");
@@ -187,7 +186,7 @@ const Exam_Schedule = () => {
       ) &&
       examSlot.status != "APPROVED" &&
       examSlot.status != "REJECTED";
-    console.log("isAvailable", result);
+
     return result;
   };
 

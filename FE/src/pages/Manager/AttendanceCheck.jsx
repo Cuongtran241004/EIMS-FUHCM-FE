@@ -133,10 +133,11 @@ const AttendanceCheck = () => {
     try {
       const response =
         await attendanceApi.getAttendanceByExamSlotIdManager(examSlotId);
-      console.log(response);
+
       const result = managerMapperUtil.mapAttendanceList(response);
       setAttendances(result || []);
     } catch (error) {
+      message.error("Failed to fetch attendance list");
       // Handle error
     } finally {
       setListLoading(false);
