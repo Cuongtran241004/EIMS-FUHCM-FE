@@ -75,12 +75,14 @@ export const Exam_Schedule_Import_Excel = (file) => {
               formattedDate
             ).toISOString();
 
-            return {
+            const examScheduleObj = {
               subjectExamId,
               startAt,
               endAt,
               numberOfStudents,
             };
+
+            return examScheduleObj;
           } catch (error) {
             console.error("Error processing row:", item, error);
             return null; // Skip this row on error

@@ -386,11 +386,14 @@ const Exam_Schedule = () => {
     setFileLoading(true);
     try {
       const data = await Exam_Schedule_Import_Excel(file);
+      console.log(data);
       await examSlotApi.addMultipleExamSlots(data);
-      message.success("Exam schedules imported successfully!");
+
       if (selectedSemester.id == selectedSemesterForm.id) {
         fetchExamSchedule(selectedSemester.id, currentPage);
       }
+
+      message.success("Exam schedules imported successfully!");
     } catch (error) {
       message.error("Failed to import exam schedules.");
     } finally {
