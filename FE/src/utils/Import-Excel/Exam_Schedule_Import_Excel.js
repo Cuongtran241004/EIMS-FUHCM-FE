@@ -80,6 +80,7 @@ export const Exam_Schedule_Import_Excel = (file) => {
               startAt,
               endAt,
               numberOfStudents,
+              status: "NEEDS_ROOM_ASSIGNMENT",
             };
 
             return examScheduleObj;

@@ -162,8 +162,12 @@ const Exam_Schedule = () => {
       setFilteredExamSchedule(filtered); // Update the filtered data displayed in the table
       setFilteredExamSlotByStatus(filtered);
     } else {
-      setFilteredExamSchedule(examSchedule);
-      setFilteredExamSlotByStatus(filteredExamSlotByStatus);
+      setFilteredExamSchedule(filteredExamSchedule);
+      setFilteredExamSlotByStatus(
+        filteredExamSchedule.filter(
+          (examSlot) => examSlot.status === selectedExamSlotStatus
+        )
+      );
     }
   };
 
@@ -389,9 +393,7 @@ const Exam_Schedule = () => {
       console.log(data);
       await examSlotApi.addMultipleExamSlots(data);
 
-      if (selectedSemester.id == selectedSemesterForm.id) {
-        fetchExamSchedule(selectedSemester.id, currentPage);
-      }
+      fetchExamSchedule(selectedSemester.id, currentPage);
 
       message.success("Exam schedules imported successfully!");
     } catch (error) {
