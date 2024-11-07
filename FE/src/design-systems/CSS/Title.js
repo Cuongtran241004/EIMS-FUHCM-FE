@@ -13,10 +13,9 @@ const titleRoomStyle = {
 };
 
 const titleAssignmentStyle = {
-  color: "#F9C74F",
+  color: "#F94144",
   fontSize: "30px",
-  margin: "0",
-  padding: "10px",
+  margin: "10px 0",
 };
 
 export { titleStyle, titleRoomStyle, titleAssignmentStyle };

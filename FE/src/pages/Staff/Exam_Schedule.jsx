@@ -61,7 +61,7 @@ import { Exam_Schedule_Import_Excel } from "../../utils/Import-Excel/Exam_Schedu
 import { Exam_Schedule_Excel_Template } from "../../utils/Import-Excel/Exam_Schedule_Excel_Template.js";
 const { Option } = Select;
 const { Content } = Layout;
-const PAGE_SIZE = 6;
+const PAGE_SIZE = 7;
 
 const examSlotStatus = [
   "NEEDS_ROOM_ASSIGNMENT",
@@ -219,6 +219,7 @@ const Exam_Schedule = () => {
         date: moment(record.startAt),
         startTime: moment(record.startAt),
         endTime: moment(record.endAt),
+        numberOfStudents: record.numberOfStudents,
       });
       //  await fetchExams(selectedSemester.id);
     } else {
@@ -391,7 +392,7 @@ const Exam_Schedule = () => {
         fetchExamSchedule(selectedSemester.id, currentPage);
       }
     } catch (error) {
-      message.error("Failed to import exam schedules");
+      message.error("Failed to import exam schedules.");
     } finally {
       setFileLoading(false);
     }

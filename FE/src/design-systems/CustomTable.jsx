@@ -36,7 +36,7 @@ const examScheduleTable = (handleRoomClick, handleEdit, handleDelete) => [
     key: "date",
     align: "center",
     width: "10%",
-    render: (text) => moment(text).format("DD/MM/YYYY"), // Format as DD-MM-YYYY
+    render: (text) => moment(text).format("DD/MM/YYYY"),
   },
   {
     title: "Time",
