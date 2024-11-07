@@ -232,8 +232,13 @@ const AssignmentInvigilator = () => {
       <Layout style={{ backgroundColor: "#fff" }}>
         <Spin spinning={loading}>
           <Content style={{ padding: "0 50px" }}>
-            <div style={{ marginBottom: "20px", textAlign: "center" }}>
-              <h2 style={titleStyle}>ASSIGNMENT INVIGILATORS</h2>
+            <div
+              style={{
+                textAlign: "center",
+                marginBottom: "20px",
+              }}
+            >
+              <h2 style={titleAssignmentStyle}>Assignment Invigilators</h2>
             </div>
             <Dropdown
               menu={{
