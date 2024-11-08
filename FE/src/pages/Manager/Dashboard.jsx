@@ -161,8 +161,6 @@ const Dashboard = () => {
     if (selectedDates && selectedDates.length === 2) {
       const startTime = selectedDates[0].startOf("day").toISOString();
       const endTime = selectedDates[1].endOf("day").toISOString();
-      setExamSlotSummary([]);
-      setInvigilationSummary([]);
       fetchExamSlotSummary(startTime, endTime);
       fetchInvigilationSummary(startTime, endTime);
     }
