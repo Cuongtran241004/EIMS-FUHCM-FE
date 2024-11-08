@@ -86,9 +86,9 @@ const Dashboard = () => {
         startTime,
         endTime
       );
-      console.log(response);
+
       const result = managerMapperUtil.mapExamSlotSummary(response);
-      console.log(result);
+
       // sort by date
       result.sort((a, b) => {
         return new Date(a.date) - new Date(b.date);

@@ -212,10 +212,15 @@ const Exam_Schedule = () => {
   };
 
   const handleEdit = async (record) => {
+    if (selectedSemester.id) {
+      handleSemesterChange(selectedSemester.id);
+    }
+
     if (await isAvailable(record.id)) {
       setIsEditing(true);
       setEditingExamSlot(record);
       setExamId(record.examId);
+
       form.setFieldsValue({
         id: record.id,
         semesterId: selectedSemester.id,
@@ -268,7 +273,6 @@ const Exam_Schedule = () => {
           fetchExamSchedule(selectedSemester.id); // Refresh schedule
         }
       } catch (error) {
-        console.error("Error saving exam slot:", error);
         message.error(
           isEditing ? EDIT_EXAM_SCHEDULE_FAILED : ADD_EXAM_SCHEDULE_FAILED
         );
@@ -311,6 +315,7 @@ const Exam_Schedule = () => {
       (sem) => sem.id === value
     );
     setSelectedSemesterForm(selectedSemesterForm);
+
     if (selectedSemesterForm) {
       form.setFieldsValue({ semesterId: selectedSemesterForm.id }); // Update semesterId in the form
       fetchExams(selectedSemesterForm.id); // Fetch subjects for the selected semester
@@ -390,7 +395,7 @@ const Exam_Schedule = () => {
     setFileLoading(true);
     try {
       const data = await Exam_Schedule_Import_Excel(file);
-      console.log(data);
+
       await examSlotApi.addMultipleExamSlots(data);
 
       fetchExamSchedule(selectedSemester.id, currentPage);

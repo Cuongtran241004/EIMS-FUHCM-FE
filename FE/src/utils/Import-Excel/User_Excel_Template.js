@@ -51,6 +51,11 @@ export const User_Excel_Template = (
     { header: "Department", key: "department", width: 55 },
   ];
 
+  dataSheet.protect("user_import_key", {
+    selectLockedCells: false,
+    selectUnlockedCells: false,
+  });
+
   // Populate the "Data" sheet with listOfRole, listOfGenders, and listOfDepartment
   listOfRole.forEach((role) => dataSheet.addRow({ role }));
   listOfGenders.forEach((gender) => dataSheet.addRow({ gender }));
