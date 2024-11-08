@@ -244,6 +244,7 @@ const Exam_Schedule = () => {
       const selectedDate = values.date.format("YYYY-MM-DD");
       const startTime = values.startTime.format("HH:mm");
       const endTime = values.endTime.format("HH:mm");
+      const numberOfStudents = values.numberOfStudents;
 
       const examSlotDataUpdate = {
         examSlotId: isEditing ? editingExamSlot.id : null,
@@ -251,6 +252,7 @@ const Exam_Schedule = () => {
         startAt: `${selectedDate}T${startTime}:00+07:00`,
         endAt: `${selectedDate}T${endTime}:00+07:00`,
         id: isEditing ? editingExamSlot.id : null,
+        numberOfStudents: numberOfStudents,
       };
 
       const examSlotDataAdd = {
