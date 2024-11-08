@@ -22,6 +22,7 @@ import {
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Sider from "antd/es/layout/Sider";
+import dayjs from "dayjs";
 import Header from "../../components/Header/Header.jsx";
 import examApi from "../../services/Exam.js";
 import examSlotApi from "../../services/ExamSlot.js";
@@ -470,18 +471,9 @@ const Exam_Schedule = () => {
               <DatePicker
                 format="DD/MM/YYYY"
                 style={{ width: "100%" }}
-                disabledDate={(current) => {
-                  // Disable dates before the start of the semester
-                  // and after the end of the semester
-                  return (
-                    current.isBefore(
-                      moment(selectedSemesterForm?.startAt).startOf("day")
-                    ) ||
-                    current.isAfter(
-                      moment(selectedSemesterForm?.endAt).endOf("day")
-                    )
-                  );
-                }}
+                defaultOpenValue={dayjs(selectedSemesterForm?.startAt)}
+                minDate={dayjs(selectedSemesterForm?.startAt)}
+                maxDate={dayjs(selectedSemesterForm?.endAt)}
               />
             </Form.Item>
             <Row gutter={16}>
