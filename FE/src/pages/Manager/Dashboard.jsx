@@ -86,7 +86,9 @@ const Dashboard = () => {
         startTime,
         endTime
       );
+
       const result = managerMapperUtil.mapExamSlotSummary(response);
+
       // sort by date
       result.sort((a, b) => {
         return new Date(a.date) - new Date(b.date);
@@ -117,7 +119,7 @@ const Dashboard = () => {
           exam_slot: `${item.subjectCode} - ${item.examType} 
           (${moment(item.startAt).format(
             "HH:MM"
-          )} - ${moment(item.endtAt).format("HH:MM")} ${moment(
+          )} - ${moment(item.endAt).format("HH:MM")} ${moment(
             item.startAt
           ).format("DD/MM/YYYY")})`,
         };

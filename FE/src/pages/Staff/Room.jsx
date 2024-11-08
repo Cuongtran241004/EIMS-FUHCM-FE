@@ -305,7 +305,8 @@ const RoomSelectionPage = () => {
             style={{
               borderRight: "1px solid #f0f0f0",
               padding: "12px",
-              backgroundColor: "#D6EEE0",
+              background:
+                "radial-gradient(circle, rgba(208,246,218,0.6139705882352942) 0%, rgba(67,170,139,0.5775560224089635) 82%)",
             }}
           >
             <h1 style={titleRoomStyle}>
@@ -386,56 +387,59 @@ const RoomSelectionPage = () => {
               backgroundColor: "",
             }}
           >
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-            >
-              <h3 style={{ color: "#F94144" }}>Max students in a room:</h3>
-              <Slider
-                min={15}
-                max={30}
-                value={maxStudents}
-                onChange={(value) => setMaxStudents(value)} // Update max students when slider changes
-                style={{ width: "40%", marginLeft: "20px" }}
-              />
-            </div>
-            <div style={{ display: "flex", justifyContent: "center" }}>
-              <table
-                className="table-assign"
-                style={{ textAlign: "left", fontSize: 13, marginLeft: 30 }}
-              >
-                <tbody>
-                  <tr>
-                    <th>Number of students:</th>
-                    <td> {numberOfStudents}</td>
-                  </tr>
-                  <tr>
-                    <th>Number of rooms:</th>
-                    <td> {numberOfRooms}</td>{" "}
-                    {/* Display the calculated number of rooms */}
-                  </tr>
-                </tbody>
-              </table>
-
-              <table
-                className="table-assign"
-                style={{ textAlign: "left", fontSize: 13, marginLeft: 30 }}
-              >
-                <tbody>
-                  <tr>
-                    <th>Choosen Rooms: </th>
-                    <td>{choosenRooms}</td>
-                  </tr>
-                  <tr>
-                    <th>Total Capacity: </th>
-                    <td>{totalCapacity}</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
+            <Row>
+              <Col span={12}>
+                <div
+                  style={{
+                    textAlign: "center",
+                  }}
+                >
+                  <h4>Max students in a room</h4>
+                  <Slider
+                    min={15}
+                    max={35}
+                    value={maxStudents}
+                    onChange={(value) => setMaxStudents(value)} // Update max students when slider changes
+                    style={{
+                      width: "50%",
+                      margin: "0 auto",
+                    }}
+                  />
+                  <p>{maxStudents} (students)</p>
+                </div>
+              </Col>
+              <Col span={12}>
+                <div
+                  style={{ textAlign: "center", borderLeft: "1px solid black" }}
+                >
+                  <table
+                    style={{ textAlign: "left", fontSize: 13, marginLeft: 30 }}
+                  >
+                    <tbody>
+                      <tr>
+                        <th style={{ padding: "5px" }}>Number of students:</th>
+                        <td style={{ padding: "0" }}> {numberOfStudents}</td>
+                      </tr>
+                      <tr>
+                        <th style={{ padding: "5px" }}>Number of rooms:</th>
+                        <td style={{ padding: "0" }}> {numberOfRooms}</td>{" "}
+                      </tr>
+                      <tr>
+                        <th style={{ padding: "5px" }}>Choosen Rooms: </th>
+                        <td style={{ padding: "0" }}>{choosenRooms}</td>
+                      </tr>
+                      <tr>
+                        <th style={{ padding: "5px" }}>Total Capacity: </th>
+                        <td style={{ padding: "0" }}>{totalCapacity}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </Col>
+            </Row>
+            <Divider>
+              <h3 style={{ color: "#F94144" }}>Selected Rooms</h3>
+            </Divider>
             {selectedRooms.length === 0 ? (
               <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
             ) : (

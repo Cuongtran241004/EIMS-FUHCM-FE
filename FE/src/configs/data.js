@@ -35,4 +35,6 @@ const roleOptions = [
   { label: "Invigilator", value: 3 },
 ];
 
-export { examType, departments, roleOptions };
+const gender = ["Male", "Female"];
+const role = ["Staff", "Invigilator"];
+export { examType, departments, roleOptions, gender, role };

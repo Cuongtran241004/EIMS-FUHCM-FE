@@ -150,26 +150,33 @@ const userTable = (handleEdit, handleDelete) => [
     title: "FUID",
     dataIndex: "fuId",
     key: "fuId",
+    width: "10%",
+    align: "center",
   },
   {
     title: "Full Name",
     key: "fullName",
+    width: "20%",
     render: (text, record) => `${record.lastName} ${record.firstName} `,
   },
   {
     title: "Email",
     dataIndex: "email",
     key: "email",
+    width: "20%",
   },
   {
     title: "Phone Number",
     dataIndex: "phoneNumber",
     key: "phoneNumber",
+    width: "15%",
+    align: "center",
   },
   {
     title: "Department",
     dataIndex: "department",
     key: "department",
+    width: "15%",
   },
   {
     title: "Role",

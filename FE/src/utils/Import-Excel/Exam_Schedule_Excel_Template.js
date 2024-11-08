@@ -42,6 +42,11 @@ export const Exam_Schedule_Excel_Template = (listOfExam) => {
     { header: "Exam Type", key: "examType", width: 20 },
   ];
 
+  examIDSheet.protect("exam_slot_import_key", {
+    selectLockedCells: false,
+    selectUnlockedCells: false,
+  });
+
   // Populate the "Exam ID" sheet with all exam information from listOfExam
   listOfExam.forEach((exam) => {
     examIDSheet.addRow({

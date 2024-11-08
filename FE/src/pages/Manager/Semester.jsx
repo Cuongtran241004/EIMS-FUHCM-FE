@@ -12,7 +12,6 @@ import {
   Input,
   message,
   DatePicker,
-  InputNumber,
   Row,
   Col,
 } from "antd";
@@ -37,6 +36,7 @@ import { selectButtonStyle } from "../../design-systems/CSS/Button.js";
 import { titleStyle } from "../../design-systems/CSS/Title.js";
 import configApi from "../../services/Config.js";
 import { managerMapperUtil } from "../../utils/Mapper/ManagerMapperUtil.jsx";
+import dayjs from "dayjs";
 
 const { Content, Sider } = Layout;
 const { RangePicker } = DatePicker;
@@ -143,7 +143,7 @@ const Semester = ({ isLogin }) => {
     setEditingSemester(semester);
     form.setFieldsValue({
       name: semester.name,
-      dateRange: [moment(semester.startAt), moment(semester.endAt)],
+      dateRange: [dayjs(semester.startAt), dayjs(semester.endAt)],
     });
     setIsModalVisible(true);
   };
@@ -324,8 +324,9 @@ const Semester = ({ isLogin }) => {
                 >
                   <RangePicker
                     style={{ width: "100%" }}
+                    // using dayjs for disabledDate
                     disabledDate={(current) =>
-                      current && current < moment().startOf("day")
+                      current && current < dayjs().subtract(1, "day")
                     }
                     format="DD/MM/YYYY"
                     onChange={(dates) => {

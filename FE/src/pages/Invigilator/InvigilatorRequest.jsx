@@ -20,7 +20,8 @@ function InvigilatorRequest() {
 
   const [form] = Form.useForm();
   const id = localStorage.getItem("id") || "";
-  const [requestType, setRequestType] = useState({ requestTypes: [] }); 
+  const [requestType, setRequestType] = useState({ requestTypes: [] });
+  const [requestFlag, setRequestFlag] = useState("");
 
   const onFinish = async (values) => {
     try {
@@ -31,7 +32,6 @@ function InvigilatorRequest() {
         reason,
         requestType: values.requestType,
       };
-      console.log("Request Payload: ", requestPayload);
       try {
         const success = await postRequest(requestPayload);
         if (success) {
@@ -53,7 +53,7 @@ function InvigilatorRequest() {
     const fetchRequestType = async () => {
       try {
         const response = await getRequestType();
-          setRequestType(response); 
+        setRequestType(response);
       } catch (e) {
         console.error("requestType Error: ", e.message);
         message.error("Error fetching request type.");
@@ -61,6 +61,12 @@ function InvigilatorRequest() {
     };
     fetchRequestType();
   }, []);
+
+  useEffect(() => {
+    if (requestType.requestTypes.length > 0) {
+      setRequestFlag(requestType.requestTypes[0]);
+    }
+  }, [requestType]);
 
   return (
     <div>
@@ -88,7 +94,8 @@ function InvigilatorRequest() {
                 { required: true, message: "Please select a request type" },
               ]}
             >
-              <Select placeholder="Select Request Type">
+              <Select placeholder="Select Request Type"
+              onChange={(value) => setRequestFlag(value)}>
                 {
                   requestType.requestTypes.map((type) => (
                     <Option key={type} value={type}>
@@ -113,7 +120,8 @@ function InvigilatorRequest() {
                     getConfigValue(ConfigType.TIME_BEFORE_CLOSE_REQUEST),
                     "days"
                   );
-                  if (currentDate.isAfter(openAt)) {
+                  const endAt = moment(slot.startAt);
+                  if (currentDate.isAfter(openAt) && requestFlag == "UPDATE_ATTENDANCE") {
                     return (
                       <Option key={slot.examSlotId} value={slot.examSlotId}>
                         {moment(slot.startAt).format("DD/MM/YYYY")} |{" "}
@@ -122,7 +130,16 @@ function InvigilatorRequest() {
                       </Option>
                     );
                   }
-                  return null; 
+                  if (currentDate.isBefore(endAt) && currentDate.isAfter(openAt) && requestFlag == "CANCEL") {
+                    return (
+                      <Option key={slot.examSlotId} value={slot.examSlotId}>
+                        {moment(slot.startAt).format("DD/MM/YYYY")} |{" "}
+                        {moment(slot.startAt).format("HH:mm")} -{" "}
+                        {moment(slot.endAt).format("HH:mm")}
+                      </Option>
+                    );
+                  }
+                  return null;
                 })}
               </Select>
             </Form.Item>
