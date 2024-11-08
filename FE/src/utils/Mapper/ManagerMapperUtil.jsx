@@ -216,8 +216,8 @@ const managerMapperUtil = {
           invigilator.totalInvigilatorsRegistered +
           invigilator.totalInvigilatorsAssigned,
         assigned: invigilator.totalInvigilatorsAssigned,
-        startAt: invigilator.startAt,
-        endAt: invigilator.endAt,
+        startAt: invigilator.examSlot.startAt,
+        endAt: invigilator.examSlot.endAt,
       };
     });
   },
