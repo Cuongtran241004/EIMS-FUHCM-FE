@@ -40,7 +40,7 @@ import { User_Import_Excel } from "../../utils/Import-Excel/User_Import_Excel.js
 import { User_Excel_Template } from "../../utils/Import-Excel/User_Excel_Template.js";
 import NavBar_Manager from "../../components/NavBar/NavBar_Manager.jsx";
 import Header from "../../components/Header/Header.jsx";
-import { departments, roleOptions } from "../../configs/data.js";
+import { departments, gender, role, roleOptions } from "../../configs/data.js";
 import { userTable } from "../../design-systems/CustomTable.jsx";
 import { selectButtonStyle } from "../../design-systems/CSS/Button.js";
 import { titleStyle } from "../../design-systems/CSS/Title.js";
@@ -175,27 +175,8 @@ const Users = ({ isLogin }) => {
     try {
       const data = await User_Import_Excel(file);
 
-      // Mapping definitions
-      const roleMapping = {
-        manager: 1,
-        staff: 2,
-        invigilator: 3,
-      };
-
-      const genderMapping = {
-        male: true,
-        female: false,
-      };
-
-      // Transform the user data
-      const transformedData = data.map((user) => ({
-        ...user,
-        role: roleMapping[user.role] || null, // Map role to backend value
-        gender: genderMapping[user.gender] || null, // Map gender to backend value
-      }));
-
       // Send transformed data to backend
-      await userApi.addMultipleUsers(transformedData);
+      await userApi.addMultipleUsers(data);
 
       message.success("Users imported successfully!");
       fetchData(); // Refresh data after import
@@ -269,7 +250,7 @@ const Users = ({ isLogin }) => {
 
                 <Button
                   icon={<DownloadOutlined />}
-                  onClick={() => User_Excel_Template()}
+                  onClick={() => User_Excel_Template(role, gender, departments)}
                   type="default"
                 >
                   Download Template
