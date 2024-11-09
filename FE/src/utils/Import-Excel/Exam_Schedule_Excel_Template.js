@@ -29,8 +29,8 @@ export const Exam_Schedule_Excel_Template = (listOfExam) => {
   examScheduleSheet.addRow({
     subjectExamId: "", // Empty cell to show dropdown
     date: "DD/MM/YYYY", // Placeholder for date format
-    startTime: "HH:MM",
-    endTime: "HH:MM",
+    startTime: "HH:MM(24h)",
+    endTime: "HH:MM(24h)",
     numberOfStudents: "",
   });
 
@@ -42,7 +42,7 @@ export const Exam_Schedule_Excel_Template = (listOfExam) => {
     { header: "Exam Type", key: "examType", width: 20 },
   ];
 
-  examIDSheet.protect("exam_slot_import_key", {
+  examIDSheet.protect("abc123@", {
     selectLockedCells: false,
     selectUnlockedCells: false,
   });
@@ -67,6 +67,10 @@ export const Exam_Schedule_Excel_Template = (listOfExam) => {
         formulae: [`'Exam'!$A$2:$A$${rangeEnd}`], // Dropdown from "Exam" sheet, starting at A2
         showErrorMessage: true,
         error: "Please select from the dropdown options.",
+      };
+      // Lock the cell so the user cannot type in it, only select from dropdown
+      cell.style = {
+        alignment: { vertical: "middle", horizontal: "center" },
       };
     }
   });

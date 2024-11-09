@@ -37,6 +37,7 @@ const examScheduleTable = (handleRoomClick, handleEdit, handleDelete) => [
     align: "center",
     width: "10%",
     render: (text) => moment(text).format("DD/MM/YYYY"),
+    sorter: (a, b) => moment(a.startAt).unix() - moment(b.startAt).unix(),
   },
   {
     title: "Time",
@@ -188,6 +189,7 @@ const userTable = (handleEdit, handleDelete) => [
 
       return userRoleTag(role.label);
     },
+    sorter: (a, b) => a.role - b.role,
   },
   {
     title: "Action",

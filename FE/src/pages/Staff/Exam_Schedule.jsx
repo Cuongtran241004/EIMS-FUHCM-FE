@@ -18,6 +18,7 @@ import {
   InputNumber,
   Upload,
   Divider,
+  Modal,
 } from "antd";
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
@@ -397,7 +398,27 @@ const Exam_Schedule = () => {
   const handleFileUpload = async ({ file }) => {
     setFileLoading(true);
     try {
-      const data = await Exam_Schedule_Import_Excel(file);
+      const { data, errors } = await Exam_Schedule_Import_Excel(file);
+
+      if (errors.length > 0) {
+        // Display errors in a Modal
+        Modal.error({
+          title: "Failed to import exam schedules",
+          content: (
+            <div>
+              <p>There were issues with the Excel file:</p>
+              <ul>
+                {errors.map((err, index) => (
+                  <li key={index}>
+                    Row {err.row}: {err.message}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ),
+        });
+        return;
+      }
 
       await examSlotApi.addMultipleExamSlots(data);
 
@@ -410,6 +431,7 @@ const Exam_Schedule = () => {
       setFileLoading(false);
     }
   };
+
   return (
     <Layout style={{ height: "100vh" }}>
       <Header />

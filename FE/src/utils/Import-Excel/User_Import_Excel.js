@@ -3,7 +3,7 @@ import * as XLSX from "xlsx";
 /**
  * Process the uploaded file and extract staff data from the "Users" sheet in the Excel file.
  * @param {File} file - The uploaded Excel file
- * @returns {Promise<Array>} - Promise resolving to an array of staff objects
+ * @returns {Promise<{data: Array, errors: Array}>} - Promise resolving to an object containing valid data and errors
  */
 export const User_Import_Excel = (file) => {
   return new Promise((resolve, reject) => {
@@ -21,88 +21,122 @@ export const User_Import_Excel = (file) => {
         const sheet = workbook.Sheets[sheetName];
 
         if (!sheet) {
-          reject(new Error("No 'Users' sheet found in the Excel file."));
+          reject(
+            new Error(`No sheet named '${sheetName}' found in the Excel file.`)
+          );
           return;
         }
 
         // Convert sheet to JSON
         const data = XLSX.utils.sheet_to_json(sheet);
 
+        // Arrays to hold the valid data and errors
+        const usersData = [];
+        const errors = [];
+
         // Map and validate data
-        const usersData = data
-          .map((item) => {
-            const {
-              fuId,
-              firstName,
-              lastName,
-              email,
-              phoneNumber,
-              department,
-              gender,
-              role,
-            } = item;
+        data.forEach((item, index) => {
+          const {
+            fuId,
+            firstName,
+            lastName,
+            email,
+            phoneNumber,
+            department,
+            gender,
+            role,
+          } = item;
 
-            // Validate required fields
-            if (
-              !fuId ||
-              !firstName ||
-              !lastName ||
-              !email ||
-              !phoneNumber ||
-              !department ||
-              !gender ||
-              !role
-            ) {
-              return null; // Skip this row if required fields are missing
-            }
+          // Validate required fields
+          if (
+            !fuId ||
+            !firstName ||
+            !lastName ||
+            !email ||
+            !phoneNumber ||
+            !department ||
+            !gender ||
+            !role
+          ) {
+            errors.push({
+              row: index + 1,
+              message: "Missing required fields.",
+            });
+            return; // Skip this row if required fields are missing
+          }
 
-            // Validate FUID length
-            if (fuId.length > 15) {
-              console.warn("Row has invalid FUID length:", item);
-              return null; // Skip rows with invalid FUID length
-            }
-            // Validate email: only for @fpt.edu.vn or @fe.edu.vn and <= 50 characters
-            if (
-              !email.endsWith("@fpt.edu.vn") &&
-              !email.endsWith("@fe.edu.vn")
-            ) {
-              console.warn("Row has invalid email:", item);
-              return null; // Skip rows with invalid email
-            }
+          // Validate phone number: only digits and 10 characters, starting with 0
+          if (!/^[0-9]{10}$/.test(phoneNumber)) {
+            errors.push({
+              row: index + 1,
+              message: "Invalid phone number.",
+            });
+            return;
+          }
 
-            if (email.length > 50) {
-              console.warn("Row has invalid email length:", item);
-              return null; // Skip rows with invalid email length
-            }
+          // Validate FUID length
+          if (fuId.length > 15) {
+            errors.push({
+              row: index + 1,
+              message: "FUID length exceeds 15 characters.",
+            });
+            return;
+          }
 
-            // lastname <= 50 characters
-            if (lastName.length > 50) {
-              console.warn("Row has invalid last name length:", item);
-              return null; // Skip rows with invalid last name length
-            }
-            // firstname <= 50 characters
-            if (firstName.length > 30) {
-              console.warn("Row has invalid first name length:", item);
-              return null; // Skip rows with invalid first name length
-            }
+          // Validate email: only for @fpt.edu.vn or @fe.edu.vn and <= 50 characters
+          const emailLower = email.toLowerCase();
+          if (
+            !emailLower.endsWith("@fpt.edu.vn") &&
+            !emailLower.endsWith("@fe.edu.vn")
+          ) {
+            errors.push({
+              row: index + 1,
+              message: "Invalid email domain.",
+            });
+            return;
+          }
 
-            // Create user object
-            const userObj = {
-              fuId,
-              firstName,
-              lastName,
-              email,
-              phoneNumber,
-              department,
-              gender: gender == "Male" ? true : false,
-              role: role == "Staff" ? 2 : 3,
-            };
+          if (email.length > 50) {
+            errors.push({
+              row: index + 1,
+              message: "Email length exceeds 50 characters.",
+            });
+            return;
+          }
 
-            return userObj;
-          })
-          .filter((item) => item !== null); // Remove any invalid rows
+          // Validate names lengths
+          if (firstName.length > 30) {
+            errors.push({
+              row: index + 1,
+              message: "First name length exceeds 30 characters.",
+            });
+            return;
+          }
 
-        resolve(usersData);
+          if (lastName.length > 50) {
+            errors.push({
+              row: index + 1,
+              message: "Last name length exceeds 50 characters.",
+            });
+            return;
+          }
+
+          // Create user object for valid rows
+          const userObj = {
+            fuId,
+            firstName,
+            lastName,
+            email,
+            phoneNumber,
+            department,
+            gender: gender.toLowerCase() === "male", // Gender check case-insensitive
+            role: role.toLowerCase() === "staff" ? 2 : 3, // Role check case-insensitive
+          };
+
+          usersData.push(userObj);
+        });
+
+        resolve({ data: usersData, errors }); // Return both data and errors
       } catch (error) {
         reject(new Error("Error processing Excel file: " + error.message));
       }

@@ -51,7 +51,7 @@ export const User_Excel_Template = (
     { header: "Department", key: "department", width: 55 },
   ];
 
-  dataSheet.protect("user_import_key", {
+  dataSheet.protect("abc123@", {
     selectLockedCells: false,
     selectUnlockedCells: false,
   });

@@ -101,7 +101,7 @@ const Exam = () => {
   // Handle subject search in dropdown
   const handleSearch = (value) => {
     const filtered = subjects.filter((subject) =>
-      subject.name.toLowerCase().includes(value.toLowerCase())
+      subject.code.toLowerCase().includes(value.toLowerCase())
     );
     setFilteredSubjects(filtered);
   };
@@ -153,6 +153,7 @@ const Exam = () => {
         await examApi.deleteExam(id);
         message.success("Exam deleted successfully");
         fetchExams(selectedSemester.id); // Reload exams after deletion
+        handleCancel();
       } catch (error) {
         notification.error({ message: DELETE_EXAM_FAILED });
       }
@@ -166,7 +167,7 @@ const Exam = () => {
       setLoadingSubmit(true);
       try {
         const values = await form.validateFields();
-        const subject = subjects.find((sub) => sub.name === values.subjectName);
+        const subject = subjects.find((sub) => sub.code === values.subjectCode);
         values.subjectId = subject.id;
 
         if (isEditing) {
@@ -227,6 +228,8 @@ const Exam = () => {
       key: "examType",
       align: "center",
       render: (examType) => examTypeTag(examType),
+      filters: examType.map((type) => ({ text: type, value: type })), // Filter by exam type
+      onFilter: (value, record) => record.examType === value,
     },
     {
       title: "Duration (minutes)",
@@ -296,7 +299,7 @@ const Exam = () => {
             </Form.Item>
             {/* Subject Field */}
             <Form.Item
-              name="subjectName"
+              name="subjectCode"
               label={<span className="custom-label">Subject</span>}
               rules={[{ required: true, message: "Please select a subject!" }]}
             >
@@ -307,8 +310,8 @@ const Exam = () => {
                 filterOption={false} // Use custom search logic
               >
                 {filteredSubjects.map((subject) => (
-                  <Option key={subject.id} value={subject.name}>
-                    {subject.name}
+                  <Option key={subject.id} value={subject.code}>
+                    {subject.code}
                   </Option>
                 ))}
               </Select>

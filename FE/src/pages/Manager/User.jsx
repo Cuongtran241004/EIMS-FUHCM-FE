@@ -14,7 +14,6 @@ import {
   Col,
   Row,
   Select,
-  Tag,
 } from "antd";
 import {
   UploadOutlined,
@@ -67,6 +66,7 @@ const Users = ({ isLogin }) => {
         // sort by createAt
         return new Date(b.createdAt) - new Date(a.createdAt);
       });
+
       setData(result);
       setFilteredData(result); // Initialize filteredData with all users
     } catch (error) {
@@ -173,7 +173,27 @@ const Users = ({ isLogin }) => {
   const handleFileUpload = async ({ file }) => {
     setFileLoading(true);
     try {
-      const data = await User_Import_Excel(file);
+      const { data, errors } = await User_Import_Excel(file);
+
+      if (errors.length > 0) {
+        // Display errors in a Modal
+        Modal.error({
+          title: "Failed to import users",
+          content: (
+            <div>
+              <p>There were issues with the Excel file:</p>
+              <ul>
+                {errors.map((err, index) => (
+                  <li key={index}>
+                    Row {err.row}: {err.message}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ),
+        });
+        return;
+      }
 
       // Send transformed data to backend
       await userApi.addMultipleUsers(data);
@@ -181,7 +201,6 @@ const Users = ({ isLogin }) => {
       message.success("Users imported successfully!");
       fetchData(); // Refresh data after import
     } catch (error) {
-      console.error("Import error:", error);
       message.error(IMPORT_USERS_FAILED);
     } finally {
       setFileLoading(false);
@@ -340,7 +359,6 @@ const Users = ({ isLogin }) => {
                 label="Email"
                 rules={[
                   { required: true, message: "Please input email!" },
-                  { type: "email", message: "Please enter a valid email!" },
                   {
                     pattern: /^[\w.-]+@(fpt\.edu\.vn|fe\.edu\.vn)$/,
                     message: "Email must be @fpt.edu.vn or @fe.edu.vn",
