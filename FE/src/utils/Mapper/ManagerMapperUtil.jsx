@@ -137,9 +137,9 @@ const managerMapperUtil = {
             subjectCode: detail.examSlot?.subjectExam?.subjectId?.code,
             subjectName: detail.examSlot?.subjectExam?.subjectId?.name,
             examType: detail.examSlot?.subjectExam?.examType,
-            staffId: detail.examSlot?.updatedBy?.fuId,
-            staffFirstName: detail.examSlot?.updatedBy?.firstName,
-            staffLastName: detail.examSlot?.updatedBy?.lastName,
+            staffId: detail.examSlot?.updatedBy?.fuId || "-",
+            staffFirstName: detail.examSlot?.updatedBy?.firstName || "-",
+            staffLastName: detail.examSlot?.updatedBy?.lastName || "-",
             date: moment(detail.startAt).format("DD/MM/YYYY"),
             startAt: moment(detail.startAt).format("HH:mm"),
             endAt: moment(detail.endAt).format("HH:mm"),
@@ -157,7 +157,7 @@ const managerMapperUtil = {
         totalSlots: item.totalExamSlots,
         totalHours: item.totalHours,
         hourlyRate: item.hourlyRate,
-        fee: item.preCalculatedInvigilatorFree ,
+        fee: item.preCalculatedInvigilatorFree,
         detail: attendance,
       };
     });
