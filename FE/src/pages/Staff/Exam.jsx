@@ -264,7 +264,6 @@ const Exam = () => {
 
   return (
     <Layout style={{ height: "100vh" }}>
-      <Header />
       <Layout>
         {/* Sider for Form */}
         <Sider

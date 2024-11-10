@@ -434,7 +434,6 @@ const Exam_Schedule = () => {
 
   return (
     <Layout style={{ height: "100vh" }}>
-      <Header />
       <Layout>
         <Sider
           width={300}
