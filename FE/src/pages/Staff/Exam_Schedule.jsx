@@ -176,7 +176,7 @@ const Exam_Schedule = () => {
   const handleExamSearch = (value) => {
     if (value) {
       const filtered = exams.filter((exam) =>
-        exam.subjectName.toLowerCase().includes(value.toLowerCase())
+        exam.subjectCode.toLowerCase().includes(value.toLowerCase())
       );
       setFilteredExams(filtered);
     } else {
