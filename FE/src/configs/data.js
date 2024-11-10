@@ -1,4 +1,4 @@
-const examType = ["PE", "FE", "PE&TE"];
+const examType = ["PE", "FE", "PE&TE", "RE"];
 
 const departments = [
   "Chinese",

@@ -34,7 +34,7 @@ const RoomSelectionPage = () => {
   const { examSlotId } = useParams();
   const [rooms, setRooms] = useState([]);
   const [selectedRooms, setSelectedRooms] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [examSlot, setExamSlot] = useState(null);
   const [groupedRooms, setGroupedRooms] = useState([]);
   const [unavailableRooms, setUnavailableRooms] = useState([]);
@@ -64,11 +64,14 @@ const RoomSelectionPage = () => {
 
   // Fetch all rooms
   const fetchRooms = async () => {
+    setLoading(true);
     try {
       const response = await roomApi.getAllRooms();
       setRooms(response || []);
     } catch (error) {
       message.error("Failed to fetch rooms");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -82,6 +85,10 @@ const RoomSelectionPage = () => {
         setSelectedRooms(response.flat()); // Flatten the response array
         setGroupedRooms(response); // Directly set grouped rooms
       }
+      setChoosenRooms(response.flat().length);
+      setTotalCapacity(
+        response.flat().reduce((acc, room) => acc + room.capacity, 0)
+      );
     } catch (error) {
       message.error("Failed to fetch using room");
     }
@@ -118,15 +125,11 @@ const RoomSelectionPage = () => {
 
   // Sequentially fetch exam slot, rooms, using rooms, and unavailable rooms
   useEffect(() => {
-    setLoading(true);
     try {
       fetchExamSlot();
       fetchRooms();
       fetchUsingRoom();
-    } catch (error) {
-    } finally {
-      setLoading(false);
-    }
+    } catch (error) {}
   }, [examSlotId]);
 
   useEffect(() => {
@@ -280,8 +283,10 @@ const RoomSelectionPage = () => {
   const handleCancel = () => {
     setSelectedRooms(usingRoom.flat());
     setGroupedRooms(usingRoom);
-    setChoosenRooms(0);
-    setTotalCapacity(0);
+    setChoosenRooms(usingRoom.flat().length);
+    setTotalCapacity(
+      usingRoom.flat().reduce((acc, room) => acc + room.capacity, 0)
+    );
   };
 
   const isAvailable = () => {
@@ -322,61 +327,56 @@ const RoomSelectionPage = () => {
                 {moment(examSlot?.endAt).format("HH:mm")})
               </Tag>
             </h2>
-
             <Spin spinning={loading}>
-              {Object.keys(groupedRoomsByFloor).length === 0 ? (
-                <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
-              ) : (
-                Object.keys(groupedRoomsByFloor).map((floor) => (
-                  <div key={floor}>
-                    <div
+              {Object.keys(groupedRoomsByFloor).map((floor) => (
+                <div key={floor}>
+                  <div
+                    style={{
+                      display: "flex",
+                      flexWrap: "wrap",
+                      gap: "8px",
+                      margin: "5px",
+                    }}
+                  >
+                    <Divider
+                      variant="dashed"
                       style={{
-                        display: "flex",
-                        flexWrap: "wrap",
-                        gap: "8px",
-                        margin: "5px",
+                        borderColor: "#F9844A",
+                        margin: "10px",
                       }}
-                    >
-                      <Divider
-                        variant="dashed"
+                    ></Divider>
+                    {groupedRoomsByFloor[floor].map((room) => (
+                      <Button
+                        key={room.id}
+                        size="small"
+                        onClick={() => handleRoomSelect(room)}
+                        disabled={unavailableRooms.some(
+                          // Disable if room is unavailable
+                          (unavailableRoom) => unavailableRoom == room.id
+                        )}
                         style={{
-                          borderColor: "#F9844A",
-                          margin: "10px",
+                          width: "calc(10% - 8px)",
+                          backgroundColor: selectedRooms.some(
+                            (selectedRoom) => selectedRoom.id === room.id
+                          )
+                            ? "#4D908E"
+                            : "",
+                          color: selectedRooms.some(
+                            (selectedRoom) => selectedRoom.id === room.id
+                          )
+                            ? "white"
+                            : "",
                         }}
-                      ></Divider>
-                      {groupedRoomsByFloor[floor].map((room) => (
-                        <Button
-                          key={room.id}
-                          size="small"
-                          onClick={() => handleRoomSelect(room)}
-                          disabled={unavailableRooms.some(
-                            // Disable if room is unavailable
-                            (unavailableRoom) => unavailableRoom == room.id
-                          )}
-                          style={{
-                            width: "calc(10% - 8px)",
-                            backgroundColor: selectedRooms.some(
-                              (selectedRoom) => selectedRoom.id === room.id
-                            )
-                              ? "#4D908E"
-                              : "",
-                            color: selectedRooms.some(
-                              (selectedRoom) => selectedRoom.id === room.id
-                            )
-                              ? "white"
-                              : "",
-                          }}
-                        >
-                          <strong style={{ color: "#F9C74F" }}>
-                            {room.roomName}
-                          </strong>{" "}
-                          | {room.capacity}
-                        </Button>
-                      ))}
-                    </div>
+                      >
+                        <strong style={{ color: "#F9C74F" }}>
+                          {room.roomName}
+                        </strong>{" "}
+                        | {room.capacity}
+                      </Button>
+                    ))}
                   </div>
-                ))
-              )}
+                </div>
+              ))}
             </Spin>
           </Col>
 
