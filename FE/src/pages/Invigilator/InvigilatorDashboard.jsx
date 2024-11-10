@@ -164,9 +164,9 @@ function InvigilatorDashboard() {
             <p style={{ textAlign: 'center', fontSize: 20, fontWeight: 'bold' }}>Invigilation Summary</p>
             <table className="table-assign" style={{ textAlign: 'left', fontSize: 13, marginLeft: 30 }}>
               <tbody>
-                <tr><th>Hours of invigilation completed:</th><td><span style={{ color: 'green' }}>{assignedSlotDetail.totalInvigilatedHours}</span> Hour(s)</td></tr>
-                <tr><th>Hours of invigilation remaining:</th><td><span style={{ color: 'orange' }}>{assignedSlotDetail.totalRequiredInvigilationHours}</span> Hour(s)</td></tr>
-                <tr><th>Total hours of invigilation:</th><td><span>{assignedSlotDetail.totalAssignedHours}</span> Hour(s)</td></tr>
+                <tr><th>Hours of invigilation completed:</th><td><span style={{ color: 'green' }}>{Math.round(assignedSlotDetail.totalInvigilatedHours * 100) / 100}</span> Hour(s)</td></tr>
+                <tr><th>Hours of invigilation remaining:</th><td><span style={{ color: 'orange' }}>{Math.round(assignedSlotDetail.totalRequiredInvigilationHours * 100) / 100}</span> Hour(s)</td></tr>
+                <tr><th>Total hours of invigilation:</th><td><span>{Math.round(assignedSlotDetail.totalAssignedHours * 100) / 100}</span> Hour(s)</td></tr>
                 <tr><th>Invigilation slots completed:</th><td><span style={{ color: 'green' }}>{assignedSlotDetail.totalInvigilatedSlots}</span> Slot(s)</td></tr>
                 <tr><th>Invigilation slots remaining:</th><td><span style={{ color: 'orange' }}>{assignedSlotDetail.totalRequiredInvigilationSlots}</span> Slot(s)</td></tr>
                 <tr><th>Slots not attended:</th><td><span style={{ color: 'red' }}>{assignedSlotDetail.totalNonInvigilatedSlots}</span> Slot(s)</td></tr>
