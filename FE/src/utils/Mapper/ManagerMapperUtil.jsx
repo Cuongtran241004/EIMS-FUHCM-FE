@@ -100,8 +100,8 @@ const managerMapperUtil = {
         subjectName: examSlot.subjectExamDTO?.subjectName,
         subjectCode: examSlot.subjectExamDTO?.subjectCode,
         status: examSlot.status,
-        updatedByLastName: examSlot.updatedByLastName,
-        updatedByFirstName: examSlot.updatedByFirstName,
+        updatedByLastName: examSlot.updatedByLastName || "-",
+        updatedByFirstName: examSlot.updatedByFirstName || "-",
       };
     });
   },
