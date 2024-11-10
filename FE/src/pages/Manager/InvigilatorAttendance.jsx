@@ -154,21 +154,7 @@ const InvigilatorAttendance = () => {
         return `${record.startAt} - ${record.endAt}`;
       },
     },
-    {
-      title: "Staff ID",
-      dataIndex: "staffId",
-      key: "staffId",
-      align: "center",
-    },
-    {
-      title: "Staff Name",
-      dataIndex: "staffName",
-      key: "staffName",
-      align: "center",
-      render: (text, record) => {
-        return `${record.staffLastName} ${record.staffFirstName}`;
-      },
-    },
+   
   ];
   return (
     <Layout style={{ height: "100vh" }}>
