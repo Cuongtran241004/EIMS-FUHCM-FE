@@ -182,7 +182,6 @@ const Subject = () => {
 
   return (
     <Layout style={{ height: "100vh" }}>
-      <Header />
       <Layout>
         <Sider
           width={300}

@@ -228,7 +228,6 @@ const AssignmentInvigilator = () => {
 
   return (
     <Layout style={{ height: "100vh" }}>
-      <Header />
       <Layout style={{ backgroundColor: "#fff" }}>
         <Spin spinning={loading}>
           <Content style={{ padding: "0 50px" }}>

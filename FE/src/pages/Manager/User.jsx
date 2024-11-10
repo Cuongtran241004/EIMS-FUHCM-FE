@@ -190,7 +190,6 @@ const Users = ({ isLogin }) => {
 
   return (
     <Layout style={{ height: "100vh" }}>
-      <Header />
       <Layout>
         <Sider width={256} style={{ backgroundColor: "#4D908E" }}>
           <NavBar_Manager isLogin={isLogin} />
