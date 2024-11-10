@@ -246,14 +246,7 @@ const AttendanceCheck = () => {
         </Button>
       ),
     },
-    {
-      title: "Check Attendance By",
-      dataIndex: "checkAttendanceBy",
-      key: "checkAttendanceBy",
-      align: "center",
-      render: (text, record) =>
-        `${record.updatedByLastName} ${record.updatedByFirstName}`,
-    },
+   
 
     {
       title: "Action",
