@@ -346,11 +346,11 @@ const Request = () => {
           };
 
           await requestApi.updateRequestStatus(requestData);
-          message.success("Request rejected successfully");
+          message.success("Request approved successfully");
           // Optionally refetch the updated requests
           fetchData(selectedSemester.id);
         } catch (error) {
-          message.error("Failed to reject the request");
+          message.error("Failed to approve the request");
         } finally {
           setDetailLoading((prev) => ({ ...prev, [record.requestId]: false }));
         }
