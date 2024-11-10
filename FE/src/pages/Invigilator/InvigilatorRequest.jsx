@@ -63,10 +63,8 @@ function InvigilatorRequest() {
   }, []);
 
   useEffect(() => {
-    if (requestType.requestTypes.length > 0) {
-      setRequestFlag(requestType.requestTypes[0]);
-    }
-  }, [requestType]);
+    form.resetFields(['examSlot']);
+  }, [requestFlag]);
 
   return (
     <div>
@@ -116,12 +114,9 @@ function InvigilatorRequest() {
               <Select placeholder="Select Exam Slot">
                 {examSlots.map((slot) => {
                   const currentDate = moment();
-                  const openAt = moment(slot.startAt).subtract(
-                    getConfigValue(ConfigType.TIME_BEFORE_CLOSE_REQUEST),
-                    "days"
-                  );
+                  const openAt = moment(slot.startAt).subtract(parseInt(getConfigValue(ConfigType.TIME_BEFORE_CLOSE_REQUEST), 10), 'days');
                   const endAt = moment(slot.startAt);
-                  if (currentDate.isAfter(openAt) && requestFlag == "UPDATE_ATTENDANCE") {
+                  if (currentDate.isSameOrAfter(endAt.startOf('day')) && requestFlag == "UPDATE_ATTENDANCE") {
                     return (
                       <Option key={slot.examSlotId} value={slot.examSlotId}>
                         {moment(slot.startAt).format("DD/MM/YYYY")} |{" "}
@@ -130,7 +125,7 @@ function InvigilatorRequest() {
                       </Option>
                     );
                   }
-                  if (currentDate.isBefore(endAt) && currentDate.isAfter(openAt) && requestFlag == "CANCEL") {
+                  if (currentDate.isBetween(openAt.startOf('day'), endAt.startOf('day'), null, '[)') && requestFlag === "CANCEL") {
                     return (
                       <Option key={slot.examSlotId} value={slot.examSlotId}>
                         {moment(slot.startAt).format("DD/MM/YYYY")} |{" "}
