@@ -155,11 +155,9 @@ const managerMapperUtil = {
         email: item.email,
         phone: item.phoneNum,
         totalSlots: item.totalExamSlots,
-        // round to 2 decimal places
-        totalHours: Math.round(item.totalHours * 100) / 100,
+        totalHours: item.totalHours,
         hourlyRate: item.hourlyRate,
-        // round to neareast thousand
-        fee: Math.round(item.fee / 1000) * 1000,
+        fee: item.preCalculatedInvigilatorFree ,
         detail: attendance,
       };
     });
