@@ -162,15 +162,15 @@ function App() {
 
   return (
     <div className="container">
-      {role === 1? (
+      {role === 1 ? (
         <>
-        <Header />
-        <SemesterProviderManager> {renderRoutes()}</SemesterProviderManager>
+          <Header />
+          <SemesterProviderManager> {renderRoutes()}</SemesterProviderManager>
         </>
-      ) : role === 2? (
+      ) : role === 2 ? (
         <>
-        <Header />
-        <SemesterProviderStaff>{renderRoutes()}</SemesterProviderStaff>
+          <Header />
+          <SemesterProviderStaff>{renderRoutes()}</SemesterProviderStaff>
         </>
       ) : (
         <>

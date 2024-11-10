@@ -13,7 +13,7 @@ const headerConfig = {
   1: [
     {
       name: "Dashboard",
-      path: MANAGER_DASHBOARD_URL,
+      path: "/" || MANAGER_DASHBOARD_URL,
     },
     { name: "Request", path: MANAGER_REQUESTS_URL },
   ],
