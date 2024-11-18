@@ -10,12 +10,7 @@ import moment from "moment";
 import { examScheduleTag, examTypeTag, userRoleTag } from "./CustomTag.jsx";
 import { roleOptions } from "../configs/data.js";
 
-const examScheduleTable = (
-  handleRoomClick,
-  handleAssignmentClick,
-  handleEdit,
-  handleDelete
-) => [
+const examScheduleTable = (handleRoomClick, handleEdit, handleDelete) => [
   {
     title: "Code",
     dataIndex: "subjectCode",
