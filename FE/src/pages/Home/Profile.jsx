@@ -182,7 +182,7 @@ const ProfilePage = ({ user }) => {
         <Form.Item>
           <Button
             danger
-            onClick={() => navigate(MANAGER_DASHBOARD_URL)}
+            onClick={() => navigate("/")}
             style={{ marginRight: 10, borderRadius: "4px" }}
           >
             <BackwardOutlined />
