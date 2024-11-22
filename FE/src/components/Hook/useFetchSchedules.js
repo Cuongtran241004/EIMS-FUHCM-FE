@@ -10,8 +10,7 @@ export function useFetchSchedules(selectedSemester, reloadSlots) {
     const fetchSchedules = async () => {
       try {
         const response = await schedules(selectedSemester);
-        const examSlotDetailSet =
-          response;
+        const examSlotDetailSet = response;
         const mappedEvents = examSlotDetailSet.map((slot) => ({
           examSlotId: slot.examSlotId,
           startAt: new Date(slot.startAt),

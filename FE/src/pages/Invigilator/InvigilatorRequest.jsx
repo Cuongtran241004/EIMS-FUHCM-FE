@@ -5,6 +5,7 @@ import { postRequest } from "../../components/API/postRequest";
 import moment from "moment";
 import { ConfigType } from "../../configs/enum";
 import { titleStyle } from "../../design-systems/CSS/Title";
+import "./InvigilatorRequest.css"
 const { Option } = Select;
 
 function InvigilatorRequest() {
@@ -25,9 +26,11 @@ function InvigilatorRequest() {
         fuId: id,
         examSlotId: examSlot,
         reason,
+        requestType: values.requestType,
       };
       try {
         const success = await postRequest(requestPayload);
+      
         if (success) {
           message.success("Request submitted successfully");
           form.resetFields();
@@ -42,6 +45,11 @@ function InvigilatorRequest() {
       message.error("Error submitting the request");
     }
   };
+  const requestType = {
+    requestType: ["Change", "Swap", "Drop"],
+  };//call API to get request type
+ 
+    
 
   return (
     <div>
@@ -52,7 +60,7 @@ function InvigilatorRequest() {
           paddingTop: 10,
         }}
       >
-        <h2 style={{ textAlign: "center", ...titleStyle }}>CANCEL REQUEST </h2>
+        <h2 style={{ textAlign: "center", ...titleStyle }}>REQUEST </h2>
         {loadingSemesters || loadingSchedules ? (
           <div>Loading...</div>
         ) : (
@@ -62,6 +70,22 @@ function InvigilatorRequest() {
             onFinish={onFinish}
             style={{ width: "90%", margin: "auto" }}
           >
+            <Form.Item 
+              label= "Request type"
+              name = "requestType"
+              rules = {[
+                { required: true, message: "Please select a request type" },
+              ]}
+              >
+              <Select placeholder="Select Request Type">
+                {requestType.requestType.map((type) => (
+                  <Option key={type} value={type}>
+                    {type}
+                  </Option>
+                ))}
+              </Select>
+              </Form.Item>
+
             <Form.Item
               label="Exam slot"
               name="examSlot"

@@ -6,6 +6,7 @@ import moment from "moment";
 import { useInviReport } from "./Hook/useInviReport";
 import { useFetchSchedules } from "./Hook/useFetchSchedules";
 import { useInviAttendance } from "./Hook/useInviAttendance";
+import { useRegisterSlots } from "./Hook/useRegisterSlots";
 
 
 const SemesterContext = createContext();
@@ -23,8 +24,10 @@ export const SemesterProviderInvigilator = ({ children }) => {
     selectedSemester?.id, reloadSlots);
   const { examSlotDetail, loading: loadingSchedules } = useFetchSchedules(
     selectedSemester?.id, reloadSlots);
-    const {attendance, loading: loadingAttendance} = useInviAttendance(
+  const {attendance, loading: loadingAttendance} = useInviAttendance(
       selectedSemester?.id, reloadSlots);
+  const {examSlotRegister, loading: loadingExamSlotRegister} = useRegisterSlots(
+    selectedSemester?.id, reloadSlots);
 
   const { semesterConfig, getConfigValue } = useSemesterConfig(lastestSemester?.id);
 
@@ -83,6 +86,7 @@ export const SemesterProviderInvigilator = ({ children }) => {
         examSlotApproved,
         inviFee,
         attendance,
+        examSlotRegister,
       }}
     >
       {children}

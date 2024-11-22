@@ -34,7 +34,7 @@ function InvigilatorRegistration() {
     semesters = [],
     selectedSemester,
     setSelectedSemester,
-    examSlotDetail,
+    examSlotRegister,
     availableSlotsData,
     reloadAvailableSlots,
     lastestSemester,
@@ -54,7 +54,7 @@ function InvigilatorRegistration() {
   if (selectedSemester != lastestSemester) {
     setSelectedSemester(lastestSemester);
   }
-
+  
   const fetchAndSetData = async () => {
     try {
       setLoading(true);
@@ -66,7 +66,6 @@ function InvigilatorRegistration() {
       message.error("Error fetching data.");
     }
   };
-
   useEffect(() => {
     if (lastestSemester && availableSlotsData) {
       setSlots({ ...slots, examSlotId: [] });
@@ -74,6 +73,7 @@ function InvigilatorRegistration() {
       fetchAndSetData();
     }
   }, [lastestSemester, availableSlotsData]);
+
 
   const handleSelectEvent = (event) => {
     const { examSlotId, status, startAt } = event;
@@ -94,6 +94,7 @@ function InvigilatorRegistration() {
       });
       return;
     }
+    console.log("examSlotRegister", examSlotRegister);
 
     if (status === "REGISTERED" || status === "FULL") {
       return;
@@ -105,7 +106,7 @@ function InvigilatorRegistration() {
       setSelectedSlots(updatedSelectedSlots);
       setSlots({ ...slots, examSlotId: updatedSelectedSlots });
     } else {
-      if (examSlotDetail.length + selectedSlots.length < allowedSlots) {
+      if (examSlotRegister.length + selectedSlots.length < allowedSlots) {
         const updatedSelectedSlots = [...selectedSlots, examSlotId];
         setSelectedSlots(updatedSelectedSlots);
         setSlots({ ...slots, examSlotId: updatedSelectedSlots });
@@ -166,7 +167,7 @@ function InvigilatorRegistration() {
 
   const handleSelectAll = (checked) => {
     if (checked) {
-      const allSlotIds = examSlotDetail.map((slot) => slot.examSlotId);
+      const allSlotIds = examSlotRegister.map((slot) => slot.examSlotId);
       setSelectedCancelSlots(allSlotIds);
     } else {
       setSelectedCancelSlots([]);
@@ -342,7 +343,7 @@ function InvigilatorRegistration() {
               Cancel Slots
             </Button>
             <p>
-              Registered Slots: {examSlotDetail.length} /{" "}
+              Registered Slots: {examSlotRegister.length} /{" "}
               <span style={{ color: "red" }}>{allowedSlots}</span>
             </p>
             <p>Selected Slots: {selectedSlots.length}</p>
@@ -398,11 +399,11 @@ function InvigilatorRegistration() {
               checked={isAllSelected}
             />
           </div>
-          {examSlotDetail.length === 0 ? (
+          {examSlotRegister.length === 0 ? (
             <p>No registered slots available to cancel.</p>
           ) : (
             <div>
-              {examSlotDetail.map((slot) => {
+              {examSlotRegister.map((slot) => {
                 const currentDate = moment();
                 const openAt = moment(slot.startAt).subtract(
                   getConfigValue(ConfigType.TIME_BEFORE_OPEN_REGISTRATION),
@@ -442,7 +443,7 @@ function InvigilatorRegistration() {
                   </div>
                 ) : null;
               })}
-              {examSlotDetail.every((slot) => {
+              {examSlotRegister.every((slot) => {
                 const currentDate = moment();
                 const openAt = moment(slot.startAt).subtract(
                   getConfigValue(ConfigType.TIME_BEFORE_OPEN_REGISTRATION),
