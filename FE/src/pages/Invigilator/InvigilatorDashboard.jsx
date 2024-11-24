@@ -20,6 +20,8 @@ function InvigilatorDashboard() {
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [view, setView] = useState('month');
 
+  console.log("examSlotDetail", examSlotDetail);
+
   const handleMenuClick = (e) => {
     const selected = semesters.find(
       (semester) => semester.id === parseInt(e.key)

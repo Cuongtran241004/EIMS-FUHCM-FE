@@ -1,11 +1,13 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Form, Input, Button, Select, message } from "antd";
 import { useSemester } from "../../components/SemesterContext";
 import { postRequest } from "../../components/API/postRequest";
 import moment from "moment";
 import { ConfigType } from "../../configs/enum";
 import { titleStyle } from "../../design-systems/CSS/Title";
-import "./InvigilatorRequest.css"
+import "./InvigilatorRequest.css";
+import { getRequestType } from "../../components/API/getRequestType";
+
 const { Option } = Select;
 
 function InvigilatorRequest() {
@@ -18,6 +20,7 @@ function InvigilatorRequest() {
 
   const [form] = Form.useForm();
   const id = localStorage.getItem("id") || "";
+  const [requestType, setRequestType] = useState({ requestTypes: [] }); 
 
   const onFinish = async (values) => {
     try {
@@ -30,7 +33,6 @@ function InvigilatorRequest() {
       };
       try {
         const success = await postRequest(requestPayload);
-      
         if (success) {
           message.success("Request submitted successfully");
           form.resetFields();
@@ -45,11 +47,19 @@ function InvigilatorRequest() {
       message.error("Error submitting the request");
     }
   };
-  const requestType = {
-    requestType: ["Change", "Swap", "Drop"],
-  };//call API to get request type
- 
-    
+
+  useEffect(() => {
+    const fetchRequestType = async () => {
+      try {
+        const response = await getRequestType();
+          setRequestType(response); 
+      } catch (e) {
+        console.error("requestType Error: ", e.message);
+        message.error("Error fetching request type.");
+      }
+    };
+    fetchRequestType();
+  }, []);
 
   return (
     <div>
@@ -60,7 +70,7 @@ function InvigilatorRequest() {
           paddingTop: 10,
         }}
       >
-        <h2 style={{ textAlign: "center", ...titleStyle }}>REQUEST </h2>
+        <h2 style={{ textAlign: "center", ...titleStyle }}>REQUEST</h2>
         {loadingSemesters || loadingSchedules ? (
           <div>Loading...</div>
         ) : (
@@ -70,21 +80,23 @@ function InvigilatorRequest() {
             onFinish={onFinish}
             style={{ width: "90%", margin: "auto" }}
           >
-            <Form.Item 
-              label= "Request type"
-              name = "requestType"
-              rules = {[
+            <Form.Item
+              label="Request type"
+              name="requestType"
+              rules={[
                 { required: true, message: "Please select a request type" },
               ]}
-              >
+            >
               <Select placeholder="Select Request Type">
-                {requestType.requestType.map((type) => (
-                  <Option key={type} value={type}>
-                    {type}
-                  </Option>
-                ))}
+                {
+                  requestType.requestTypes.map((type) => (
+                    <Option key={type} value={type}>
+                      {type}
+                    </Option>
+                  ))
+                }
               </Select>
-              </Form.Item>
+            </Form.Item>
 
             <Form.Item
               label="Exam slot"
@@ -110,6 +122,7 @@ function InvigilatorRequest() {
                       </Option>
                     );
                   }
+                  return null; 
                 })}
               </Select>
             </Form.Item>
