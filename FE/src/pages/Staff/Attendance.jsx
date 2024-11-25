@@ -36,8 +36,9 @@ import dayjs from "dayjs"; // Import dayjs
 import attendanceApi from "../../services/InvigilatorAttendance.js";
 import { examTypeTag } from "../../design-systems/CustomTag.jsx";
 import {
-  checkInNotification,
-  checkOutNotification,
+  checkInNotificationEnd,
+  checkInNotificationStart,
+  checkOutNotificationEnd,
 } from "../../design-systems/CustomNotification.jsx";
 const Attendance = () => {
   const [data, setData] = useState([]);
@@ -51,6 +52,7 @@ const Attendance = () => {
     setSelectedSemester,
     semesters,
     availableSemesters,
+    configSemester,
   } = useSemester(); // Access shared semester state
   const [form] = Form.useForm();
   const [availableAttendance, setAvailableAttendance] = useState([]);
@@ -131,15 +133,28 @@ const Attendance = () => {
   // };
 
   const handleCheckIn = async (examSlotId) => {
-    console.log("examSlotId", examSlotId);
+    console.log("config", configSemester);
     setLoading(true);
     setIsCheckIn(true);
     try {
       const examSlot = await examSlotApi.getExamSlotById(examSlotId);
       // check-in time is 30 minutes before the exam start time
-      const checkInTime = moment(examSlot.startAt).subtract(30, "minutes");
+
+      const beforeCheckinTime = configSemester.find((item) => {
+        return item.configType === "check_in_time_before_exam_slot";
+      });
+
+      const checkInTime = moment(examSlot.startAt).subtract(
+        beforeCheckinTime.value,
+        "minutes"
+      );
       if (moment().isBefore(checkInTime)) {
-        checkInNotification();
+        checkInNotificationStart(beforeCheckinTime.value);
+        return;
+      }
+      // notification when moment is later then examSlot.endAt
+      if (moment().isAfter(examSlot.endAt)) {
+        checkInNotificationEnd();
         return;
       }
       setModalVisible(true);
@@ -166,13 +181,26 @@ const Attendance = () => {
     setLoading(true);
     setIsCheckIn(false);
     try {
+      const afterCheckoutTime = configSemester.find((item) => {
+        return item.configType === "check_in_time_before_exam_slot";
+      });
       const examSlot = await examSlotApi.getExamSlotById(examSlotId);
+      const checkOutTimeEnd = moment(examSlot.endAt).add(
+        afterCheckoutTime.value,
+        "minutes"
+      );
+
       // check-out time is after the exam end time
       const checkOutTime = moment(examSlot.endAt);
       if (moment().isBefore(checkOutTime)) {
-        checkOutNotification();
+        checkInNotificationStart();
         return;
       }
+      if (moment().isAfter(checkOutTimeEnd)) {
+        checkOutNotificationEnd(afterCheckoutTime.value);
+        return;
+      }
+
       setModalVisible(true);
       // Assign invigilators
       const response =

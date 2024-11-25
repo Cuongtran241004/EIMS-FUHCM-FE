@@ -6,6 +6,7 @@ import attendanceApi from "../../services/InvigilatorAttendance.js";
 import moment from "moment";
 import configApi from "../../services/Config.js";
 import requestApi from "../../services/Request.js";
+import { managerMapperUtil } from "../../utils/Mapper/ManagerMapperUtil.jsx";
 // Create a context for the semester
 const SemesterContext = createContext();
 
@@ -16,7 +17,7 @@ export const SemesterProvider = ({ children }) => {
     id: null,
     name: "Select semester",
   });
-
+  const [configSemester, setConfigSemester] = useState([]);
   const [availableSemesters, setAvailableSemesters] = useState([]);
   const [examSlotBySemester, setExamSlotBySemester] = useState([]);
   const [requestTypes, setRequestTypes] = useState([]);
@@ -65,6 +66,7 @@ export const SemesterProvider = ({ children }) => {
       message.error("Failed to fetch request types");
     }
   };
+
   const addTodayAttendance = async () => {
     try {
       // Add today attendance, params is today (YYYY-MM-DD)
@@ -82,7 +84,12 @@ export const SemesterProvider = ({ children }) => {
           const result = await examSlotApi.getExamSlotBySemesterId(
             selectedSemester.id
           );
+          const resconfig = await configApi.getAllConfigsBySemesterId(
+            selectedSemester.id
+          );
+
           setExamSlotBySemester(result);
+          setConfigSemester(resconfig);
         } catch (error) {
           message.error("Failed to fetch exam slots");
         }
@@ -108,6 +115,7 @@ export const SemesterProvider = ({ children }) => {
         loading,
         examSlotBySemester,
         requestTypes,
+        configSemester,
       }} // Expose loading state
     >
       {children}

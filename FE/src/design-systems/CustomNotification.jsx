@@ -16,20 +16,30 @@ const deleteNotification = () => {
   });
 };
 
-const checkInNotification = () => {
+const checkInNotificationStart = (time) => {
   notification.info({
     type: "info",
-    message: "You can only check-in 30 minutes before the exam starts",
+    message: `You can only check-in ${time} minutes before the exam starts`,
   });
 };
-
-const checkOutNotification = () => {
+const checkInNotificationEnd = () => {
+  notification.info({
+    type: "info",
+    message: `You can only check-in before the exam ends`,
+  });
+};
+const checkOutNotificationStart = () => {
   notification.info({
     type: "info",
     message: "You can only check-out after the exam ends",
   });
 };
-
+const checkOutNotificationEnd = (time) => {
+  notification.info({
+    type: "info",
+    message: `You can only check-out ${time} minutes after the exam ends`,
+  });
+};
 const assignmentNotification = () => {
   notification.info({
     message: "Information",
@@ -46,8 +56,10 @@ const requestNotification = () => {
 export {
   editNotification,
   deleteNotification,
-  checkInNotification,
-  checkOutNotification,
+  checkInNotificationStart,
+  checkInNotificationEnd,
+  checkOutNotificationStart,
+  checkOutNotificationEnd,
   assignmentNotification,
   requestNotification,
 };
